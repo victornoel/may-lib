@@ -2,12 +2,14 @@
 import java.lang.String
 import fr.irit.smac.may.lib.interfaces.*
 import java.util.concurrent.Executor
+import java.util.Collection
 
 namespace fr.irit.smac.may.lib.components {
 
 	component Queue[Truc] {
 		provides put: Push[Truc]
 		provides get: Pull[Truc]
+		provides getAll: Pull[Collection[Truc]]
 	}
 	
 	component SequentialDispatcher[Truc] {
@@ -20,7 +22,7 @@ namespace fr.irit.smac.may.lib.components {
 		requires handler: Push[Truc]
 	}
 	
-		transverse ReferenceSender[MsgType, Ref] {
+	transverse ReferenceSender[MsgType, Ref] {
 		agent {
 			provides send: Send[MsgType, Ref]
 		}

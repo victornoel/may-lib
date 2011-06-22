@@ -171,6 +171,7 @@ public abstract class RemoteClassic<Msg> {
 
 	public static final class Component<Msg> {
 
+		@SuppressWarnings("unused")
 		private final Bridge<Msg> bridge;
 
 		private final RemoteClassic<Msg> implementation;
@@ -530,4 +531,11 @@ public abstract class RemoteClassic<Msg> {
 	 */
 	protected void start() {
 	}
+
+	public static final <Msg> Component<Msg> createComponent(
+			RemoteClassic<Msg> _compo) {
+		return new Component<Msg>(_compo, new Bridge<Msg>() {
+		});
+	}
+
 }

@@ -128,4 +128,5 @@ public abstract class SequentialDispatcher<Truc> {
 	 */
 	protected void start() {
 	}
+
 }

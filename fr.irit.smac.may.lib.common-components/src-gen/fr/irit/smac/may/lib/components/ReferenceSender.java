@@ -68,6 +68,7 @@ public abstract class ReferenceSender<MsgType, Ref> {
 
 		public static final class Component<MsgType, Ref> {
 
+			@SuppressWarnings("unused")
 			private final Bridge<MsgType, Ref> bridge;
 
 			private final Agent<MsgType, Ref> implementation;

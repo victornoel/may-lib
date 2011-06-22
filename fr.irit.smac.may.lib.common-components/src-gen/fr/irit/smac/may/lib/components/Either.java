@@ -100,4 +100,5 @@ public abstract class Either<L, R> {
 	 */
 	protected void start() {
 	}
+
 }

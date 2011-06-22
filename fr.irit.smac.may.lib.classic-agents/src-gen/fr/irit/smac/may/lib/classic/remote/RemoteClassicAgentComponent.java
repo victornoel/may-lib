@@ -241,4 +241,5 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 */
 	protected void start() {
 	}
+
 }

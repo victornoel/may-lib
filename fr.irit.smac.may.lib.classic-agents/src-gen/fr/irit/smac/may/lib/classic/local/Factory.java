@@ -68,6 +68,7 @@ public abstract class Factory<Msg, Ref> {
 
 		public static final class Component<Msg, Ref> {
 
+			@SuppressWarnings("unused")
 			private final Bridge<Msg, Ref> bridge;
 
 			private final Agent<Msg, Ref> implementation;

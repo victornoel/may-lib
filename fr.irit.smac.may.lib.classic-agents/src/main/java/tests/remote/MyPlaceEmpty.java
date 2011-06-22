@@ -7,9 +7,8 @@ import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 public class MyPlaceEmpty {
 
 	public static void main(String[] args) {
-		RemoteClassic.Component<PatternMatchingMessage> infra = new RemoteClassic.Component<PatternMatchingMessage>(new RemoteClassicImpl<PatternMatchingMessage>(1098), new RemoteClassic.Bridge<PatternMatchingMessage>() {}) ;
-		infra.start();
-		
+		RemoteClassic.Component<PatternMatchingMessage> infra = RemoteClassic.createComponent(new RemoteClassicImpl<PatternMatchingMessage>(1098));
+
 		System.out.println("a");
 	}
 }

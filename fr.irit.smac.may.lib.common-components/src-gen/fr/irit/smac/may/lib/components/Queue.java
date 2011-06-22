@@ -24,12 +24,21 @@ public abstract class Queue<Truc> {
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<Truc> get();
 
+	/**
+	 * This should be overridden by the implementation to define the provided port
+	 * This will be called once during the construction of the component to initialise the port
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll();
+
 	public static interface Bridge<Truc> {
 
 	}
 
 	public static final class Component<Truc> {
 
+		@SuppressWarnings("unused")
 		private final Bridge<Truc> bridge;
 
 		private final Queue<Truc> implementation;
@@ -48,6 +57,7 @@ public abstract class Queue<Truc> {
 
 			this.put = implem.put();
 			this.get = implem.get();
+			this.getAll = implem.getAll();
 
 		}
 
@@ -69,6 +79,15 @@ public abstract class Queue<Truc> {
 		public final fr.irit.smac.may.lib.interfaces.Pull<Truc> get() {
 			return this.get;
 		};
+		private final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll;
+
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll() {
+			return this.getAll;
+		};
 
 		/**
 		 * This must be called to start the component and its sub-components.
@@ -88,4 +107,11 @@ public abstract class Queue<Truc> {
 	 */
 	protected void start() {
 	}
+
+	public static final <Truc> Component<Truc> createComponent(
+			Queue<Truc> _compo) {
+		return new Component<Truc>(_compo, new Bridge<Truc>() {
+		});
+	}
+
 }

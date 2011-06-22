@@ -210,4 +210,5 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	 */
 	protected void start() {
 	}
+
 }

@@ -75,6 +75,7 @@ public abstract class Placed {
 
 		public static final class Component {
 
+			@SuppressWarnings("unused")
 			private final Bridge bridge;
 
 			private final Agent implementation;

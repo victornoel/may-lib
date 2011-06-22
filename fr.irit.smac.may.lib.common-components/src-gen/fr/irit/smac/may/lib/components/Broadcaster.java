@@ -106,6 +106,7 @@ public abstract class Broadcaster<T, Ref> {
 
 		public static final class Component<T, Ref> {
 
+			@SuppressWarnings("unused")
 			private final Bridge<T, Ref> bridge;
 
 			private final Agent<T, Ref> implementation;

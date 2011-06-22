@@ -1,6 +1,9 @@
 package fr.irit.smac.may.lib.components.impl;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import fr.irit.smac.may.lib.components.Queue;
 import fr.irit.smac.may.lib.interfaces.Pull;
@@ -8,7 +11,7 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 public class ConcurrentQueueImpl<Truc> extends Queue<Truc> {
 	
-	private final ConcurrentLinkedQueue<Truc> l = new ConcurrentLinkedQueue<Truc>();
+	private final BlockingQueue<Truc> l = new LinkedBlockingQueue<Truc>();
 	
 	@Override
 	public Push<Truc> put() {
@@ -28,8 +31,19 @@ public class ConcurrentQueueImpl<Truc> extends Queue<Truc> {
 		};
 	}
 	
+	@Override
+	protected Pull<Collection<Truc>> getAll() {
+		return new Pull<Collection<Truc>>() {
+			public Collection<Truc> pull() {
+				Collection<Truc> c = new LinkedList<Truc>();
+				l.drainTo(c);
+				return c;
+			}
+		};
+	}
+	
 	public static void main(String[] args) {
-		Queue.Component<String> t = new Queue.Component<String>(new ConcurrentQueueImpl<String>(), new Queue.Bridge<String>() {});
+		Queue.Component<String> t = Queue.createComponent(new ConcurrentQueueImpl<String>());
 		t.put().push("a");
 		System.out.println(t.get().pull());
 	}

@@ -22,6 +22,7 @@ public abstract class ExecutorService {
 
 	public static final class Component {
 
+		@SuppressWarnings("unused")
 		private final Bridge bridge;
 
 		private final ExecutorService implementation;
@@ -70,4 +71,10 @@ public abstract class ExecutorService {
 	 */
 	protected void start() {
 	}
+
+	public static final Component createComponent(ExecutorService _compo) {
+		return new Component(_compo, new Bridge() {
+		});
+	}
+
 }

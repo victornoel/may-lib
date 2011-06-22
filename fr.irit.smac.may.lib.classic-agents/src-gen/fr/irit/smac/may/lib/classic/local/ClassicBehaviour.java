@@ -116,4 +116,5 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 	 */
 	protected void start() {
 	}
+
 }

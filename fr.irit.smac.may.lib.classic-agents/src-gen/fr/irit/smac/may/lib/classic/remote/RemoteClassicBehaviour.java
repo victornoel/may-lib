@@ -116,4 +116,5 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
 	 */
 	protected void start() {
 	}
+
 }

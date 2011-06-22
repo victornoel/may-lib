@@ -11,8 +11,7 @@ public class MyPlaceStart {
 
 	public static void main(String[] args) {
 
-		Classic.Component<PatternMatchingMessage> infra = new Classic.Component<PatternMatchingMessage>(new ClassicImpl<PatternMatchingMessage>(), new Classic.Bridge<PatternMatchingMessage>() {}) ;
-		infra.start();
+		Classic.Component<PatternMatchingMessage> infra = Classic.createComponent(new ClassicImpl<PatternMatchingMessage>());
 		
 		AgentRef<PatternMatchingMessage> starter = infra.create().create(new BehaviorSetup<AgentRef<PatternMatchingMessage>>());
 
