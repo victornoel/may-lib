@@ -5,7 +5,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -15,7 +15,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	};
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -26,7 +26,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialise the port
+	 * This will be called once during the construction of the component to initialize the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -73,7 +73,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	}
 
 	/**
-	 * Can be overriden by the implementation
+	 * Can be overridden by the implementation
 	 * It will be called after the infrastructure part of the transverse has been instantiated
 	 * and during the containing infrastructure start() method is called.
 	 *
@@ -87,7 +87,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 		/**
 		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialise the port
+		 * This will be called once during the construction of the component to initialize the port
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
@@ -133,7 +133,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 		}
 
 		/**
-		 * Can be overriden by the implementation
+		 * Can be overridden by the implementation
 		 * It will be called after the agent part of the transverse has been instantiated
 		 * and during the constructed agent start() method is called.
 		 *

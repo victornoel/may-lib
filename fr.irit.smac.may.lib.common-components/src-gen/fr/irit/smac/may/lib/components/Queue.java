@@ -2,15 +2,11 @@ package fr.irit.smac.may.lib.components;
 
 public abstract class Queue<Truc> {
 
-	private final void init() {
-
-	}
-
 	private Component<Truc> structure = null;
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialise the port
+	 * This will be called once during the construction of the component to initialize the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -18,7 +14,7 @@ public abstract class Queue<Truc> {
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialise the port
+	 * This will be called once during the construction of the component to initialize the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -26,7 +22,7 @@ public abstract class Queue<Truc> {
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialise the port
+	 * This will be called once during the construction of the component to initialize the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -53,7 +49,6 @@ public abstract class Queue<Truc> {
 
 			assert implem.structure == null;
 			implem.structure = this;
-			implem.init();
 
 			this.put = implem.put();
 			this.get = implem.get();
@@ -99,7 +94,7 @@ public abstract class Queue<Truc> {
 	}
 
 	/**
-	 * Can be overriden by the implementation
+	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.
 	 *
