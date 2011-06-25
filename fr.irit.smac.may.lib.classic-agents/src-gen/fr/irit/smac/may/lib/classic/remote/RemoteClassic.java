@@ -151,9 +151,6 @@ public abstract class RemoteClassic<Msg> {
 
 		private final RemoteClassic<Msg> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final RemoteClassic<Msg> implem, final Bridge<Msg> b) {
 			this.bridge = b;
 
@@ -165,25 +162,25 @@ public abstract class RemoteClassic<Msg> {
 			this.create = implem.create();
 
 			this.scheduler = new Scheduler.Component(implem.make_scheduler(),
-					new RemoteClassic_scheduler());
+					new Bridge_scheduler());
 			this.sender = new ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>>(
-					implem.make_sender(), new RemoteClassic_sender());
+					implem.make_sender(), new Bridge_sender());
 			this.receive = new ReferenceReceiver.Component<Msg>(
-					implem.make_receive(), new RemoteClassic_receive());
+					implem.make_receive(), new Bridge_receive());
 			this.placed = new Placed.Component(implem.make_placed(),
-					new RemoteClassic_placed());
+					new Bridge_placed());
 			this.remReceive = new RemoteReferenceReceiver.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
-					implem.make_remReceive(), new RemoteClassic_remReceive());
+					implem.make_remReceive(), new Bridge_remReceive());
 			this.fact = new RemoteFactory.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>>(
-					implem.make_fact(), new RemoteClassic_fact());
+					implem.make_fact(), new Bridge_fact());
 			this.executor = new ExecutorService.Component(
-					implem.make_executor(), new RemoteClassic_executor());
+					implem.make_executor(), new Bridge_executor());
 
 		}
 
 		private final Scheduler.Component scheduler;
 
-		private final class RemoteClassic_scheduler implements Scheduler.Bridge {
+		private final class Bridge_scheduler implements Scheduler.Bridge {
 
 			public final java.util.concurrent.Executor infraSched() {
 				return Component.this.executor.exec();
@@ -193,7 +190,7 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> sender;
 
-		private final class RemoteClassic_sender
+		private final class Bridge_sender
 				implements
 					ReferenceSender.Bridge<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> {
 
@@ -205,19 +202,19 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final ReferenceReceiver.Component<Msg> receive;
 
-		private final class RemoteClassic_receive
+		private final class Bridge_receive
 				implements
 					ReferenceReceiver.Bridge<Msg> {
 
 		}
 		private final Placed.Component placed;
 
-		private final class RemoteClassic_placed implements Placed.Bridge {
+		private final class Bridge_placed implements Placed.Bridge {
 
 		}
 		private final RemoteReferenceReceiver.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> remReceive;
 
-		private final class RemoteClassic_remReceive
+		private final class Bridge_remReceive
 				implements
 					RemoteReferenceReceiver.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
 
@@ -234,7 +231,7 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final RemoteFactory.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> fact;
 
-		private final class RemoteClassic_fact
+		private final class Bridge_fact
 				implements
 					RemoteFactory.Bridge<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> {
 
@@ -251,9 +248,7 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final ExecutorService.Component executor;
 
-		private final class RemoteClassic_executor
-				implements
-					ExecutorService.Bridge {
+		private final class Bridge_executor implements ExecutorService.Bridge {
 
 		}
 
@@ -282,9 +277,6 @@ public abstract class RemoteClassic<Msg> {
 			return this.create;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.scheduler.start();
 			this.sender.start();

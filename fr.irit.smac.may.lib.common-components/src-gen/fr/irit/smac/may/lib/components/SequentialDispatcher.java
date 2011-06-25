@@ -64,9 +64,6 @@ public abstract class SequentialDispatcher<Truc> {
 
 		private final SequentialDispatcher<Truc> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final SequentialDispatcher<Truc> implem,
 				final Bridge<Truc> b) {
 			this.bridge = b;
@@ -79,15 +76,13 @@ public abstract class SequentialDispatcher<Truc> {
 			this.dispatch = implem.dispatch();
 
 			this.queue = new Queue.Component<Truc>(implem.make_queue(),
-					new SequentialDispatcher_queue());
+					new Bridge_queue());
 
 		}
 
 		private final Queue.Component<Truc> queue;
 
-		private final class SequentialDispatcher_queue
-				implements
-					Queue.Bridge<Truc> {
+		private final class Bridge_queue implements Queue.Bridge<Truc> {
 
 		}
 
@@ -101,9 +96,6 @@ public abstract class SequentialDispatcher<Truc> {
 			return this.dispatch;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.queue.start();
 

@@ -36,6 +36,7 @@ public abstract class Scheduler {
 		}
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -113,6 +114,7 @@ public abstract class Scheduler {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

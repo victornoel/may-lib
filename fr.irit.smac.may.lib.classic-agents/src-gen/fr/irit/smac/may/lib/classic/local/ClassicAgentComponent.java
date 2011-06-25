@@ -107,9 +107,6 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 
 		private final ClassicAgentComponent<Msg, Ref> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final ClassicAgentComponent<Msg, Ref> implem,
 				final Bridge<Msg, Ref> b) {
 			this.bridge = b;
@@ -120,16 +117,15 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 			implem.structure = this;
 
 			this.dispatcher = new SequentialDispatcher.Component<Msg>(
-					implem.make_dispatcher(),
-					new ClassicAgentComponent_dispatcher());
+					implem.make_dispatcher(), new Bridge_dispatcher());
 			this.beh = new ClassicBehaviour.Component<Msg, Ref>(
-					implem.make_beh(), new ClassicAgentComponent_beh());
+					implem.make_beh(), new Bridge_beh());
 
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
 
-		private final class ClassicAgentComponent_dispatcher
+		private final class Bridge_dispatcher
 				implements
 					SequentialDispatcher.Bridge<Msg> {
 
@@ -146,7 +142,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 		}
 		private final ClassicBehaviour.Component<Msg, Ref> beh;
 
-		private final class ClassicAgentComponent_beh
+		private final class Bridge_beh
 				implements
 					ClassicBehaviour.Bridge<Msg, Ref> {
 
@@ -180,9 +176,6 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 			return this.dispatcher.dispatch();
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.dispatcher.start();
 			this.beh.start();

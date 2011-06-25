@@ -75,6 +75,7 @@ public abstract class Broadcaster<T, Ref> {
 		};
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -134,6 +135,7 @@ public abstract class Broadcaster<T, Ref> {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

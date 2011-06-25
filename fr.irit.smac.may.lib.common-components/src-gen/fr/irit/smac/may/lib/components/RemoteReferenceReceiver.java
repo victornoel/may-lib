@@ -68,6 +68,7 @@ public abstract class RemoteReferenceReceiver<Msg, LocalRef> {
 		};
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -157,6 +158,7 @@ public abstract class RemoteReferenceReceiver<Msg, LocalRef> {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

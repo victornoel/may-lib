@@ -57,6 +57,7 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 		};
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -146,6 +147,7 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

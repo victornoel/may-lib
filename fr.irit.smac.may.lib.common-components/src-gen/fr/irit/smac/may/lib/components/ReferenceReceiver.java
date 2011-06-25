@@ -46,6 +46,7 @@ public abstract class ReferenceReceiver<MsgType> {
 		};
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -135,6 +136,7 @@ public abstract class ReferenceReceiver<MsgType> {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

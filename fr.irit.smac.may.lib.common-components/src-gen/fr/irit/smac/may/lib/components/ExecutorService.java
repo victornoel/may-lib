@@ -23,9 +23,6 @@ public abstract class ExecutorService {
 
 		private final ExecutorService implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final ExecutorService implem, final Bridge b) {
 			this.bridge = b;
 
@@ -48,9 +45,6 @@ public abstract class ExecutorService {
 			return this.exec;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 
 			this.implementation.start();

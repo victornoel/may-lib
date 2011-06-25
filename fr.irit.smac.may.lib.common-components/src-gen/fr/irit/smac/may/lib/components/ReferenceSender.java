@@ -37,6 +37,7 @@ public abstract class ReferenceSender<MsgType, Ref> {
 		}
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -97,6 +98,7 @@ public abstract class ReferenceSender<MsgType, Ref> {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

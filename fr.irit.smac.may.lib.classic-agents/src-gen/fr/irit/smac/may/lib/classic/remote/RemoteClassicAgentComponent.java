@@ -126,9 +126,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 
 		private final RemoteClassicAgentComponent<Msg, Ref> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final RemoteClassicAgentComponent<Msg, Ref> implem,
 				final Bridge<Msg, Ref> b) {
 			this.bridge = b;
@@ -141,16 +138,15 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 			this.die = implem.die();
 
 			this.dispatcher = new SequentialDispatcher.Component<Msg>(
-					implem.make_dispatcher(),
-					new RemoteClassicAgentComponent_dispatcher());
+					implem.make_dispatcher(), new Bridge_dispatcher());
 			this.beh = new RemoteClassicBehaviour.Component<Msg, Ref>(
-					implem.make_beh(), new RemoteClassicAgentComponent_beh());
+					implem.make_beh(), new Bridge_beh());
 
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
 
-		private final class RemoteClassicAgentComponent_dispatcher
+		private final class Bridge_dispatcher
 				implements
 					SequentialDispatcher.Bridge<Msg> {
 
@@ -167,7 +163,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 		}
 		private final RemoteClassicBehaviour.Component<Msg, Ref> beh;
 
-		private final class RemoteClassicAgentComponent_beh
+		private final class Bridge_beh
 				implements
 					RemoteClassicBehaviour.Bridge<Msg, Ref> {
 
@@ -210,9 +206,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 			return this.die;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.dispatcher.start();
 			this.beh.start();

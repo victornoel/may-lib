@@ -45,6 +45,7 @@ public abstract class Placed {
 		};
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -104,6 +105,7 @@ public abstract class Placed {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

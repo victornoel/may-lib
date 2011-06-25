@@ -42,9 +42,6 @@ public abstract class Either<L, R> {
 
 		private final Either<L, R> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final Either<L, R> implem, final Bridge<L, R> b) {
 			this.bridge = b;
 
@@ -77,9 +74,6 @@ public abstract class Either<L, R> {
 			return this.right;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 
 			this.implementation.start();

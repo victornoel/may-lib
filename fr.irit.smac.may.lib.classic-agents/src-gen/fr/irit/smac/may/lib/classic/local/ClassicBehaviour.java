@@ -67,9 +67,6 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 
 		private final ClassicBehaviour<Msg, Ref> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final ClassicBehaviour<Msg, Ref> implem,
 				final Bridge<Msg, Ref> b) {
 			this.bridge = b;
@@ -93,9 +90,6 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 			return this.cycle;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 
 			this.implementation.start();

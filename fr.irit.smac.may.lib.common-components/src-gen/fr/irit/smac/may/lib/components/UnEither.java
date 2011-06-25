@@ -45,9 +45,6 @@ public abstract class UnEither<L, R> {
 
 		private final UnEither<L, R> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final UnEither<L, R> implem, final Bridge<L, R> b) {
 			this.bridge = b;
 
@@ -70,9 +67,6 @@ public abstract class UnEither<L, R> {
 			return this.in;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 
 			this.implementation.start();

@@ -36,6 +36,7 @@ public abstract class Scheduled {
 		}
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -106,6 +107,7 @@ public abstract class Scheduled {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

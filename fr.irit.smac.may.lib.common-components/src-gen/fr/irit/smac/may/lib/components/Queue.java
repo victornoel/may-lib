@@ -39,9 +39,6 @@ public abstract class Queue<Truc> {
 
 		private final Queue<Truc> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final Queue<Truc> implem, final Bridge<Truc> b) {
 			this.bridge = b;
 
@@ -84,9 +81,6 @@ public abstract class Queue<Truc> {
 			return this.getAll;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 
 			this.implementation.start();

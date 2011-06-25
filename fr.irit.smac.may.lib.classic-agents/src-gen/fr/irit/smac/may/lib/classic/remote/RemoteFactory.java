@@ -68,6 +68,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 		};
 
 		public final void start() {
+
 			this.implementation.start();
 		}
 	}
@@ -128,6 +129,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 			};
 
 			public final void start() {
+
 				this.implementation.start();
 			}
 		}

@@ -115,9 +115,6 @@ public abstract class Classic<Msg> {
 
 		private final Classic<Msg> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final Classic<Msg> implem, final Bridge<Msg> b) {
 			this.bridge = b;
 
@@ -129,21 +126,21 @@ public abstract class Classic<Msg> {
 			this.create = implem.create();
 
 			this.scheduler = new Scheduler.Component(implem.make_scheduler(),
-					new Classic_scheduler());
+					new Bridge_scheduler());
 			this.sender = new ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
-					implem.make_sender(), new Classic_sender());
+					implem.make_sender(), new Bridge_sender());
 			this.receive = new ReferenceReceiver.Component<Msg>(
-					implem.make_receive(), new Classic_receive());
+					implem.make_receive(), new Bridge_receive());
 			this.fact = new Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
-					implem.make_fact(), new Classic_fact());
+					implem.make_fact(), new Bridge_fact());
 			this.executor = new ExecutorService.Component(
-					implem.make_executor(), new Classic_executor());
+					implem.make_executor(), new Bridge_executor());
 
 		}
 
 		private final Scheduler.Component scheduler;
 
-		private final class Classic_scheduler implements Scheduler.Bridge {
+		private final class Bridge_scheduler implements Scheduler.Bridge {
 
 			public final java.util.concurrent.Executor infraSched() {
 				return Component.this.executor.exec();
@@ -153,7 +150,7 @@ public abstract class Classic<Msg> {
 		}
 		private final ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender;
 
-		private final class Classic_sender
+		private final class Bridge_sender
 				implements
 					ReferenceSender.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
 
@@ -165,14 +162,14 @@ public abstract class Classic<Msg> {
 		}
 		private final ReferenceReceiver.Component<Msg> receive;
 
-		private final class Classic_receive
+		private final class Bridge_receive
 				implements
 					ReferenceReceiver.Bridge<Msg> {
 
 		}
 		private final Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact;
 
-		private final class Classic_fact
+		private final class Bridge_fact
 				implements
 					Factory.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
 
@@ -184,7 +181,7 @@ public abstract class Classic<Msg> {
 		}
 		private final ExecutorService.Component executor;
 
-		private final class Classic_executor implements ExecutorService.Bridge {
+		private final class Bridge_executor implements ExecutorService.Bridge {
 
 		}
 
@@ -205,9 +202,6 @@ public abstract class Classic<Msg> {
 			return this.create;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.scheduler.start();
 			this.sender.start();
