@@ -1,6 +1,7 @@
 package fr.irit.smac.may.lib.components;
 
 public abstract class Broadcaster<T, Ref> {
+
 	private Component<T, Ref> structure = null;
 
 	/**
@@ -80,17 +81,8 @@ public abstract class Broadcaster<T, Ref> {
 		}
 	}
 
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the infrastructure part of the transverse has been instantiated
-	 * and during the containing infrastructure start() method is called.
-	 *
-	 * This is not meant to be called by hand
-	 */
-	protected void start() {
-	}
-
 	public static abstract class Agent<T, Ref> {
+
 		private Component<T, Ref> structure = null;
 
 		/**
@@ -142,12 +134,24 @@ public abstract class Broadcaster<T, Ref> {
 
 		/**
 		 * Can be overridden by the implementation
-		 * It will be called after the agent part of the transverse has been instantiated
-		 * and during the constructed agent start() method is called.
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected void start() {
 		}
+
 	}
+
+	/**
+	 * Can be overridden by the implementation
+	 * It will be called after the component has been instantiated, after the components have been instantiated
+	 * and during the containing component start() method is called.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected void start() {
+	}
+
 }
