@@ -4,11 +4,16 @@ import fr.irit.smac.may.lib.components.Queue;
 
 public abstract class SequentialDispatcher<Truc> {
 
+	private final void init() {
+		this.queue = make_queue();
+
+	}
+
 	private Component<Truc> structure = null;
 
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * It will be initialised before the provided ports are initialised
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -18,7 +23,7 @@ public abstract class SequentialDispatcher<Truc> {
 	};
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * It will be initialised before the provided ports are initialised
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -29,7 +34,7 @@ public abstract class SequentialDispatcher<Truc> {
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This will be called once during the construction of the component to initialise the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -37,13 +42,15 @@ public abstract class SequentialDispatcher<Truc> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This will be called once during the construction of the component to initialise this sub-component
 	 */
 	protected abstract Queue<Truc> make_queue();
 
+	private Queue<Truc> queue;
+
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -64,6 +71,9 @@ public abstract class SequentialDispatcher<Truc> {
 
 		private final SequentialDispatcher<Truc> implementation;
 
+		/**
+		 * This constructor can be called directly to instantiate stand-alone components
+		 */
 		public Component(final SequentialDispatcher<Truc> implem,
 				final Bridge<Truc> b) {
 			this.bridge = b;
@@ -72,17 +82,20 @@ public abstract class SequentialDispatcher<Truc> {
 
 			assert implem.structure == null;
 			implem.structure = this;
+			implem.init();
 
 			this.dispatch = implem.dispatch();
 
-			this.queue = new Queue.Component<Truc>(implem.make_queue(),
-					new Bridge_queue());
+			this.queue = new Queue.Component<Truc>(implem.queue,
+					new SequentialDispatcher_queue());
 
 		}
 
 		private final Queue.Component<Truc> queue;
 
-		private final class Bridge_queue implements Queue.Bridge<Truc> {
+		private final class SequentialDispatcher_queue
+				implements
+					Queue.Bridge<Truc> {
 
 		}
 
@@ -96,6 +109,9 @@ public abstract class SequentialDispatcher<Truc> {
 			return this.dispatch;
 		};
 
+		/**
+		 * This must be called to start the component and its sub-components.
+		 */
 		public final void start() {
 			this.queue.start();
 
@@ -104,7 +120,7 @@ public abstract class SequentialDispatcher<Truc> {
 	}
 
 	/**
-	 * Can be overridden by the implementation
+	 * Can be overriden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.
 	 *
