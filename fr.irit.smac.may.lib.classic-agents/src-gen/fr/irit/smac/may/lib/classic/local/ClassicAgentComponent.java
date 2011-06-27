@@ -5,17 +5,11 @@ import fr.irit.smac.may.lib.components.SequentialDispatcher;
 
 public abstract class ClassicAgentComponent<Msg, Ref> {
 
-	private final void init() {
-		this.dispatcher = make_dispatcher();
-		this.beh = make_beh();
-
-	}
-
 	private Component<Msg, Ref> structure = null;
 
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -25,7 +19,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	};
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -35,7 +29,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	};
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -45,7 +39,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	};
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -55,7 +49,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	};
 	/**
 	 * This can be called by the implementation to access this required port
-	 * It will be initialised before the provided ports are initialised
+	 * It will be initialized before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -66,15 +60,13 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract SequentialDispatcher<Msg> make_dispatcher();
 
-	private SequentialDispatcher<Msg> dispatcher;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -85,15 +77,13 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ClassicBehaviour<Msg, Ref> make_beh();
 
-	private ClassicBehaviour<Msg, Ref> beh;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -117,9 +107,6 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 
 		private final ClassicAgentComponent<Msg, Ref> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final ClassicAgentComponent<Msg, Ref> implem,
 				final Bridge<Msg, Ref> b) {
 			this.bridge = b;
@@ -128,18 +115,17 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 
 			assert implem.structure == null;
 			implem.structure = this;
-			implem.init();
 
 			this.dispatcher = new SequentialDispatcher.Component<Msg>(
-					implem.dispatcher, new ClassicAgentComponent_dispatcher());
-			this.beh = new ClassicBehaviour.Component<Msg, Ref>(implem.beh,
-					new ClassicAgentComponent_beh());
+					implem.make_dispatcher(), new Bridge_dispatcher());
+			this.beh = new ClassicBehaviour.Component<Msg, Ref>(
+					implem.make_beh(), new Bridge_beh());
 
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
 
-		private final class ClassicAgentComponent_dispatcher
+		private final class Bridge_dispatcher
 				implements
 					SequentialDispatcher.Bridge<Msg> {
 
@@ -156,7 +142,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 		}
 		private final ClassicBehaviour.Component<Msg, Ref> beh;
 
-		private final class ClassicAgentComponent_beh
+		private final class Bridge_beh
 				implements
 					ClassicBehaviour.Bridge<Msg, Ref> {
 
@@ -190,9 +176,6 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 			return this.dispatcher.dispatch();
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.dispatcher.start();
 			this.beh.start();
@@ -202,7 +185,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	}
 
 	/**
-	 * Can be overriden by the implementation
+	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.
 	 *

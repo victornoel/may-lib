@@ -11,22 +11,11 @@ import fr.irit.smac.may.lib.components.Scheduler;
 
 public abstract class RemoteClassic<Msg> {
 
-	private final void init() {
-		this.scheduler = make_scheduler();
-		this.sender = make_sender();
-		this.receive = make_receive();
-		this.placed = make_placed();
-		this.remReceive = make_remReceive();
-		this.fact = make_fact();
-		this.executor = make_executor();
-
-	}
-
 	private Component<Msg> structure = null;
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialise the port
+	 * This will be called once during the construction of the component to initialize the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -34,15 +23,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract Scheduler make_scheduler();
 
-	private Scheduler scheduler;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -53,15 +40,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ReferenceSender<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> make_sender();
 
-	private ReferenceSender<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> sender;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -72,15 +57,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ReferenceReceiver<Msg> make_receive();
 
-	private ReferenceReceiver<Msg> receive;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -91,15 +74,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract Placed make_placed();
 
-	private Placed placed;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -110,15 +91,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract RemoteReferenceReceiver<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> make_remReceive();
 
-	private RemoteReferenceReceiver<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> remReceive;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -129,15 +108,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract RemoteFactory<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> make_fact();
 
-	private RemoteFactory<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> fact;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -148,15 +125,13 @@ public abstract class RemoteClassic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ExecutorService make_executor();
 
-	private ExecutorService executor;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -176,9 +151,6 @@ public abstract class RemoteClassic<Msg> {
 
 		private final RemoteClassic<Msg> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final RemoteClassic<Msg> implem, final Bridge<Msg> b) {
 			this.bridge = b;
 
@@ -186,30 +158,29 @@ public abstract class RemoteClassic<Msg> {
 
 			assert implem.structure == null;
 			implem.structure = this;
-			implem.init();
 
 			this.create = implem.create();
 
-			this.scheduler = new Scheduler.Component(implem.scheduler,
-					new RemoteClassic_scheduler());
+			this.scheduler = new Scheduler.Component(implem.make_scheduler(),
+					new Bridge_scheduler());
 			this.sender = new ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>>(
-					implem.sender, new RemoteClassic_sender());
-			this.receive = new ReferenceReceiver.Component<Msg>(implem.receive,
-					new RemoteClassic_receive());
-			this.placed = new Placed.Component(implem.placed,
-					new RemoteClassic_placed());
+					implem.make_sender(), new Bridge_sender());
+			this.receive = new ReferenceReceiver.Component<Msg>(
+					implem.make_receive(), new Bridge_receive());
+			this.placed = new Placed.Component(implem.make_placed(),
+					new Bridge_placed());
 			this.remReceive = new RemoteReferenceReceiver.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
-					implem.remReceive, new RemoteClassic_remReceive());
+					implem.make_remReceive(), new Bridge_remReceive());
 			this.fact = new RemoteFactory.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>>(
-					implem.fact, new RemoteClassic_fact());
-			this.executor = new ExecutorService.Component(implem.executor,
-					new RemoteClassic_executor());
+					implem.make_fact(), new Bridge_fact());
+			this.executor = new ExecutorService.Component(
+					implem.make_executor(), new Bridge_executor());
 
 		}
 
 		private final Scheduler.Component scheduler;
 
-		private final class RemoteClassic_scheduler implements Scheduler.Bridge {
+		private final class Bridge_scheduler implements Scheduler.Bridge {
 
 			public final java.util.concurrent.Executor infraSched() {
 				return Component.this.executor.exec();
@@ -219,7 +190,7 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> sender;
 
-		private final class RemoteClassic_sender
+		private final class Bridge_sender
 				implements
 					ReferenceSender.Bridge<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> {
 
@@ -231,19 +202,19 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final ReferenceReceiver.Component<Msg> receive;
 
-		private final class RemoteClassic_receive
+		private final class Bridge_receive
 				implements
 					ReferenceReceiver.Bridge<Msg> {
 
 		}
 		private final Placed.Component placed;
 
-		private final class RemoteClassic_placed implements Placed.Bridge {
+		private final class Bridge_placed implements Placed.Bridge {
 
 		}
 		private final RemoteReferenceReceiver.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> remReceive;
 
-		private final class RemoteClassic_remReceive
+		private final class Bridge_remReceive
 				implements
 					RemoteReferenceReceiver.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
 
@@ -260,7 +231,7 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final RemoteFactory.Component<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> fact;
 
-		private final class RemoteClassic_fact
+		private final class Bridge_fact
 				implements
 					RemoteFactory.Bridge<Msg, fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef<Msg>> {
 
@@ -277,9 +248,7 @@ public abstract class RemoteClassic<Msg> {
 		}
 		private final ExecutorService.Component executor;
 
-		private final class RemoteClassic_executor
-				implements
-					ExecutorService.Bridge {
+		private final class Bridge_executor implements ExecutorService.Bridge {
 
 		}
 
@@ -308,9 +277,6 @@ public abstract class RemoteClassic<Msg> {
 			return this.create;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.scheduler.start();
 			this.sender.start();
@@ -523,7 +489,7 @@ public abstract class RemoteClassic<Msg> {
 	}
 
 	/**
-	 * Can be overriden by the implementation
+	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.
 	 *

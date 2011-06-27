@@ -9,20 +9,11 @@ import fr.irit.smac.may.lib.components.Scheduler;
 
 public abstract class Classic<Msg> {
 
-	private final void init() {
-		this.scheduler = make_scheduler();
-		this.sender = make_sender();
-		this.receive = make_receive();
-		this.fact = make_fact();
-		this.executor = make_executor();
-
-	}
-
 	private Component<Msg> structure = null;
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialise the port
+	 * This will be called once during the construction of the component to initialize the port
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -30,15 +21,13 @@ public abstract class Classic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract Scheduler make_scheduler();
 
-	private Scheduler scheduler;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -49,15 +38,13 @@ public abstract class Classic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ReferenceSender<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> make_sender();
 
-	private ReferenceSender<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -68,15 +55,13 @@ public abstract class Classic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ReferenceReceiver<Msg> make_receive();
 
-	private ReferenceReceiver<Msg> receive;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -87,15 +72,13 @@ public abstract class Classic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract Factory<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> make_fact();
 
-	private Factory<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -106,15 +89,13 @@ public abstract class Classic<Msg> {
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialise this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
 	protected abstract ExecutorService make_executor();
 
-	private ExecutorService executor;
-
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialised after the required ports are initialised and before the provided ports are initialised
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -134,9 +115,6 @@ public abstract class Classic<Msg> {
 
 		private final Classic<Msg> implementation;
 
-		/**
-		 * This constructor can be called directly to instantiate stand-alone components
-		 */
 		public Component(final Classic<Msg> implem, final Bridge<Msg> b) {
 			this.bridge = b;
 
@@ -144,26 +122,25 @@ public abstract class Classic<Msg> {
 
 			assert implem.structure == null;
 			implem.structure = this;
-			implem.init();
 
 			this.create = implem.create();
 
-			this.scheduler = new Scheduler.Component(implem.scheduler,
-					new Classic_scheduler());
+			this.scheduler = new Scheduler.Component(implem.make_scheduler(),
+					new Bridge_scheduler());
 			this.sender = new ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
-					implem.sender, new Classic_sender());
-			this.receive = new ReferenceReceiver.Component<Msg>(implem.receive,
-					new Classic_receive());
+					implem.make_sender(), new Bridge_sender());
+			this.receive = new ReferenceReceiver.Component<Msg>(
+					implem.make_receive(), new Bridge_receive());
 			this.fact = new Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
-					implem.fact, new Classic_fact());
-			this.executor = new ExecutorService.Component(implem.executor,
-					new Classic_executor());
+					implem.make_fact(), new Bridge_fact());
+			this.executor = new ExecutorService.Component(
+					implem.make_executor(), new Bridge_executor());
 
 		}
 
 		private final Scheduler.Component scheduler;
 
-		private final class Classic_scheduler implements Scheduler.Bridge {
+		private final class Bridge_scheduler implements Scheduler.Bridge {
 
 			public final java.util.concurrent.Executor infraSched() {
 				return Component.this.executor.exec();
@@ -173,7 +150,7 @@ public abstract class Classic<Msg> {
 		}
 		private final ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender;
 
-		private final class Classic_sender
+		private final class Bridge_sender
 				implements
 					ReferenceSender.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
 
@@ -185,14 +162,14 @@ public abstract class Classic<Msg> {
 		}
 		private final ReferenceReceiver.Component<Msg> receive;
 
-		private final class Classic_receive
+		private final class Bridge_receive
 				implements
 					ReferenceReceiver.Bridge<Msg> {
 
 		}
 		private final Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact;
 
-		private final class Classic_fact
+		private final class Bridge_fact
 				implements
 					Factory.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
 
@@ -204,7 +181,7 @@ public abstract class Classic<Msg> {
 		}
 		private final ExecutorService.Component executor;
 
-		private final class Classic_executor implements ExecutorService.Bridge {
+		private final class Bridge_executor implements ExecutorService.Bridge {
 
 		}
 
@@ -225,9 +202,6 @@ public abstract class Classic<Msg> {
 			return this.create;
 		};
 
-		/**
-		 * This must be called to start the component and its sub-components.
-		 */
 		public final void start() {
 			this.scheduler.start();
 			this.sender.start();
@@ -388,7 +362,7 @@ public abstract class Classic<Msg> {
 	}
 
 	/**
-	 * Can be overriden by the implementation
+	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.
 	 *
