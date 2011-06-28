@@ -51,4 +51,7 @@
 			<url>ftp://ftpintra.irit.fr/../../usr/local/WWW/PERSONNEL/SMAC/noel/maven-repos/</url>
 		</repository>
 	</distributionManagement>
+	<properties>
+		<encoding>UTF-8</encoding>
+	</properties>
 </project>
