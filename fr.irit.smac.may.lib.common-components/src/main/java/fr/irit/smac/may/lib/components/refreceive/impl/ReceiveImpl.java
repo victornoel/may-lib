@@ -11,13 +11,10 @@ public class ReceiveImpl<Msg> extends ReferenceReceiver<Msg> {
 		
 		private final AgentRef<Msg> agentRef;
 		
-		private final String name;
-		
 		/**
 		 * Name is not used as a reference
 		 */
 		public AgentSide(String name) {
-			this.name = name;
 			this.agentRef = new AgentRef<Msg>(this, name);
 		}
 		
