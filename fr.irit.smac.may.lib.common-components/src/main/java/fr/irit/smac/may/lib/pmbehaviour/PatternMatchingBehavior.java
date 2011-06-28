@@ -62,6 +62,7 @@ public class PatternMatchingBehavior implements Serializable {
 			if (matches) {
 				// obtain a Class[] based on the passed arguments as Object[]
 				method.invoke(targetObject, parameters);
+				return;
 			}
 		}
 		throw new NoSuchMethodException();
