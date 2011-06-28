@@ -38,7 +38,7 @@ public class PatternMatchingBehavior implements Serializable {
 			} catch (Exception e1) {
 				throw new RuntimeException("No fallback method for "
 						+ msg.toString() + " in "
-						+ target.getClass().getSimpleName());
+						+ target.getClass().getSimpleName(), e1);
 			}
 		}
 	}
@@ -62,10 +62,9 @@ public class PatternMatchingBehavior implements Serializable {
 			if (matches) {
 				// obtain a Class[] based on the passed arguments as Object[]
 				method.invoke(targetObject, parameters);
-			} else {
-				throw new NoSuchMethodException();
 			}
 		}
+		throw new NoSuchMethodException();
 	}
 
 }
