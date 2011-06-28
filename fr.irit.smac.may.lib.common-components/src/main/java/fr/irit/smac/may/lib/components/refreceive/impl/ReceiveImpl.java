@@ -25,10 +25,6 @@ public class ReceiveImpl<Msg> extends ReferenceReceiver<Msg> {
 			put().push(m);
 		}
 		
-		String getName() {
-			return this.name;
-		}
-		
 		@Override
 		protected Pull<AgentRef<Msg>> me() {
 			return new Pull<AgentRef<Msg>>() {
