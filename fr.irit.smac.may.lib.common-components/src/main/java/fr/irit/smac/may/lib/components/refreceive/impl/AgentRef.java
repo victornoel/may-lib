@@ -15,7 +15,7 @@ public class AgentRef<Msg> implements Serializable {
 	}
 
 	void receive(Msg m) {
-		this.ref.receive(m);
+		if (this.ref != null) this.ref.receive(m);
 	}
 	
 	void stop() {
@@ -25,7 +25,7 @@ public class AgentRef<Msg> implements Serializable {
 	
 	@Override
 	public String toString() {
-		return name + (ref == null ? "(dead agent)" : "");
+		return this.name + (this.ref == null ? "(dead agent)" : "");
 	}
 
 }
