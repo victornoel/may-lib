@@ -9,7 +9,7 @@ import fr.irit.smac.may.lib.classic.local.Factory;
 import fr.irit.smac.may.lib.components.messaging.SenderImpl;
 import fr.irit.smac.may.lib.components.messaging.Sender;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiveImpl;
+import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
@@ -20,7 +20,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	private SchedulerImpl schedulerImpl;
 	private SenderImpl<Msg, AgentRef<Msg>> send;
-	private ReceiveImpl<Msg> receive;
+	private ReceiverImpl<Msg> receive;
 	private FactoryImpl<Msg, AgentRef<Msg>> factory;
 
 	private volatile int i = 0;
@@ -44,7 +44,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	@Override
 	protected Receiver<Msg> make_receive() {
-		receive = new ReceiveImpl<Msg>();
+		receive = new ReceiverImpl<Msg>();
 		return receive;
 	}
 

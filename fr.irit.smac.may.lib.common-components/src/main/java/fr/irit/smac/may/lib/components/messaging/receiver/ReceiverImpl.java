@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Send;
 
-public class ReceiveImpl<Msg> extends Receiver<Msg> {
+public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	
 	public class AgentSide extends Agent<Msg> {
 		

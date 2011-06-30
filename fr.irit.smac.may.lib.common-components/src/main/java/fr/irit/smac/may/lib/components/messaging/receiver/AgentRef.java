@@ -6,10 +6,10 @@ public class AgentRef<Msg> implements Serializable {
 
 	private static final long serialVersionUID = 683175997362391141L;
 	
-	private ReceiveImpl<Msg>.AgentSide ref;
+	private ReceiverImpl<Msg>.AgentSide ref;
 	private final String name;
 	
-	AgentRef(ReceiveImpl<Msg>.AgentSide ref, String name) {
+	AgentRef(ReceiverImpl<Msg>.AgentSide ref, String name) {
 		this.ref = ref;
 		this.name = name;
 	}

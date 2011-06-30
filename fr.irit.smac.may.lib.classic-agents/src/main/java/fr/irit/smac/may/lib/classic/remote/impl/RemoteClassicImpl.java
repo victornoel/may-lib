@@ -9,7 +9,7 @@ import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 import fr.irit.smac.may.lib.components.messaging.Sender;
 import fr.irit.smac.may.lib.components.messaging.SenderImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiveImpl;
+import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
@@ -27,7 +27,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	private final int port;
 	private SchedulerImpl scheduler;
 	private SenderImpl<Msg, RemoteAgentRef<Msg>> send;
-	private ReceiveImpl<Msg> receive;
+	private ReceiverImpl<Msg> receive;
 	private RemoteReceiverImpl<Msg, AgentRef<Msg>> remoteRefReceive;
 	private RemoteFactoryImpl<Msg, RemoteAgentRef<Msg>> factory;
 
@@ -52,7 +52,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	@Override
 	public Receiver<Msg> make_receive() {
-		receive = new ReceiveImpl<Msg>();
+		receive = new ReceiverImpl<Msg>();
 		return receive;
 	}
 
