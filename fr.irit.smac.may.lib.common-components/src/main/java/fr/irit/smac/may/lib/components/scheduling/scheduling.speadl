@@ -1,0 +1,43 @@
+
+import fr.irit.smac.may.lib.interfaces.*
+import fr.irit.smac.may.lib.components.scheduling.interfaces.*
+import java.util.concurrent.Executor
+
+namespace fr.irit.smac.may.lib.components.scheduling {
+	
+	transverse Scheduled {
+		agent {
+			requires cycle: Do
+			provides stop: Do
+		}
+		infra {
+			provides tick: Do
+			requires sched: Executor
+		}
+	}
+	
+	component Clock {
+		requires sched: Executor
+		requires tick: Do
+		
+		provides control: SchedulingControl
+	}
+	
+	component SchedulingControllerGUI {
+		requires control: SchedulingControl
+	}
+
+	transverse Scheduler {
+		agent {
+			provides sched: Executor
+			provides stop: Do
+		}
+		infra {
+			requires infraSched: Executor
+		}
+	}
+
+	component ExecutorService {
+		provides exec: Executor
+	}
+}

@@ -3,7 +3,7 @@ package tests.local;
 import fr.irit.smac.may.lib.classic.impl.ClassicImpl;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.refreceive.impl.AgentRef;
+import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
 import fr.irit.smac.may.lib.interfaces.Push;
 
 public class Test {

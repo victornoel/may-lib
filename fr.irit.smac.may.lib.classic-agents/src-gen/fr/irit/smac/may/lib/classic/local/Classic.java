@@ -2,10 +2,10 @@ package fr.irit.smac.may.lib.classic.local;
 
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.local.Factory;
-import fr.irit.smac.may.lib.components.ExecutorService;
-import fr.irit.smac.may.lib.components.ReferenceReceiver;
-import fr.irit.smac.may.lib.components.ReferenceSender;
-import fr.irit.smac.may.lib.components.Scheduler;
+import fr.irit.smac.may.lib.components.messaging.Sender;
+import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 
 public abstract class Classic<Msg> {
 
@@ -17,7 +17,7 @@ public abstract class Classic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> create();
+	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> create();
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component
@@ -40,7 +40,7 @@ public abstract class Classic<Msg> {
 	 * This should be overridden by the implementation to define how to create this sub-component
 	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
-	protected abstract ReferenceSender<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> make_sender();
+	protected abstract Sender<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> make_sender();
 
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
@@ -48,7 +48,7 @@ public abstract class Classic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender() {
+	protected final Sender.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> sender() {
 		assert this.structure != null;
 		return this.structure.sender;
 	}
@@ -57,7 +57,7 @@ public abstract class Classic<Msg> {
 	 * This should be overridden by the implementation to define how to create this sub-component
 	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
-	protected abstract ReferenceReceiver<Msg> make_receive();
+	protected abstract Receiver<Msg> make_receive();
 
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
@@ -65,7 +65,7 @@ public abstract class Classic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final ReferenceReceiver.Component<Msg> receive() {
+	protected final Receiver.Component<Msg> receive() {
 		assert this.structure != null;
 		return this.structure.receive;
 	}
@@ -74,7 +74,7 @@ public abstract class Classic<Msg> {
 	 * This should be overridden by the implementation to define how to create this sub-component
 	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
-	protected abstract Factory<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> make_fact();
+	protected abstract Factory<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> make_fact();
 
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
@@ -82,7 +82,7 @@ public abstract class Classic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact() {
+	protected final Factory.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> fact() {
 		assert this.structure != null;
 		return this.structure.fact;
 	}
@@ -127,11 +127,11 @@ public abstract class Classic<Msg> {
 
 			this.scheduler = new Scheduler.Component(implem.make_scheduler(),
 					new Bridge_scheduler());
-			this.sender = new ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
+			this.sender = new Sender.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>>(
 					implem.make_sender(), new Bridge_sender());
-			this.receive = new ReferenceReceiver.Component<Msg>(
-					implem.make_receive(), new Bridge_receive());
-			this.fact = new Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
+			this.receive = new Receiver.Component<Msg>(implem.make_receive(),
+					new Bridge_receive());
+			this.fact = new Factory.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>>(
 					implem.make_fact(), new Bridge_fact());
 			this.executor = new ExecutorService.Component(
 					implem.make_executor(), new Bridge_executor());
@@ -148,32 +148,30 @@ public abstract class Classic<Msg> {
 			};
 
 		}
-		private final ReferenceSender.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender;
+		private final Sender.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> sender;
 
 		private final class Bridge_sender
 				implements
-					ReferenceSender.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
+					Sender.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> {
 
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> deposit() {
+			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> deposit() {
 				return Component.this.receive.deposit();
 
 			};
 
 		}
-		private final ReferenceReceiver.Component<Msg> receive;
+		private final Receiver.Component<Msg> receive;
 
-		private final class Bridge_receive
-				implements
-					ReferenceReceiver.Bridge<Msg> {
+		private final class Bridge_receive implements Receiver.Bridge<Msg> {
 
 		}
-		private final Factory.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact;
+		private final Factory.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> fact;
 
 		private final class Bridge_fact
 				implements
-					Factory.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
+					Factory.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> {
 
-			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> infraCreate() {
+			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> infraCreate() {
 				return Component.this.create();
 
 			};
@@ -189,16 +187,16 @@ public abstract class Classic<Msg> {
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> send() {
+		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> send() {
 			return this.receive.deposit();
 		};
-		private final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> create;
+		private final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> create;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> create() {
+		public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> create() {
 			return this.create;
 		};
 
@@ -215,48 +213,48 @@ public abstract class Classic<Msg> {
 
 	public static final class ClassicAgent<Msg> {
 		public ClassicAgent(
-				final ClassicAgentComponent<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> _component,
+				final ClassicAgentComponent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> _component,
 				final Scheduler.Agent _scheduler,
-				final Factory.Agent<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> _fact,
-				final ReferenceReceiver.Agent<Msg> _receive,
-				final ReferenceSender.Agent<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> _sender) {
-			this.component = new ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
+				final Factory.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> _fact,
+				final Receiver.Agent<Msg> _receive,
+				final Sender.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> _sender) {
+			this.component = new ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>>(
 					_component, new ClassicAgent_component());
 
 			this.scheduler = new Scheduler.Agent.Component(_scheduler,
 					new ClassicAgent_scheduler());
 
-			this.fact = new Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
+			this.fact = new Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>>(
 					_fact, new ClassicAgent_fact());
 
-			this.receive = new ReferenceReceiver.Agent.Component<Msg>(_receive,
+			this.receive = new Receiver.Agent.Component<Msg>(_receive,
 					new ClassicAgent_receive());
 
-			this.sender = new ReferenceSender.Agent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>>(
+			this.sender = new Sender.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>>(
 					_sender, new ClassicAgent_sender());
 
 		}
 
-		private final ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> component;
+		private final ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> component;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> component() {
+		public final ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> component() {
 			return this.component;
 		};
 
 		private final class ClassicAgent_component
 				implements
-					ClassicAgentComponent.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
+					ClassicAgentComponent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> {
 
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> send() {
+			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> send() {
 				return ClassicAgent.this.sender.send();
 
 			};
 
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> me() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> me() {
 				return ClassicAgent.this.receive.me();
 
 			};
@@ -271,7 +269,7 @@ public abstract class Classic<Msg> {
 
 			};
 
-			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> create() {
+			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> create() {
 				return ClassicAgent.this.fact.create();
 
 			};
@@ -293,11 +291,11 @@ public abstract class Classic<Msg> {
 		public final Scheduler.Agent.Component scheduler() {
 			return this.scheduler;
 		};
-		private final Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact;
+		private final Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> fact;
 
 		private final class ClassicAgent_fact
 				implements
-					Factory.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
+					Factory.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> {
 
 		}
 
@@ -305,14 +303,14 @@ public abstract class Classic<Msg> {
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> fact() {
+		public final Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> fact() {
 			return this.fact;
 		};
-		private final ReferenceReceiver.Agent.Component<Msg> receive;
+		private final Receiver.Agent.Component<Msg> receive;
 
 		private final class ClassicAgent_receive
 				implements
-					ReferenceReceiver.Agent.Bridge<Msg> {
+					Receiver.Agent.Bridge<Msg> {
 
 			public final fr.irit.smac.may.lib.interfaces.Push<Msg> put() {
 				return ClassicAgent.this.component.put();
@@ -325,14 +323,14 @@ public abstract class Classic<Msg> {
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final ReferenceReceiver.Agent.Component<Msg> receive() {
+		public final Receiver.Agent.Component<Msg> receive() {
 			return this.receive;
 		};
-		private final ReferenceSender.Agent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender;
+		private final Sender.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> sender;
 
 		private final class ClassicAgent_sender
 				implements
-					ReferenceSender.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> {
+					Sender.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> {
 
 		}
 
@@ -340,7 +338,7 @@ public abstract class Classic<Msg> {
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final ReferenceSender.Agent.Component<Msg, fr.irit.smac.may.lib.components.refreceive.impl.AgentRef<Msg>> sender() {
+		public final Sender.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<Msg>> sender() {
 			return this.sender;
 		};
 

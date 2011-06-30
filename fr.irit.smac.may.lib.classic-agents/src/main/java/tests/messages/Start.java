@@ -1,6 +1,6 @@
 package tests.messages;
 
-import fr.irit.smac.may.lib.components.remplace.impl.Place;
+import fr.irit.smac.may.lib.components.remote.place.Place;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
 public class Start extends PatternMatchingMessage {

@@ -1,32 +1,34 @@
 package fr.irit.smac.may.lib.classic.remote.impl;
 
+import java.util.concurrent.Executors;
+
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
-import fr.irit.smac.may.lib.components.ExecutorService;
-import fr.irit.smac.may.lib.components.Placed;
-import fr.irit.smac.may.lib.components.ReferenceReceiver;
-import fr.irit.smac.may.lib.components.ReferenceSender;
-import fr.irit.smac.may.lib.components.RemoteReferenceReceiver;
-import fr.irit.smac.may.lib.components.Scheduler;
-import fr.irit.smac.may.lib.components.impl.FixedThreadPoolExecutorServiceImpl;
-import fr.irit.smac.may.lib.components.impl.SchedulerImpl;
-import fr.irit.smac.may.lib.components.impl.SendImpl;
-import fr.irit.smac.may.lib.components.refreceive.impl.AgentRef;
-import fr.irit.smac.may.lib.components.refreceive.impl.ReceiveImpl;
-import fr.irit.smac.may.lib.components.remplace.impl.Place;
-import fr.irit.smac.may.lib.components.remplace.impl.PlacedImpl;
-import fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef;
-import fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteRefReceiveImpl;
+import fr.irit.smac.may.lib.components.messaging.Sender;
+import fr.irit.smac.may.lib.components.messaging.SenderImpl;
+import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
+import fr.irit.smac.may.lib.components.messaging.receiver.ReceiveImpl;
+import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiverImpl;
+import fr.irit.smac.may.lib.components.remote.place.Place;
+import fr.irit.smac.may.lib.components.remote.place.Placed;
+import fr.irit.smac.may.lib.components.remote.place.PlacedImpl;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
+import fr.irit.smac.may.lib.components.scheduling.Scheduler;
+import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 
 public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	private final int port;
 	private SchedulerImpl scheduler;
-	private SendImpl<Msg, RemoteAgentRef<Msg>> send;
+	private SenderImpl<Msg, RemoteAgentRef<Msg>> send;
 	private ReceiveImpl<Msg> receive;
-	private RemoteRefReceiveImpl<Msg, AgentRef<Msg>> remoteRefReceive;
+	private RemoteReceiverImpl<Msg, AgentRef<Msg>> remoteRefReceive;
 	private RemoteFactoryImpl<Msg, RemoteAgentRef<Msg>> factory;
 
 	private volatile int i = 0;
@@ -43,26 +45,26 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	public ReferenceSender<Msg, RemoteAgentRef<Msg>> make_sender() {
-		send = new SendImpl<Msg, RemoteAgentRef<Msg>>();
+	public Sender<Msg, RemoteAgentRef<Msg>> make_sender() {
+		send = new SenderImpl<Msg, RemoteAgentRef<Msg>>();
 		return send;
 	}
 
 	@Override
-	public ReferenceReceiver<Msg> make_receive() {
+	public Receiver<Msg> make_receive() {
 		receive = new ReceiveImpl<Msg>();
 		return receive;
 	}
 
 	@Override
-	public RemoteReferenceReceiver<Msg, AgentRef<Msg>> make_remReceive() {
-		remoteRefReceive = new RemoteRefReceiveImpl<Msg, AgentRef<Msg>>();
+	public RemoteReceiver<Msg, AgentRef<Msg>> make_remReceive() {
+		remoteRefReceive = new RemoteReceiverImpl<Msg, AgentRef<Msg>>();
 		return remoteRefReceive;
 	}
 
 	@Override
 	public ExecutorService make_executor() {
-		return new FixedThreadPoolExecutorServiceImpl(5);
+		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(5));
 	}
 
 	@Override

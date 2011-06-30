@@ -1,0 +1,34 @@
+
+import fr.irit.smac.may.lib.interfaces.*
+import fr.irit.smac.may.lib.components.remote.place.Place
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
+
+namespace fr.irit.smac.may.lib.components.remote {
+	
+	namespace place {
+		transverse Placed {
+			agent {
+				provides myPlace: Pull[Place]
+			}
+			infra {
+				provides thisPlace: Pull[Place]
+			}
+		}
+	}
+	
+	namespace messaging.receiver {
+		transverse RemoteReceiver[Msg, LocalRef] {
+			agent {
+				provides me: Pull[RemoteAgentRef[Msg]]
+				requires localMe: Pull[LocalRef]
+				provides disconnect: Do
+			}
+			infra {
+				requires localDeposit: Send[Msg, LocalRef]
+				requires myPlace: Pull[Place]
+				provides deposit: Send[Msg, RemoteAgentRef[Msg]]
+			}
+		}
+	}
+	
+}

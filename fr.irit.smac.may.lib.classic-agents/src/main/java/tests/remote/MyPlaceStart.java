@@ -3,8 +3,8 @@ package tests.remote;
 import tests.messages.Start;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.impl.RemoteClassicImpl;
-import fr.irit.smac.may.lib.components.remplace.impl.Place;
-import fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef;
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
+import fr.irit.smac.may.lib.components.remote.place.Place;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
 public class MyPlaceStart {

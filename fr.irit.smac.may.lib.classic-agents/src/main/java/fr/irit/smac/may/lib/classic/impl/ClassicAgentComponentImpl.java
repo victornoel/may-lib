@@ -2,9 +2,9 @@ package fr.irit.smac.may.lib.classic.impl;
 
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.SequentialDispatcher;
-import fr.irit.smac.may.lib.components.impl.SequentialDispatcherImpl;
-import fr.irit.smac.may.lib.components.refreceive.impl.AgentRef;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcherImpl;
+import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
 
 public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, AgentRef<Msg>> {
 	

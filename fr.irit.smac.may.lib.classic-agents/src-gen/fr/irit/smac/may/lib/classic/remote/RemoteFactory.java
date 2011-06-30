@@ -20,7 +20,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remplace.impl.Place> thisPlace() {
+	protected final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace() {
 		assert this.structure != null;
 		return this.structure.bridge.thisPlace();
 	};
@@ -35,7 +35,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 	public static interface Bridge<Msg, Ref> {
 		public fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> infraCreate();
-		public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remplace.impl.Place> thisPlace();
+		public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace();
 
 	}
 

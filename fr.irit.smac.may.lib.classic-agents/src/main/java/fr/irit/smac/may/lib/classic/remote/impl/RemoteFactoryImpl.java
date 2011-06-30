@@ -12,7 +12,7 @@ import java.rmi.server.UnicastRemoteObject;
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
-import fr.irit.smac.may.lib.components.remplace.impl.Place;
+import fr.irit.smac.may.lib.components.remote.place.Place;
 
 public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 

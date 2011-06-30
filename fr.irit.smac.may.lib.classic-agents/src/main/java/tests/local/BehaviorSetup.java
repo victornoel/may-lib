@@ -2,7 +2,7 @@ package tests.local;
 
 import tests.messages.Hello;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.remplace.impl.Place;
+import fr.irit.smac.may.lib.components.remote.place.Place;
 import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingBehavior;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;

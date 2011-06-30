@@ -1,7 +1,7 @@
 package fr.irit.smac.may.lib.classic.local;
 
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.SequentialDispatcher;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 
 public abstract class ClassicAgentComponent<Msg, Ref> {
 

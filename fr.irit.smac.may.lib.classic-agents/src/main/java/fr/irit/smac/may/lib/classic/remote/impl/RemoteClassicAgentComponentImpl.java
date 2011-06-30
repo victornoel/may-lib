@@ -2,9 +2,9 @@ package fr.irit.smac.may.lib.classic.remote.impl;
 
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
-import fr.irit.smac.may.lib.components.SequentialDispatcher;
-import fr.irit.smac.may.lib.components.impl.SequentialDispatcherImpl;
-import fr.irit.smac.may.lib.components.remrefreceive.impl.RemoteAgentRef;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcherImpl;
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.interfaces.Do;
 
 public class RemoteClassicAgentComponentImpl<Msg> extends RemoteClassicAgentComponent<Msg, RemoteAgentRef<Msg>> {

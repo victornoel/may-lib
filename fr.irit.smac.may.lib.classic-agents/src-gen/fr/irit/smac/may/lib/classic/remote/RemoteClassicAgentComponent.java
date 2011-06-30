@@ -1,7 +1,7 @@
 package fr.irit.smac.may.lib.classic.remote;
 
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
-import fr.irit.smac.may.lib.components.SequentialDispatcher;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 
 public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 

@@ -1,0 +1,52 @@
+
+import fr.irit.smac.may.lib.interfaces.*
+import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
+import java.lang.String
+
+namespace fr.irit.smac.may.lib.components.messaging {
+
+	transverse Sender[MsgType, Ref] {
+		agent {
+			provides send: Send[MsgType, Ref]
+		}
+		infra {
+			requires deposit: Send[MsgType, Ref]
+		}
+	}
+	
+	transverse Broadcaster[T, Ref] {
+		agent {
+			provides bc: Broadcast[T]
+		}
+		infra {
+			requires deposit: Send[T, Ref]
+			provides add: Push[Ref]
+			provides remove: Push[Ref]
+		}
+	}
+
+	namespace receiver {
+		transverse Receiver[MsgType] {
+			agent {
+				requires put: Push[MsgType]
+				provides me: Pull[AgentRef[MsgType]]
+				provides stop: Do
+			}
+			infra {
+				provides deposit: Send[MsgType, AgentRef[MsgType]]
+			}
+		}
+	}
+	
+	transverse IdentifierReceiver[Msg, RealRef] {
+		agent {
+			provides me: Pull[String]
+			requires realMe: Pull[RealRef]
+			provides disconnect: Do
+		}
+		infra {
+			provides deposit: Send[Msg, String]
+			requires realDeposit: Send[Msg, RealRef]
+		}
+	}
+}

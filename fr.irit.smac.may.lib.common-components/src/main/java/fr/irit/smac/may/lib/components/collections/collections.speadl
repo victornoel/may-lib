@@ -1,0 +1,12 @@
+
+import java.util.Collection
+import fr.irit.smac.may.lib.interfaces.*
+
+namespace fr.irit.smac.may.lib.components.collections {
+	
+	component Queue[Truc] {
+		provides put: Push[Truc]
+		provides get: Pull[Truc]
+		provides getAll: Pull[Collection[Truc]]
+	}
+}

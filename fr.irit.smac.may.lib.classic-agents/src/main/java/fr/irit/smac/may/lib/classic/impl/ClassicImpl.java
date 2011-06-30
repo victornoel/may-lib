@@ -1,23 +1,25 @@
 package fr.irit.smac.may.lib.classic.impl;
 
+import java.util.concurrent.Executors;
+
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
 import fr.irit.smac.may.lib.classic.local.Factory;
-import fr.irit.smac.may.lib.components.ExecutorService;
-import fr.irit.smac.may.lib.components.ReferenceReceiver;
-import fr.irit.smac.may.lib.components.ReferenceSender;
-import fr.irit.smac.may.lib.components.Scheduler;
-import fr.irit.smac.may.lib.components.impl.FixedThreadPoolExecutorServiceImpl;
-import fr.irit.smac.may.lib.components.impl.SchedulerImpl;
-import fr.irit.smac.may.lib.components.impl.SendImpl;
-import fr.irit.smac.may.lib.components.refreceive.impl.AgentRef;
-import fr.irit.smac.may.lib.components.refreceive.impl.ReceiveImpl;
+import fr.irit.smac.may.lib.components.messaging.SenderImpl;
+import fr.irit.smac.may.lib.components.messaging.Sender;
+import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
+import fr.irit.smac.may.lib.components.messaging.receiver.ReceiveImpl;
+import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
+import fr.irit.smac.may.lib.components.scheduling.Scheduler;
+import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	private SchedulerImpl schedulerImpl;
-	private SendImpl<Msg, AgentRef<Msg>> send;
+	private SenderImpl<Msg, AgentRef<Msg>> send;
 	private ReceiveImpl<Msg> receive;
 	private FactoryImpl<Msg, AgentRef<Msg>> factory;
 
@@ -31,17 +33,17 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	@Override
 	protected ExecutorService make_executor() {
-		return new FixedThreadPoolExecutorServiceImpl(5);
+		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(5));
 	}
 
 	@Override
-	protected ReferenceSender<Msg, AgentRef<Msg>> make_sender() {
-		send = new SendImpl<Msg, AgentRef<Msg>>();
+	protected Sender<Msg, AgentRef<Msg>> make_sender() {
+		send = new SenderImpl<Msg, AgentRef<Msg>>();
 		return send;
 	}
 
 	@Override
-	protected ReferenceReceiver<Msg> make_receive() {
+	protected Receiver<Msg> make_receive() {
 		receive = new ReceiveImpl<Msg>();
 		return receive;
 	}
