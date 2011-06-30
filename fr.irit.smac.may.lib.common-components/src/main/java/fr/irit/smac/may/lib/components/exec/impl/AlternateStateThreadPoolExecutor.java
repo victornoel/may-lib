@@ -1,6 +1,7 @@
 package fr.irit.smac.may.lib.components.exec.impl;
 
-import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
@@ -17,22 +18,18 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 	private final ReentrantLock pauseLock = new ReentrantLock();
 	private final Condition unpaused = pauseLock.newCondition();
 
-	/*
-	 * les parametres d'initialisation meritent d'etre affin�s, leur valeur est
-	 * une valeur par d�faut
-	 */
-	public static final int CORE_POOL_SIZE = 5;
-	public static final int MAX_POOL_SIZE = 50;
-	public static final long KEEP_ALIVE_TIME = 100;
-	public static final int BLOCKING_QUEUE_SIZE = 999;
-
-	public static final int SLOW_SPEED = 100;
-	public static final int FAST_SPEED = 0;
+	private volatile int slowSpeed = 100;
+	private volatile int fastSpeed = 0;
 
 	public AlternateStateThreadPoolExecutor() {
-		super(CORE_POOL_SIZE, MAX_POOL_SIZE, KEEP_ALIVE_TIME,
-				TimeUnit.MICROSECONDS, new ArrayBlockingQueue<Runnable>(
-						BLOCKING_QUEUE_SIZE));
+		this(5, Integer.MAX_VALUE, 100, TimeUnit.MICROSECONDS, new SynchronousQueue<Runnable>());
+	}
+	
+	/**
+	 * See {@link ThreadPoolExecutor} and {@link Executors} for example of values to use.
+	 */
+	public AlternateStateThreadPoolExecutor(int corePoolSize, int completedTaskCount, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
+		super(corePoolSize, completedTaskCount, keepAliveTime, unit, workQueue);
 		currentState = STATE.PAUSE;
 	}
 
@@ -66,10 +63,10 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 		try {
 			switch (currentState) {
 			case SLOW:
-				unpaused.await(SLOW_SPEED, TimeUnit.MILLISECONDS);
+				unpaused.await(getSlowSpeed(), TimeUnit.MILLISECONDS);
 				break;
 			case FAST:
-				unpaused.await(FAST_SPEED, TimeUnit.MILLISECONDS);
+				unpaused.await(getFastSpeed(), TimeUnit.MILLISECONDS);
 				break;
 			default:
 
@@ -122,6 +119,22 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 				pauseLock.unlock();
 			}
 		}
+	}
+
+	public void setFastSpeed(int fastSpeed) {
+		this.fastSpeed = fastSpeed;
+	}
+
+	public int getFastSpeed() {
+		return fastSpeed;
+	}
+
+	public void setSlowSpeed(int slowSpeed) {
+		this.slowSpeed = slowSpeed;
+	}
+
+	public int getSlowSpeed() {
+		return slowSpeed;
 	}
 
 }
