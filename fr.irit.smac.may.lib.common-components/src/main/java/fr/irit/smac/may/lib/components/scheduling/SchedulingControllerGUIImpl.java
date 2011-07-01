@@ -3,6 +3,8 @@ package fr.irit.smac.may.lib.components.scheduling;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
@@ -23,6 +25,12 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 		frame = new JFrame();
 		frame.add(new ControlComponent());
 		frame.setLayout(new FlowLayout());
+		frame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				control().pause();
+			}
+		});
 		frame.pack();
 	}
 	
@@ -106,21 +114,19 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 					int state = source.getValue();
 					switch (state) {
 					case 1:
-						control().stop();
+						control().pause();
 						stepButton.setEnabled(false);
 						break;
 					case 2:
-						control().stop();
+						control().pause();
 						stepButton.setEnabled(true);
 						break;
 					case 3:
 						control().setSlow();
-						control().start();
 						stepButton.setEnabled(false);
 						break;
 					case 4:
 						control().setFast();
-						control().start();
 						stepButton.setEnabled(false);
 						break;
 					}

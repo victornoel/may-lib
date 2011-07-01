@@ -11,11 +11,19 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 			provides stop: Do
 		}
 		infra {
+			/**
+			 * when called, all agents are called concurrently
+			 * (using sched) on their cycle port
+			 * return upon completion of all agents 
+			 */
 			provides tick: Do
 			requires sched: Executor
 		}
 	}
 	
+	/**
+	 * One step means to execute all agents once
+	 */
 	component Clock {
 		requires sched: Executor
 		requires tick: Do
@@ -34,6 +42,18 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		}
 		infra {
 			requires infraSched: Executor
+		}
+	}
+	
+	namespace ase {
+		/**
+		 * One step equals to execute at once the number of max thread to be created
+		 * It is not meant to schedule a set of agents all at once (for that see Clock),
+		 * but to execute a set of tasks bit by bit
+		 */
+		component AlternateStateExecutorService {
+			provides exec: Executor
+			provides control: SchedulingControl
 		}
 	}
 

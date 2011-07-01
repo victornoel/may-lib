@@ -24,7 +24,7 @@ public class ClockImpl extends Clock {
 	protected SchedulingControl control() {
 		return new SchedulingControl() {
 			
-			public void stop() {
+			public void pause() {
 				running.set(false);
 			}
 			
@@ -37,18 +37,16 @@ public class ClockImpl extends Clock {
 				});
 			}
 			
-			public void start() {
+			public void setSlow() {
 				if (!running.getAndSet(true)) {
 					run();
 				}
 			}
 			
-			public void setSlow() {
-				// TODO Auto-generated method stub
-			}
-			
 			public void setFast() {
-				// TODO Auto-generated method stub
+				if (!running.getAndSet(true)) {
+					run();
+				}
 			}
 		};
 	}

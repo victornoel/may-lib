@@ -1,25 +1,20 @@
 package fr.irit.smac.may.lib.components.scheduling.ase;
 
-import java.awt.FlowLayout;
 import java.util.concurrent.Executor;
 
-import javax.swing.JFrame;
-
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl;
 
 public class AlternateStateThreadPoolExecutorServiceImpl extends
-		ExecutorService {
+		AlternateStateExecutorService {
 
-	private final AlternateStateThreadPoolExecutor exec = new AlternateStateThreadPoolExecutor();
-
-	private final JFrame frame;
+	private final AlternateStateThreadPoolExecutor exec;
+	
+	protected AlternateStateThreadPoolExecutor makeExec() {
+		return new AlternateStateThreadPoolExecutor();
+	}
 	
 	public AlternateStateThreadPoolExecutorServiceImpl() {
-		frame = new JFrame();
-		frame.add(new SchedulerControlComponent(exec));
-		frame.setLayout(new FlowLayout());
-		frame.pack();
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.exec = makeExec();
 	}
 	
 	@Override
@@ -30,10 +25,26 @@ public class AlternateStateThreadPoolExecutorServiceImpl extends
 			}
 		};
 	}
-	
+
 	@Override
-	protected void start() {
-		super.start();
-		frame.setVisible(true);
+	protected SchedulingControl control() {
+		return new SchedulingControl() {
+			
+			public void pause() {
+				exec.pause();
+			}
+			
+			public void step() {
+				exec.nextStep();
+			}
+			
+			public void setSlow() {
+				exec.goSlow();
+			}
+			
+			public void setFast() {
+				exec.goFast();
+			}
+		};
 	}
 }

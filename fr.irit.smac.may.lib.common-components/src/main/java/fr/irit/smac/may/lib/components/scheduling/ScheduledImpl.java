@@ -3,6 +3,7 @@ package fr.irit.smac.may.lib.components.scheduling;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -22,8 +23,9 @@ public class ScheduledImpl extends Scheduled {
 			return new Do() {
 				public void doIt() {
 					run.set(false);
-					if (currentTask != null && !currentTask.isDone())
+					if (currentTask != null && !currentTask.isDone()) {
 						currentTask.cancel(true);
+					}
 				}
 			};
 		}
@@ -32,12 +34,7 @@ public class ScheduledImpl extends Scheduled {
 			if (run.get()) {
 				currentTask = new FutureTask<Object>(new Runnable() {
 					public void run() {
-						try {
-							cycle().doIt();
-						} catch (Exception e) {
-							System.err.println("Error when executing cycle in ScheduledImpl:");
-							e.printStackTrace();
-						}
+						cycle().doIt();
 					}
 				}, null);
 				sched().execute(currentTask);
@@ -50,8 +47,25 @@ public class ScheduledImpl extends Scheduled {
 		return new Do() {
 			public void doIt() {
 				synchronized (agents) {
-					for(final AgentSide a: agents) {
+					// start agents
+					for(AgentSide a: agents) {
 						a.tick();
+					}
+					// wait for all of them to finish before giving back control
+					for(AgentSide a: agents) {
+						if (a.currentTask != null) {
+							try {
+								a.currentTask.get();
+							} catch (InterruptedException e) {
+								// TODO what to do here?
+								e.printStackTrace();
+							} catch (ExecutionException e) {
+								System.err.println("Error when executing cycle in ScheduledImpl:");
+								e.printStackTrace();
+							} finally {
+								a.currentTask = null;
+							}
+						}
 					}
 				}
 			}
