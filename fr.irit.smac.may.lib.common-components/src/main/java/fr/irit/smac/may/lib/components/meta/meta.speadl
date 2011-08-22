@@ -1,0 +1,19 @@
+
+namespace fr.irit.smac.may.lib.components.meta {
+	
+	import java.lang.*
+	
+	/**
+	 * This transverse enables to realise collection ports
+	 * with keys to retrieve the wanted port
+	 */
+	transverse Collection[K,I] {
+		agent {
+			requires p: I
+			provides idx: fr.irit.smac.may.lib.interfaces.Pull[K]
+		}
+		infra {
+			provides get: fr.irit.smac.may.lib.interfaces.MapGet[K,I]
+		}
+	}
+}
