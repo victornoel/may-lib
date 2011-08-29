@@ -23,6 +23,10 @@ public class AgentRef<Msg> implements Serializable {
 		this.ref = null;
 	}
 	
+	public String getName() {
+		return this.name;
+	}
+	
 	@Override
 	public String toString() {
 		return this.name + (this.ref == null ? "(dead agent)" : "");
