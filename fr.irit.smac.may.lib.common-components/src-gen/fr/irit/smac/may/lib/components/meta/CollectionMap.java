@@ -1,6 +1,6 @@
 package fr.irit.smac.may.lib.components.meta;
 
-public abstract class Collection<K, I> {
+public abstract class CollectionMap<K, I> {
 
 	private Component<K, I> structure = null;
 
@@ -21,9 +21,9 @@ public abstract class Collection<K, I> {
 		@SuppressWarnings("unused")
 		private final Bridge<K, I> bridge;
 
-		private final Collection<K, I> implementation;
+		private final CollectionMap<K, I> implementation;
 
-		public Component(final Collection<K, I> implem, final Bridge<K, I> b) {
+		public Component(final CollectionMap<K, I> implem, final Bridge<K, I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -65,17 +65,20 @@ public abstract class Collection<K, I> {
 			assert this.structure != null;
 			return this.structure.bridge.p();
 		};
-
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This can be called by the implementation to access this required port
+		 * It will be initialized before the provided ports are initialized
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<K> idx();
+		protected final fr.irit.smac.may.lib.interfaces.Pull<K> key() {
+			assert this.structure != null;
+			return this.structure.bridge.key();
+		};
 
 		public static interface Bridge<K, I> {
 			public I p();
+			public fr.irit.smac.may.lib.interfaces.Pull<K> key();
 
 		}
 
@@ -93,19 +96,7 @@ public abstract class Collection<K, I> {
 				assert implem.structure == null;
 				implem.structure = this;
 
-				this.idx = implem.idx();
-
 			}
-
-			private final fr.irit.smac.may.lib.interfaces.Pull<K> idx;
-
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public final fr.irit.smac.may.lib.interfaces.Pull<K> idx() {
-				return this.idx;
-			};
 
 			public final void start() {
 

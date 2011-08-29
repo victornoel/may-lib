@@ -6,7 +6,7 @@ import java.util.List;
 import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Pull;
 
-public class CollectionImpl<I> extends Collection<Integer,I> {
+public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 
 	private final List<AgentSide> interfaces = new ArrayList<AgentSide>();
 	
@@ -19,7 +19,7 @@ public class CollectionImpl<I> extends Collection<Integer,I> {
 		};
 	}
 	
-	public class AgentSide extends Agent<Integer,I> {
+	public class AgentSide extends Agent<I> {
 		
 		private final int k;
 		

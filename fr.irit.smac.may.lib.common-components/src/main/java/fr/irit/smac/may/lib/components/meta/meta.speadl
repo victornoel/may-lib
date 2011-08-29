@@ -5,12 +5,26 @@ namespace fr.irit.smac.may.lib.components.meta {
 	
 	/**
 	 * This transverse enables to realise collection ports
-	 * with keys to retrieve the wanted port
+	 * with integer keys to retrieve the wanted port
 	 */
-	transverse Collection[K,I] {
+	transverse CollectionInteger[I] {
 		agent {
 			requires p: I
-			provides idx: fr.irit.smac.may.lib.interfaces.Pull[K]
+			provides idx: fr.irit.smac.may.lib.interfaces.Pull[Integer]
+		}
+		infra {
+			provides get: fr.irit.smac.may.lib.interfaces.MapGet[Integer,I]
+		}
+	}
+	
+	/**
+	 * This transverse enables to realise collection ports
+	 * with keys to retrieve the wanted port
+	 */
+	transverse CollectionMap[K,I] {
+		agent {
+			requires p: I
+			requires key: fr.irit.smac.may.lib.interfaces.Pull[K]
 		}
 		infra {
 			provides get: fr.irit.smac.may.lib.interfaces.MapGet[K,I]
