@@ -9,12 +9,12 @@ public class ClockImpl extends Clock {
 
 	private AtomicBoolean running = new AtomicBoolean(false);
 	
-	private void run() {
+	private void myrun() {
 		if (running.get()) {
 			sched().execute(new Runnable() {
 				public void run() {
 					tick().doIt();
-					run();
+					myrun();
 				}
 			});
 		}
@@ -39,13 +39,13 @@ public class ClockImpl extends Clock {
 			
 			public void setSlow() {
 				if (!running.getAndSet(true)) {
-					run();
+					myrun();
 				}
 			}
 			
 			public void setFast() {
 				if (!running.getAndSet(true)) {
-					run();
+					myrun();
 				}
 			}
 		};

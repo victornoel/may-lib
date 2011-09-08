@@ -15,13 +15,18 @@ public class ScheduledImpl extends Scheduled {
 	
 	public class AgentSide extends Scheduled.Agent {
 
-		private FutureTask<?> currentTask;
+		public AgentSide() {
+			agents.add(this);
+		}
+		
+		private FutureTask<?> currentTask = null;
 		private AtomicBoolean run = new AtomicBoolean(true);
 
 		@Override
 		protected Do stop() {
 			return new Do() {
 				public void doIt() {
+					agents.remove(AgentSide.this);
 					run.set(false);
 					if (currentTask != null && !currentTask.isDone()) {
 						currentTask.cancel(true);
@@ -40,6 +45,22 @@ public class ScheduledImpl extends Scheduled {
 				sched().execute(currentTask);
 			}
 		}
+		
+		private void waitForEnd() {
+			if (this.currentTask != null) {
+				try {
+					this.currentTask.get();
+				} catch (InterruptedException e) {
+					// TODO what to do here?
+					e.printStackTrace();
+				} catch (ExecutionException e) {
+					System.err.println("Error when executing cycle in ScheduledImpl:");
+					e.printStackTrace();
+				} finally {
+					this.currentTask = null;
+				}
+			}
+		}
 	}
 
 	@Override
@@ -53,19 +74,7 @@ public class ScheduledImpl extends Scheduled {
 					}
 					// wait for all of them to finish before giving back control
 					for(AgentSide a: agents) {
-						if (a.currentTask != null) {
-							try {
-								a.currentTask.get();
-							} catch (InterruptedException e) {
-								// TODO what to do here?
-								e.printStackTrace();
-							} catch (ExecutionException e) {
-								System.err.println("Error when executing cycle in ScheduledImpl:");
-								e.printStackTrace();
-							} finally {
-								a.currentTask = null;
-							}
-						}
+						a.waitForEnd();
 					}
 				}
 			}
