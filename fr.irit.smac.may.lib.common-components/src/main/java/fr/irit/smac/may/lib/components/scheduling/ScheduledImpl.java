@@ -55,7 +55,7 @@ public class ScheduledImpl extends Scheduled {
 					e.printStackTrace();
 				} catch (ExecutionException e) {
 					System.err.println("Error when executing cycle in ScheduledImpl:");
-					e.printStackTrace();
+					e.getCause().printStackTrace();
 				} finally {
 					this.currentTask = null;
 				}

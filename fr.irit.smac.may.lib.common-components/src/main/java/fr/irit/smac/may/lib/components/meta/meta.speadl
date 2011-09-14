@@ -30,4 +30,16 @@ namespace fr.irit.smac.may.lib.components.meta {
 			provides get: fr.irit.smac.may.lib.interfaces.MapGet[K,I]
 		}
 	}
+	
+	/**
+	 * Simply forward a port from the agents to the infrastructure
+	 */
+	transverse Forward[I] {
+		agent {
+			provides a: I
+		}
+		infra {
+			requires i: I
+		}
+	}
 }

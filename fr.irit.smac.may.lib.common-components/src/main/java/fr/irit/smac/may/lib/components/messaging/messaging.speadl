@@ -5,6 +5,9 @@ import java.lang.String
 
 namespace fr.irit.smac.may.lib.components.messaging {
 
+	/**
+	 * Could be replaced by meta.Forward
+	 */
 	transverse Sender[MsgType, Ref] {
 		agent {
 			provides send: Send[MsgType, Ref]
