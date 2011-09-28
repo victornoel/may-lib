@@ -2,6 +2,7 @@ package fr.irit.smac.may.lib.components.scheduling;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
@@ -34,31 +35,19 @@ public class ScheduledImpl extends Scheduled {
 			return new Do() {
 				public void doIt() {
 					run.set(false);
-					if (currentTask != null && !currentTask.isDone() && !currentTask.isCancelled()) {
-						currentTask.cancel(true);
-					}
-					currentTask = null;
-					// remove the agent when the collection is not locked (later)
-					sched().execute(new Runnable() {
-						public void run() {
-							agents.remove(AgentSide.this);
-						}
-					});
 				}
 			};
 		}
 		
 		private void tick() {
-			if (run.get()) {
-				currentTask = new FutureTask<Object>(new Runnable() {
-					public void run() {
-						if (run.get()) {
-							cycle().doIt();
-						}
+			currentTask = new FutureTask<Object>(new Runnable() {
+				public void run() {
+					if (run.get()) {
+						cycle().doIt();
 					}
-				}, null);
-				sched().execute(currentTask);
-			}
+				}
+			}, null);
+			sched().execute(currentTask);
 		}
 		
 		private void waitForEnd() {
@@ -88,8 +77,11 @@ public class ScheduledImpl extends Scheduled {
 			public void doIt() {
 				synchronized (agents) {
 					// start agents
-					for(AgentSide a: agents) {
-						a.tick();
+					Iterator<AgentSide> it = agents.iterator();
+					while(it.hasNext()) {
+						AgentSide a = it.next();
+						if (a.run.get()) a.tick();
+						else it.remove();
 					}
 					// wait for all of them to finish before giving back control
 					for(AgentSide a: agents) {
