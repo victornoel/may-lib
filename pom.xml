@@ -15,7 +15,7 @@
 	<repositories>
 		<repository>
 			<id>fr.irit.smac</id>
-			<url>http://www.irit.fr/PERSONNEL/SMAC/noel/maven-repos/</url>
+			<url>http://www.irit.fr/~Victor.Noel/maven-repos/</url>
 		</repository>
 	</repositories>
 	<build>
@@ -48,7 +48,7 @@
 	<distributionManagement>
 		<repository>
 			<id>ftp-repository-irit-vnoel</id>
-			<url>ftp://ftpintra.irit.fr/../../usr/local/WWW/PERSONNEL/SMAC/noel/maven-repos/</url>
+			<url>ftp://ftpintra.irit.fr//usr/local/WWW-personnel/Victor.Noel/maven-repos/</url>
 		</repository>
 	</distributionManagement>
 	<properties>
