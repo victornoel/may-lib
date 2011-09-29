@@ -5,6 +5,7 @@ import java.util.concurrent.Executor
 
 namespace fr.irit.smac.may.lib.components.scheduling {
 	
+	
 	transverse Scheduled {
 		agent {
 			requires cycle: Do
@@ -35,6 +36,11 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		requires control: SchedulingControl
 	}
 
+
+	/**
+	 * Will schedule as much tasks as needed
+	 * Stop will stop any task not finished
+	 */
 	transverse Scheduler {
 		agent {
 			provides sched: Executor
@@ -50,6 +56,8 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		 * One step equals to execute at once the number of max thread to be created
 		 * It is not meant to schedule a set of agents all at once (for that see Clock),
 		 * but to execute a set of tasks bit by bit
+		 * 
+		 * Prefer to use the Clock with an ExecutorService
 		 */
 		component AlternateStateExecutorService {
 			provides exec: Executor

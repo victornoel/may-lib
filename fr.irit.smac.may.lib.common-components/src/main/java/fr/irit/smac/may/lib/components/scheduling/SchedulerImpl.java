@@ -10,14 +10,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import fr.irit.smac.may.lib.interfaces.Do;
 
 /**
- * Will schedule as much as runnable as needed Stop will stop any runnable not
- * finished
+ * Will schedule as much as runnable as needed
+ * Stop will stop any runnable not finished
  */
 public class SchedulerImpl extends Scheduler {
 
 	public class AgentSide extends Scheduler.Agent {
 
-		private AtomicBoolean run = new AtomicBoolean(true);
+		private final AtomicBoolean run = new AtomicBoolean(true);
 
 		private final Set<Future<?>> s = new HashSet<Future<?>>();
 

@@ -19,9 +19,11 @@ public class ScheduledImpl extends Scheduled {
 
 		private FutureTask<?> currentTask = null;
 		
-		private AtomicBoolean run = new AtomicBoolean(true);
+		private final AtomicBoolean run = new AtomicBoolean(true);
 		
-		public AgentSide() {
+		@Override
+		protected void start() {
+			super.start();
 			// add the agent when the collection is not locked (later)
 			sched().execute(new Runnable() {
 				public void run() {
