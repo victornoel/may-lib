@@ -13,4 +13,17 @@ namespace fr.irit.smac.may.lib.components.controlflow {
 
 		requires handler: Push[Truc]
 	}
+	
+	/**
+	 * When the component starts,
+	 * execute handler as long as stop
+	 * is not called
+	 */
+	component Loop {
+		requires executor: Executor
+		
+		requires handler: Do
+		
+		provides stop: Do
+	}
 }
