@@ -2,6 +2,9 @@ package fr.irit.smac.may.lib.components.messaging.receiver;
 
 import java.io.Serializable;
 
+
+public interface AgentRef extends Serializable {}
+/*
 public class AgentRef<Msg> implements Serializable {
 
 	private static final long serialVersionUID = 683175997362391141L;
@@ -33,3 +36,4 @@ public class AgentRef<Msg> implements Serializable {
 	}
 
 }
+*/

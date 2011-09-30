@@ -19,14 +19,14 @@ namespace fr.irit.smac.may.lib.components.remote {
 	namespace messaging.receiver {
 		transverse RemoteReceiver[Msg, LocalRef] {
 			agent {
-				provides me: Pull[RemoteAgentRef[Msg]]
+				provides me: Pull[RemoteAgentRef]
 				requires localMe: Pull[LocalRef]
 				provides disconnect: Do
 			}
 			infra {
 				requires localDeposit: Send[Msg, LocalRef]
 				requires myPlace: Pull[Place]
-				provides deposit: Send[Msg, RemoteAgentRef[Msg]]
+				provides deposit: Send[Msg, RemoteAgentRef]
 			}
 		}
 	}

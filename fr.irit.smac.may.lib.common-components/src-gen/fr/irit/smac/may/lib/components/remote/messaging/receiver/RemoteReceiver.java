@@ -31,7 +31,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef<Msg>> deposit();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit();
 
 	public static interface Bridge<Msg, LocalRef> {
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit();
@@ -58,13 +58,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef<Msg>> deposit;
+		private final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef<Msg>> deposit() {
+		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit() {
 			return this.deposit;
 		};
 
@@ -95,7 +95,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef<Msg>> me();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port
@@ -130,13 +130,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 			}
 
-			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef<Msg>> me;
+			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me;
 
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef<Msg>> me() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me() {
 				return this.me;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do disconnect;

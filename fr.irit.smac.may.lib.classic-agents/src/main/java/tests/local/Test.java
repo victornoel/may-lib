@@ -12,7 +12,7 @@ public class Test {
 		Classic.Component<String> infra = new Classic.Component<String>(new ClassicImpl<String>(), new Classic.Bridge<String>() {}) ;
 		infra.start();
 		
-		final AgentRef<String> create = infra.create().create(new ClassicBehaviour<String, AgentRef<String>>() {
+		final AgentRef create = infra.create().create(new ClassicBehaviour<String, AgentRef>() {
 			@Override
 			public Push<String> cycle() {
 				return new Push<String>() {
@@ -24,7 +24,7 @@ public class Test {
 			}
 		});
 		
-		AgentRef<String> create2 = infra.create().create(new ClassicBehaviour<String, AgentRef<String>>() {
+		AgentRef create2 = infra.create().create(new ClassicBehaviour<String, AgentRef>() {
 			@Override
 			public Push<String> cycle() {
 				return new Push<String>() {

@@ -12,7 +12,7 @@ public class Test {
 		RemoteClassic.Component<String> infra = new RemoteClassic.Component<String>(new RemoteClassicImpl<String>(1099), new RemoteClassic.Bridge<String>() {}) ;
 		infra.start();
 		
-		final RemoteAgentRef<String> create = infra.create().create(new RemoteClassicBehaviour<String, RemoteAgentRef<String>>() {
+		final RemoteAgentRef create = infra.create().create(new RemoteClassicBehaviour<String, RemoteAgentRef>() {
 			@Override
 			public Push<String> cycle() {
 				return new Push<String>() {
@@ -24,7 +24,7 @@ public class Test {
 			}
 		});
 		
-		RemoteAgentRef<String> create2 = infra.create().create(new RemoteClassicBehaviour<String, RemoteAgentRef<String>>() {
+		RemoteAgentRef create2 = infra.create().create(new RemoteClassicBehaviour<String, RemoteAgentRef>() {
 			@Override
 			public Push<String> cycle() {
 				return new Push<String>() {

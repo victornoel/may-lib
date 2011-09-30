@@ -10,7 +10,7 @@ public abstract class Receiver<MsgType> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<MsgType>> deposit();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit();
 
 	public static interface Bridge<MsgType> {
 
@@ -35,13 +35,13 @@ public abstract class Receiver<MsgType> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<MsgType>> deposit;
+		private final fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<MsgType>> deposit() {
+		public final fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit() {
 			return this.deposit;
 		};
 
@@ -72,7 +72,7 @@ public abstract class Receiver<MsgType> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<MsgType>> me();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port
@@ -107,13 +107,13 @@ public abstract class Receiver<MsgType> {
 
 			}
 
-			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<MsgType>> me;
+			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> me;
 
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef<MsgType>> me() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> me() {
 				return this.me;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do stop;

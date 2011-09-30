@@ -13,7 +13,7 @@ public class MyPlaceStart {
 
 		Classic.Component<PatternMatchingMessage> infra = Classic.createComponent(new ClassicImpl<PatternMatchingMessage>());
 		
-		AgentRef<PatternMatchingMessage> starter = infra.create().create(new BehaviorSetup<AgentRef<PatternMatchingMessage>>());
+		AgentRef starter = infra.create().create(new BehaviorSetup<AgentRef>());
 
 		infra.send().send(new Start(new Place(null, 0), new Place(null, 0)), starter);
 		

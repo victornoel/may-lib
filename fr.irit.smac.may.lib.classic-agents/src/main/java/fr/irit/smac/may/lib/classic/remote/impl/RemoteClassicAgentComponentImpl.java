@@ -7,9 +7,9 @@ import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcherImpl;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.interfaces.Do;
 
-public class RemoteClassicAgentComponentImpl<Msg> extends RemoteClassicAgentComponent<Msg, RemoteAgentRef<Msg>> {
-	private final RemoteClassicBehaviour<Msg, RemoteAgentRef<Msg>> beh;
-	public RemoteClassicAgentComponentImpl(RemoteClassicBehaviour<Msg, RemoteAgentRef<Msg>> beh) {
+public class RemoteClassicAgentComponentImpl<Msg> extends RemoteClassicAgentComponent<Msg, RemoteAgentRef> {
+	private final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh;
+	public RemoteClassicAgentComponentImpl(RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
 		this.beh = beh;
 	}
 	@Override
@@ -17,7 +17,7 @@ public class RemoteClassicAgentComponentImpl<Msg> extends RemoteClassicAgentComp
 		return new SequentialDispatcherImpl<Msg>();
 	}
 	@Override
-	public RemoteClassicBehaviour<Msg, RemoteAgentRef<Msg>> make_beh() {
+	public RemoteClassicBehaviour<Msg, RemoteAgentRef> make_beh() {
 		return beh;
 	}
 	

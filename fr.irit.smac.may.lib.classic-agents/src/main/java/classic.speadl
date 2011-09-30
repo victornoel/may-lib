@@ -28,26 +28,26 @@ namespace fr.irit.smac.may.lib.classic {
 		
 		infrastructure Classic[Msg] {
 
-			provides send: Send[Msg, AgentRef[Msg]] = receive.deposit
-			provides create: CreateClassic[Msg, AgentRef[Msg]]
+			provides send: Send[Msg, AgentRef] = receive.deposit
+			provides create: CreateClassic[Msg, AgentRef]
 
 			transverse scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			transverse sender: Sender[Msg, AgentRef[Msg]] {
+			transverse sender: Sender[Msg, AgentRef] {
 				bind deposit to receive.deposit
 			}
 
 			transverse receive: Receiver[Msg]
 
-			transverse fact: Factory[Msg, AgentRef[Msg]] {
+			transverse fact: Factory[Msg, AgentRef] {
 				bind infraCreate toThis create
 			}
 
 			instance executor: ExecutorService
 
-			species ClassicAgent for ClassicAgentComponent[Msg, AgentRef[Msg]] {
+			species ClassicAgent for ClassicAgentComponent[Msg, AgentRef] {
 
 				bind send to sender.send
 				bind me to receive.me
@@ -149,15 +149,15 @@ namespace fr.irit.smac.may.lib.classic {
 
 		infrastructure RemoteClassic[Msg] {
 
-			provides send: Send[Msg, RemoteAgentRef[Msg]] = remReceive.deposit
+			provides send: Send[Msg, RemoteAgentRef] = remReceive.deposit
 			provides thisPlace: Pull[Place] = placed.thisPlace
-			provides create: CreateRemoteClassic[Msg, RemoteAgentRef[Msg]]
+			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
 
 			transverse scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			transverse sender: Sender[Msg, RemoteAgentRef[Msg]] {
+			transverse sender: Sender[Msg, RemoteAgentRef] {
 				bind deposit to remReceive.deposit
 			}
 
@@ -165,19 +165,19 @@ namespace fr.irit.smac.may.lib.classic {
 
 			transverse placed: Placed
 
-			transverse remReceive: RemoteReceiver[Msg, AgentRef[Msg]] {
+			transverse remReceive: RemoteReceiver[Msg, AgentRef] {
 				bind localDeposit to receive.deposit
 				bind myPlace to placed.thisPlace
 			}
 
-			transverse fact: RemoteFactory[Msg, RemoteAgentRef[Msg]] {
+			transverse fact: RemoteFactory[Msg, RemoteAgentRef] {
 				bind infraCreate toThis create
 				bind thisPlace to placed.thisPlace
 			}
 
 			instance executor: ExecutorService
 
-			species ClassicAgent for RemoteClassicAgentComponent[Msg, RemoteAgentRef[Msg]] {
+			species ClassicAgent for RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
 				bind send to sender.send
 				bind me to remReceive.me
 				bind stopExec to scheduler.stop

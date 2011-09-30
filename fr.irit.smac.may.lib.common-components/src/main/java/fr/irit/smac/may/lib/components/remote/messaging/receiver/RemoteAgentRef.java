@@ -2,8 +2,10 @@ package fr.irit.smac.may.lib.components.remote.messaging.receiver;
 
 import java.io.Serializable;
 
-import fr.irit.smac.may.lib.components.remote.place.Place;
 
+public interface RemoteAgentRef extends Serializable {}
+
+/*
 public class RemoteAgentRef<Msg> implements Serializable {
 
 	private static final long serialVersionUID = 3786174379034488447L;
@@ -25,4 +27,4 @@ public class RemoteAgentRef<Msg> implements Serializable {
 		return name+"@"+place;
 	};
 }
-
+*/

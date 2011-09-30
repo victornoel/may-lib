@@ -26,10 +26,10 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	private final int port;
 	private SchedulerImpl scheduler;
-	private SenderImpl<Msg, RemoteAgentRef<Msg>> send;
+	private SenderImpl<Msg, RemoteAgentRef> send;
 	private ReceiverImpl<Msg> receive;
-	private RemoteReceiverImpl<Msg, AgentRef<Msg>> remoteRefReceive;
-	private RemoteFactoryImpl<Msg, RemoteAgentRef<Msg>> factory;
+	private RemoteReceiverImpl<Msg, AgentRef> remoteRefReceive;
+	private RemoteFactoryImpl<Msg, RemoteAgentRef> factory;
 
 	private volatile int i = 0;
 	private PlacedImpl placed; 
@@ -45,8 +45,8 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	public Sender<Msg, RemoteAgentRef<Msg>> make_sender() {
-		send = new SenderImpl<Msg, RemoteAgentRef<Msg>>();
+	public Sender<Msg, RemoteAgentRef> make_sender() {
+		send = new SenderImpl<Msg, RemoteAgentRef>();
 		return send;
 	}
 
@@ -57,8 +57,8 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	public RemoteReceiver<Msg, AgentRef<Msg>> make_remReceive() {
-		remoteRefReceive = new RemoteReceiverImpl<Msg, AgentRef<Msg>>();
+	public RemoteReceiver<Msg, AgentRef> make_remReceive() {
+		remoteRefReceive = new RemoteReceiverImpl<Msg, AgentRef>();
 		return remoteRefReceive;
 	}
 
@@ -68,16 +68,16 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	protected RemoteFactory<Msg, RemoteAgentRef<Msg>> make_fact() {
-		factory = new RemoteFactoryImpl<Msg, RemoteAgentRef<Msg>>();
+	protected RemoteFactory<Msg, RemoteAgentRef> make_fact() {
+		factory = new RemoteFactoryImpl<Msg, RemoteAgentRef>();
 		return factory;
 	}
 
 	@Override
-	protected CreateRemoteClassic<Msg, RemoteAgentRef<Msg>> create() {
-		return new CreateRemoteClassic<Msg, RemoteAgentRef<Msg>>() {
-			public RemoteAgentRef<Msg> create(
-					final RemoteClassicBehaviour<Msg, RemoteAgentRef<Msg>> beh) {
+	protected CreateRemoteClassic<Msg, RemoteAgentRef> create() {
+		return new CreateRemoteClassic<Msg, RemoteAgentRef>() {
+			public RemoteAgentRef create(
+					final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
 
 				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
 						new RemoteClassicAgentComponentImpl<Msg>(beh),
@@ -88,8 +88,8 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 				return agent.remReceive().me().pull();
 			}
 
-			public RemoteAgentRef<Msg> create(
-					RemoteClassicBehaviour<Msg, RemoteAgentRef<Msg>> beh,
+			public RemoteAgentRef create(
+					RemoteClassicBehaviour<Msg, RemoteAgentRef> beh,
 					Place place) {
 				return fact().factCreate().create(beh, place);
 			}

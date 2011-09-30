@@ -1,9 +1,11 @@
 package fr.irit.smac.may.lib.components.remote.messaging.receiver;
 
 import java.rmi.NoSuchObjectException;
+import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
+import fr.irit.smac.may.lib.components.remote.place.Place;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Send;
@@ -11,11 +13,33 @@ import fr.irit.smac.may.lib.interfaces.Send;
 public class RemoteReceiverImpl<Msg, LocalRef> extends
 		RemoteReceiver<Msg, LocalRef> {
 	
-	public class RemoteAgentImpl implements RemoteAgent<Msg> {
+	public class RemoteAgentRefImpl implements RemoteAgentRef {
+
+		private static final long serialVersionUID = 3786174379034488447L;
+		
+		final RemoteAgent agent;
+
+		private final Place place;
+
+		private final String name;
+
+		RemoteAgentRefImpl(RemoteAgent agent, Place place, String name) {
+			this.place = place;
+			this.name = name;
+			this.agent = agent;
+		}
+		
+		@Override
+		public String toString() {
+			return name+"@"+place;
+		};
+	}
+	
+	public class RemoteAgent implements Remote {
 
 		private final LocalRef ref;
 		
-		public RemoteAgentImpl(LocalRef ref) {
+		public RemoteAgent(LocalRef ref) {
 			this.ref = ref;
 		}
 		
@@ -26,14 +50,14 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 
 	public class AgentSide extends Agent<Msg, LocalRef> {
 
-		private RemoteAgentRef<Msg> me;
+		private RemoteAgentRefImpl me;
 		
 		@Override
 		protected void start() {
 			super.start();
 			// beware that anonymous instance of classes are kept linked to
 			// "this" and so may not be gc'ed when we would want
-			RemoteAgent<Msg> remoteMe = new RemoteAgentImpl(localMe().pull());
+			RemoteAgent remoteMe = new RemoteAgent(localMe().pull());
 
 			try {
 				// reuse port instead of opening another one.
@@ -43,13 +67,13 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 			}
 
 			// we encapsulate it inside this class to hide the remote object
-			this.me = new RemoteAgentRef<Msg>(remoteMe, myPlace().pull(), localMe().pull().toString());
+			this.me = new RemoteAgentRefImpl(remoteMe, myPlace().pull(), localMe().pull().toString());
 		}
 
 		@Override
-		public Pull<RemoteAgentRef<Msg>> me() {
-			return new Pull<RemoteAgentRef<Msg>>() {
-				public RemoteAgentRef<Msg> pull() {
+		public Pull<RemoteAgentRef> me() {
+			return new Pull<RemoteAgentRef>() {
+				public RemoteAgentRef pull() {
 					return AgentSide.this.me;
 				}
 			};
@@ -70,11 +94,12 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 	}
 
 	@Override
-	public Send<Msg, RemoteAgentRef<Msg>> deposit() {
-		return new Send<Msg, RemoteAgentRef<Msg>>() {
-			public void send(Msg msg, RemoteAgentRef<Msg> receiver) {
+	public Send<Msg, RemoteAgentRef> deposit() {
+		return new Send<Msg, RemoteAgentRef>() {
+			public void send(Msg msg, RemoteAgentRef receiver) {
 				try {
-					receiver.agent.receive(msg);
+					// TODO
+					((RemoteAgentRefImpl)receiver).agent.receive(msg);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

@@ -6,12 +6,12 @@ import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcherImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
 
-public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, AgentRef<Msg>> {
+public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, AgentRef> {
 	
-	private final ClassicBehaviour<Msg, AgentRef<Msg>> beh;
+	private final ClassicBehaviour<Msg, AgentRef> beh;
 
 	public ClassicAgentComponentImpl(
-			ClassicBehaviour<Msg, AgentRef<Msg>> beh) {
+			ClassicBehaviour<Msg, AgentRef> beh) {
 		this.beh = beh;
 	}
 
@@ -21,7 +21,7 @@ public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, A
 	}
 
 	@Override
-	public ClassicBehaviour<Msg, AgentRef<Msg>> make_beh() {
+	public ClassicBehaviour<Msg, AgentRef> make_beh() {
 		return beh;
 	}
 }

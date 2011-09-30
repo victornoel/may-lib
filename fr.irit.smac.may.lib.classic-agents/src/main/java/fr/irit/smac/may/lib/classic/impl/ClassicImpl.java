@@ -19,9 +19,9 @@ import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	private SchedulerImpl schedulerImpl;
-	private SenderImpl<Msg, AgentRef<Msg>> send;
+	private SenderImpl<Msg, AgentRef> send;
 	private ReceiverImpl<Msg> receive;
-	private FactoryImpl<Msg, AgentRef<Msg>> factory;
+	private FactoryImpl<Msg, AgentRef> factory;
 
 	private volatile int i = 0;
 	
@@ -37,8 +37,8 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected Sender<Msg, AgentRef<Msg>> make_sender() {
-		send = new SenderImpl<Msg, AgentRef<Msg>>();
+	protected Sender<Msg, AgentRef> make_sender() {
+		send = new SenderImpl<Msg, AgentRef>();
 		return send;
 	}
 
@@ -49,16 +49,16 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected Factory<Msg, AgentRef<Msg>> make_fact() {
-		factory = new FactoryImpl<Msg, AgentRef<Msg>>();
+	protected Factory<Msg, AgentRef> make_fact() {
+		factory = new FactoryImpl<Msg, AgentRef>();
 		return factory;
 	}
 
 	@Override
-	protected CreateClassic<Msg, AgentRef<Msg>> create() {
-		return new CreateClassic<Msg, AgentRef<Msg>>() {
-			public AgentRef<Msg> create(
-					final ClassicBehaviour<Msg, AgentRef<Msg>> beh) {
+	protected CreateClassic<Msg, AgentRef> create() {
+		return new CreateClassic<Msg, AgentRef>() {
+			public AgentRef create(
+					final ClassicBehaviour<Msg, AgentRef> beh) {
 				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
 						new ClassicAgentComponentImpl<Msg>(beh),
 						schedulerImpl.new AgentSide(), factory.new AgentSide(),
