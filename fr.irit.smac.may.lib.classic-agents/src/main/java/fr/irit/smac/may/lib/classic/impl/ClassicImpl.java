@@ -5,12 +5,13 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.classic.local.Factory;
-import fr.irit.smac.may.lib.components.messaging.SenderImpl;
 import fr.irit.smac.may.lib.components.messaging.Sender;
+import fr.irit.smac.may.lib.components.messaging.SenderImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
+import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
+import fr.irit.smac.may.lib.components.meta.Forward;
+import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
@@ -18,17 +19,17 @@ import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
 
-	private SchedulerImpl schedulerImpl;
+	private SchedulerImpl scheduler;
 	private SenderImpl<Msg, AgentRef> send;
 	private ReceiverImpl<Msg> receive;
-	private FactoryImpl<Msg, AgentRef> factory;
+	private ForwardImpl<CreateClassic<Msg,AgentRef>> forward;
 
 	private volatile int i = 0;
 	
 	@Override
 	protected Scheduler make_scheduler() {
-		schedulerImpl = new SchedulerImpl();
-		return schedulerImpl;
+		scheduler = new SchedulerImpl();
+		return scheduler;
 	}
 
 	@Override
@@ -49,11 +50,10 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected Factory<Msg, AgentRef> make_fact() {
-		factory = new FactoryImpl<Msg, AgentRef>();
-		return factory;
+	protected Forward<CreateClassic<Msg, AgentRef>> make_fact() {
+		forward = new ForwardImpl<CreateClassic<Msg,AgentRef>>();
+		return forward;
 	}
-
 	@Override
 	protected CreateClassic<Msg, AgentRef> create() {
 		return new CreateClassic<Msg, AgentRef>() {
@@ -61,7 +61,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 					final ClassicBehaviour<Msg, AgentRef> beh) {
 				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
 						new ClassicAgentComponentImpl<Msg>(beh),
-						schedulerImpl.new AgentSide(), factory.new AgentSide(),
+						scheduler.new AgentSide(), forward.new AgentSide(),
 						receive.new AgentSide("agent"+(i++)), send.new AgentSide());
 				agent.start();
 				return agent.receive().me().pull();

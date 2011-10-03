@@ -469,7 +469,6 @@ public abstract class RemoteClassic<Msg> {
 		 * This must be called to start the agent and its sub-components
 		 */
 		public final void start() {
-			this.component.start();
 
 			this.placed.start();
 
@@ -483,6 +482,7 @@ public abstract class RemoteClassic<Msg> {
 
 			this.remReceive.start();
 
+			this.component.start();
 		}
 	}
 

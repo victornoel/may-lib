@@ -1,9 +1,9 @@
 package fr.irit.smac.may.lib.classic.local;
 
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
-import fr.irit.smac.may.lib.classic.local.Factory;
 import fr.irit.smac.may.lib.components.messaging.Sender;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
+import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 
@@ -74,7 +74,7 @@ public abstract class Classic<Msg> {
 	 * This should be overridden by the implementation to define how to create this sub-component
 	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
-	protected abstract Factory<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> make_fact();
+	protected abstract Forward<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> make_fact();
 
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports
@@ -82,7 +82,7 @@ public abstract class Classic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final Factory.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> fact() {
+	protected final Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> fact() {
 		assert this.structure != null;
 		return this.structure.fact;
 	}
@@ -131,7 +131,7 @@ public abstract class Classic<Msg> {
 					implem.make_sender(), new Bridge_sender());
 			this.receive = new Receiver.Component<Msg>(implem.make_receive(),
 					new Bridge_receive());
-			this.fact = new Factory.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>(
+			this.fact = new Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>>(
 					implem.make_fact(), new Bridge_fact());
 			this.executor = new ExecutorService.Component(
 					implem.make_executor(), new Bridge_executor());
@@ -165,13 +165,13 @@ public abstract class Classic<Msg> {
 		private final class Bridge_receive implements Receiver.Bridge<Msg> {
 
 		}
-		private final Factory.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> fact;
+		private final Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> fact;
 
 		private final class Bridge_fact
 				implements
-					Factory.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> {
+					Forward.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> {
 
-			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> infraCreate() {
+			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> i() {
 				return Component.this.create();
 
 			};
@@ -215,7 +215,7 @@ public abstract class Classic<Msg> {
 		public ClassicAgent(
 				final ClassicAgentComponent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> _component,
 				final Scheduler.Agent _scheduler,
-				final Factory.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> _fact,
+				final Forward.Agent<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> _fact,
 				final Receiver.Agent<Msg> _receive,
 				final Sender.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> _sender) {
 			this.component = new ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>(
@@ -224,7 +224,7 @@ public abstract class Classic<Msg> {
 			this.scheduler = new Scheduler.Agent.Component(_scheduler,
 					new ClassicAgent_scheduler());
 
-			this.fact = new Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>(
+			this.fact = new Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>>(
 					_fact, new ClassicAgent_fact());
 
 			this.receive = new Receiver.Agent.Component<Msg>(_receive,
@@ -270,7 +270,7 @@ public abstract class Classic<Msg> {
 			};
 
 			public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> create() {
-				return ClassicAgent.this.fact.create();
+				return ClassicAgent.this.fact.a();
 
 			};
 
@@ -291,11 +291,11 @@ public abstract class Classic<Msg> {
 		public final Scheduler.Agent.Component scheduler() {
 			return this.scheduler;
 		};
-		private final Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> fact;
+		private final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> fact;
 
 		private final class ClassicAgent_fact
 				implements
-					Factory.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> {
+					Forward.Agent.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> {
 
 		}
 
@@ -303,7 +303,7 @@ public abstract class Classic<Msg> {
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final Factory.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> fact() {
+		public final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef>> fact() {
 			return this.fact;
 		};
 		private final Receiver.Agent.Component<Msg> receive;
@@ -346,7 +346,6 @@ public abstract class Classic<Msg> {
 		 * This must be called to start the agent and its sub-components
 		 */
 		public final void start() {
-			this.component.start();
 
 			this.scheduler.start();
 
@@ -356,6 +355,7 @@ public abstract class Classic<Msg> {
 
 			this.sender.start();
 
+			this.component.start();
 		}
 	}
 

@@ -41,8 +41,8 @@ namespace fr.irit.smac.may.lib.classic {
 
 			transverse receive: Receiver[Msg]
 
-			transverse fact: Factory[Msg, AgentRef] {
-				bind infraCreate toThis create
+			transverse fact: fr.irit.smac.may.lib.components.meta.Forward[CreateClassic[Msg, AgentRef]] {
+				bind i toThis create
 			}
 
 			instance executor: ExecutorService
@@ -53,7 +53,7 @@ namespace fr.irit.smac.may.lib.classic {
 				bind me to receive.me
 				bind executor to scheduler.sched
 				bind die to scheduler.stop
-				bind create to fact.create
+				bind create to fact.a
 
 				use scheduler
 
@@ -84,15 +84,6 @@ namespace fr.irit.smac.may.lib.classic {
 				bind me toThis me
 				bind die toThis die
 				bind create toThis create
-			}
-		}
-
-		transverse Factory[Msg, Ref] {
-			agent {
-				provides create: CreateClassic[Msg, Ref]
-			}
-			infra {
-				requires infraCreate: CreateClassic[Msg, Ref]
 			}
 		}
 
