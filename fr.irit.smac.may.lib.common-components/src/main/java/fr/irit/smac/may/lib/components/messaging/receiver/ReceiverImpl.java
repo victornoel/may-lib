@@ -18,16 +18,16 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 		private ReceiverImpl<Msg>.AgentSide ref;
 		private final String name;
 		
-		AgentRefImpl(ReceiverImpl<Msg>.AgentSide ref, String name) {
+		private AgentRefImpl(ReceiverImpl<Msg>.AgentSide ref, String name) {
 			this.ref = ref;
 			this.name = name;
 		}
 
-		void receive(Msg m) {
+		private void receive(Msg m) {
 			if (this.ref != null) this.ref.receive(m);
 		}
 		
-		void stop() {
+		private void stop() {
 			// allow for garbage collection
 			this.ref = null;
 		}
