@@ -3,7 +3,10 @@ package fr.irit.smac.may.lib.components.messaging.receiver;
 import java.io.Serializable;
 
 
-public interface AgentRef extends Serializable {}
+public interface AgentRef extends Serializable {
+	
+	public String getName();
+}
 /*
 public class AgentRef<Msg> implements Serializable {
 
