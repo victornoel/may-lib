@@ -52,4 +52,23 @@ namespace fr.irit.smac.may.lib.components.messaging {
 			requires realDeposit: Send[Msg, RealRef]
 		}
 	}
+	
+	namespace distributed {
+		
+		transverse DistributedSenderReceiver[Msg,LocalRef,DistRef] {
+			agent {
+				provides me: Pull[DistRef]
+				requires localMe: Pull[LocalRef]
+				provides disconnect: Do
+				provides send: Send[Msg,DistRef]
+			}
+			infra {
+				requires distributedDeposit: Send[Msg,DistRef]
+				provides deposit: Send[Msg,DistRef]
+				requires localDeposit: Send[Msg,LocalRef]
+				requires generateRef: Pull[DistRef]
+			}
+		}
+	}
+	
 }
