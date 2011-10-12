@@ -2,25 +2,25 @@ package fr.irit.smac.may.lib.components.distribution.ivy;
 
 public class IvyConnectionConfig {
 
-	protected String broadCastAdress;
-	protected String port;
+	public final String broadCastAdress;
+	public final String port;
 	
-	protected String actorName;
-	protected String actorName2;
+	public final String actorName;
+	public final String helloWorldMessage;
 	
 	public IvyConnectionConfig(String broadCastAdress, String port,
-			String actorName, String actorName2) {
+			String actorName, String helloWorldMessage) {
 		super();
 		this.broadCastAdress = broadCastAdress;
 		this.port = port;
 		this.actorName = actorName;
-		this.actorName2 = actorName2;
+		this.helloWorldMessage = helloWorldMessage;
 	}
-	
-	
+
 	public String getBroadCastAdress() {
 		return broadCastAdress;
 	}
+
 	public String getPort() {
 		return port;
 	}
@@ -29,10 +29,7 @@ public class IvyConnectionConfig {
 		return actorName;
 	}
 
-	public String getActorName2() {
-		return actorName2;
+	public String getHelloWorldMessage() {
+		return helloWorldMessage;
 	}
-	
-	
-	
 }

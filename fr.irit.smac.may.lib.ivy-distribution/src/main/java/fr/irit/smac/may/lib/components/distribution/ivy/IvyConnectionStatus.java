@@ -1,23 +1,22 @@
 package fr.irit.smac.may.lib.components.distribution.ivy;
 
 public class IvyConnectionStatus {
-	protected String broadCastAdress;
-	protected String port;
 	
-	protected String actorName;
-	protected String actorName2;
+	private final String broadCastAdress;
+	private final String port;
 	
-	protected boolean connected;
+	private final String actorName;
+	private final String helloWorldMessage;
 	
-	
+	private final boolean connected;
 	
 	public IvyConnectionStatus(String broadCastAdress, String port,
-			String actorName, String actorName2, boolean connected) {
+			String actorName, String helloWorldMessage, boolean connected) {
 		super();
 		this.broadCastAdress = broadCastAdress;
 		this.port = port;
 		this.actorName = actorName;
-		this.actorName2 = actorName2;
+		this.helloWorldMessage = helloWorldMessage;
 		this.connected = connected;
 	}
 	
@@ -35,7 +34,7 @@ public class IvyConnectionStatus {
 		return actorName;
 	}
 
-	public String getActorName2() {
-		return actorName2;
+	public String getHelloWorldMessage() {
+		return helloWorldMessage;
 	}
 }
