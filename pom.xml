@@ -11,6 +11,7 @@
 		<module>fr.irit.smac.may.lib.classic-agents</module>
 		<module>fr.irit.smac.may.lib.common-interfaces</module>
 		<module>fr.irit.smac.may.lib.common-components</module>
+		<module>fr.irit.smac.may.lib.ivy-distribution</module>
 	</modules>
 	<repositories>
 		<repository>
