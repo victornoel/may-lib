@@ -1,7 +1,6 @@
 package fr.irit.smac.may.lib.components.distribution.ivy;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
@@ -89,14 +88,8 @@ public class IvyBusImpl extends IvyBus {
 
 			public void push(String thing) {
 				IvyBusImpl.this.listener = new IvyMessageListener() {
-
 					public void receive(IvyClient client, String[] args) {
-						List<String> list = new ArrayList<String>(args.length);
-						for (int i = 0; i < args.length; i++) {
-							list.add(args[i]);
-						}
-						IvyBusImpl.this.receive().push(list);
-
+						IvyBusImpl.this.receive().push(Arrays.asList(args));
 					}
 				};
 
@@ -113,13 +106,11 @@ public class IvyBusImpl extends IvyBus {
 	@Override
 	protected Push<String> send() {
 		return new Push<String>() {
-
 			public void push(String ivyMessage) {
 				if (IvyBusImpl.this.connected) {
 					try {
 						// System.out.println(ivyMessage);
 						IvyBusImpl.this.bus.sendMsg(ivyMessage);
-
 						// System.out.println("sent"+i );
 					} catch (IvyException e) {
 						e.printStackTrace();

@@ -38,7 +38,7 @@ public class IvyJacksonModemImpl<Msg> extends IvyJacksonModem<Msg> {
 	protected void start() {
 		super.start();
 		ivyConnect().push(new IvyConnectionConfig(broadCastAdress, port, platformName, platformName));
-		ivyBindMsg().push("IvyJacksonModemImpl: ^([:alnum:]*)@([:alnum:]*): (.*)$");
+		ivyBindMsg().push("^IvyJacksonModemImpl: ([:alnum:]*)@([:alnum:]*): (.*)$");
 	}
 	
 	@Override
