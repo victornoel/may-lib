@@ -44,6 +44,26 @@ public abstract class IvyJacksonModem<Msg> {
 		assert this.structure != null;
 		return this.structure.bridge.ivyBindMsg();
 	};
+	/**
+	 * This can be called by the implementation to access this required port
+	 * It will be initialized before the provided ports are initialized
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected final fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer() {
+		assert this.structure != null;
+		return this.structure.bridge.serializer();
+	};
+	/**
+	 * This can be called by the implementation to access this required port
+	 * It will be initialized before the provided ports are initialized
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer() {
+		assert this.structure != null;
+		return this.structure.bridge.deserializer();
+	};
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
@@ -74,6 +94,8 @@ public abstract class IvyJacksonModem<Msg> {
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend();
 		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionConfig> ivyConnect();
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg();
+		public fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer();
+		public fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer();
 
 	}
 

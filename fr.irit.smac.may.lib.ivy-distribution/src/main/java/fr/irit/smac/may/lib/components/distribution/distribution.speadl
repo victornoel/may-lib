@@ -19,6 +19,15 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		
 		provides ivyReceive: Push[List[String]]
 		requires ivyBindMsg : Push[String]
+		
+		
+		requires serializer : MapGet[Msg,String]
+		requires deserializer : MapGet[String, Msg]
+	}
+	
+	component JacksonModem[Msg] {
+		provides serializer : MapGet[Msg,String]
+		provides deserializer : MapGet[String, Msg]
 	}
 	
 	namespace ivy {
