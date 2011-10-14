@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.Dictionary;
 import java.util.Hashtable;
 
 import javax.swing.BorderFactory;
@@ -69,13 +70,12 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 			private static final long serialVersionUID = -5591439208368228848L;
 
 			public SchedulerSlider() {
-				super(SwingConstants.HORIZONTAL, 1, 4, 2);
+				super(SwingConstants.HORIZONTAL, 1, 3, 1);
 
-				Hashtable<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
+				Dictionary<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 				labelTable.put(new Integer(1), new JLabel("Pause"));
-				labelTable.put(new Integer(2), new JLabel("Step-by-step"));
-				labelTable.put(new Integer(3), new JLabel("Slow"));
-				labelTable.put(new Integer(4), new JLabel("Fast"));
+				labelTable.put(new Integer(2), new JLabel("Slow (1sec)"));
+				labelTable.put(new Integer(3), new JLabel("Fast "));
 
 				setLabelTable(labelTable);
 				setMinorTickSpacing(1);
@@ -115,18 +115,14 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 					switch (state) {
 					case 1:
 						control().pause();
-						stepButton.setEnabled(false);
-						break;
-					case 2:
-						control().pause();
 						stepButton.setEnabled(true);
 						break;
-					case 3:
-						control().setSlow();
+					case 2:
+						control().run(1000);
 						stepButton.setEnabled(false);
 						break;
-					case 4:
-						control().setFast();
+					case 3:
+						control().run(0);
 						stepButton.setEnabled(false);
 						break;
 					}

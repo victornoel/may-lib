@@ -10,17 +10,16 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 
-	public enum STATE {
-		FAST, SLOW, PAUSE
+	public enum State {
+		RUN, PAUSE
 	};
 
-	private volatile STATE currentState = STATE.PAUSE;
+	private volatile State currentState = State.PAUSE;
 
 	private final ReentrantLock pauseLock = new ReentrantLock();
 	private final Condition unpaused = pauseLock.newCondition();
 
-	private volatile int slowSpeed = 100;
-	private volatile int fastSpeed = 0;
+	private volatile int speed = 0;
 
 	public AlternateStateThreadPoolExecutor() {
 		this(5, Integer.MAX_VALUE, 100, TimeUnit.MICROSECONDS, new SynchronousQueue<Runnable>());
@@ -31,10 +30,10 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 	 */
 	public AlternateStateThreadPoolExecutor(int corePoolSize, int completedTaskCount, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
 		super(corePoolSize, completedTaskCount, keepAliveTime, unit, workQueue);
-		currentState = STATE.PAUSE;
+		currentState = State.PAUSE;
 	}
 
-	public STATE getState() {
+	public State getState() {
 		return currentState;
 	}
 
@@ -47,8 +46,7 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 			case PAUSE:
 				unpaused.await();
 				break;
-			case SLOW:
-			case FAST:
+			case RUN:
 				break;
 			}
 		} catch (InterruptedException ie) {
@@ -63,11 +61,8 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 		pauseLock.lock();
 		try {
 			switch (currentState) {
-			case SLOW:
-				unpaused.await(getSlowSpeed(), TimeUnit.MILLISECONDS);
-				break;
-			case FAST:
-				unpaused.await(getFastSpeed(), TimeUnit.MILLISECONDS);
+			case RUN:
+				unpaused.await(speed, TimeUnit.MILLISECONDS);
 				break;
 			default:
 
@@ -79,10 +74,10 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 	}
 
 	public void pause() {
-		if (!currentState.equals(STATE.PAUSE)) {
+		if (!currentState.equals(State.PAUSE)) {
 			pauseLock.lock();
 			try {
-				currentState = STATE.PAUSE;
+				currentState = State.PAUSE;
 			} finally {
 				pauseLock.unlock();
 			}
@@ -98,44 +93,15 @@ public class AlternateStateThreadPoolExecutor extends ThreadPoolExecutor {
 		}
 	}
 
-	public void goSlow() {
-		if (!currentState.equals(STATE.SLOW)) {
-			pauseLock.lock();
-			try {
-				currentState = STATE.SLOW;
-				unpaused.signalAll();
-			} finally {
-				pauseLock.unlock();
-			}
+	public void go(int ms) {
+		pauseLock.lock();
+		try {
+			currentState = State.RUN;
+			speed = ms;
+			unpaused.signalAll();
+		} finally {
+			pauseLock.unlock();
 		}
-	}
-
-	public void goFast() {
-		if (!currentState.equals(STATE.FAST)) {
-			pauseLock.lock();
-			try {
-				currentState = STATE.FAST;
-				unpaused.signalAll();
-			} finally {
-				pauseLock.unlock();
-			}
-		}
-	}
-
-	public void setFastSpeed(int fastSpeed) {
-		this.fastSpeed = fastSpeed;
-	}
-
-	public int getFastSpeed() {
-		return fastSpeed;
-	}
-
-	public void setSlowSpeed(int slowSpeed) {
-		this.slowSpeed = slowSpeed;
-	}
-
-	public int getSlowSpeed() {
-		return slowSpeed;
 	}
 
 }

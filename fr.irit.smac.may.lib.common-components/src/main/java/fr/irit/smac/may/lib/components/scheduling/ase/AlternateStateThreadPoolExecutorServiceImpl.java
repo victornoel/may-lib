@@ -38,12 +38,8 @@ public class AlternateStateThreadPoolExecutorServiceImpl extends
 				exec.nextStep();
 			}
 			
-			public void setSlow() {
-				exec.goSlow();
-			}
-			
-			public void setFast() {
-				exec.goFast();
+			public void run(int ms) {
+				exec.go(ms);
 			}
 		};
 	}

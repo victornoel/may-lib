@@ -9,18 +9,20 @@ public class ClockImpl extends Clock {
 
 	private AtomicBoolean running = new AtomicBoolean(false);
 	
-	private void myrun(final int ms) {
+	private volatile int sleep = 0;
+	
+	private void myrun() {
 		if (running.get()) {
 			sched().execute(new Runnable() {
 				public void run() {
 					tick().doIt();
 					try {
-						Thread.sleep(ms);
+						Thread.sleep(sleep);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					myrun(ms);
+					myrun();
 				}
 			});
 		}
@@ -36,6 +38,7 @@ public class ClockImpl extends Clock {
 			
 			public void step() {
 				running.set(false);
+				// TODO maybe wait for the previous one to finish before executing the step?
 				sched().execute(new Runnable() {
 					public void run() {
 						tick().doIt();
@@ -43,15 +46,10 @@ public class ClockImpl extends Clock {
 				});
 			}
 			
-			public void setSlow() {
+			public void run(int ms) {
+				sleep = ms;
 				if (!running.getAndSet(true)) {
-					myrun(1000);
-				}
-			}
-			
-			public void setFast() {
-				if (!running.getAndSet(true)) {
-					myrun(0);
+					myrun();
 				}
 			}
 		};

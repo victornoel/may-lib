@@ -4,9 +4,8 @@ public interface SchedulingControl {
 	
 	public void pause();
 	
-	public void setSlow();
-	
-	public void setFast();
+	// run every ms milliseconds
+	public void run(int ms);
 	
 	public void step();
 }
