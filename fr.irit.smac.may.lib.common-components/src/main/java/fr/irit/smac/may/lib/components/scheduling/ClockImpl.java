@@ -9,12 +9,18 @@ public class ClockImpl extends Clock {
 
 	private AtomicBoolean running = new AtomicBoolean(false);
 	
-	private void myrun() {
+	private void myrun(final int ms) {
 		if (running.get()) {
 			sched().execute(new Runnable() {
 				public void run() {
 					tick().doIt();
-					myrun();
+					try {
+						Thread.sleep(ms);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					myrun(ms);
 				}
 			});
 		}
@@ -39,13 +45,13 @@ public class ClockImpl extends Clock {
 			
 			public void setSlow() {
 				if (!running.getAndSet(true)) {
-					myrun();
+					myrun(1000);
 				}
 			}
 			
 			public void setFast() {
 				if (!running.getAndSet(true)) {
-					myrun();
+					myrun(0);
 				}
 			}
 		};
