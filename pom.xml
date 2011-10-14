@@ -7,18 +7,39 @@
 	<artifactId>parent</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<modules>
-		<module>fr.irit.smac.may.lib.classic-agents</module>
-		<module>fr.irit.smac.may.lib.common-interfaces</module>
-		<module>fr.irit.smac.may.lib.common-components</module>
-		<module>fr.irit.smac.may.lib.ivy-distribution</module>
-	</modules>
+	
+	<properties>
+		<encoding>UTF-8</encoding>
+	</properties>
+	
+	<scm>
+		<connection>scm:hg:https://anon@wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</connection>
+		<developerConnection>scm:hg:https://wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</developerConnection>
+		<url>https://wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</url>
+	</scm>
+	
+	<distributionManagement>
+		<repository>
+			<id>ftp-repository-irit-vnoel</id>
+			<url>ftp://ftpintra.irit.fr//usr/local/WWW-personnel/Victor.Noel/maven-repos/</url>
+		</repository>
+		<downloadUrl>http://www.irit.fr/~Victor.Noel/maven-repos/</downloadUrl>
+	</distributionManagement>
+		
 	<repositories>
 		<repository>
 			<id>fr.irit.smac</id>
 			<url>http://www.irit.fr/~Victor.Noel/maven-repos/</url>
 		</repository>
 	</repositories>
+	
+	<modules>
+		<module>fr.irit.smac.may.lib.classic-agents</module>
+		<module>fr.irit.smac.may.lib.common-interfaces</module>
+		<module>fr.irit.smac.may.lib.common-components</module>
+		<module>fr.irit.smac.may.lib.ivy-distribution</module>
+	</modules>
+	
 	<build>
 		<pluginManagement>
 			<plugins>
@@ -38,21 +59,13 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		
 		<extensions>
 			<extension>
 				<groupId>org.apache.maven.wagon</groupId>
 				<artifactId>wagon-ftp</artifactId>
-				<version>1.0-beta-7</version>
+				<version>2.0</version>
 			</extension>
 		</extensions>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>ftp-repository-irit-vnoel</id>
-			<url>ftp://ftpintra.irit.fr//usr/local/WWW-personnel/Victor.Noel/maven-repos/</url>
-		</repository>
-	</distributionManagement>
-	<properties>
-		<encoding>UTF-8</encoding>
-	</properties>
 </project>
