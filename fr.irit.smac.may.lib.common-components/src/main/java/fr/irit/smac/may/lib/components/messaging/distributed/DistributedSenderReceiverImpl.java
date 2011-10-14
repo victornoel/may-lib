@@ -27,9 +27,11 @@ public class DistributedSenderReceiverImpl<Msg, LocalRef, DistRef> extends Distr
 
 	public class AgentSide extends Agent<Msg, LocalRef, DistRef> {
 
-		private final DistRef myRef;
-		
-		public AgentSide() {
+		private DistRef myRef;
+
+		@Override
+		protected void start() {
+			super.start();
 			myRef = DistributedSenderReceiverImpl.this.generateRef().pull();
 			DistributedSenderReceiverImpl.this.map.put(myRef, this.localMe().pull());
 		}
