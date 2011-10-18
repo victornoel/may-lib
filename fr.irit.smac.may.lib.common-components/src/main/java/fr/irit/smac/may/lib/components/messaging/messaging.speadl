@@ -53,21 +53,35 @@ namespace fr.irit.smac.may.lib.components.messaging {
 		}
 	}
 	
+	transverse MapSenderReceiver[Msg,LocalRef,Ref] {
+		agent {
+			provides me: Pull[Ref]
+			requires localMe: Pull[LocalRef]
+			provides disconnect: Do
+			provides send: Send[Msg,Ref]
+		}
+		infra {
+			provides inDeposit: Send[Msg,Ref]
+			requires outDeposit: Send[Msg,Ref]
+			
+			requires localDeposit: Send[Msg,LocalRef]
+			requires generateRef: Pull[Ref]
+		}
+	}
+	
 	namespace distributed {
 		
-		transverse DistributedSenderReceiver[Msg,LocalRef,DistRef] {
-			agent {
-				provides me: Pull[DistRef]
-				requires localMe: Pull[LocalRef]
-				provides disconnect: Do
-				provides send: Send[Msg,DistRef]
-			}
-			infra {
-				requires distributedDeposit: Send[Msg,DistRef]
-				provides deposit: Send[Msg,DistRef]
-				requires localDeposit: Send[Msg,LocalRef]
-				requires generateRef: Pull[DistRef]
-			}
+		import fr.irit.smac.may.lib.components.messaging.distributed.DistRef
+		import fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage
+		
+		component DistributedMessaging[Msg] {
+			provides generateRef: Pull[DistRef]
+			
+			provides send: Send[Msg,DistRef]
+			requires deposit: Send[Msg,DistRef]
+			
+			requires broadcast: Push[DistributedMessage[Msg]]
+			provides handle: Push[DistributedMessage[Msg]]
 		}
 	}
 	

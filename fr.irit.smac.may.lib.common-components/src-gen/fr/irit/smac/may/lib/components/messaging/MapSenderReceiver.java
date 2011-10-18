@@ -1,8 +1,8 @@
-package fr.irit.smac.may.lib.components.messaging.distributed;
+package fr.irit.smac.may.lib.components.messaging;
 
-public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
+public abstract class MapSenderReceiver<Msg, LocalRef, Ref> {
 
-	private Component<Msg, LocalRef, DistRef> structure = null;
+	private Component<Msg, LocalRef, Ref> structure = null;
 
 	/**
 	 * This can be called by the implementation to access this required port
@@ -10,9 +10,9 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> distributedDeposit() {
+	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> outDeposit() {
 		assert this.structure != null;
-		return this.structure.bridge.distributedDeposit();
+		return this.structure.bridge.outDeposit();
 	};
 	/**
 	 * This can be called by the implementation to access this required port
@@ -30,7 +30,7 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Pull<DistRef> generateRef() {
+	protected final fr.irit.smac.may.lib.interfaces.Pull<Ref> generateRef() {
 		assert this.structure != null;
 		return this.structure.bridge.generateRef();
 	};
@@ -41,24 +41,23 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> deposit();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> inDeposit();
 
-	public static interface Bridge<Msg, LocalRef, DistRef> {
-		public fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> distributedDeposit();
+	public static interface Bridge<Msg, LocalRef, Ref> {
+		public fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> outDeposit();
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit();
-		public fr.irit.smac.may.lib.interfaces.Pull<DistRef> generateRef();
+		public fr.irit.smac.may.lib.interfaces.Pull<Ref> generateRef();
 
 	}
 
-	public static final class Component<Msg, LocalRef, DistRef> {
+	public static final class Component<Msg, LocalRef, Ref> {
 
-		private final Bridge<Msg, LocalRef, DistRef> bridge;
+		private final Bridge<Msg, LocalRef, Ref> bridge;
 
-		private final DistributedSenderReceiver<Msg, LocalRef, DistRef> implementation;
+		private final MapSenderReceiver<Msg, LocalRef, Ref> implementation;
 
-		public Component(
-				final DistributedSenderReceiver<Msg, LocalRef, DistRef> implem,
-				final Bridge<Msg, LocalRef, DistRef> b) {
+		public Component(final MapSenderReceiver<Msg, LocalRef, Ref> implem,
+				final Bridge<Msg, LocalRef, Ref> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -66,18 +65,18 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.deposit = implem.deposit();
+			this.inDeposit = implem.inDeposit();
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> deposit;
+		private final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> inDeposit;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> deposit() {
-			return this.deposit;
+		public final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> inDeposit() {
+			return this.inDeposit;
 		};
 
 		public final void start() {
@@ -86,9 +85,9 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 		}
 	}
 
-	public static abstract class Agent<Msg, LocalRef, DistRef> {
+	public static abstract class Agent<Msg, LocalRef, Ref> {
 
-		private Component<Msg, LocalRef, DistRef> structure = null;
+		private Component<Msg, LocalRef, Ref> structure = null;
 
 		/**
 		 * This can be called by the implementation to access this required port
@@ -107,7 +106,7 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<DistRef> me();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port
@@ -123,21 +122,21 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> send();
+		protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send();
 
-		public static interface Bridge<Msg, LocalRef, DistRef> {
+		public static interface Bridge<Msg, LocalRef, Ref> {
 			public fr.irit.smac.may.lib.interfaces.Pull<LocalRef> localMe();
 
 		}
 
-		public static final class Component<Msg, LocalRef, DistRef> {
+		public static final class Component<Msg, LocalRef, Ref> {
 
-			private final Bridge<Msg, LocalRef, DistRef> bridge;
+			private final Bridge<Msg, LocalRef, Ref> bridge;
 
-			private final Agent<Msg, LocalRef, DistRef> implementation;
+			private final Agent<Msg, LocalRef, Ref> implementation;
 
-			public Component(final Agent<Msg, LocalRef, DistRef> implem,
-					final Bridge<Msg, LocalRef, DistRef> b) {
+			public Component(final Agent<Msg, LocalRef, Ref> implem,
+					final Bridge<Msg, LocalRef, Ref> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -151,13 +150,13 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 
 			}
 
-			private final fr.irit.smac.may.lib.interfaces.Pull<DistRef> me;
+			private final fr.irit.smac.may.lib.interfaces.Pull<Ref> me;
 
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public final fr.irit.smac.may.lib.interfaces.Pull<DistRef> me() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
 				return this.me;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do disconnect;
@@ -169,13 +168,13 @@ public abstract class DistributedSenderReceiver<Msg, LocalRef, DistRef> {
 			public final fr.irit.smac.may.lib.interfaces.Do disconnect() {
 				return this.disconnect;
 			};
-			private final fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> send;
+			private final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send;
 
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, DistRef> send() {
+			public final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
 				return this.send;
 			};
 

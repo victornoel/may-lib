@@ -1,4 +1,4 @@
-package fr.irit.smac.may.lib.components.distribution;
+package fr.irit.smac.may.lib.components.messaging.distributed;
 
 public class DistRef {
 

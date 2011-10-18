@@ -1,4 +1,4 @@
-package fr.irit.smac.may.lib.components.distribution;
+package fr.irit.smac.may.lib.components.messaging.distributed;
 
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;

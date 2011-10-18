@@ -4,22 +4,11 @@ import java.util.List
 import org.javatuples.*
 import java.util.concurrent.Executor
 
-import fr.irit.smac.may.lib.components.distribution.DistRef
-import fr.irit.smac.may.lib.components.distribution.DistributedMessage
+
 
 import fr.irit.smac.may.lib.components.distribution.ivy.*
 		
 namespace fr.irit.smac.may.lib.components.distribution {
-
-	component DistributedMessaging[Msg] {
-		provides generateRef: Pull[DistRef]
-		
-		provides send: Send[Msg,DistRef]
-		requires deposit: Send[Msg,DistRef]
-		
-		requires broadcast: Push[DistributedMessage[Msg]]
-		provides handle: Push[DistributedMessage[Msg]]
-	}
 	
 	component IvyBroadcaster[T] {
 		provides ivyReceive: Push[List[String]]

@@ -1,4 +1,4 @@
-package fr.irit.smac.may.lib.components.distribution;
+package fr.irit.smac.may.lib.components.messaging.distributed;
 
 public abstract class DistributedMessaging<Msg> {
 
@@ -10,7 +10,7 @@ public abstract class DistributedMessaging<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> deposit() {
+	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef> deposit() {
 		assert this.structure != null;
 		return this.structure.bridge.deposit();
 	};
@@ -20,7 +20,7 @@ public abstract class DistributedMessaging<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> broadcast() {
+	protected final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg>> broadcast() {
 		assert this.structure != null;
 		return this.structure.bridge.broadcast();
 	};
@@ -31,7 +31,7 @@ public abstract class DistributedMessaging<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.DistRef> generateRef();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.distributed.DistRef> generateRef();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
@@ -39,7 +39,7 @@ public abstract class DistributedMessaging<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> send();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef> send();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
@@ -47,11 +47,11 @@ public abstract class DistributedMessaging<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> handle();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg>> handle();
 
 	public static interface Bridge<Msg> {
-		public fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> deposit();
-		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> broadcast();
+		public fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef> deposit();
+		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg>> broadcast();
 
 	}
 
@@ -76,31 +76,31 @@ public abstract class DistributedMessaging<Msg> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.DistRef> generateRef;
+		private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.distributed.DistRef> generateRef;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.DistRef> generateRef() {
+		public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.distributed.DistRef> generateRef() {
 			return this.generateRef;
 		};
-		private final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> send;
+		private final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef> send;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> send() {
+		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef> send() {
 			return this.send;
 		};
-		private final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> handle;
+		private final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg>> handle;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> handle() {
+		public final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg>> handle() {
 			return this.handle;
 		};
 
