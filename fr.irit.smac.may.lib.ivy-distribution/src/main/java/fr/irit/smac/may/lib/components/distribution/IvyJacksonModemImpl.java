@@ -12,22 +12,14 @@ public class IvyJacksonModemImpl<Msg> extends IvyJacksonModem<Msg> {
 	private volatile int i = 0;
 
 	private final String platformName;
-	private final String broadCastAdress;
-	private final String port;
 
-	public IvyJacksonModemImpl(String platformName, String broadCastAdress,
-			String port) {
+	public IvyJacksonModemImpl(String platformName) {
 		this.platformName = platformName;
-		this.broadCastAdress = broadCastAdress;
-		this.port = port;
 	}
 
 	@Override
 	protected void start() {
 		super.start();
-		ivyConnect().push(
-				new IvyConnectionConfig(broadCastAdress, port, platformName,
-						platformName));
 		ivyBindMsg().push(
 				"^IvyJacksonModemImpl: ([:alnum:]*)@([:alnum:]*): (.*)$");
 	}

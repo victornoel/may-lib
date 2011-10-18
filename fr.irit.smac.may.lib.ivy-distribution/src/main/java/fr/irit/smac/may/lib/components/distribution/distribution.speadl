@@ -16,8 +16,6 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		requires deposit: Send[Msg,DistRef]
 		
 		requires ivySend: Push[String]
-
-		requires ivyConnect: Push[IvyConnectionConfig]
 		
 		provides ivyReceive: Push[List[String]]
 		requires ivyBindMsg : Push[String]
@@ -34,6 +32,7 @@ namespace fr.irit.smac.may.lib.components.distribution {
 	
 	namespace ivy {
 		
+		
 		component IvyBus {
 			provides disconnect : Do
 			
@@ -44,6 +43,7 @@ namespace fr.irit.smac.may.lib.components.distribution {
 			provides send : Push[String]
 		}
 		
+		// TODO improve for better typed messages!
 		component IvyBinder {
 			requires bindMsg : MapGet[Pair[String,Push[List[String]]],Integer]
 			requires unBindMsg : Push[Integer]
