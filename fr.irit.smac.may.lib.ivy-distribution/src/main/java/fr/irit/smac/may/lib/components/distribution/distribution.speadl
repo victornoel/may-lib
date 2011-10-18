@@ -1,6 +1,8 @@
 import fr.irit.smac.may.lib.interfaces.*
 import java.lang.*
 import java.util.List
+import org.javatuples.*
+import java.util.concurrent.Executor
 
 import fr.irit.smac.may.lib.components.distribution.DistRef
 
@@ -33,15 +35,24 @@ namespace fr.irit.smac.may.lib.components.distribution {
 	namespace ivy {
 		
 		component IvyBus {
-			provides connectionStatus : Pull[IvyConnectionStatus]
-			provides connect : Push[IvyConnectionConfig]
 			provides disconnect : Do
 			
-			requires receive : Push[List[String]]
-			provides bindMsg : Push[String]
+			requires exec: Executor
+			// TODO maybe change it to use a specific class instead of this too much generic and meaningless one
+			provides bindMsg : MapGet[Pair[String,Push[List[String]]],Integer]
+			provides unBindMsg : Push[Integer]
 			provides send : Push[String]
 		}
 		
+		component IvyBinder {
+			requires bindMsg : MapGet[Pair[String,Push[List[String]]],Integer]
+			requires unBindMsg : Push[Integer]
+			
+			provides reBindMsg : Push[String]
+			requires receive : Push[List[String]]
+		}
+		
+		// deprecared, do not use
 		component IvySend {
 			// TODO : mettre comment 
 			provides send : Push[String]
@@ -51,6 +62,7 @@ namespace fr.irit.smac.may.lib.components.distribution {
 			provides disconnect : Do
 		}
 		
+		// deprecared, do not use
 		component IvyReceive {
 			requires receive : Push[List[String]]
 			provides bindMsg : Push[String]

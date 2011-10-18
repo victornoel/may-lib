@@ -7,6 +7,7 @@
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
 	<artifactId>ivy-distribution</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
 	<build>
 		<plugins>
 			<plugin>
@@ -49,6 +50,11 @@
 			<groupId>fr.dgac.ivy</groupId>
 			<artifactId>ivy-java</artifactId>
 			<version>1.2.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.javatuples</groupId>
+			<artifactId>javatuples</artifactId>
+			<version>1.2</version>
 		</dependency>
 	</dependencies>
 </project>

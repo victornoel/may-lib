@@ -1,74 +1,49 @@
 package fr.irit.smac.may.lib.components.distribution.ivy;
 
 import java.util.Arrays;
+import java.util.List;
+
+import org.javatuples.Pair;
 
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
 import fr.dgac.ivy.IvyMessageListener;
 import fr.irit.smac.may.lib.interfaces.Do;
-import fr.irit.smac.may.lib.interfaces.Pull;
+import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Push;
 
 public class IvyBusImpl extends IvyBus {
 
-	private IvyConnectionConfig connectionConfig;
-	private Ivy bus = null;
-	private boolean connected = false;
+	private final IvyConnectionConfig connectionConfig;
+	
+	private Ivy bus;
 
-	private IvyMessageListener listener;
+	//private IvyMessageListener listener;
 
-	@Override
-	protected Pull<IvyConnectionStatus> connectionStatus() {
-		return new Pull<IvyConnectionStatus>() {
+	protected boolean connected;
 
-			public IvyConnectionStatus pull() {
-				IvyConnectionStatus status = new IvyConnectionStatus(
-						IvyBusImpl.this.connectionConfig.getBroadCastAdress(),
-						IvyBusImpl.this.connectionConfig.getPort(),
-						IvyBusImpl.this.connectionConfig.getActorName(),
-						IvyBusImpl.this.connectionConfig.getHelloWorldMessage(),
-						IvyBusImpl.this.connected);
-				return status;
-			}
-		};
+	public IvyBusImpl(IvyConnectionConfig config) {
+		this.connectionConfig = config;
 	}
-
+	
 	@Override
-	protected Push<IvyConnectionConfig> connect() {
-		return new Push<IvyConnectionConfig>() {
-			public void push(IvyConnectionConfig config) {
-				if (IvyBusImpl.this.connected) {
-					IvyBusImpl.this.bus.stop();
-					IvyBusImpl.this.bus = null;
-					IvyBusImpl.this.connected = false;
-				}
+	protected void start() {
+		super.start();
 
-				IvyBusImpl.this.bus = new Ivy(config.getActorName(),
-						config.getHelloWorldMessage(), null);
-				try {
-					IvyBusImpl.this.connectionConfig = config;
 
-					String domainBus = config.getBroadCastAdress() + ":"
-							+ config.getPort();
-
-					IvyBusImpl.this.bus.start(domainBus);
-
-					// System.out.println("connected "+domainBus );
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-					IvyBusImpl.this.connected = true;
-				} catch (IvyException ie) {
-					System.out.println("Error : " + ie.getMessage());
-				}
-
-			}
-
-		};
+		this.bus = new Ivy(connectionConfig.getActorName(),
+				connectionConfig.getHelloWorldMessage(), null);
+		try {
+			String domainBus = connectionConfig.getBroadCastAdress() + ":"
+					+ connectionConfig.getPort();
+			this.bus.start(domainBus);
+			this.connected = true;
+			// System.out.println("connected "+domainBus );
+			
+		} catch (IvyException ie) {
+			ie.printStackTrace();
+		}
 	}
 
 	@Override
@@ -78,27 +53,6 @@ public class IvyBusImpl extends IvyBus {
 				IvyBusImpl.this.bus.stop();
 				IvyBusImpl.this.bus = null;
 				IvyBusImpl.this.connected = false;
-			}
-		};
-	}
-
-	@Override
-	protected Push<String> bindMsg() {
-		return new Push<String>() {
-
-			public void push(String thing) {
-				IvyBusImpl.this.listener = new IvyMessageListener() {
-					public void receive(IvyClient client, String[] args) {
-						IvyBusImpl.this.receive().push(Arrays.asList(args));
-					}
-				};
-
-				try {
-					IvyBusImpl.this.bus.bindMsg(thing, listener);
-				} catch (IvyException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
 			}
 		};
 	}
@@ -119,6 +73,47 @@ public class IvyBusImpl extends IvyBus {
 
 			}
 
+		};
+	}
+
+	@Override
+	protected MapGet<Pair<String, Push<List<String>>>, Integer> bindMsg() {
+		return new MapGet<Pair<String, Push<List<String>>>, Integer>() {
+			public Integer get(Pair<String, Push<List<String>>> thing) {
+				final Push<List<String>> callback = thing.getValue1();
+				String regexp = thing.getValue0();
+				IvyMessageListener listener = new IvyMessageListener() {
+					public void receive(IvyClient client, final String[] args) {
+						exec().execute(new Runnable() {
+							public void run() {
+								callback.push(Arrays.asList(args));
+							}
+						});
+					}
+				};
+				
+				try {
+					int bindId = IvyBusImpl.this.bus.bindMsg(regexp, listener);
+					return bindId;
+				} catch (IvyException e) {
+					e.printStackTrace();
+				}
+				// TODO better!
+				return null;
+			}
+		};
+	}
+
+	@Override
+	protected Push<Integer> unBindMsg() {
+		return new Push<Integer>() {
+			public void push(Integer thing) {
+				try {
+					IvyBusImpl.this.bus.unBindMsg(thing);
+				} catch (IvyException e) {
+					e.printStackTrace();
+				}
+			}
 		};
 	}
 }
