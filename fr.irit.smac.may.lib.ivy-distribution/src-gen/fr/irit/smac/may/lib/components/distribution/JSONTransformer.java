@@ -1,16 +1,8 @@
 package fr.irit.smac.may.lib.components.distribution;
 
-public abstract class JacksonModem<Msg> {
+public abstract class JSONTransformer<T> {
 
-	private Component<Msg> structure = null;
-
-	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer();
+	private Component<T> structure = null;
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
@@ -18,20 +10,28 @@ public abstract class JacksonModem<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer();
+	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer();
 
-	public static interface Bridge<Msg> {
+	/**
+	 * This should be overridden by the implementation to define the provided port
+	 * This will be called once during the construction of the component to initialize the port
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer();
+
+	public static interface Bridge<T> {
 
 	}
 
-	public static final class Component<Msg> {
+	public static final class Component<T> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<Msg> bridge;
+		private final Bridge<T> bridge;
 
-		private final JacksonModem<Msg> implementation;
+		private final JSONTransformer<T> implementation;
 
-		public Component(final JacksonModem<Msg> implem, final Bridge<Msg> b) {
+		public Component(final JSONTransformer<T> implem, final Bridge<T> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -44,22 +44,22 @@ public abstract class JacksonModem<Msg> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer;
+		private final fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer() {
+		public final fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer() {
 			return this.serializer;
 		};
-		private final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer;
+		private final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer() {
+		public final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer() {
 			return this.deserializer;
 		};
 
@@ -79,9 +79,9 @@ public abstract class JacksonModem<Msg> {
 	protected void start() {
 	}
 
-	public static final <Msg> Component<Msg> createComponent(
-			JacksonModem<Msg> _compo) {
-		return new Component<Msg>(_compo, new Bridge<Msg>() {
+	public static final <T> Component<T> createComponent(
+			JSONTransformer<T> _compo) {
+		return new Component<T>(_compo, new Bridge<T>() {
 		});
 	}
 

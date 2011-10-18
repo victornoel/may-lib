@@ -10,12 +10,12 @@ import org.codehaus.jackson.type.TypeReference;
 
 import fr.irit.smac.may.lib.interfaces.MapGet;
 
-public class JacksonModemImpl<Msg> extends JacksonModem<Msg> {
+public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 
 	private final static ObjectMapper mapper = new ObjectMapper();
 	private TypeReference<Msg> clazz;
 
-	public JacksonModemImpl(TypeReference<Msg> clazz) {
+	public JSONTransformerImpl(TypeReference<Msg> clazz) {
 		this.clazz = clazz;
 	}
 

@@ -1,6 +1,6 @@
 package fr.irit.smac.may.lib.components.distribution;
 
-public abstract class IvyJacksonModem<Msg> {
+public abstract class DistributedMessaging<Msg> {
 
 	private Component<Msg> structure = null;
 
@@ -20,39 +20,9 @@ public abstract class IvyJacksonModem<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend() {
+	protected final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> broadcast() {
 		assert this.structure != null;
-		return this.structure.bridge.ivySend();
-	};
-	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg() {
-		assert this.structure != null;
-		return this.structure.bridge.ivyBindMsg();
-	};
-	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer() {
-		assert this.structure != null;
-		return this.structure.bridge.serializer();
-	};
-	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer() {
-		assert this.structure != null;
-		return this.structure.bridge.deserializer();
+		return this.structure.bridge.broadcast();
 	};
 
 	/**
@@ -77,14 +47,11 @@ public abstract class IvyJacksonModem<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> ivyReceive();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> handle();
 
 	public static interface Bridge<Msg> {
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> deposit();
-		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend();
-		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg();
-		public fr.irit.smac.may.lib.interfaces.MapGet<Msg, java.lang.String> serializer();
-		public fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, Msg> deserializer();
+		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> broadcast();
 
 	}
 
@@ -92,9 +59,10 @@ public abstract class IvyJacksonModem<Msg> {
 
 		private final Bridge<Msg> bridge;
 
-		private final IvyJacksonModem<Msg> implementation;
+		private final DistributedMessaging<Msg> implementation;
 
-		public Component(final IvyJacksonModem<Msg> implem, final Bridge<Msg> b) {
+		public Component(final DistributedMessaging<Msg> implem,
+				final Bridge<Msg> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -104,7 +72,7 @@ public abstract class IvyJacksonModem<Msg> {
 
 			this.generateRef = implem.generateRef();
 			this.send = implem.send();
-			this.ivyReceive = implem.ivyReceive();
+			this.handle = implem.handle();
 
 		}
 
@@ -126,14 +94,14 @@ public abstract class IvyJacksonModem<Msg> {
 		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.distribution.DistRef> send() {
 			return this.send;
 		};
-		private final fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> ivyReceive;
+		private final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> handle;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> ivyReceive() {
-			return this.ivyReceive;
+		public final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.DistributedMessage<Msg>> handle() {
+			return this.handle;
 		};
 
 		public final void start() {
