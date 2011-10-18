@@ -81,7 +81,7 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	public Send<Msg, AgentRef> deposit() {
 		return new Send<Msg, AgentRef>() {
 			public void send(Msg msg, AgentRef receiver) {
-				// TODO
+				// TODO using nested classes
 				((AgentRefImpl)receiver).receive(msg);
 			};
 		};

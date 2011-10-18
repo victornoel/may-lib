@@ -98,7 +98,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 		return new Send<Msg, RemoteAgentRef>() {
 			public void send(Msg msg, RemoteAgentRef receiver) {
 				try {
-					// TODO
+					// TODO using nested classes
 					((RemoteAgentRefImpl)receiver).agent.receive(msg);
 				} catch (RemoteException e) {
 					// TODO Auto-generated catch block
