@@ -3,8 +3,12 @@ package fr.irit.smac.may.lib.components.either.datatypes;
 public class Either<L, R> {
 
 	public final L left;
-	
 	public final R right;
+	
+	// dummy constructor for jackson! this is bad
+	private Either() {
+		this(null,null);
+	}
 	
 	private Either(L l, R r) {
 		this.left = l;

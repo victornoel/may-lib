@@ -4,6 +4,11 @@ public class DistRef {
 
 	public final String name;
 	public final String platform;
+
+	// dummy constructor for jackson! this is bad
+	private DistRef() {
+		this(null,null);
+	}
 	
 	public DistRef(String name, String platform) {
 		this.name = name;
