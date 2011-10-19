@@ -6,6 +6,7 @@ import org.codehaus.jackson.JsonGenerationException;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.map.ObjectMapper.DefaultTyping;
 import org.codehaus.jackson.type.TypeReference;
 
 import fr.irit.smac.may.lib.interfaces.MapGet;
@@ -17,7 +18,7 @@ public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 
 	public JSONTransformerImpl(TypeReference<Msg> clazz) {
 		this.clazz = clazz;
-		mapper.enableDefaultTyping();
+		mapper.enableDefaultTypingAsProperty(DefaultTyping.NON_FINAL, "@class");
 	}
 
 	@Override
