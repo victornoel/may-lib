@@ -14,17 +14,15 @@ public class IvyBinderImpl extends IvyBinder {
 	protected Push<String> reBindMsg() {
 		return new Push<String>() {
 			public void push(String thing) {
-				synchronized (bindId) {
-					if (bindId != null) {
-						unBindMsg().push(bindId);
-					}
-					Push<List<String>> callback = new Push<List<String>>() {
-						public void push(List<String> thing) {
-							IvyBinderImpl.this.receive().push(thing);
-						}
-					};
-					bindId = bindMsg().get(Pair.with(thing, callback));
+				if (bindId != null) {
+					unBindMsg().push(bindId);
 				}
+				Push<List<String>> callback = new Push<List<String>>() {
+					public void push(List<String> thing) {
+						IvyBinderImpl.this.receive().push(thing);
+					}
+				};
+				bindId = bindMsg().get(Pair.with(thing, callback));
 			}
 		};
 	}
