@@ -9,10 +9,10 @@ public class UnEitherImpl<L, R> extends UnEither<L, R> {
 	protected Push<Either<L, R>> in() {
 		return new Push<Either<L,R>>() {
 			public void push(Either<L, R> thing) {
-				if (thing.isLeft()) {
-					left().push(thing.getLeft());
-				} else if (thing.isRight()) {
-					right().push(thing.getRight());
+				if (thing.hasLeft()) {
+					left().push(thing.left);
+				} else if (thing.hasRight()) {
+					right().push(thing.right);
 				} else {
 					throw new IllegalStateException("The either is neither right nor left!");
 				}

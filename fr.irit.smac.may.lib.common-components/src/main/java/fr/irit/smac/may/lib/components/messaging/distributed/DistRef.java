@@ -2,8 +2,8 @@ package fr.irit.smac.may.lib.components.messaging.distributed;
 
 public class DistRef {
 
-	final String name;
-	final String platform;
+	public final String name;
+	public final String platform;
 	
 	public DistRef(String name, String platform) {
 		this.name = name;

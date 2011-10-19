@@ -2,29 +2,21 @@ package fr.irit.smac.may.lib.components.either.datatypes;
 
 public class Either<L, R> {
 
-	private final L left;
+	public final L left;
 	
-	private final R right;
+	public final R right;
 	
 	private Either(L l, R r) {
 		this.left = l;
 		this.right = r;
 	}
 	
-	public boolean isLeft() {
+	public boolean hasLeft() {
 		return left != null;
 	}
 	
-	public boolean isRight() {
+	public boolean hasRight() {
 		return right != null;
-	}
-	
-	public L getLeft() {
-		return left;
-	}
-	
-	public R getRight() {
-		return right;
 	}
 	
 	public static <L,R> Either<L,R> right(R r) {
