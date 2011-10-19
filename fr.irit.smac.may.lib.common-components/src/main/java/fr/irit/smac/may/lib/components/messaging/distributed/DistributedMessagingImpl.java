@@ -39,7 +39,7 @@ public class DistributedMessagingImpl<Msg> extends DistributedMessaging<Msg> {
 		return new Push<DistributedMessage<Msg>>() {
 			public void push(DistributedMessage<Msg> thing) {
 				if (thing.ref.platform.equals(platformName)) {
-					send().send(thing.msg, thing.ref);
+					deposit().send(thing.msg, thing.ref);
 				}
 			}
 		};
