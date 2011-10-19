@@ -17,6 +17,7 @@ public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 
 	public JSONTransformerImpl(TypeReference<Msg> clazz) {
 		this.clazz = clazz;
+		mapper.enableDefaultTyping();
 	}
 
 	@Override
