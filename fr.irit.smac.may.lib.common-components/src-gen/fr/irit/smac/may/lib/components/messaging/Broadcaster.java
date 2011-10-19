@@ -21,6 +21,14 @@ public abstract class Broadcaster<T, Ref> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> broadcast();
+
+	/**
+	 * This should be overridden by the implementation to define the provided port
+	 * This will be called once during the construction of the component to initialize the port
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> add();
 
 	/**
@@ -51,11 +59,21 @@ public abstract class Broadcaster<T, Ref> {
 			assert implem.structure == null;
 			implem.structure = this;
 
+			this.broadcast = implem.broadcast();
 			this.add = implem.add();
 			this.remove = implem.remove();
 
 		}
 
+		private final fr.irit.smac.may.lib.interfaces.Push<T> broadcast;
+
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public final fr.irit.smac.may.lib.interfaces.Push<T> broadcast() {
+			return this.broadcast;
+		};
 		private final fr.irit.smac.may.lib.interfaces.Push<Ref> add;
 
 		/**

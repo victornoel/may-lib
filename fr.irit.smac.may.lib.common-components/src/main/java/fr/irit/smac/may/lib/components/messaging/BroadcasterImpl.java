@@ -44,4 +44,15 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 		};
 	}
 
+	@Override
+	protected Push<T> broadcast() {
+		return new Push<T>() {
+			public void push(T thing) {
+				for (Ref r : s) {
+					deposit().send(thing, r);
+				}
+			};
+		};
+	}
+
 }

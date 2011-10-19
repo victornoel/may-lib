@@ -23,6 +23,7 @@ namespace fr.irit.smac.may.lib.components.messaging {
 		}
 		infra {
 			requires deposit: Send[T, Ref]
+			provides broadcast: Push[T]
 			provides add: Push[Ref]
 			provides remove: Push[Ref]
 		}
