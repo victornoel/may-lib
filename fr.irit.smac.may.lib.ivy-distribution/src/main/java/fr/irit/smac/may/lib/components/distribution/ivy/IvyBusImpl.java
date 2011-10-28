@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.javatuples.Pair;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
@@ -15,6 +17,8 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 public class IvyBusImpl extends IvyBus {
 
+	Logger logger = LoggerFactory.getLogger(IvyBusImpl.class);
+	
 	private final IvyConnectionConfig connectionConfig;
 	
 	private Ivy bus;
@@ -39,10 +43,10 @@ public class IvyBusImpl extends IvyBus {
 					+ connectionConfig.getPort();
 			this.bus.start(domainBus);
 			this.connected = true;
-			// System.out.println("connected "+domainBus );
 			
+			logger.info("connected on {}",domainBus);
 		} catch (IvyException ie) {
-			ie.printStackTrace();
+			logger.error("error on connection",ie);
 		}
 	}
 
@@ -63,11 +67,10 @@ public class IvyBusImpl extends IvyBus {
 			public void push(String ivyMessage) {
 				if (IvyBusImpl.this.connected) {
 					try {
-						// System.out.println(ivyMessage);
+						logger.debug("sending message \"{}\"", ivyMessage);
 						IvyBusImpl.this.bus.sendMsg(ivyMessage);
-						// System.out.println("sent"+i );
 					} catch (IvyException e) {
-						e.printStackTrace();
+						logger.error("error while sending message",e);
 					}
 				}
 
@@ -93,10 +96,11 @@ public class IvyBusImpl extends IvyBus {
 				};
 				
 				try {
+					logger.debug("binding regexp \"{}\"", regexp);
 					int bindId = IvyBusImpl.this.bus.bindMsg(regexp, listener);
 					return bindId;
 				} catch (IvyException e) {
-					e.printStackTrace();
+					logger.error("error while binding",e);
 				}
 				// TODO better!
 				return null;
@@ -111,7 +115,7 @@ public class IvyBusImpl extends IvyBus {
 				try {
 					IvyBusImpl.this.bus.unBindMsg(thing);
 				} catch (IvyException e) {
-					e.printStackTrace();
+					logger.error("error while unbinding",e);
 				}
 			}
 		};

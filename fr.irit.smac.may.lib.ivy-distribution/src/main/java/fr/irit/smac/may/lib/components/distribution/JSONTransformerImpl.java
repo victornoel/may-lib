@@ -12,7 +12,7 @@ import org.codehaus.jackson.type.TypeReference;
 import fr.irit.smac.may.lib.interfaces.MapGet;
 
 public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
-
+	
 	private final static ObjectMapper mapper = new ObjectMapper();
 	private TypeReference<Msg> clazz;
 
