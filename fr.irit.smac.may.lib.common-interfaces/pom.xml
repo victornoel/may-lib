@@ -4,8 +4,9 @@
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>fr.irit.smac.may.lib</groupId>
-		<version>0.0.1-SNAPSHOT</version>
+		<version>0.0.1</version>
 	</parent>
+	<version>0.0.1-SNAPSHOT</version>
 	<artifactId>common-interfaces</artifactId>
 	<build>
 		<plugins>
