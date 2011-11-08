@@ -17,7 +17,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.5</version>
+				<version>1.7</version>
 				<executions>
 					<execution>
 						<id>add-source</id>
@@ -34,14 +34,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/java</directory>
-				<includes>
-					<include> **/*.speadl</include>
-				</includes>
-			</resource>
-		</resources>
 	</build>
 	<dependencies>
 		<dependency>
@@ -52,7 +44,7 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-lgpl</artifactId>
-			<version>1.9.0</version>
+			<version>1.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.dgac.ivy</groupId>
@@ -67,7 +59,7 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.6.3</version>
+			<version>1.6.4</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -3,25 +3,24 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
-		<groupId>fr.irit.smac.lib</groupId>
 		<artifactId>parent</artifactId>
+		<groupId>fr.irit.smac.may.lib</groupId>
 		<version>0.0.1</version>
 	</parent>
 	
-	<groupId>fr.irit.smac.may.lib</groupId>
-	<artifactId>parent</artifactId>
-	<version>0.0.1</version>
+	<artifactId>aggregator</artifactId>
+	<version>0.0.2</version>
 	<packaging>pom</packaging>
-	
+
 	<repositories>
 		<repository>
 			<id>fr.irit.smac</id>
 			<url>http://www.irit.fr/~Victor.Noel/maven-repos/</url>
 		</repository>
 	</repositories>
-	
+
 	<scm>
 		<connection>scm:hg:https://anon@wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</connection>
 		<developerConnection>scm:hg:https://wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</developerConnection>
