@@ -1,8 +1,8 @@
 package fr.irit.smac.may.lib.components.messaging;
 
-public abstract class IdentifierReceiver<Msg, RealRef> {
+public abstract class MapReceiver<Msg, RealRef, Ref> {
 
-	private Component<Msg, RealRef> structure = null;
+	private Component<Msg, RealRef, Ref> structure = null;
 
 	/**
 	 * This can be called by the implementation to access this required port
@@ -21,21 +21,21 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> deposit();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> deposit();
 
-	public static interface Bridge<Msg, RealRef> {
+	public static interface Bridge<Msg, RealRef, Ref> {
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> realDeposit();
 
 	}
 
-	public static final class Component<Msg, RealRef> {
+	public static final class Component<Msg, RealRef, Ref> {
 
-		private final Bridge<Msg, RealRef> bridge;
+		private final Bridge<Msg, RealRef, Ref> bridge;
 
-		private final IdentifierReceiver<Msg, RealRef> implementation;
+		private final MapReceiver<Msg, RealRef, Ref> implementation;
 
-		public Component(final IdentifierReceiver<Msg, RealRef> implem,
-				final Bridge<Msg, RealRef> b) {
+		public Component(final MapReceiver<Msg, RealRef, Ref> implem,
+				final Bridge<Msg, RealRef, Ref> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -47,13 +47,13 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> deposit;
+		private final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> deposit;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> deposit() {
+		public final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> deposit() {
 			return this.deposit;
 		};
 
@@ -63,9 +63,9 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 		}
 	}
 
-	public static abstract class Agent<Msg, RealRef> {
+	public static abstract class Agent<Msg, RealRef, Ref> {
 
-		private Component<Msg, RealRef> structure = null;
+		private Component<Msg, RealRef, Ref> structure = null;
 
 		/**
 		 * This can be called by the implementation to access this required port
@@ -77,14 +77,16 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 			assert this.structure != null;
 			return this.structure.bridge.realMe();
 		};
-
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This can be called by the implementation to access this required port
+		 * It will be initialized before the provided ports are initialized
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> me();
+		protected final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
+			assert this.structure != null;
+			return this.structure.bridge.me();
+		};
 
 		/**
 		 * This should be overridden by the implementation to define the provided port
@@ -94,19 +96,20 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
 
-		public static interface Bridge<Msg, RealRef> {
+		public static interface Bridge<Msg, RealRef, Ref> {
 			public fr.irit.smac.may.lib.interfaces.Pull<RealRef> realMe();
+			public fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
 
 		}
 
-		public static final class Component<Msg, RealRef> {
+		public static final class Component<Msg, RealRef, Ref> {
 
-			private final Bridge<Msg, RealRef> bridge;
+			private final Bridge<Msg, RealRef, Ref> bridge;
 
-			private final Agent<Msg, RealRef> implementation;
+			private final Agent<Msg, RealRef, Ref> implementation;
 
-			public Component(final Agent<Msg, RealRef> implem,
-					final Bridge<Msg, RealRef> b) {
+			public Component(final Agent<Msg, RealRef, Ref> implem,
+					final Bridge<Msg, RealRef, Ref> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -114,20 +117,10 @@ public abstract class IdentifierReceiver<Msg, RealRef> {
 				assert implem.structure == null;
 				implem.structure = this;
 
-				this.me = implem.me();
 				this.disconnect = implem.disconnect();
 
 			}
 
-			private final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> me;
-
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> me() {
-				return this.me;
-			};
 			private final fr.irit.smac.may.lib.interfaces.Do disconnect;
 
 			/**

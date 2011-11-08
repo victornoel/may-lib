@@ -5,8 +5,6 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.messaging.Sender;
-import fr.irit.smac.may.lib.components.messaging.SenderImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
 import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
@@ -16,11 +14,12 @@ import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
+import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	private SchedulerImpl scheduler;
-	private SenderImpl<Msg, AgentRef> send;
+	private ForwardImpl<Send<Msg, AgentRef>> send;
 	private ReceiverImpl<Msg> receive;
 	private ForwardImpl<CreateClassic<Msg,AgentRef>> forward;
 
@@ -38,8 +37,8 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected Sender<Msg, AgentRef> make_sender() {
-		send = new SenderImpl<Msg, AgentRef>();
+	protected Forward<Send<Msg, AgentRef>> make_sender() {
+		send = new ForwardImpl<Send<Msg, AgentRef>>();
 		return send;
 	}
 

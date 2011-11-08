@@ -6,7 +6,8 @@ import java.lang.String
 namespace fr.irit.smac.may.lib.components.messaging {
 
 	/**
-	 * Could be replaced by meta.Forward
+	 * Deprecated
+	 * Should be replaced by meta.Forward[Send[MsgType, Ref]]
 	 */
 	transverse Sender[MsgType, Ref] {
 		agent {
@@ -42,31 +43,17 @@ namespace fr.irit.smac.may.lib.components.messaging {
 		}
 	}
 	
-	transverse IdentifierReceiver[Msg, RealRef] {
+	// to combine for example with meta.Data and an infrastructure component generating the references...
+	transverse MapReceiver[Msg,RealRef,Ref] {
 		agent {
-			provides me: Pull[String]
 			requires realMe: Pull[RealRef]
+			requires me: Pull[Ref]
 			provides disconnect: Do
 		}
 		infra {
-			provides deposit: Send[Msg, String]
-			requires realDeposit: Send[Msg, RealRef]
-		}
-	}
-	
-	transverse MapSenderReceiver[Msg,LocalRef,Ref] {
-		agent {
-			provides me: Pull[Ref]
-			requires localMe: Pull[LocalRef]
-			provides disconnect: Do
-			provides send: Send[Msg,Ref]
-		}
-		infra {
-			provides inDeposit: Send[Msg,Ref]
-			requires outDeposit: Send[Msg,Ref]
+			provides deposit: Send[Msg,Ref]
 			
-			requires localDeposit: Send[Msg,LocalRef]
-			requires generateRef: Pull[Ref]
+			requires realDeposit: Send[Msg,RealRef]
 		}
 	}
 	

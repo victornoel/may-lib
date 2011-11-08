@@ -1,7 +1,12 @@
 
+import java.lang.*
+import fr.irit.smac.may.lib.interfaces.*
+
 namespace fr.irit.smac.may.lib.components.meta {
 	
-	import java.lang.*
+	component Data[T] {
+		provides data: Pull[T]
+	}
 	
 	/**
 	 * This transverse enables to realise collection ports
@@ -10,10 +15,10 @@ namespace fr.irit.smac.may.lib.components.meta {
 	transverse CollectionInteger[I] {
 		agent {
 			requires p: I
-			provides idx: fr.irit.smac.may.lib.interfaces.Pull[Integer]
+			provides idx: Pull[Integer]
 		}
 		infra {
-			provides get: fr.irit.smac.may.lib.interfaces.MapGet[Integer,I]
+			provides get: MapGet[Integer,I]
 		}
 	}
 	
@@ -24,10 +29,10 @@ namespace fr.irit.smac.may.lib.components.meta {
 	transverse CollectionMap[K,I] {
 		agent {
 			requires p: I
-			requires key: fr.irit.smac.may.lib.interfaces.Pull[K]
+			requires key: Pull[K]
 		}
 		infra {
-			provides get: fr.irit.smac.may.lib.interfaces.MapGet[K,I]
+			provides get: MapGet[K,I]
 		}
 	}
 	

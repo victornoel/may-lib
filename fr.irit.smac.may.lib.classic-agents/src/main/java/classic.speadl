@@ -2,6 +2,7 @@
 import java.lang.String
 import fr.irit.smac.may.lib.interfaces.*
 import fr.irit.smac.may.lib.classic.interfaces.*
+import fr.irit.smac.may.lib.components.meta.*
 import fr.irit.smac.may.lib.components.scheduling.*
 import fr.irit.smac.may.lib.components.messaging.*
 import fr.irit.smac.may.lib.components.messaging.receiver.*
@@ -15,6 +16,93 @@ import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
 import java.util.concurrent.Executor
 
 namespace fr.irit.smac.may.lib.classic {
+
+	import fr.irit.smac.may.lib.classic.*
+
+	namespace named {
+		
+		infrastructure ClassicNamed[Msg] {
+			provides send: Send[Msg, String] = receive.deposit
+			provides create: CreateNamed[Msg, String]
+			
+			transverse scheduler: Scheduler {
+				bind infraSched to executor.exec
+			}
+
+			transverse sender: Forward[Send[Msg, String]] {
+				bind i to receive.deposit
+			}
+			
+			transverse fact: Forward[CreateNamed[Msg, String]] {
+				bind i toThis create
+			}
+			
+			transverse realReceive: Receiver[Msg]
+			
+			transverse receive: MapReceiver[Msg,AgentRef,String] {
+				bind realDeposit to realReceive.deposit
+			}
+			
+			instance executor: ExecutorService
+			
+			species ClassicNamedAgent for ClassicNamedAgentComponent[Msg, String] {
+
+				bind send to sender.a
+				bind executor to scheduler.sched
+				bind die to scheduler.stop
+				bind create to fact.a
+
+				use scheduler
+
+				use fact
+
+				use receive {
+					bind me toThis me
+					bind realMe to realReceive.me
+				}
+				
+				use realReceive {
+					bind put toThis put
+				}
+
+				use sender
+			}
+		}
+		
+		component ClassicNamedBehaviour[Msg, Ref] {
+			provides cycle: Push[Msg]
+			requires send: Send[Msg, Ref]
+			requires me: Pull[Ref]
+			requires die: Do
+			requires create: CreateNamed[Msg, Ref]
+		}
+		
+		component ClassicNamedAgentComponent[Msg, Ref] {
+			
+			provides put: Push[Msg] = dispatcher.dispatch
+			provides me: Pull[Ref] = name.data
+			
+			requires send: Send[Msg, Ref]
+			requires executor: Executor
+			requires die: Do
+			requires create: CreateNamed[Msg, Ref]
+
+			instance name: Data[Ref]
+
+			instance dispatcher: SequentialDispatcher[Msg] {
+				bind executor toThis executor
+				bind handler to beh.cycle
+			}
+			
+			instance beh: ClassicNamedBehaviour[Msg, Ref] {
+				bind send toThis send
+				bind me toThis me
+				bind die toThis die
+				bind create toThis create
+			}
+
+		}
+	}
 
 	namespace local {
 		
@@ -35,8 +123,8 @@ namespace fr.irit.smac.may.lib.classic {
 				bind infraSched to executor.exec
 			}
 
-			transverse sender: Sender[Msg, AgentRef] {
-				bind deposit to receive.deposit
+			transverse sender: Forward[Send[Msg, AgentRef]] {
+				bind i to receive.deposit
 			}
 
 			transverse receive: Receiver[Msg]
@@ -49,7 +137,7 @@ namespace fr.irit.smac.may.lib.classic {
 
 			species ClassicAgent for ClassicAgentComponent[Msg, AgentRef] {
 
-				bind send to sender.send
+				bind send to sender.a
 				bind me to receive.me
 				bind executor to scheduler.sched
 				bind die to scheduler.stop

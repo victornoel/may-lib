@@ -18,9 +18,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 		protected Broadcast<T> bc() {
 			return new Broadcast<T>() {
 				public void broadcast(T msg) {
-					for (Ref r : s) {
-						deposit().send(msg, r);
-					}
+					doBroadcast(msg);
 				}
 			};
 		}
@@ -43,14 +41,20 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 			};
 		};
 	}
+	
+	private void doBroadcast(T t) {
+		synchronized (s) {
+			for (Ref r : s) {
+				deposit().send(t, r);
+			}
+		}
+	}
 
 	@Override
 	protected Push<T> broadcast() {
 		return new Push<T>() {
 			public void push(T thing) {
-				for (Ref r : s) {
-					deposit().send(thing, r);
-				}
+				doBroadcast(thing);
 			};
 		};
 	}
