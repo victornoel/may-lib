@@ -9,14 +9,6 @@
 	<version>0.0.2</version>
 	<packaging>pom</packaging>
 
-	<properties>
-		<!--
-		Used to prevent eclipse to add speadl files
-		to the target dir.
-		 -->
-		<outside-eclipse>true</outside-eclipse>
-	</properties>
-
 	<modules>
 		<module>parent</module>
 		<module>classic-agents</module>

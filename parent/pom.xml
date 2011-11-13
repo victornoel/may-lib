@@ -54,6 +54,16 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	
+	
+	<properties>
+		<!--
+		Used to prevent eclipse to add speadl files
+		to the target dir.
+		 -->
+		<outside-eclipse>true</outside-eclipse>
+	</properties>
+	
 	<profiles>
 		<profile>
 			<id>add-speadl-resources</id>
