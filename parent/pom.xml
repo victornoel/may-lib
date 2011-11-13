@@ -54,16 +54,12 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
-	
+
 	<properties>
-		<!--
-		Used to prevent eclipse to add speadl files
-		to the target dir.
-		 -->
+		<!-- Used to prevent eclipse to add speadl files to the target dir. -->
 		<outside-eclipse>true</outside-eclipse>
 	</properties>
-	
+
 	<profiles>
 		<profile>
 			<id>add-speadl-resources</id>
@@ -75,14 +71,33 @@
 				</property>
 			</activation>
 			<build>
-				<resources>
-					<resource>
-						<directory>src/main/java</directory>
-						<includes>
-							<include> **/*.speadl</include>
-						</includes>
-					</resource>
-				</resources>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<artifactId>maven-resources-plugin</artifactId>
+							<executions>
+								<execution>
+									<id>copy-resources</id>
+									<phase>initialize</phase>
+									<goals>
+										<goal>copy-resources</goal>
+									</goals>
+									<configuration>
+										<outputDirectory>${project.build.outputDirectory}</outputDirectory>
+										<resources>
+											<resource>
+												<directory>src/main/java</directory>
+												<includes>
+													<include>**/*.speadl</include>
+												</includes>
+											</resource>
+										</resources>
+									</configuration>
+								</execution>
+							</executions>
+						</plugin>
+					</plugins>
+				</pluginManagement>
 			</build>
 		</profile>
 	</profiles>
