@@ -54,4 +54,26 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+	<profiles>
+		<profile>
+			<id>add-speadl-resources</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>outside-eclipse</name>
+					<value>true</value>
+				</property>
+			</activation>
+			<build>
+				<resources>
+					<resource>
+						<directory>src/main/java</directory>
+						<includes>
+							<include> **/*.speadl</include>
+						</includes>
+					</resource>
+				</resources>
+			</build>
+		</profile>
+	</profiles>
 </project>
