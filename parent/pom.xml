@@ -55,20 +55,17 @@
 		</pluginManagement>
 	</build>
 
-	<properties>
-		<!-- Used to prevent eclipse to add speadl files to the target dir. -->
-		<outside-eclipse>true</outside-eclipse>
-	</properties>
-
 	<profiles>
+		<!--
+		This is a workaround to add speadl file to the jar
+		Apparently eclipse does not understand that and it prevents
+		it to validate speadl files in the target dir
+		(see https://bugs.eclipse.org/bugs/show_bug.cgi?id=356616)
+		  -->
 		<profile>
 			<id>add-speadl-resources</id>
 			<activation>
-				<activeByDefault>false</activeByDefault>
-				<property>
-					<name>outside-eclipse</name>
-					<value>true</value>
-				</property>
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<build>
 				<pluginManagement>
