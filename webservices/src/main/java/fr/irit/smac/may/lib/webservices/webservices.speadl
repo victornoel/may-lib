@@ -1,0 +1,16 @@
+
+import fr.irit.smac.may.lib.interfaces.*
+import java.lang.*
+
+namespace fr.irit.smac.may.lib.webservices {
+	
+	component WebServiceEndpoint[I] {
+		
+		requires service: I
+	}
+	
+	component WebServiceClient[I] {
+		provides service: RemoteCall[I,String]
+	}
+	
+}

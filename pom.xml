@@ -15,6 +15,7 @@
 		<module>common-interfaces</module>
 		<module>common-components</module>
 		<module>ivy-distribution</module>
+		<module>webservices</module>
 	</modules>
 
 </project>
