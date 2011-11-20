@@ -1,16 +1,17 @@
 package fr.irit.smac.may.lib.components.messaging.distributed;
 
-public class DistRef {
+public class DistRef<NodeRef> {
 
 	public final String name;
-	public final String platform;
+	public final NodeRef platform;
 
 	// dummy constructor for jackson! this is bad
+	@SuppressWarnings("unused")
 	private DistRef() {
 		this(null,null);
 	}
 	
-	public DistRef(String name, String platform) {
+	public DistRef(String name, NodeRef platform) {
 		this.name = name;
 		this.platform = platform;
 	}
@@ -33,6 +34,7 @@ public class DistRef {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
+		@SuppressWarnings("rawtypes")
 		DistRef other = (DistRef) obj;
 		if (name == null) {
 			if (other.name != null)

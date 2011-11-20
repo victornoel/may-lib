@@ -82,7 +82,9 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 		return new Send<Msg, AgentRef>() {
 			public void send(Msg msg, AgentRef receiver) {
 				// TODO using nested classes
-				((AgentRefImpl)receiver).receive(msg);
+				@SuppressWarnings("unchecked")
+				AgentRefImpl agentRefImpl = (AgentRefImpl)receiver;
+				agentRefImpl.receive(msg);
 			};
 		};
 	}

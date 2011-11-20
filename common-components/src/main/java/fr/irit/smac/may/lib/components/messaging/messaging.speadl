@@ -59,17 +59,30 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	
 	namespace distributed {
 		
-		import fr.irit.smac.may.lib.components.messaging.distributed.DistRef
-		import fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage
+		import fr.irit.smac.may.lib.components.messaging.distributed.*
 		
-		component DistributedMessaging[Msg] {
-			provides generateRef: Pull[DistRef]
+		// a bit useless now it seems…
+		component DistributedMessaging[Msg,NodeRef] {
+			provides generateRef: Pull[DistRef[NodeRef]]
 			
-			provides send: Send[Msg,DistRef]
-			requires deposit: Send[Msg,DistRef]
+			provides send: Send[Msg,DistRef[NodeRef]]
+			requires deposit: Send[Msg,DistRef[NodeRef]]
 			
-			requires broadcast: Push[DistributedMessage[Msg]]
-			provides handle: Push[DistributedMessage[Msg]]
+			requires myNode: Pull[NodeRef]
+
+			requires distOut: Push[DistributedMessage[Msg,NodeRef]]
+			provides distIn: Push[DistributedMessage[Msg,NodeRef]]
+		}
+		
+		component DistributedCommunication[T] {
+			
+			provides nodeName: Pull[String]
+			
+			provides in: Send[T,String]
+			requires out: Push[T]
+			
+			requires broadcast: Push[DistributedInfo[T]]
+			provides handle: Push[DistributedInfo[T]]
 		}
 	}
 	

@@ -4,43 +4,35 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.interfaces.Send;
 
-public class DistributedMessagingImpl<Msg> extends DistributedMessaging<Msg> {
+public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<Msg,NodeRef> {
 
 	private volatile int i = 0;
-
-	private final String platformName;
-
-	public DistributedMessagingImpl(String platformName) {
-		this.platformName = platformName;
-	}
-
+	
 	@Override
-	protected Pull<DistRef> generateRef() {
-		return new Pull<DistRef>() {
-			public DistRef pull() {
+	protected Pull<DistRef<NodeRef>> generateRef() {
+		return new Pull<DistRef<NodeRef>>() {
+			public DistRef<NodeRef> pull() {
 				int me = i++;
-				return new DistRef("agent" + me, platformName);
+				return new DistRef<NodeRef>("agent" + me, myNode().pull());
 			}
 		};
 	}
 
 	@Override
-	protected Send<Msg, DistRef> send() {
-		return new Send<Msg, DistRef>() {
-			public void send(Msg message, DistRef receiver) {
-				DistributedMessage<Msg> m = new DistributedMessage<Msg>(receiver, message);
-				broadcast().push(m);
+	protected Send<Msg, DistRef<NodeRef>> send() {
+		return new Send<Msg, DistRef<NodeRef>>() {
+			public void send(Msg message, DistRef<NodeRef> receiver) {
+				DistributedMessage<Msg,NodeRef> m = new DistributedMessage<Msg,NodeRef>(receiver, message);
+				distOut().push(m);
 			};
 		};
 	}
 
 	@Override
-	protected Push<DistributedMessage<Msg>> handle() {
-		return new Push<DistributedMessage<Msg>>() {
-			public void push(DistributedMessage<Msg> thing) {
-				if (thing.ref.platform.equals(platformName)) {
-					deposit().send(thing.msg, thing.ref);
-				}
+	protected Push<DistributedMessage<Msg, NodeRef>> distIn() {
+		return new Push<DistributedMessage<Msg, NodeRef>>() {
+			public void push(DistributedMessage<Msg, NodeRef> thing) {
+				deposit().send(thing.msg, thing.ref);
 			}
 		};
 	}
