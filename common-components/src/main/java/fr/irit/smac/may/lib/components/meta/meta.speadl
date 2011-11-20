@@ -8,6 +8,11 @@ namespace fr.irit.smac.may.lib.components.meta {
 		provides data: Pull[T]
 	}
 	
+	// to explicitely do nothing with a requires, plug it a Void
+	component Void[I] {
+		provides port: I
+	}
+	
 	/**
 	 * This transverse enables to realise collection ports
 	 * with integer keys to retrieve the wanted port
