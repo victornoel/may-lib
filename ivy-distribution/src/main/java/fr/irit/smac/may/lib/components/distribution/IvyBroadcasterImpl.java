@@ -6,10 +6,20 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 
+	private final String namespace;
+
+	/**
+	 * 
+	 * @param namespace a namespace to avoid conflicting instances of IvyBroadcaster exchanging messages
+	 */
+	public IvyBroadcasterImpl(String namespace) {
+		this.namespace = namespace;
+	}
+	
 	@Override
 	protected void start() {
 		super.start();
-		ivyBindMsg().push("^fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl: (.*)$");
+		ivyBindMsg().push("^fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl[" + namespace + "]: (.*)$");
 	}
 	
 	@Override
@@ -29,7 +39,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 		return new Push<T>() {
 			public void push(T thing) {
 				String m = serializer().get(thing);
-				ivySend().push("fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl: " + m);
+				ivySend().push("fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl[" + namespace + "]: " + m);
 			};
 		};
 	}

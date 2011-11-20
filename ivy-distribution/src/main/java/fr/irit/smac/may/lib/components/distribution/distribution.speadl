@@ -10,6 +10,33 @@ import fr.irit.smac.may.lib.components.distribution.ivy.*
 		
 namespace fr.irit.smac.may.lib.components.distribution {
 	
+	component IvyJSONBroadcaster[T] {
+		provides send: Push[T] = bc.send
+		requires handle: Push[T]
+		
+		requires exec: Executor
+		
+		instance bc: IvyBroadcaster[T] {
+			bind deserializer to json.deserializer
+			bind serializer to json.serializer
+			bind handle toThis handle
+			bind ivyBindMsg to binder.reBindMsg
+			bind ivySend to ivy.send
+		}
+		
+		instance binder: IvyBinder {
+			bind bindMsg to ivy.bindMsg
+			bind receive to bc.ivyReceive
+			bind unBindMsg to ivy.unBindMsg
+		}
+		
+		instance ivy: IvyBus {
+			bind exec toThis exec
+		}
+		
+		instance json: JSONTransformer[T]
+	}
+	
 	component IvyBroadcaster[T] {
 		provides ivyReceive: Push[List[String]]
 		
@@ -46,6 +73,7 @@ namespace fr.irit.smac.may.lib.components.distribution {
 			
 			provides reBindMsg : Push[String]
 			requires receive : Push[List[String]]
+			
 		}
 		
 		// deprecared, do not use
