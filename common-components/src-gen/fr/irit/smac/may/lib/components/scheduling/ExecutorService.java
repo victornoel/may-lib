@@ -10,7 +10,7 @@ public abstract class ExecutorService {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract java.util.concurrent.Executor exec();
+	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
 
 	public static interface Bridge {
 
@@ -35,13 +35,13 @@ public abstract class ExecutorService {
 
 		}
 
-		private final java.util.concurrent.Executor exec;
+		private final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final java.util.concurrent.Executor exec() {
+		public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec() {
 			return this.exec;
 		};
 

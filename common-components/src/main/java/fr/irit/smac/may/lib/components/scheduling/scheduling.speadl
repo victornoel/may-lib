@@ -66,6 +66,6 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 	}
 
 	component ExecutorService {
-		provides exec: Executor
+		provides exec: AdvancedExecutor
 	}
 }
