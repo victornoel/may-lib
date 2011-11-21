@@ -4,12 +4,20 @@ import java.lang.*
 
 namespace fr.irit.smac.may.lib.webservices {
 	
+	// this component provides the logic
+	// to publish a webservice of type I
 	component WebServiceEndpoint[I] {
 		
+		// the actual implementation of the service
 		requires service: I
 	}
 	
+	// this component provides the logic
+	// to access to a webservice of type I
 	component WebServiceClient[I] {
+		
+		// allows for calling using an url for
+		// the service reference
 		provides service: RemoteCall[I,String]
 	}
 	

@@ -4,6 +4,13 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import fr.irit.smac.may.lib.interfaces.RemoteCall;
 
+/**
+ * Implements the WebServiceClient using CXF
+ * 
+ * @author victor
+ *
+ * @param <I>
+ */
 public class WebServiceClientImpl<I> extends WebServiceClient<I> {
 
 	@SuppressWarnings("rawtypes")
@@ -15,6 +22,13 @@ public class WebServiceClientImpl<I> extends WebServiceClient<I> {
 		super.start();
 	}
 
+	/**
+	 * 
+	 * @param interfaze the class of the interface I
+	 * @param name the name of the service (will be appended to the url when calling)
+	 * 
+	 * TODO this last point must be improved
+	 */
 	public WebServiceClientImpl(@SuppressWarnings("rawtypes") Class interfaze,
 			String name) {
 		this.interfaze = interfaze;
