@@ -1,8 +1,9 @@
 package fr.irit.smac.may.lib.components.messaging.receiver;
 
+import fr.irit.smac.may.lib.components.messaging.exceptions.AgentDoesNotExistException;
+import fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
-import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	
@@ -23,12 +24,13 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 			this.name = name;
 		}
 
-		private void receive(Msg m) {
+		private void receive(Msg m) throws AgentDoesNotExistException {
 			if (this.ref != null) this.ref.receive(m);
+			else throw new AgentDoesNotExistException();
 		}
 		
 		private void stop() {
-			// allow for garbage collection
+			// allow for garbage collection and reliability checks
 			this.ref = null;
 		}
 		
@@ -78,13 +80,22 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	}
 	
 	@Override
-	public Send<Msg, AgentRef> deposit() {
-		return new Send<Msg, AgentRef>() {
+	public ReliableSend<Msg, AgentRef> deposit() {
+		return new ReliableSend<Msg, AgentRef>() {
 			public void send(Msg msg, AgentRef receiver) {
+				try {
+					reliableSend(msg, receiver);
+				} catch (AgentDoesNotExistException e) {
+					// do nothing, on purpose!
+				}
+			}
+
+			public void reliableSend(Msg message, AgentRef receiver)
+					throws AgentDoesNotExistException {
 				// TODO using nested classes
 				@SuppressWarnings("unchecked")
 				AgentRefImpl agentRefImpl = (AgentRefImpl)receiver;
-				agentRefImpl.receive(msg);
+				agentRefImpl.receive(message);
 			};
 		};
 	}

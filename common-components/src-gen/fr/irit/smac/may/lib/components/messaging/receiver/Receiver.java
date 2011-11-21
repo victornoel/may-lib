@@ -10,7 +10,7 @@ public abstract class Receiver<MsgType> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit();
+	protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit();
 
 	public static interface Bridge<MsgType> {
 
@@ -35,13 +35,13 @@ public abstract class Receiver<MsgType> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit;
+		private final fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit() {
+		public final fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit() {
 			return this.deposit;
 		};
 

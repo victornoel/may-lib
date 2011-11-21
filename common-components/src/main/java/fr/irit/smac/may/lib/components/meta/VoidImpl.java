@@ -23,7 +23,7 @@ public abstract class VoidImpl<I> extends Void<I> {
 				return VoidImpl.this.invoke(proxy, method, args);
 			}
 		};
-		return(I) Proxy.newProxyInstance(
+		return (I) Proxy.newProxyInstance(
 									clazz.getClassLoader(),
 		                            new Class[] { clazz },
 		                            handler);

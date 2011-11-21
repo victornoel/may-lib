@@ -1,6 +1,7 @@
 
 import fr.irit.smac.may.lib.interfaces.*
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
+import fr.irit.smac.may.lib.components.messaging.interfaces.*
 import java.lang.String
 
 namespace fr.irit.smac.may.lib.components.messaging {
@@ -38,7 +39,7 @@ namespace fr.irit.smac.may.lib.components.messaging {
 				provides stop: Do
 			}
 			infra {
-				provides deposit: Send[MsgType, AgentRef]
+				provides deposit: ReliableSend[MsgType, AgentRef]
 			}
 		}
 	}
