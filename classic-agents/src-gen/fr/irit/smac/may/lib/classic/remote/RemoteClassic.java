@@ -182,7 +182,7 @@ public abstract class RemoteClassic<Msg> {
 
 		private final class Bridge_scheduler implements Scheduler.Bridge {
 
-			public final java.util.concurrent.Executor infraSched() {
+			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
 				return Component.this.executor.exec();
 
 			};

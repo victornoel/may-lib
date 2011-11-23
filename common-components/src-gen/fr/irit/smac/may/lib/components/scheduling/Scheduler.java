@@ -10,13 +10,13 @@ public abstract class Scheduler {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final java.util.concurrent.Executor infraSched() {
+	protected final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
 		assert this.structure != null;
 		return this.structure.bridge.infraSched();
 	};
 
 	public static interface Bridge {
-		public java.util.concurrent.Executor infraSched();
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched();
 
 	}
 
@@ -52,7 +52,7 @@ public abstract class Scheduler {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected abstract java.util.concurrent.Executor sched();
+		protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port
@@ -86,13 +86,13 @@ public abstract class Scheduler {
 
 			}
 
-			private final java.util.concurrent.Executor sched;
+			private final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched;
 
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public final java.util.concurrent.Executor sched() {
+			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched() {
 				return this.sched;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do stop;

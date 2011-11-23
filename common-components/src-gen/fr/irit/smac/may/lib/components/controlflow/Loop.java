@@ -10,7 +10,7 @@ public abstract class Loop {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final java.util.concurrent.Executor executor() {
+	protected final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 		assert this.structure != null;
 		return this.structure.bridge.executor();
 	};
@@ -34,7 +34,7 @@ public abstract class Loop {
 	protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
 
 	public static interface Bridge {
-		public java.util.concurrent.Executor executor();
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor();
 		public fr.irit.smac.may.lib.interfaces.Do handler();
 
 	}

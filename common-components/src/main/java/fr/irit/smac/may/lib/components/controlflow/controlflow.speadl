@@ -1,6 +1,8 @@
 
 import fr.irit.smac.may.lib.components.collections.Queue
 import fr.irit.smac.may.lib.interfaces.*
+import fr.irit.smac.may.lib.components.scheduling.interfaces.*
+
 import java.util.concurrent.Executor
 
 namespace fr.irit.smac.may.lib.components.controlflow {
@@ -20,7 +22,7 @@ namespace fr.irit.smac.may.lib.components.controlflow {
 	 * is not called
 	 */
 	component Loop {
-		requires executor: Executor
+		requires executor: AdvancedExecutor
 		
 		requires handler: Do
 		

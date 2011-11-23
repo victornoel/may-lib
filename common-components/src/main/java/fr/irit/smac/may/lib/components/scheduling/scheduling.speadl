@@ -43,11 +43,11 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 	 */
 	transverse Scheduler {
 		agent {
-			provides sched: Executor
+			provides sched: AdvancedExecutor
 			provides stop: Do
 		}
 		infra {
-			requires infraSched: Executor
+			requires infraSched: AdvancedExecutor
 		}
 	}
 	
