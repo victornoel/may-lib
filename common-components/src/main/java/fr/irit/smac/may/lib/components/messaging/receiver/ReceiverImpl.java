@@ -12,7 +12,7 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	 * Use directly the inner class, since it is only created by ReceiverImpl
 	 * we can avoid to publish the Msg abstract type!
 	 */
-	public class AgentRefImpl implements AgentRef {
+	private class AgentRefImpl implements AgentRef {
 
 		private static final long serialVersionUID = 683175997362391141L;
 		
