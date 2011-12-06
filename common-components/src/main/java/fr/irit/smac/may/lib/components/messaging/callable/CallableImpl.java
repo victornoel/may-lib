@@ -19,8 +19,9 @@ public class CallableImpl<I> extends Callable<I> {
 			this.ref = null; // enable GC
 		}
 
-		public I call() {
-			return ref.toCall();
+		public I call() throws CallRefDoesNotExistException {
+			if (ref != null) return ref.toCall();
+			else throw new CallRefDoesNotExistException();
 		}
 		
 	}
