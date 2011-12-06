@@ -7,7 +7,9 @@ import java.util.concurrent.Executor
 
 
 import fr.irit.smac.may.lib.components.distribution.ivy.*
-		
+import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.*
+import fr.irit.smac.may.lib.components.distribution.interfaces.*
+
 namespace fr.irit.smac.may.lib.components.distribution {
 	
 	component IvyJSONBroadcaster[T] {
@@ -43,16 +45,16 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		requires ivyBindMsg : Push[String]
 		requires ivySend: Push[String]
 		
-		requires serializer : MapGet[T,String]
-		requires deserializer : MapGet[String, T]
+		requires serializer : Transform[T,String]
+		requires deserializer : Transform[String, T]
 		
 		provides send: Push[T]
 		requires handle: Push[T]
 	}
 	
 	component JSONTransformer[T] {
-		provides serializer : MapGet[T,String]
-		provides deserializer : MapGet[String, T]
+		provides serializer : Transform[T,String]
+		provides deserializer : Transform[String, T]
 	}
 	
 	namespace ivy {
@@ -62,13 +64,13 @@ namespace fr.irit.smac.may.lib.components.distribution {
 			
 			requires exec: Executor
 			// TODO maybe change it to use a specific class instead of this too much generic and meaningless one
-			provides bindMsg : MapGet[Pair[String,Push[List[String]]],Integer]
+			provides bindMsg : Bind
 			provides unBindMsg : Push[Integer]
 			provides send : Push[String]
 		}
 		
 		component IvyBinder {
-			requires bindMsg : MapGet[Pair[String,Push[List[String]]],Integer]
+			requires bindMsg : Bind
 			requires unBindMsg : Push[Integer]
 			
 			provides reBindMsg : Push[String]

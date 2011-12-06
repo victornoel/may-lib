@@ -29,7 +29,7 @@ public abstract class IvyBus {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<org.javatuples.Pair<java.lang.String, fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>>>, java.lang.Integer> bindMsg();
+	protected abstract fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
@@ -82,13 +82,13 @@ public abstract class IvyBus {
 		public final fr.irit.smac.may.lib.interfaces.Do disconnect() {
 			return this.disconnect;
 		};
-		private final fr.irit.smac.may.lib.interfaces.MapGet<org.javatuples.Pair<java.lang.String, fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>>>, java.lang.Integer> bindMsg;
+		private final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.MapGet<org.javatuples.Pair<java.lang.String, fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>>>, java.lang.Integer> bindMsg() {
+		public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
 			return this.bindMsg;
 		};
 		private final fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg;

@@ -27,7 +27,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 		return new Push<List<String>>() {
 			public void push(List<String> thing) {
 				// there should be only one String
-				T m = deserializer().get(thing.get(0));
+				T m = deserializer().transform(thing.get(0));
 				handle().push(m);
 				// TODO handle errors in logs
 			}
@@ -38,7 +38,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 	protected Push<T> send() {
 		return new Push<T>() {
 			public void push(T thing) {
-				String m = serializer().get(thing);
+				String m = serializer().transform(thing);
 				ivySend().push("fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl[" + namespace + "]: " + m);
 			};
 		};

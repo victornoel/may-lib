@@ -9,7 +9,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.ObjectMapper.DefaultTyping;
 import org.codehaus.jackson.type.TypeReference;
 
-import fr.irit.smac.may.lib.interfaces.MapGet;
+import fr.irit.smac.may.lib.components.distribution.interfaces.Transform;
 
 public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 	
@@ -22,9 +22,9 @@ public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 	}
 
 	@Override
-	protected MapGet<Msg, String> serializer() {
-		return new MapGet<Msg, String>() {
-			public String get(Msg message) {
+	protected Transform<Msg, String> serializer() {
+		return new Transform<Msg, String>() {
+			public String transform(Msg message) {
 				String m = null;
 				try {
 					m = mapper.writeValueAsString(message);
@@ -44,9 +44,9 @@ public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 	}
 
 	@Override
-	protected MapGet<String, Msg> deserializer() {
-		return new MapGet<String, Msg>() {
-			public Msg get(String thing) {
+	protected Transform<String, Msg> deserializer() {
+		return new Transform<String, Msg>() {
+			public Msg transform(String thing) {
 				Msg message = null;
 				try {
 					message = mapper.readValue(thing, clazz);

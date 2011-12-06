@@ -30,7 +30,7 @@ public abstract class IvyBroadcaster<T> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer() {
+	protected final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
 		assert this.structure != null;
 		return this.structure.bridge.serializer();
 	};
@@ -40,7 +40,7 @@ public abstract class IvyBroadcaster<T> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer() {
+	protected final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
 		assert this.structure != null;
 		return this.structure.bridge.deserializer();
 	};
@@ -74,8 +74,8 @@ public abstract class IvyBroadcaster<T> {
 	public static interface Bridge<T> {
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg();
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend();
-		public fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer();
-		public fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer();
+		public fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer();
+		public fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
 		public fr.irit.smac.may.lib.interfaces.Push<T> handle();
 
 	}

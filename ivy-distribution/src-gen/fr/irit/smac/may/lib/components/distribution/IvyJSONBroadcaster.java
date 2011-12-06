@@ -132,12 +132,12 @@ public abstract class IvyJSONBroadcaster<T> {
 
 		private final class Bridge_bc implements IvyBroadcaster.Bridge<T> {
 
-			public final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer() {
+			public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
 				return Component.this.json.deserializer();
 
 			};
 
-			public final fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer() {
+			public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
 				return Component.this.json.serializer();
 
 			};
@@ -162,7 +162,7 @@ public abstract class IvyJSONBroadcaster<T> {
 
 		private final class Bridge_binder implements IvyBinder.Bridge {
 
-			public final fr.irit.smac.may.lib.interfaces.MapGet<org.javatuples.Pair<java.lang.String, fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>>>, java.lang.Integer> bindMsg() {
+			public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
 				return Component.this.ivy.bindMsg();
 
 			};

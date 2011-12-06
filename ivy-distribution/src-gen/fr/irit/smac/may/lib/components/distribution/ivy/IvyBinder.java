@@ -10,7 +10,7 @@ public abstract class IvyBinder {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.MapGet<org.javatuples.Pair<java.lang.String, fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>>>, java.lang.Integer> bindMsg() {
+	protected final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
 		assert this.structure != null;
 		return this.structure.bridge.bindMsg();
 	};
@@ -44,7 +44,7 @@ public abstract class IvyBinder {
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg();
 
 	public static interface Bridge {
-		public fr.irit.smac.may.lib.interfaces.MapGet<org.javatuples.Pair<java.lang.String, fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>>>, java.lang.Integer> bindMsg();
+		public fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg();
 		public fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive();
 

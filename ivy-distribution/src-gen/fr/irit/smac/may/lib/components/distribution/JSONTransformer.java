@@ -10,7 +10,7 @@ public abstract class JSONTransformer<T> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer();
+	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port
@@ -18,7 +18,7 @@ public abstract class JSONTransformer<T> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer();
+	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
 
 	public static interface Bridge<T> {
 
@@ -44,22 +44,22 @@ public abstract class JSONTransformer<T> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer;
+		private final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.MapGet<T, java.lang.String> serializer() {
+		public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
 			return this.serializer;
 		};
-		private final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer;
+		private final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.String, T> deserializer() {
+		public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
 			return this.deserializer;
 		};
 

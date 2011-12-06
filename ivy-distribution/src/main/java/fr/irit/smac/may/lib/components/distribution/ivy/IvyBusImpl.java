@@ -3,7 +3,6 @@ package fr.irit.smac.may.lib.components.distribution.ivy;
 import java.util.Arrays;
 import java.util.List;
 
-import org.javatuples.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,8 +10,8 @@ import fr.dgac.ivy.Ivy;
 import fr.dgac.ivy.IvyClient;
 import fr.dgac.ivy.IvyException;
 import fr.dgac.ivy.IvyMessageListener;
+import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind;
 import fr.irit.smac.may.lib.interfaces.Do;
-import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Push;
 
 public class IvyBusImpl extends IvyBus {
@@ -80,11 +79,10 @@ public class IvyBusImpl extends IvyBus {
 	}
 
 	@Override
-	protected MapGet<Pair<String, Push<List<String>>>, Integer> bindMsg() {
-		return new MapGet<Pair<String, Push<List<String>>>, Integer>() {
-			public Integer get(Pair<String, Push<List<String>>> thing) {
-				final Push<List<String>> callback = thing.getValue1();
-				String regexp = thing.getValue0();
+	protected Bind bindMsg() {
+		return new Bind() {
+			public int bind(String regex, final Push<List<String>> callback) {
+				
 				IvyMessageListener listener = new IvyMessageListener() {
 					public void receive(IvyClient client, final String[] args) {
 						logger.debug("receiving message \"{}\"", Arrays.toString(args));
@@ -98,14 +96,14 @@ public class IvyBusImpl extends IvyBus {
 				};
 				
 				try {
-					logger.debug("binding regexp \"{}\"", regexp);
-					int bindId = IvyBusImpl.this.bus.bindMsg(regexp, listener);
+					logger.debug("binding regexp \"{}\"", regex);
+					int bindId = IvyBusImpl.this.bus.bindMsg(regex, listener);
 					return bindId;
 				} catch (IvyException e) {
 					logger.error("error while binding",e);
 				}
-				// TODO better!
-				return null;
+				// TODO better, use an exception
+				return -1;
 			}
 		};
 	}
