@@ -25,7 +25,7 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 		}
 
 		private void receive(Msg m) throws AgentDoesNotExistException {
-			if (this.ref != null) this.ref.receive(m);
+			if (this.ref != null) this.ref.put().push(m);
 			else throw new AgentDoesNotExistException();
 		}
 		
@@ -54,10 +54,6 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 		 */
 		public AgentSide(String name) {
 			this.agentRef = new AgentRefImpl(this, name);
-		}
-		
-		private void receive(Msg m) {
-			put().push(m);
 		}
 		
 		@Override
