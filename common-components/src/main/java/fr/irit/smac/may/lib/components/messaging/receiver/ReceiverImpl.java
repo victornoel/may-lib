@@ -56,7 +56,7 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 			this.agentRef = new AgentRefImpl(this, name);
 		}
 		
-		void receive(Msg m) {
+		private void receive(Msg m) {
 			put().push(m);
 		}
 		
