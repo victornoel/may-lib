@@ -1,6 +1,7 @@
 
 import fr.irit.smac.may.lib.interfaces.*
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
+import fr.irit.smac.may.lib.components.messaging.callable.CallRef
 import fr.irit.smac.may.lib.components.messaging.interfaces.*
 import java.lang.String
 
@@ -40,6 +41,19 @@ namespace fr.irit.smac.may.lib.components.messaging {
 			}
 			infra {
 				provides deposit: ReliableSend[MsgType, AgentRef]
+			}
+		}
+	}
+	
+	namespace callable {
+		transverse Callable[I] {
+			agent {
+				requires toCall: I
+				provides me: Pull[CallRef]
+				provides stop: Do
+			}
+			infra {
+				provides call: ReliableSynchronousCall[I, CallRef]
 			}
 		}
 	}
