@@ -1,8 +1,8 @@
 package fr.irit.smac.may.lib.components.messaging.callable;
 
-import fr.irit.smac.may.lib.components.messaging.exceptions.CallRefDoesNotExistException;
-import fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSynchronousCall;
+import fr.irit.smac.may.lib.exceptions.KeyDoesNotExistException;
 import fr.irit.smac.may.lib.interfaces.Do;
+import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Pull;
 
 public class CallableImpl<I> extends Callable<I> {
@@ -19,22 +19,24 @@ public class CallableImpl<I> extends Callable<I> {
 			this.ref = null; // enable GC
 		}
 
-		public I call() throws CallRefDoesNotExistException {
+		public I call() {
 			if (ref != null) return ref.toCall();
-			else throw new CallRefDoesNotExistException();
+			else return null;
 		}
 	}
 	
-	@Override
-	protected ReliableSynchronousCall<I, CallRef> call() {
-		return new ReliableSynchronousCall<I, CallRef>() {
-			public I call(CallRef ref) throws CallRefDoesNotExistException {
-				@SuppressWarnings("unchecked")
-				CallRefImpl realRef = (CallRefImpl) ref;
-				return realRef.call();
+	protected MapGet<CallRef, I> call() {
+		return new MapGet<CallRef, I>() {
+			public I get(CallRef k) throws KeyDoesNotExistException {
+				if (k instanceof CallableImpl.CallRefImpl) {
+					CallRefImpl realRef = (CallableImpl.CallRefImpl) k;
+					return realRef.call();
+				} else {
+					throw new KeyDoesNotExistException();
+				}
 			}
 		};
-	}
+	};
 	
 	public class AgentSide extends Agent<I> {
 

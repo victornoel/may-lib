@@ -46,6 +46,7 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	}
 	
 	namespace callable {
+		// est-ce que ce n'est juste une version spéciale du collection map sans map ? si!
 		transverse Callable[I] {
 			agent {
 				requires toCall: I
@@ -53,7 +54,7 @@ namespace fr.irit.smac.may.lib.components.messaging {
 				provides stop: Do
 			}
 			infra {
-				provides call: ReliableSynchronousCall[I, CallRef]
+				provides call: MapGet[CallRef,I]
 			}
 		}
 	}

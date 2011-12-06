@@ -10,7 +10,7 @@ public abstract class Callable<I> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSynchronousCall<I, fr.irit.smac.may.lib.components.messaging.callable.CallRef> call();
+	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
 
 	public static interface Bridge<I> {
 
@@ -35,13 +35,13 @@ public abstract class Callable<I> {
 
 		}
 
-		private final fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSynchronousCall<I, fr.irit.smac.may.lib.components.messaging.callable.CallRef> call;
+		private final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSynchronousCall<I, fr.irit.smac.may.lib.components.messaging.callable.CallRef> call() {
+		public final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call() {
 			return this.call;
 		};
 
