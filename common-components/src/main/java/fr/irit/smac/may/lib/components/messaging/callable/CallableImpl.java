@@ -7,7 +7,7 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 
 public class CallableImpl<I> extends Callable<I> {
 
-	public class CallRefImpl implements CallRef {
+	private class CallRefImpl implements CallRef {
 		
 		private AgentSide ref;
 		
@@ -23,7 +23,6 @@ public class CallableImpl<I> extends Callable<I> {
 			if (ref != null) return ref.toCall();
 			else throw new CallRefDoesNotExistException();
 		}
-		
 	}
 	
 	@Override
@@ -36,7 +35,6 @@ public class CallableImpl<I> extends Callable<I> {
 			}
 		};
 	}
-	
 	
 	public class AgentSide extends Agent<I> {
 
