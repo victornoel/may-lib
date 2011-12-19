@@ -29,6 +29,7 @@ public class CallableImpl<I> extends Callable<I> {
 		return new MapGet<CallRef, I>() {
 			public I get(CallRef k) throws KeyDoesNotExistException {
 				if (k instanceof CallableImpl.CallRefImpl) {
+					@SuppressWarnings({ "rawtypes", "unchecked" })
 					CallRefImpl realRef = (CallableImpl.CallRefImpl) k;
 					return realRef.call();
 				} else {
