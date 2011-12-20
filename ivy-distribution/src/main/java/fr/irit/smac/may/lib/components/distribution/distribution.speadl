@@ -18,13 +18,11 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		
 		requires exec: Executor
 		
-		instance bc: IvyBroadcaster[T] {
-			bind deserializer to json.deserializer
-			bind serializer to json.serializer
-			bind handle toThis handle
-			bind ivyBindMsg to binder.reBindMsg
-			bind ivySend to ivy.send
+		instance ivy: IvyBus {
+			bind exec toThis exec
 		}
+		
+		instance json: JSONTransformer[T]
 		
 		instance binder: IvyBinder {
 			bind bindMsg to ivy.bindMsg
@@ -32,11 +30,13 @@ namespace fr.irit.smac.may.lib.components.distribution {
 			bind unBindMsg to ivy.unBindMsg
 		}
 		
-		instance ivy: IvyBus {
-			bind exec toThis exec
+		instance bc: IvyBroadcaster[T] {
+			bind deserializer to json.deserializer
+			bind serializer to json.serializer
+			bind handle toThis handle
+			bind ivyBindMsg to binder.reBindMsg
+			bind ivySend to ivy.send
 		}
-		
-		instance json: JSONTransformer[T]
 	}
 	
 	component IvyBroadcaster[T] {

@@ -34,40 +34,6 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This should be overridden by the implementation to define how to create this sub-component
 	 * This will be called once during the construction of the component to initialize this sub-component
 	 */
-	protected abstract IvyBroadcaster<T> make_bc();
-
-	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final IvyBroadcaster.Component<T> bc() {
-		assert this.structure != null;
-		return this.structure.bc;
-	}
-
-	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
-	 */
-	protected abstract IvyBinder make_binder();
-
-	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final IvyBinder.Component binder() {
-		assert this.structure != null;
-		return this.structure.binder;
-	}
-
-	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
-	 */
 	protected abstract IvyBus make_ivy();
 
 	/**
@@ -98,6 +64,40 @@ public abstract class IvyJSONBroadcaster<T> {
 		return this.structure.json;
 	}
 
+	/**
+	 * This should be overridden by the implementation to define how to create this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
+	 */
+	protected abstract IvyBinder make_binder();
+
+	/**
+	 * This can be called by the implementation to access the sub-component instance and its provided ports
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected final IvyBinder.Component binder() {
+		assert this.structure != null;
+		return this.structure.binder;
+	}
+
+	/**
+	 * This should be overridden by the implementation to define how to create this sub-component
+	 * This will be called once during the construction of the component to initialize this sub-component
+	 */
+	protected abstract IvyBroadcaster<T> make_bc();
+
+	/**
+	 * This can be called by the implementation to access the sub-component instance and its provided ports
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected final IvyBroadcaster.Component<T> bc() {
+		assert this.structure != null;
+		return this.structure.bc;
+	}
+
 	public static interface Bridge<T> {
 		public fr.irit.smac.may.lib.interfaces.Push<T> handle();
 		public java.util.concurrent.Executor exec();
@@ -118,16 +118,51 @@ public abstract class IvyJSONBroadcaster<T> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.bc = new IvyBroadcaster.Component<T>(implem.make_bc(),
-					new Bridge_bc());
-			this.binder = new IvyBinder.Component(implem.make_binder(),
-					new Bridge_binder());
 			this.ivy = new IvyBus.Component(implem.make_ivy(), new Bridge_ivy());
 			this.json = new JSONTransformer.Component<T>(implem.make_json(),
 					new Bridge_json());
+			this.binder = new IvyBinder.Component(implem.make_binder(),
+					new Bridge_binder());
+			this.bc = new IvyBroadcaster.Component<T>(implem.make_bc(),
+					new Bridge_bc());
 
 		}
 
+		private final IvyBus.Component ivy;
+
+		private final class Bridge_ivy implements IvyBus.Bridge {
+
+			public final java.util.concurrent.Executor exec() {
+				return Component.this.bridge.exec();
+
+			};
+
+		}
+		private final JSONTransformer.Component<T> json;
+
+		private final class Bridge_json implements JSONTransformer.Bridge<T> {
+
+		}
+		private final IvyBinder.Component binder;
+
+		private final class Bridge_binder implements IvyBinder.Bridge {
+
+			public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
+				return Component.this.ivy.bindMsg();
+
+			};
+
+			public final fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
+				return Component.this.bc.ivyReceive();
+
+			};
+
+			public final fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
+				return Component.this.ivy.unBindMsg();
+
+			};
+
+		}
 		private final IvyBroadcaster.Component<T> bc;
 
 		private final class Bridge_bc implements IvyBroadcaster.Bridge<T> {
@@ -158,41 +193,6 @@ public abstract class IvyJSONBroadcaster<T> {
 			};
 
 		}
-		private final IvyBinder.Component binder;
-
-		private final class Bridge_binder implements IvyBinder.Bridge {
-
-			public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
-				return Component.this.ivy.bindMsg();
-
-			};
-
-			public final fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
-				return Component.this.bc.ivyReceive();
-
-			};
-
-			public final fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
-				return Component.this.ivy.unBindMsg();
-
-			};
-
-		}
-		private final IvyBus.Component ivy;
-
-		private final class Bridge_ivy implements IvyBus.Bridge {
-
-			public final java.util.concurrent.Executor exec() {
-				return Component.this.bridge.exec();
-
-			};
-
-		}
-		private final JSONTransformer.Component<T> json;
-
-		private final class Bridge_json implements JSONTransformer.Bridge<T> {
-
-		}
 
 		/**
 		 * This can be called to access the provided port
@@ -203,10 +203,10 @@ public abstract class IvyJSONBroadcaster<T> {
 		};
 
 		public final void start() {
-			this.bc.start();
-			this.binder.start();
 			this.ivy.start();
 			this.json.start();
+			this.binder.start();
+			this.bc.start();
 
 			this.implementation.start();
 		}
