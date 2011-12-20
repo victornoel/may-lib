@@ -22,7 +22,7 @@ namespace fr.irit.smac.may.lib.classic {
 	namespace named {
 		
 		infrastructure ClassicNamed[Msg] {
-			provides send: Send[Msg, String] = receive.deposit
+			provides send: Send[Msg, String] = receive.depositKey
 			provides create: CreateNamed[Msg, String]
 			
 			transverse scheduler: Scheduler {
@@ -30,7 +30,7 @@ namespace fr.irit.smac.may.lib.classic {
 			}
 
 			transverse sender: Forward[Send[Msg, String]] {
-				bind i to receive.deposit
+				bind i to receive.depositKey
 			}
 			
 			transverse fact: Forward[CreateNamed[Msg, String]] {
@@ -40,7 +40,7 @@ namespace fr.irit.smac.may.lib.classic {
 			transverse realReceive: Receiver[Msg]
 			
 			transverse receive: MapReceiver[Msg,AgentRef,String] {
-				bind realDeposit to realReceive.deposit
+				bind depositValue to realReceive.deposit
 			}
 			
 			instance executor: ExecutorService
@@ -57,8 +57,8 @@ namespace fr.irit.smac.may.lib.classic {
 				use fact
 
 				use receive {
-					bind me toThis me
-					bind realMe to realReceive.me
+					bind key toThis me
+					bind value to realReceive.me
 				}
 				
 				use realReceive {

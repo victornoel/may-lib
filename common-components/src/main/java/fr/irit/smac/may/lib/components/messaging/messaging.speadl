@@ -62,14 +62,18 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	// to combine for example with meta.Data and an infrastructure component generating the references...
 	transverse MapReceiver[Msg,RealRef,Ref] {
 		agent {
-			requires realMe: Pull[RealRef]
-			requires me: Pull[Ref]
+			// value
+			requires value: Pull[RealRef]
+			// key
+			requires key: Pull[Ref]
 			provides disconnect: Do
 		}
 		infra {
-			provides deposit: Send[Msg,Ref]
+			// send for the key
+			provides depositKey: Send[Msg,Ref]
 			
-			requires realDeposit: Send[Msg,RealRef]
+			// send for the value
+			requires depositValue: Send[Msg,RealRef]
 		}
 	}
 	
@@ -80,13 +84,15 @@ namespace fr.irit.smac.may.lib.components.messaging {
 		// a bit useless now it seems…
 		component DistributedMessaging[Msg,NodeRef] {
 			provides generateRef: Pull[DistRef[NodeRef]]
+
+			requires myNode: Pull[NodeRef]
 			
+			// local
 			provides send: Send[Msg,DistRef[NodeRef]]
 			requires deposit: Send[Msg,DistRef[NodeRef]]
 			
-			requires myNode: Pull[NodeRef]
-
-			requires distOut: Push[DistributedMessage[Msg,NodeRef]]
+			// toward exterior
+			requires distOut: Send[DistributedMessage[Msg,NodeRef],NodeRef]
 			provides distIn: Push[DistributedMessage[Msg,NodeRef]]
 		}
 		
@@ -94,9 +100,11 @@ namespace fr.irit.smac.may.lib.components.messaging {
 			
 			provides nodeName: Pull[String]
 			
+			// local
 			provides in: Send[T,String]
 			requires out: Push[T]
 			
+			// toward exterior
 			requires broadcast: Push[DistributedInfo[T]]
 			provides handle: Push[DistributedInfo[T]]
 		}

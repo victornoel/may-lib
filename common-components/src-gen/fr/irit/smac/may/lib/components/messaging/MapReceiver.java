@@ -10,9 +10,9 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> realDeposit() {
+	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> depositValue() {
 		assert this.structure != null;
-		return this.structure.bridge.realDeposit();
+		return this.structure.bridge.depositValue();
 	};
 
 	/**
@@ -21,10 +21,10 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> deposit();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> depositKey();
 
 	public static interface Bridge<Msg, RealRef, Ref> {
-		public fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> realDeposit();
+		public fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> depositValue();
 
 	}
 
@@ -43,18 +43,18 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.deposit = implem.deposit();
+			this.depositKey = implem.depositKey();
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> deposit;
+		private final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> depositKey;
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> deposit() {
-			return this.deposit;
+		public final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> depositKey() {
+			return this.depositKey;
 		};
 
 		public final void start() {
@@ -73,9 +73,9 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected final fr.irit.smac.may.lib.interfaces.Pull<RealRef> realMe() {
+		protected final fr.irit.smac.may.lib.interfaces.Pull<RealRef> value() {
 			assert this.structure != null;
-			return this.structure.bridge.realMe();
+			return this.structure.bridge.value();
 		};
 		/**
 		 * This can be called by the implementation to access this required port
@@ -83,9 +83,9 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
+		protected final fr.irit.smac.may.lib.interfaces.Pull<Ref> key() {
 			assert this.structure != null;
-			return this.structure.bridge.me();
+			return this.structure.bridge.key();
 		};
 
 		/**
@@ -97,8 +97,8 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
 
 		public static interface Bridge<Msg, RealRef, Ref> {
-			public fr.irit.smac.may.lib.interfaces.Pull<RealRef> realMe();
-			public fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
+			public fr.irit.smac.may.lib.interfaces.Pull<RealRef> value();
+			public fr.irit.smac.may.lib.interfaces.Pull<Ref> key();
 
 		}
 

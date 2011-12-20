@@ -23,7 +23,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 		return new Send<Msg, DistRef<NodeRef>>() {
 			public void send(Msg message, DistRef<NodeRef> receiver) {
 				DistributedMessage<Msg,NodeRef> m = new DistributedMessage<Msg,NodeRef>(receiver, message);
-				distOut().push(m);
+				distOut().send(m,receiver.platform);
 			};
 		};
 	}

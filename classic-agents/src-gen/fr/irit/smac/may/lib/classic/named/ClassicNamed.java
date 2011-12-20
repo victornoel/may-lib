@@ -174,7 +174,7 @@ public abstract class ClassicNamed<Msg> {
 					Forward.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
 
 			public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> i() {
-				return Component.this.receive.deposit();
+				return Component.this.receive.depositKey();
 
 			};
 
@@ -202,7 +202,7 @@ public abstract class ClassicNamed<Msg> {
 				implements
 					MapReceiver.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> {
 
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> realDeposit() {
+			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> depositValue() {
 				return Component.this.realReceive.deposit();
 
 			};
@@ -219,7 +219,7 @@ public abstract class ClassicNamed<Msg> {
 		 * start() must have been called before
 		 */
 		public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send() {
-			return this.receive.deposit();
+			return this.receive.depositKey();
 		};
 		private final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create;
 
@@ -343,12 +343,12 @@ public abstract class ClassicNamed<Msg> {
 				implements
 					MapReceiver.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> {
 
-			public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> me() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> key() {
 				return ClassicNamedAgent.this.component.me();
 
 			};
 
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> realMe() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> value() {
 				return ClassicNamedAgent.this.realReceive.me();
 
 			};
