@@ -19,7 +19,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 	@Override
 	protected void start() {
 		super.start();
-		ivyBindMsg().push("^fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl[" + namespace + "]: (.*)$");
+		ivyBindMsg().push("^fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl\\[" + namespace + "\\]: (.*)$");
 	}
 	
 	@Override
