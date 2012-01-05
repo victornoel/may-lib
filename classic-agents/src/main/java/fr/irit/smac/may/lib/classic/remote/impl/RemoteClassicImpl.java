@@ -79,11 +79,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 			public RemoteAgentRef create(
 					final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
 
-				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
-						new RemoteClassicAgentComponentImpl<Msg>(beh),
-						placed.new AgentSide(), factory.new AgentSide(), scheduler.new AgentSide(),
-						receive.new AgentSide("agent"+(i++)), send.new AgentSide(),
-						remoteRefReceive.new AgentSide());
+				ClassicAgent<Msg> agent = createClassicAgent(new RemoteClassicAgentComponentImpl<Msg>(beh), "agent"+(i++));
 				agent.start();
 				return agent.remReceive().me().pull();
 			}

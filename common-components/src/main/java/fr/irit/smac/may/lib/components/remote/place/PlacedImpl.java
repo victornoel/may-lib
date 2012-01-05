@@ -38,4 +38,8 @@ public class PlacedImpl extends Placed {
 		}
 	}
 
+	@Override
+	protected Agent make_Agent() {
+		return new AgentSide();
+	}
 }

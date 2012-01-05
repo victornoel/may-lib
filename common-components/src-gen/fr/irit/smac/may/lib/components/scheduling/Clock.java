@@ -1,35 +1,45 @@
 package fr.irit.smac.may.lib.components.scheduling;
 
+import fr.irit.smac.may.lib.components.scheduling.Clock;
+
 public abstract class Clock {
 
-	private Component structure = null;
+	private Clock.ComponentImpl structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final java.util.concurrent.Executor sched() {
+	protected Clock.Component self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected java.util.concurrent.Executor sched() {
 		assert this.structure != null;
 		return this.structure.bridge.sched();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Do tick() {
+	protected fr.irit.smac.may.lib.interfaces.Do tick() {
 		assert this.structure != null;
 		return this.structure.bridge.tick();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
 
@@ -39,13 +49,24 @@ public abstract class Clock {
 
 	}
 
-	public static final class Component {
+	public static interface Component {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
 
-		private final Bridge bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl implements Clock.Component {
+
+		private final Clock.Bridge bridge;
 
 		private final Clock implementation;
 
-		public Component(final Clock implem, final Bridge b) {
+		private ComponentImpl(final Clock implem, final Clock.Bridge b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -59,10 +80,6 @@ public abstract class Clock {
 
 		private final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control() {
 			return this.control;
 		};
@@ -71,6 +88,7 @@ public abstract class Clock {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -81,6 +99,10 @@ public abstract class Clock {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public Clock.Component createComponent(Clock.Bridge b) {
+		return new Clock.ComponentImpl(this, b);
 	}
 
 }

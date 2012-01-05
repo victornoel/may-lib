@@ -93,4 +93,9 @@ public class ScheduledImpl extends Scheduled {
 			}
 		};
 	}
+	
+	@Override
+	protected Agent make_Agent() {
+		return new AgentSide();
+	}
 }

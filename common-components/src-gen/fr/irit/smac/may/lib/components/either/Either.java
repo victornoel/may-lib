@@ -1,33 +1,44 @@
 package fr.irit.smac.may.lib.components.either;
 
+import fr.irit.smac.may.lib.components.either.Either;
+
 public abstract class Either<L, R> {
 
-	private Component<L, R> structure = null;
+	private Either.ComponentImpl<L, R> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out() {
+	protected Either.Component<L, R> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out() {
 		assert this.structure != null;
 		return this.structure.bridge.out();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<L> left();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<R> right();
 
@@ -36,13 +47,30 @@ public abstract class Either<L, R> {
 
 	}
 
-	public static final class Component<L, R> {
+	public static interface Component<L, R> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<L> left();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<R> right();
 
-		private final Bridge<L, R> bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl<L, R> implements Either.Component<L, R> {
+
+		private final Either.Bridge<L, R> bridge;
 
 		private final Either<L, R> implementation;
 
-		public Component(final Either<L, R> implem, final Bridge<L, R> b) {
+		private ComponentImpl(final Either<L, R> implem,
+				final Either.Bridge<L, R> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -57,19 +85,11 @@ public abstract class Either<L, R> {
 
 		private final fr.irit.smac.may.lib.interfaces.Push<L> left;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<L> left() {
 			return this.left;
 		};
 		private final fr.irit.smac.may.lib.interfaces.Push<R> right;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<R> right() {
 			return this.right;
 		};
@@ -78,6 +98,7 @@ public abstract class Either<L, R> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -88,6 +109,10 @@ public abstract class Either<L, R> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public Either.Component<L, R> createComponent(Either.Bridge<L, R> b) {
+		return new Either.ComponentImpl<L, R>(this, b);
 	}
 
 }

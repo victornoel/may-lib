@@ -89,4 +89,9 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 		  public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) throws RemoteException;
 	}
 
+	@Override
+	protected RemoteFactory.Agent<Msg, Ref> make_Agent() {
+		return new AgentSide();
+	}
+
 }

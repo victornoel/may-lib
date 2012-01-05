@@ -1,55 +1,63 @@
 package fr.irit.smac.may.lib.classic.local;
 
+import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
+
 public abstract class ClassicBehaviour<Msg, Ref> {
 
-	private Component<Msg, Ref> structure = null;
+	private ClassicBehaviour.ComponentImpl<Msg, Ref> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
+	protected ClassicBehaviour.Component<Msg, Ref> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
 		assert this.structure != null;
 		return this.structure.bridge.send();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
+	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
 		assert this.structure != null;
 		return this.structure.bridge.me();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Do die() {
+	protected fr.irit.smac.may.lib.interfaces.Do die() {
 		assert this.structure != null;
 		return this.structure.bridge.die();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, Ref> create() {
+	protected fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, Ref> create() {
 		assert this.structure != null;
 		return this.structure.bridge.create();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Msg> cycle();
 
@@ -61,14 +69,27 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 
 	}
 
-	public static final class Component<Msg, Ref> {
+	public static interface Component<Msg, Ref> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<Msg> cycle();
 
-		private final Bridge<Msg, Ref> bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl<Msg, Ref>
+			implements
+				ClassicBehaviour.Component<Msg, Ref> {
+
+		private final ClassicBehaviour.Bridge<Msg, Ref> bridge;
 
 		private final ClassicBehaviour<Msg, Ref> implementation;
 
-		public Component(final ClassicBehaviour<Msg, Ref> implem,
-				final Bridge<Msg, Ref> b) {
+		private ComponentImpl(final ClassicBehaviour<Msg, Ref> implem,
+				final ClassicBehaviour.Bridge<Msg, Ref> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -82,10 +103,6 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 
 		private final fr.irit.smac.may.lib.interfaces.Push<Msg> cycle;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<Msg> cycle() {
 			return this.cycle;
 		};
@@ -94,6 +111,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -104,6 +122,11 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public ClassicBehaviour.Component<Msg, Ref> createComponent(
+			ClassicBehaviour.Bridge<Msg, Ref> b) {
+		return new ClassicBehaviour.ComponentImpl<Msg, Ref>(this, b);
 	}
 
 }

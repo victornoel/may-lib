@@ -1,14 +1,26 @@
 package fr.irit.smac.may.lib.components.meta;
 
+import fr.irit.smac.may.lib.components.meta.CollectionMap;
+
 public abstract class CollectionMap<K, I> {
 
-	private Component<K, I> structure = null;
+	private CollectionMap.ComponentImpl<K, I> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected CollectionMap.Component<K, I> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<K, I> get();
 
@@ -16,14 +28,30 @@ public abstract class CollectionMap<K, I> {
 
 	}
 
-	public static final class Component<K, I> {
+	public static interface Component<K, I> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.MapGet<K, I> get();
+
+		public void start();
+
+		public CollectionMap.Agent<K, I> createAgent();
+
+	}
+
+	private static class ComponentImpl<K, I>
+			implements
+				CollectionMap.Component<K, I> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<K, I> bridge;
+		private final CollectionMap.Bridge<K, I> bridge;
 
 		private final CollectionMap<K, I> implementation;
 
-		public Component(final CollectionMap<K, I> implem, final Bridge<K, I> b) {
+		private ComponentImpl(final CollectionMap<K, I> implem,
+				final CollectionMap.Bridge<K, I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -37,10 +65,6 @@ public abstract class CollectionMap<K, I> {
 
 		private final fr.irit.smac.may.lib.interfaces.MapGet<K, I> get;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.MapGet<K, I> get() {
 			return this.get;
 		};
@@ -49,29 +73,45 @@ public abstract class CollectionMap<K, I> {
 
 			this.implementation.start();
 		}
+
+		public CollectionMap.Agent<K, I> createAgent() {
+			CollectionMap.Agent<K, I> agentSide = this.implementation
+					.make_Agent();
+			agentSide.infraStructure = this;
+			return agentSide;
+		}
+
 	}
 
 	public static abstract class Agent<K, I> {
 
-		private Component<K, I> structure = null;
+		private CollectionMap.Agent.ComponentImpl<K, I> structure = null;
 
 		/**
-		 * This can be called by the implementation to access this required port
-		 * It will be initialized before the provided ports are initialized
+		 * This can be called by the implementation to access the component itself and its provided ports.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called from the outside by hand.
 		 */
-		protected final I p() {
+		protected CollectionMap.Agent.Component<K, I> self() {
+			assert this.structure != null;
+			return this.structure;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected I p() {
 			assert this.structure != null;
 			return this.structure.bridge.p();
 		};
 		/**
-		 * This can be called by the implementation to access this required port
-		 * It will be initialized before the provided ports are initialized
+		 * This can be called by the implementation to access this required port.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called from the outside by hand.
 		 */
-		protected final fr.irit.smac.may.lib.interfaces.Pull<K> key() {
+		protected fr.irit.smac.may.lib.interfaces.Pull<K> key() {
 			assert this.structure != null;
 			return this.structure.bridge.key();
 		};
@@ -82,13 +122,22 @@ public abstract class CollectionMap<K, I> {
 
 		}
 
-		public static final class Component<K, I> {
+		public static interface Component<K, I> {
 
-			private final Bridge<K, I> bridge;
+			public void start();
 
-			private final Agent<K, I> implementation;
+		}
 
-			public Component(final Agent<K, I> implem, final Bridge<K, I> b) {
+		private static class ComponentImpl<K, I>
+				implements
+					CollectionMap.Agent.Component<K, I> {
+
+			private final CollectionMap.Agent.Bridge<K, I> bridge;
+
+			private final CollectionMap.Agent<K, I> implementation;
+
+			private ComponentImpl(final CollectionMap.Agent<K, I> implem,
+					final CollectionMap.Agent.Bridge<K, I> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -102,7 +151,20 @@ public abstract class CollectionMap<K, I> {
 
 				this.implementation.start();
 			}
+
 		}
+
+		private CollectionMap.ComponentImpl<K, I> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected CollectionMap.Component<K, I> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -114,7 +176,14 @@ public abstract class CollectionMap<K, I> {
 		protected void start() {
 		}
 
+		public CollectionMap.Agent.Component<K, I> createComponent(
+				CollectionMap.Agent.Bridge<K, I> b) {
+			return new CollectionMap.Agent.ComponentImpl<K, I>(this, b);
+		}
+
 	}
+
+	protected abstract CollectionMap.Agent<K, I> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation
@@ -124,6 +193,11 @@ public abstract class CollectionMap<K, I> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public CollectionMap.Component<K, I> createComponent(
+			CollectionMap.Bridge<K, I> b) {
+		return new CollectionMap.ComponentImpl<K, I>(this, b);
 	}
 
 }

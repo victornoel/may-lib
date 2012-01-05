@@ -1,35 +1,45 @@
 package fr.irit.smac.may.lib.components.remote.messaging.receiver;
 
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
+
 public abstract class RemoteReceiver<Msg, LocalRef> {
 
-	private Component<Msg, LocalRef> structure = null;
+	private RemoteReceiver.ComponentImpl<Msg, LocalRef> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit() {
+	protected RemoteReceiver.Component<Msg, LocalRef> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit() {
 		assert this.structure != null;
 		return this.structure.bridge.localDeposit();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace() {
+	protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace() {
 		assert this.structure != null;
 		return this.structure.bridge.myPlace();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit();
 
@@ -39,14 +49,29 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 	}
 
-	public static final class Component<Msg, LocalRef> {
+	public static interface Component<Msg, LocalRef> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit();
 
-		private final Bridge<Msg, LocalRef> bridge;
+		public void start();
+
+		public RemoteReceiver.Agent<Msg, LocalRef> createAgent();
+
+	}
+
+	private static class ComponentImpl<Msg, LocalRef>
+			implements
+				RemoteReceiver.Component<Msg, LocalRef> {
+
+		private final RemoteReceiver.Bridge<Msg, LocalRef> bridge;
 
 		private final RemoteReceiver<Msg, LocalRef> implementation;
 
-		public Component(final RemoteReceiver<Msg, LocalRef> implem,
-				final Bridge<Msg, LocalRef> b) {
+		private ComponentImpl(final RemoteReceiver<Msg, LocalRef> implem,
+				final RemoteReceiver.Bridge<Msg, LocalRef> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -60,10 +85,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 		private final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit() {
 			return this.deposit;
 		};
@@ -72,36 +93,53 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 			this.implementation.start();
 		}
+
+		public RemoteReceiver.Agent<Msg, LocalRef> createAgent() {
+			RemoteReceiver.Agent<Msg, LocalRef> agentSide = this.implementation
+					.make_Agent();
+			agentSide.infraStructure = this;
+			return agentSide;
+		}
+
 	}
 
 	public static abstract class Agent<Msg, LocalRef> {
 
-		private Component<Msg, LocalRef> structure = null;
+		private RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef> structure = null;
 
 		/**
-		 * This can be called by the implementation to access this required port
-		 * It will be initialized before the provided ports are initialized
+		 * This can be called by the implementation to access the component itself and its provided ports.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called from the outside by hand.
 		 */
-		protected final fr.irit.smac.may.lib.interfaces.Pull<LocalRef> localMe() {
+		protected RemoteReceiver.Agent.Component<Msg, LocalRef> self() {
+			assert this.structure != null;
+			return this.structure;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Pull<LocalRef> localMe() {
 			assert this.structure != null;
 			return this.structure.bridge.localMe();
 		};
 
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called on from the outside by hand.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me();
 
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called on from the outside by hand.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
 
@@ -110,14 +148,33 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 		}
 
-		public static final class Component<Msg, LocalRef> {
+		public static interface Component<Msg, LocalRef> {
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me();
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Do disconnect();
 
-			private final Bridge<Msg, LocalRef> bridge;
+			public void start();
 
-			private final Agent<Msg, LocalRef> implementation;
+		}
 
-			public Component(final Agent<Msg, LocalRef> implem,
-					final Bridge<Msg, LocalRef> b) {
+		private static class ComponentImpl<Msg, LocalRef>
+				implements
+					RemoteReceiver.Agent.Component<Msg, LocalRef> {
+
+			private final RemoteReceiver.Agent.Bridge<Msg, LocalRef> bridge;
+
+			private final RemoteReceiver.Agent<Msg, LocalRef> implementation;
+
+			private ComponentImpl(
+					final RemoteReceiver.Agent<Msg, LocalRef> implem,
+					final RemoteReceiver.Agent.Bridge<Msg, LocalRef> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -132,19 +189,11 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me;
 
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
 			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me() {
 				return this.me;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do disconnect;
 
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
 			public final fr.irit.smac.may.lib.interfaces.Do disconnect() {
 				return this.disconnect;
 			};
@@ -153,7 +202,39 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 				this.implementation.start();
 			}
+
 		}
+
+		private RemoteReceiver.ComponentImpl<Msg, LocalRef> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected RemoteReceiver.Component<Msg, LocalRef> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the infrastructure.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit() {
+			assert this.infraStructure != null;
+			return this.infraStructure.bridge.localDeposit();
+		};
+		/**
+		 * This can be called by the implementation to access this required port from the infrastructure.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace() {
+			assert this.infraStructure != null;
+			return this.infraStructure.bridge.myPlace();
+		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -165,7 +246,15 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		protected void start() {
 		}
 
+		public RemoteReceiver.Agent.Component<Msg, LocalRef> createComponent(
+				RemoteReceiver.Agent.Bridge<Msg, LocalRef> b) {
+			return new RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef>(this,
+					b);
+		}
+
 	}
+
+	protected abstract RemoteReceiver.Agent<Msg, LocalRef> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation
@@ -175,6 +264,11 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public RemoteReceiver.Component<Msg, LocalRef> createComponent(
+			RemoteReceiver.Bridge<Msg, LocalRef> b) {
+		return new RemoteReceiver.ComponentImpl<Msg, LocalRef>(this, b);
 	}
 
 }

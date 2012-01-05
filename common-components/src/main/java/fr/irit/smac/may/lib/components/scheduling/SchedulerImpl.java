@@ -2,6 +2,7 @@ package fr.irit.smac.may.lib.components.scheduling;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,6 +71,11 @@ public class SchedulerImpl extends Scheduler {
 			};
 		}
 
+	}
+	
+	@Override
+	protected Agent make_Agent() {
+		return new AgentSide();
 	}
 
 }

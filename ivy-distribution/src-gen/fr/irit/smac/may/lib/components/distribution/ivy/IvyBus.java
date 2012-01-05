@@ -1,49 +1,60 @@
 package fr.irit.smac.may.lib.components.distribution.ivy;
 
+import fr.irit.smac.may.lib.components.distribution.ivy.IvyBus;
+
 public abstract class IvyBus {
 
-	private Component structure = null;
+	private IvyBus.ComponentImpl structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final java.util.concurrent.Executor exec() {
+	protected IvyBus.Component self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected java.util.concurrent.Executor exec() {
 		assert this.structure != null;
 		return this.structure.bridge.exec();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send();
 
@@ -52,13 +63,39 @@ public abstract class IvyBus {
 
 	}
 
-	public static final class Component {
+	public static interface Component {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Do disconnect();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send();
 
-		private final Bridge bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl implements IvyBus.Component {
+
+		private final IvyBus.Bridge bridge;
 
 		private final IvyBus implementation;
 
-		public Component(final IvyBus implem, final Bridge b) {
+		private ComponentImpl(final IvyBus implem, final IvyBus.Bridge b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -75,37 +112,21 @@ public abstract class IvyBus {
 
 		private final fr.irit.smac.may.lib.interfaces.Do disconnect;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Do disconnect() {
 			return this.disconnect;
 		};
 		private final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
 			return this.bindMsg;
 		};
 		private final fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
 			return this.unBindMsg;
 		};
 		private final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send() {
 			return this.send;
 		};
@@ -114,6 +135,7 @@ public abstract class IvyBus {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -124,6 +146,10 @@ public abstract class IvyBus {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public IvyBus.Component createComponent(IvyBus.Bridge b) {
+		return new IvyBus.ComponentImpl(this, b);
 	}
 
 }

@@ -1,14 +1,26 @@
 package fr.irit.smac.may.lib.components.messaging.callable;
 
+import fr.irit.smac.may.lib.components.messaging.callable.Callable;
+
 public abstract class Callable<I> {
 
-	private Component<I> structure = null;
+	private Callable.ComponentImpl<I> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected Callable.Component<I> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
 
@@ -16,14 +28,28 @@ public abstract class Callable<I> {
 
 	}
 
-	public static final class Component<I> {
+	public static interface Component<I> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
+
+		public void start();
+
+		public Callable.Agent<I> createAgent();
+
+	}
+
+	private static class ComponentImpl<I> implements Callable.Component<I> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<I> bridge;
+		private final Callable.Bridge<I> bridge;
 
 		private final Callable<I> implementation;
 
-		public Component(final Callable<I> implem, final Bridge<I> b) {
+		private ComponentImpl(final Callable<I> implem,
+				final Callable.Bridge<I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -37,10 +63,6 @@ public abstract class Callable<I> {
 
 		private final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call() {
 			return this.call;
 		};
@@ -49,36 +71,52 @@ public abstract class Callable<I> {
 
 			this.implementation.start();
 		}
+
+		public Callable.Agent<I> createAgent() {
+			Callable.Agent<I> agentSide = this.implementation.make_Agent();
+			agentSide.infraStructure = this;
+			return agentSide;
+		}
+
 	}
 
 	public static abstract class Agent<I> {
 
-		private Component<I> structure = null;
+		private Callable.Agent.ComponentImpl<I> structure = null;
 
 		/**
-		 * This can be called by the implementation to access this required port
-		 * It will be initialized before the provided ports are initialized
+		 * This can be called by the implementation to access the component itself and its provided ports.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called from the outside by hand.
 		 */
-		protected final I toCall() {
+		protected Callable.Agent.Component<I> self() {
+			assert this.structure != null;
+			return this.structure;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected I toCall() {
 			assert this.structure != null;
 			return this.structure.bridge.toCall();
 		};
 
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called on from the outside by hand.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me();
 
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called on from the outside by hand.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
 
@@ -87,13 +125,32 @@ public abstract class Callable<I> {
 
 		}
 
-		public static final class Component<I> {
+		public static interface Component<I> {
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me();
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Do stop();
 
-			private final Bridge<I> bridge;
+			public void start();
 
-			private final Agent<I> implementation;
+		}
 
-			public Component(final Agent<I> implem, final Bridge<I> b) {
+		private static class ComponentImpl<I>
+				implements
+					Callable.Agent.Component<I> {
+
+			private final Callable.Agent.Bridge<I> bridge;
+
+			private final Callable.Agent<I> implementation;
+
+			private ComponentImpl(final Callable.Agent<I> implem,
+					final Callable.Agent.Bridge<I> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -108,19 +165,11 @@ public abstract class Callable<I> {
 
 			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me;
 
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
 			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me() {
 				return this.me;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do stop;
 
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
 			public final fr.irit.smac.may.lib.interfaces.Do stop() {
 				return this.stop;
 			};
@@ -129,7 +178,20 @@ public abstract class Callable<I> {
 
 				this.implementation.start();
 			}
+
 		}
+
+		private Callable.ComponentImpl<I> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Callable.Component<I> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -141,7 +203,14 @@ public abstract class Callable<I> {
 		protected void start() {
 		}
 
+		public Callable.Agent.Component<I> createComponent(
+				Callable.Agent.Bridge<I> b) {
+			return new Callable.Agent.ComponentImpl<I>(this, b);
+		}
+
 	}
+
+	protected abstract Callable.Agent<I> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation
@@ -151,6 +220,10 @@ public abstract class Callable<I> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public Callable.Component<I> createComponent(Callable.Bridge<I> b) {
+		return new Callable.ComponentImpl<I>(this, b);
 	}
 
 }

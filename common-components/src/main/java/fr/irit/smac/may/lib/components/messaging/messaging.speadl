@@ -34,10 +34,11 @@ namespace fr.irit.smac.may.lib.components.messaging {
 
 	namespace receiver {
 		transverse Receiver[MsgType] {
-			agent {
+			agent(name:String) {
 				requires put: Push[MsgType]
 				provides me: Pull[AgentRef]
 				provides stop: Do
+				provides send: ReliableSend[MsgType, AgentRef]
 			}
 			infra {
 				provides deposit: ReliableSend[MsgType, AgentRef]

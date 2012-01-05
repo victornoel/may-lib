@@ -1,5 +1,6 @@
 package fr.irit.smac.may.lib.classic.named;
 
+import fr.irit.smac.may.lib.classic.named.ClassicNamed;
 import fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent;
 import fr.irit.smac.may.lib.components.messaging.MapReceiver;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
@@ -9,25 +10,35 @@ import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 
 public abstract class ClassicNamed<Msg> {
 
-	private Component<Msg> structure = null;
+	private ClassicNamed.ComponentImpl<Msg> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected ClassicNamed.Component<Msg> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create();
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract Scheduler make_scheduler();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -37,14 +48,14 @@ public abstract class ClassicNamed<Msg> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract Forward<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> make_sender();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -54,14 +65,14 @@ public abstract class ClassicNamed<Msg> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract Forward<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> make_fact();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -71,14 +82,14 @@ public abstract class ClassicNamed<Msg> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract Receiver<Msg> make_realReceive();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -88,14 +99,14 @@ public abstract class ClassicNamed<Msg> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract MapReceiver<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> make_receive();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -105,14 +116,14 @@ public abstract class ClassicNamed<Msg> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract ExecutorService make_executor();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -125,14 +136,37 @@ public abstract class ClassicNamed<Msg> {
 
 	}
 
-	public static final class Component<Msg> {
+	public static interface Component<Msg> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create();
+
+		public void start();
+
+		public ClassicNamed.ClassicNamedAgent<Msg> createClassicNamedAgent(
+				ClassicNamedAgentComponent<Msg, java.lang.String> _component,
+				java.lang.String name);
+
+	}
+
+	private static class ComponentImpl<Msg>
+			implements
+				ClassicNamed.Component<Msg> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<Msg> bridge;
+		private final ClassicNamed.Bridge<Msg> bridge;
 
 		private final ClassicNamed<Msg> implementation;
 
-		public Component(final ClassicNamed<Msg> implem, final Bridge<Msg> b) {
+		private ComponentImpl(final ClassicNamed<Msg> implem,
+				final ClassicNamed.Bridge<Msg> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -142,18 +176,17 @@ public abstract class ClassicNamed<Msg> {
 
 			this.create = implem.create();
 
-			this.scheduler = new Scheduler.Component(implem.make_scheduler(),
+			this.scheduler = implem.make_scheduler().createComponent(
 					new Bridge_scheduler());
-			this.sender = new Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>>(
-					implem.make_sender(), new Bridge_sender());
-			this.fact = new Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>>(
-					implem.make_fact(), new Bridge_fact());
-			this.realReceive = new Receiver.Component<Msg>(
-					implem.make_realReceive(), new Bridge_realReceive());
-			this.receive = new MapReceiver.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String>(
-					implem.make_receive(), new Bridge_receive());
-			this.executor = new ExecutorService.Component(
-					implem.make_executor(), new Bridge_executor());
+			this.sender = implem.make_sender().createComponent(
+					new Bridge_sender());
+			this.fact = implem.make_fact().createComponent(new Bridge_fact());
+			this.realReceive = implem.make_realReceive().createComponent(
+					new Bridge_realReceive());
+			this.receive = implem.make_receive().createComponent(
+					new Bridge_receive());
+			this.executor = implem.make_executor().createComponent(
+					new Bridge_executor());
 
 		}
 
@@ -162,7 +195,7 @@ public abstract class ClassicNamed<Msg> {
 		private final class Bridge_scheduler implements Scheduler.Bridge {
 
 			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
-				return Component.this.executor.exec();
+				return ComponentImpl.this.executor.exec();
 
 			};
 
@@ -174,7 +207,7 @@ public abstract class ClassicNamed<Msg> {
 					Forward.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
 
 			public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> i() {
-				return Component.this.receive.depositKey();
+				return ComponentImpl.this.receive.depositKey();
 
 			};
 
@@ -186,7 +219,7 @@ public abstract class ClassicNamed<Msg> {
 					Forward.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> {
 
 			public final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> i() {
-				return Component.this.create();
+				return ComponentImpl.this.create();
 
 			};
 
@@ -203,7 +236,7 @@ public abstract class ClassicNamed<Msg> {
 					MapReceiver.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> {
 
 			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> depositValue() {
-				return Component.this.realReceive.deposit();
+				return ComponentImpl.this.realReceive.deposit();
 
 			};
 
@@ -214,19 +247,11 @@ public abstract class ClassicNamed<Msg> {
 
 		}
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send() {
 			return this.receive.depositKey();
 		};
 		private final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create() {
 			return this.create;
 		};
@@ -241,6 +266,23 @@ public abstract class ClassicNamed<Msg> {
 
 			this.implementation.start();
 		}
+
+		public ClassicNamed.ClassicNamedAgent<Msg> createClassicNamedAgent(
+				ClassicNamedAgentComponent<Msg, java.lang.String> _component,
+				java.lang.String name) {
+			return new ClassicNamed.ClassicNamedAgent<Msg>(_component,
+					this.scheduler.createAgent(), this.fact.createAgent(),
+					this.receive.createAgent(),
+					this.realReceive.createAgent(name),
+					this.sender.createAgent());
+		}
+
+	}
+
+	protected ClassicNamed.ClassicNamedAgent<Msg> createClassicNamedAgent(
+			ClassicNamedAgentComponent<Msg, java.lang.String> _component,
+			java.lang.String name) {
+		return this.structure.createClassicNamedAgent(_component, name);
 	}
 
 	public static final class ClassicNamedAgent<Msg> {
@@ -251,31 +293,30 @@ public abstract class ClassicNamed<Msg> {
 				final MapReceiver.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> _receive,
 				final Receiver.Agent<Msg> _realReceive,
 				final Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> _sender) {
-			this.component = new ClassicNamedAgentComponent.Component<Msg, java.lang.String>(
-					_component, new ClassicNamedAgent_component());
+			this.component = _component
+					.createComponent(new ClassicNamedAgent_component());
 
-			this.scheduler = new Scheduler.Agent.Component(_scheduler,
-					new ClassicNamedAgent_scheduler());
+			this.scheduler = _scheduler
+					.createComponent(new ClassicNamedAgent_scheduler());
 
-			this.fact = new Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>>(
-					_fact, new ClassicNamedAgent_fact());
+			this.fact = _fact.createComponent(new ClassicNamedAgent_fact());
 
-			this.receive = new MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String>(
-					_receive, new ClassicNamedAgent_receive());
+			this.receive = _receive
+					.createComponent(new ClassicNamedAgent_receive());
 
-			this.realReceive = new Receiver.Agent.Component<Msg>(_realReceive,
-					new ClassicNamedAgent_realReceive());
+			this.realReceive = _realReceive
+					.createComponent(new ClassicNamedAgent_realReceive());
 
-			this.sender = new Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>>(
-					_sender, new ClassicNamedAgent_sender());
+			this.sender = _sender
+					.createComponent(new ClassicNamedAgent_sender());
 
 		}
 
 		private final ClassicNamedAgentComponent.Component<Msg, java.lang.String> component;
 
 		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
+		 * This can be called to access the provided port.
+		 * start() must have been called before.
 		 */
 		public final ClassicNamedAgentComponent.Component<Msg, java.lang.String> component() {
 			return this.component;
@@ -316,8 +357,8 @@ public abstract class ClassicNamed<Msg> {
 		}
 
 		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
+		 * This can be called to access the provided port.
+		 * start() must have been called before.
 		 */
 		public final Scheduler.Agent.Component scheduler() {
 			return this.scheduler;
@@ -331,8 +372,8 @@ public abstract class ClassicNamed<Msg> {
 		}
 
 		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
+		 * This can be called to access the provided port.
+		 * start() must have been called before.
 		 */
 		public final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> fact() {
 			return this.fact;
@@ -356,8 +397,8 @@ public abstract class ClassicNamed<Msg> {
 		}
 
 		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
+		 * This can be called to access the provided port.
+		 * start() must have been called before.
 		 */
 		public final MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> receive() {
 			return this.receive;
@@ -376,8 +417,8 @@ public abstract class ClassicNamed<Msg> {
 		}
 
 		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
+		 * This can be called to access the provided port.
+		 * start() must have been called before.
 		 */
 		public final Receiver.Agent.Component<Msg> realReceive() {
 			return this.realReceive;
@@ -391,15 +432,15 @@ public abstract class ClassicNamed<Msg> {
 		}
 
 		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
+		 * This can be called to access the provided port.
+		 * start() must have been called before.
 		 */
 		public final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender() {
 			return this.sender;
 		};
 
 		/**
-		 * This must be called to start the agent and its sub-components
+		 * This must be called to start the agent and its sub-components.
 		 */
 		public final void start() {
 
@@ -427,10 +468,19 @@ public abstract class ClassicNamed<Msg> {
 	protected void start() {
 	}
 
-	public static final <Msg> Component<Msg> createComponent(
-			ClassicNamed<Msg> _compo) {
-		return new Component<Msg>(_compo, new Bridge<Msg>() {
+	public ClassicNamed.Component<Msg> createComponent(
+			ClassicNamed.Bridge<Msg> b) {
+		return new ClassicNamed.ComponentImpl<Msg>(this, b);
+	}
+
+	public ClassicNamed.Component<Msg> createComponent() {
+		return this.createComponent(new ClassicNamed.Bridge<Msg>() {
 		});
+	}
+
+	public static final <Msg> ClassicNamed.Component<Msg> createComponent(
+			ClassicNamed<Msg> _compo) {
+		return _compo.createComponent();
 	}
 
 }

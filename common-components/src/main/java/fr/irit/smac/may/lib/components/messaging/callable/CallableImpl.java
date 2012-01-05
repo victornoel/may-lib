@@ -66,6 +66,11 @@ public class CallableImpl<I> extends Callable<I> {
 		}
 		
 	}
+
+	@Override
+	protected Agent<I> make_Agent() {
+		return new AgentSide();
+	}
 	
 
 }

@@ -65,10 +65,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 		return new CreateNamed<Msg, String>() {
 			public String create(
 					final ClassicNamedBehaviour<Msg, String> beh, String name) {
-				ClassicNamedAgent<Msg> agent = new ClassicNamedAgent<Msg>(
-						new ClassicNamedAgentComponentImpl<Msg,String>(name,beh),
-						scheduler.new AgentSide(), forward.new AgentSide(),
-						receive.new AgentSide(), realReceive.new AgentSide("agent"+(i++)), send.new AgentSide());
+				ClassicNamedAgent<Msg> agent = createClassicNamedAgent(new ClassicNamedAgentComponentImpl<Msg,String>(name,beh), name);
 				agent.start();
 				return agent.component().me().pull();
 			}

@@ -41,5 +41,10 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 			};
 		}
 	}
+	
+	@Override
+	protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> make_Agent() {
+		return new AgentSide();
+	}
 
 }

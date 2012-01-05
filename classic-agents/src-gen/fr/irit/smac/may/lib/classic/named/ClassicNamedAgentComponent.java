@@ -1,63 +1,70 @@
 package fr.irit.smac.may.lib.classic.named;
 
+import fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent;
 import fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour;
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 import fr.irit.smac.may.lib.components.meta.Data;
 
 public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
-	private Component<Msg, Ref> structure = null;
+	private ClassicNamedAgentComponent.ComponentImpl<Msg, Ref> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
+	protected ClassicNamedAgentComponent.Component<Msg, Ref> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
 		assert this.structure != null;
 		return this.structure.bridge.send();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final java.util.concurrent.Executor executor() {
+	protected java.util.concurrent.Executor executor() {
 		assert this.structure != null;
 		return this.structure.bridge.executor();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Do die() {
+	protected fr.irit.smac.may.lib.interfaces.Do die() {
 		assert this.structure != null;
 		return this.structure.bridge.die();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
+	protected fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
 		assert this.structure != null;
 		return this.structure.bridge.create();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract Data<Ref> make_name();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -67,14 +74,14 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract SequentialDispatcher<Msg> make_dispatcher();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -84,14 +91,14 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract ClassicNamedBehaviour<Msg, Ref> make_beh();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -108,14 +115,33 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
 	}
 
-	public static final class Component<Msg, Ref> {
+	public static interface Component<Msg, Ref> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<Msg> put();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
 
-		private final Bridge<Msg, Ref> bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl<Msg, Ref>
+			implements
+				ClassicNamedAgentComponent.Component<Msg, Ref> {
+
+		private final ClassicNamedAgentComponent.Bridge<Msg, Ref> bridge;
 
 		private final ClassicNamedAgentComponent<Msg, Ref> implementation;
 
-		public Component(final ClassicNamedAgentComponent<Msg, Ref> implem,
-				final Bridge<Msg, Ref> b) {
+		private ComponentImpl(
+				final ClassicNamedAgentComponent<Msg, Ref> implem,
+				final ClassicNamedAgentComponent.Bridge<Msg, Ref> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -123,12 +149,10 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.name = new Data.Component<Ref>(implem.make_name(),
-					new Bridge_name());
-			this.dispatcher = new SequentialDispatcher.Component<Msg>(
-					implem.make_dispatcher(), new Bridge_dispatcher());
-			this.beh = new ClassicNamedBehaviour.Component<Msg, Ref>(
-					implem.make_beh(), new Bridge_beh());
+			this.name = implem.make_name().createComponent(new Bridge_name());
+			this.dispatcher = implem.make_dispatcher().createComponent(
+					new Bridge_dispatcher());
+			this.beh = implem.make_beh().createComponent(new Bridge_beh());
 
 		}
 
@@ -144,12 +168,12 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 					SequentialDispatcher.Bridge<Msg> {
 
 			public final java.util.concurrent.Executor executor() {
-				return Component.this.bridge.executor();
+				return ComponentImpl.this.bridge.executor();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Push<Msg> handler() {
-				return Component.this.beh.cycle();
+				return ComponentImpl.this.beh.cycle();
 
 			};
 
@@ -161,39 +185,31 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 					ClassicNamedBehaviour.Bridge<Msg, Ref> {
 
 			public final fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
-				return Component.this.bridge.send();
+				return ComponentImpl.this.bridge.send();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
-				return Component.this.me();
+				return ComponentImpl.this.me();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Do die() {
-				return Component.this.bridge.die();
+				return ComponentImpl.this.bridge.die();
 
 			};
 
 			public final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
-				return Component.this.bridge.create();
+				return ComponentImpl.this.bridge.create();
 
 			};
 
 		}
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<Msg> put() {
 			return this.dispatcher.dispatch();
 		};
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
 			return this.name.data();
 		};
@@ -205,6 +221,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -215,6 +232,11 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public ClassicNamedAgentComponent.Component<Msg, Ref> createComponent(
+			ClassicNamedAgentComponent.Bridge<Msg, Ref> b) {
+		return new ClassicNamedAgentComponent.ComponentImpl<Msg, Ref>(this, b);
 	}
 
 }

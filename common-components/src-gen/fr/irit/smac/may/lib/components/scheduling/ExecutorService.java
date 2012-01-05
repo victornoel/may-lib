@@ -1,14 +1,26 @@
 package fr.irit.smac.may.lib.components.scheduling;
 
+import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+
 public abstract class ExecutorService {
 
-	private Component structure = null;
+	private ExecutorService.ComponentImpl structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected ExecutorService.Component self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
 
@@ -16,14 +28,26 @@ public abstract class ExecutorService {
 
 	}
 
-	public static final class Component {
+	public static interface Component {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
+
+		public void start();
+
+	}
+
+	private static class ComponentImpl implements ExecutorService.Component {
 
 		@SuppressWarnings("unused")
-		private final Bridge bridge;
+		private final ExecutorService.Bridge bridge;
 
 		private final ExecutorService implementation;
 
-		public Component(final ExecutorService implem, final Bridge b) {
+		private ComponentImpl(final ExecutorService implem,
+				final ExecutorService.Bridge b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -37,10 +61,6 @@ public abstract class ExecutorService {
 
 		private final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec() {
 			return this.exec;
 		};
@@ -49,6 +69,7 @@ public abstract class ExecutorService {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -61,9 +82,18 @@ public abstract class ExecutorService {
 	protected void start() {
 	}
 
-	public static final Component createComponent(ExecutorService _compo) {
-		return new Component(_compo, new Bridge() {
+	public ExecutorService.Component createComponent(ExecutorService.Bridge b) {
+		return new ExecutorService.ComponentImpl(this, b);
+	}
+
+	public ExecutorService.Component createComponent() {
+		return this.createComponent(new ExecutorService.Bridge() {
 		});
+	}
+
+	public static final ExecutorService.Component createComponent(
+			ExecutorService _compo) {
+		return _compo.createComponent();
 	}
 
 }

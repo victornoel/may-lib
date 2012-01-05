@@ -1,44 +1,53 @@
 package fr.irit.smac.may.lib.components.distribution;
 
 import fr.irit.smac.may.lib.components.distribution.IvyBroadcaster;
+import fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster;
 import fr.irit.smac.may.lib.components.distribution.JSONTransformer;
 import fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder;
 import fr.irit.smac.may.lib.components.distribution.ivy.IvyBus;
 
 public abstract class IvyJSONBroadcaster<T> {
 
-	private Component<T> structure = null;
+	private IvyJSONBroadcaster.ComponentImpl<T> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Push<T> handle() {
+	protected IvyJSONBroadcaster.Component<T> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.interfaces.Push<T> handle() {
 		assert this.structure != null;
 		return this.structure.bridge.handle();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final java.util.concurrent.Executor exec() {
+	protected java.util.concurrent.Executor exec() {
 		assert this.structure != null;
 		return this.structure.bridge.exec();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract IvyBus make_ivy();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -48,14 +57,14 @@ public abstract class IvyJSONBroadcaster<T> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract JSONTransformer<T> make_json();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -65,14 +74,14 @@ public abstract class IvyJSONBroadcaster<T> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract IvyBinder make_binder();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -82,14 +91,14 @@ public abstract class IvyJSONBroadcaster<T> {
 	}
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract IvyBroadcaster<T> make_bc();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -104,13 +113,27 @@ public abstract class IvyJSONBroadcaster<T> {
 
 	}
 
-	public static final class Component<T> {
+	public static interface Component<T> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<T> send();
 
-		private final Bridge<T> bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl<T>
+			implements
+				IvyJSONBroadcaster.Component<T> {
+
+		private final IvyJSONBroadcaster.Bridge<T> bridge;
 
 		private final IvyJSONBroadcaster<T> implementation;
 
-		public Component(final IvyJSONBroadcaster<T> implem, final Bridge<T> b) {
+		private ComponentImpl(final IvyJSONBroadcaster<T> implem,
+				final IvyJSONBroadcaster.Bridge<T> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -118,13 +141,11 @@ public abstract class IvyJSONBroadcaster<T> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.ivy = new IvyBus.Component(implem.make_ivy(), new Bridge_ivy());
-			this.json = new JSONTransformer.Component<T>(implem.make_json(),
-					new Bridge_json());
-			this.binder = new IvyBinder.Component(implem.make_binder(),
+			this.ivy = implem.make_ivy().createComponent(new Bridge_ivy());
+			this.json = implem.make_json().createComponent(new Bridge_json());
+			this.binder = implem.make_binder().createComponent(
 					new Bridge_binder());
-			this.bc = new IvyBroadcaster.Component<T>(implem.make_bc(),
-					new Bridge_bc());
+			this.bc = implem.make_bc().createComponent(new Bridge_bc());
 
 		}
 
@@ -133,7 +154,7 @@ public abstract class IvyJSONBroadcaster<T> {
 		private final class Bridge_ivy implements IvyBus.Bridge {
 
 			public final java.util.concurrent.Executor exec() {
-				return Component.this.bridge.exec();
+				return ComponentImpl.this.bridge.exec();
 
 			};
 
@@ -148,17 +169,17 @@ public abstract class IvyJSONBroadcaster<T> {
 		private final class Bridge_binder implements IvyBinder.Bridge {
 
 			public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
-				return Component.this.ivy.bindMsg();
+				return ComponentImpl.this.ivy.bindMsg();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
-				return Component.this.bc.ivyReceive();
+				return ComponentImpl.this.bc.ivyReceive();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
-				return Component.this.ivy.unBindMsg();
+				return ComponentImpl.this.ivy.unBindMsg();
 
 			};
 
@@ -168,36 +189,32 @@ public abstract class IvyJSONBroadcaster<T> {
 		private final class Bridge_bc implements IvyBroadcaster.Bridge<T> {
 
 			public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
-				return Component.this.json.deserializer();
+				return ComponentImpl.this.json.deserializer();
 
 			};
 
 			public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
-				return Component.this.json.serializer();
+				return ComponentImpl.this.json.serializer();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Push<T> handle() {
-				return Component.this.bridge.handle();
+				return ComponentImpl.this.bridge.handle();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg() {
-				return Component.this.binder.reBindMsg();
+				return ComponentImpl.this.binder.reBindMsg();
 
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend() {
-				return Component.this.ivy.send();
+				return ComponentImpl.this.ivy.send();
 
 			};
 
 		}
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<T> send() {
 			return this.bc.send();
 		};
@@ -210,6 +227,7 @@ public abstract class IvyJSONBroadcaster<T> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -220,6 +238,11 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public IvyJSONBroadcaster.Component<T> createComponent(
+			IvyJSONBroadcaster.Bridge<T> b) {
+		return new IvyJSONBroadcaster.ComponentImpl<T>(this, b);
 	}
 
 }

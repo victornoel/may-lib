@@ -30,4 +30,9 @@ public class CollectionMapImpl<K, I> extends CollectionMap<K, I> {
 			interfaces.put(this.key().pull(), this);
 		}
 	}
+	
+	@Override
+	protected fr.irit.smac.may.lib.components.meta.CollectionMap.Agent<K, I> make_Agent() {
+		return new AgentSide();
+	}
 }
