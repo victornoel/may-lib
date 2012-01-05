@@ -10,4 +10,9 @@ public class ForwardImpl<I> extends Forward<I> {
 		}
 		
 	}
+	
+	@Override
+	protected fr.irit.smac.may.lib.components.meta.Forward.Agent<I> make_Agent() {
+		return new AgentSide();
+	}
 }

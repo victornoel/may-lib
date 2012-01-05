@@ -1,16 +1,27 @@
 package fr.irit.smac.may.lib.webservices;
 
+import fr.irit.smac.may.lib.webservices.WebServiceEndpoint;
+
 public abstract class WebServiceEndpoint<I> {
 
-	private Component<I> structure = null;
+	private WebServiceEndpoint.ComponentImpl<I> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final I service() {
+	protected WebServiceEndpoint.Component<I> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected I service() {
 		assert this.structure != null;
 		return this.structure.bridge.service();
 	};
@@ -20,13 +31,22 @@ public abstract class WebServiceEndpoint<I> {
 
 	}
 
-	public static final class Component<I> {
+	public static interface Component<I> {
 
-		private final Bridge<I> bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl<I>
+			implements
+				WebServiceEndpoint.Component<I> {
+
+		private final WebServiceEndpoint.Bridge<I> bridge;
 
 		private final WebServiceEndpoint<I> implementation;
 
-		public Component(final WebServiceEndpoint<I> implem, final Bridge<I> b) {
+		private ComponentImpl(final WebServiceEndpoint<I> implem,
+				final WebServiceEndpoint.Bridge<I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -40,6 +60,7 @@ public abstract class WebServiceEndpoint<I> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -50,6 +71,11 @@ public abstract class WebServiceEndpoint<I> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public WebServiceEndpoint.Component<I> createComponent(
+			WebServiceEndpoint.Bridge<I> b) {
+		return new WebServiceEndpoint.ComponentImpl<I>(this, b);
 	}
 
 }

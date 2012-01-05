@@ -6,6 +6,8 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import fr.irit.smac.may.lib.components.remote.place.Place;
+import fr.irit.smac.may.lib.components.remote.place.Placed.Agent;
+import fr.irit.smac.may.lib.components.remote.place.PlacedImpl.AgentSide;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Send;
@@ -108,5 +110,10 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 				}
 			};
 		};
+	}
+	
+	@Override
+	protected Agent<Msg, LocalRef> make_Agent() {
+		return new AgentSide();
 	}
 }

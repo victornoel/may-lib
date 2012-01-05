@@ -18,7 +18,7 @@ import javax.swing.SwingConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
-public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
+public class SchedulingControllerGUIImpl extends SchedulingControllerGUI {
 
 	private final JFrame frame;
 	

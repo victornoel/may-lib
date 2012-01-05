@@ -1,22 +1,34 @@
 package fr.irit.smac.may.lib.components.scheduling.ase;
 
+import fr.irit.smac.may.lib.components.scheduling.ase.AlternateStateExecutorService;
+
 public abstract class AlternateStateExecutorService {
 
-	private Component structure = null;
+	private AlternateStateExecutorService.ComponentImpl structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected AlternateStateExecutorService.Component self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract java.util.concurrent.Executor exec();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
 
@@ -24,15 +36,33 @@ public abstract class AlternateStateExecutorService {
 
 	}
 
-	public static final class Component {
+	public static interface Component {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public java.util.concurrent.Executor exec();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
+
+		public void start();
+
+	}
+
+	private static class ComponentImpl
+			implements
+				AlternateStateExecutorService.Component {
 
 		@SuppressWarnings("unused")
-		private final Bridge bridge;
+		private final AlternateStateExecutorService.Bridge bridge;
 
 		private final AlternateStateExecutorService implementation;
 
-		public Component(final AlternateStateExecutorService implem,
-				final Bridge b) {
+		private ComponentImpl(final AlternateStateExecutorService implem,
+				final AlternateStateExecutorService.Bridge b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -47,19 +77,11 @@ public abstract class AlternateStateExecutorService {
 
 		private final java.util.concurrent.Executor exec;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final java.util.concurrent.Executor exec() {
 			return this.exec;
 		};
 		private final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control() {
 			return this.control;
 		};
@@ -68,6 +90,7 @@ public abstract class AlternateStateExecutorService {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -80,10 +103,19 @@ public abstract class AlternateStateExecutorService {
 	protected void start() {
 	}
 
-	public static final Component createComponent(
-			AlternateStateExecutorService _compo) {
-		return new Component(_compo, new Bridge() {
+	public AlternateStateExecutorService.Component createComponent(
+			AlternateStateExecutorService.Bridge b) {
+		return new AlternateStateExecutorService.ComponentImpl(this, b);
+	}
+
+	public AlternateStateExecutorService.Component createComponent() {
+		return this.createComponent(new AlternateStateExecutorService.Bridge() {
 		});
+	}
+
+	public static final AlternateStateExecutorService.Component createComponent(
+			AlternateStateExecutorService _compo) {
+		return _compo.createComponent();
 	}
 
 }

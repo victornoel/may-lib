@@ -1,14 +1,26 @@
 package fr.irit.smac.may.lib.components.meta;
 
+import fr.irit.smac.may.lib.components.meta.Data;
+
 public abstract class Data<T> {
 
-	private Component<T> structure = null;
+	private Data.ComponentImpl<T> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected Data.Component<T> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<T> data();
 
@@ -16,14 +28,25 @@ public abstract class Data<T> {
 
 	}
 
-	public static final class Component<T> {
+	public static interface Component<T> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Pull<T> data();
+
+		public void start();
+
+	}
+
+	private static class ComponentImpl<T> implements Data.Component<T> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<T> bridge;
+		private final Data.Bridge<T> bridge;
 
 		private final Data<T> implementation;
 
-		public Component(final Data<T> implem, final Bridge<T> b) {
+		private ComponentImpl(final Data<T> implem, final Data.Bridge<T> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -37,10 +60,6 @@ public abstract class Data<T> {
 
 		private final fr.irit.smac.may.lib.interfaces.Pull<T> data;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Pull<T> data() {
 			return this.data;
 		};
@@ -49,6 +68,7 @@ public abstract class Data<T> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -61,9 +81,17 @@ public abstract class Data<T> {
 	protected void start() {
 	}
 
-	public static final <T> Component<T> createComponent(Data<T> _compo) {
-		return new Component<T>(_compo, new Bridge<T>() {
+	public Data.Component<T> createComponent(Data.Bridge<T> b) {
+		return new Data.ComponentImpl<T>(this, b);
+	}
+
+	public Data.Component<T> createComponent() {
+		return this.createComponent(new Data.Bridge<T>() {
 		});
+	}
+
+	public static final <T> Data.Component<T> createComponent(Data<T> _compo) {
+		return _compo.createComponent();
 	}
 
 }

@@ -1,14 +1,26 @@
 package fr.irit.smac.may.lib.components.meta;
 
+import fr.irit.smac.may.lib.components.meta.Void;
+
 public abstract class Void<I> {
 
-	private Component<I> structure = null;
+	private Void.ComponentImpl<I> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected Void.Component<I> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract I port();
 
@@ -16,14 +28,25 @@ public abstract class Void<I> {
 
 	}
 
-	public static final class Component<I> {
+	public static interface Component<I> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public I port();
+
+		public void start();
+
+	}
+
+	private static class ComponentImpl<I> implements Void.Component<I> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<I> bridge;
+		private final Void.Bridge<I> bridge;
 
 		private final Void<I> implementation;
 
-		public Component(final Void<I> implem, final Bridge<I> b) {
+		private ComponentImpl(final Void<I> implem, final Void.Bridge<I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -37,10 +60,6 @@ public abstract class Void<I> {
 
 		private final I port;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final I port() {
 			return this.port;
 		};
@@ -49,6 +68,7 @@ public abstract class Void<I> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -61,9 +81,17 @@ public abstract class Void<I> {
 	protected void start() {
 	}
 
-	public static final <I> Component<I> createComponent(Void<I> _compo) {
-		return new Component<I>(_compo, new Bridge<I>() {
+	public Void.Component<I> createComponent(Void.Bridge<I> b) {
+		return new Void.ComponentImpl<I>(this, b);
+	}
+
+	public Void.Component<I> createComponent() {
+		return this.createComponent(new Void.Bridge<I>() {
 		});
+	}
+
+	public static final <I> Void.Component<I> createComponent(Void<I> _compo) {
+		return _compo.createComponent();
 	}
 
 }

@@ -1,14 +1,26 @@
 package fr.irit.smac.may.lib.components.meta;
 
+import fr.irit.smac.may.lib.components.meta.CollectionInteger;
+
 public abstract class CollectionInteger<I> {
 
-	private Component<I> structure = null;
+	private CollectionInteger.ComponentImpl<I> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected CollectionInteger.Component<I> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get();
 
@@ -16,14 +28,30 @@ public abstract class CollectionInteger<I> {
 
 	}
 
-	public static final class Component<I> {
+	public static interface Component<I> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get();
+
+		public void start();
+
+		public CollectionInteger.Agent<I> createAgent();
+
+	}
+
+	private static class ComponentImpl<I>
+			implements
+				CollectionInteger.Component<I> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<I> bridge;
+		private final CollectionInteger.Bridge<I> bridge;
 
 		private final CollectionInteger<I> implementation;
 
-		public Component(final CollectionInteger<I> implem, final Bridge<I> b) {
+		private ComponentImpl(final CollectionInteger<I> implem,
+				final CollectionInteger.Bridge<I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -37,10 +65,6 @@ public abstract class CollectionInteger<I> {
 
 		private final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get() {
 			return this.get;
 		};
@@ -49,28 +73,45 @@ public abstract class CollectionInteger<I> {
 
 			this.implementation.start();
 		}
+
+		public CollectionInteger.Agent<I> createAgent() {
+			CollectionInteger.Agent<I> agentSide = this.implementation
+					.make_Agent();
+			agentSide.infraStructure = this;
+			return agentSide;
+		}
+
 	}
 
 	public static abstract class Agent<I> {
 
-		private Component<I> structure = null;
+		private CollectionInteger.Agent.ComponentImpl<I> structure = null;
 
 		/**
-		 * This can be called by the implementation to access this required port
-		 * It will be initialized before the provided ports are initialized
+		 * This can be called by the implementation to access the component itself and its provided ports.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called from the outside by hand.
 		 */
-		protected final I p() {
+		protected CollectionInteger.Agent.Component<I> self() {
+			assert this.structure != null;
+			return this.structure;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected I p() {
 			assert this.structure != null;
 			return this.structure.bridge.p();
 		};
 
 		/**
-		 * This should be overridden by the implementation to define the provided port
-		 * This will be called once during the construction of the component to initialize the port
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on the object by hand.
+		 * This is not meant to be called on from the outside by hand.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx();
 
@@ -79,13 +120,27 @@ public abstract class CollectionInteger<I> {
 
 		}
 
-		public static final class Component<I> {
+		public static interface Component<I> {
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx();
 
-			private final Bridge<I> bridge;
+			public void start();
 
-			private final Agent<I> implementation;
+		}
 
-			public Component(final Agent<I> implem, final Bridge<I> b) {
+		private static class ComponentImpl<I>
+				implements
+					CollectionInteger.Agent.Component<I> {
+
+			private final CollectionInteger.Agent.Bridge<I> bridge;
+
+			private final CollectionInteger.Agent<I> implementation;
+
+			private ComponentImpl(final CollectionInteger.Agent<I> implem,
+					final CollectionInteger.Agent.Bridge<I> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -99,10 +154,6 @@ public abstract class CollectionInteger<I> {
 
 			private final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx;
 
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
 			public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx() {
 				return this.idx;
 			};
@@ -111,7 +162,20 @@ public abstract class CollectionInteger<I> {
 
 				this.implementation.start();
 			}
+
 		}
+
+		private CollectionInteger.ComponentImpl<I> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected CollectionInteger.Component<I> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -123,7 +187,14 @@ public abstract class CollectionInteger<I> {
 		protected void start() {
 		}
 
+		public CollectionInteger.Agent.Component<I> createComponent(
+				CollectionInteger.Agent.Bridge<I> b) {
+			return new CollectionInteger.Agent.ComponentImpl<I>(this, b);
+		}
+
 	}
+
+	protected abstract CollectionInteger.Agent<I> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation
@@ -133,6 +204,11 @@ public abstract class CollectionInteger<I> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public CollectionInteger.Component<I> createComponent(
+			CollectionInteger.Bridge<I> b) {
+		return new CollectionInteger.ComponentImpl<I>(this, b);
 	}
 
 }

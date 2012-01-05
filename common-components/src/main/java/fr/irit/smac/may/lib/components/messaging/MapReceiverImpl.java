@@ -40,5 +40,10 @@ public class MapReceiverImpl<Msg, RealRef, Ref> extends MapReceiver<Msg, RealRef
 			};
 		}
 	}
+	
+	@Override
+	protected Agent<Msg, RealRef, Ref> make_Agent() {
+		return new AgentSide();
+	}
 
 }

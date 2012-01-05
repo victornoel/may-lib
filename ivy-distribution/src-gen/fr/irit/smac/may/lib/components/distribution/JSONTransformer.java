@@ -1,22 +1,34 @@
 package fr.irit.smac.may.lib.components.distribution;
 
+import fr.irit.smac.may.lib.components.distribution.JSONTransformer;
+
 public abstract class JSONTransformer<T> {
 
-	private Component<T> structure = null;
+	private JSONTransformer.ComponentImpl<T> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected JSONTransformer.Component<T> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
 
@@ -24,14 +36,33 @@ public abstract class JSONTransformer<T> {
 
 	}
 
-	public static final class Component<T> {
+	public static interface Component<T> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
+
+		public void start();
+
+	}
+
+	private static class ComponentImpl<T>
+			implements
+				JSONTransformer.Component<T> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<T> bridge;
+		private final JSONTransformer.Bridge<T> bridge;
 
 		private final JSONTransformer<T> implementation;
 
-		public Component(final JSONTransformer<T> implem, final Bridge<T> b) {
+		private ComponentImpl(final JSONTransformer<T> implem,
+				final JSONTransformer.Bridge<T> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -46,19 +77,11 @@ public abstract class JSONTransformer<T> {
 
 		private final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
 			return this.serializer;
 		};
 		private final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
 			return this.deserializer;
 		};
@@ -67,6 +90,7 @@ public abstract class JSONTransformer<T> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -79,10 +103,19 @@ public abstract class JSONTransformer<T> {
 	protected void start() {
 	}
 
-	public static final <T> Component<T> createComponent(
-			JSONTransformer<T> _compo) {
-		return new Component<T>(_compo, new Bridge<T>() {
+	public JSONTransformer.Component<T> createComponent(
+			JSONTransformer.Bridge<T> b) {
+		return new JSONTransformer.ComponentImpl<T>(this, b);
+	}
+
+	public JSONTransformer.Component<T> createComponent() {
+		return this.createComponent(new JSONTransformer.Bridge<T>() {
 		});
+	}
+
+	public static final <T> JSONTransformer.Component<T> createComponent(
+			JSONTransformer<T> _compo) {
+		return _compo.createComponent();
 	}
 
 }

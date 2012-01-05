@@ -59,4 +59,11 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 		};
 	}
 
+
+	@Override
+	protected fr.irit.smac.may.lib.components.messaging.Broadcaster.Agent<T, Ref> make_Agent() {
+		return new AgentSide();
+	}
+
+
 }

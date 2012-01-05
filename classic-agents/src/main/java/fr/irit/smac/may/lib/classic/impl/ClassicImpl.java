@@ -58,10 +58,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 		return new CreateClassic<Msg, AgentRef>() {
 			public AgentRef create(
 					final ClassicBehaviour<Msg, AgentRef> beh) {
-				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
-						new ClassicAgentComponentImpl<Msg>(beh),
-						scheduler.new AgentSide(), forward.new AgentSide(),
-						receive.new AgentSide("agent"+(i++)), send.new AgentSide());
+				ClassicAgent<Msg> agent = createClassicAgent(new ClassicAgentComponentImpl<Msg>(beh), "agent"+(i++));
 				agent.start();
 				return agent.receive().me().pull();
 			}

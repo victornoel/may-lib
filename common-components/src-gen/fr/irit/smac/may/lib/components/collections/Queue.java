@@ -1,30 +1,42 @@
 package fr.irit.smac.may.lib.components.collections;
 
+import fr.irit.smac.may.lib.components.collections.Queue;
+
 public abstract class Queue<Truc> {
 
-	private Component<Truc> structure = null;
+	private Queue.ComponentImpl<Truc> structure = null;
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected Queue.Component<Truc> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> put();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<Truc> get();
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll();
 
@@ -32,14 +44,36 @@ public abstract class Queue<Truc> {
 
 	}
 
-	public static final class Component<Truc> {
+	public static interface Component<Truc> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<Truc> put();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Pull<Truc> get();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll();
+
+		public void start();
+
+	}
+
+	private static class ComponentImpl<Truc> implements Queue.Component<Truc> {
 
 		@SuppressWarnings("unused")
-		private final Bridge<Truc> bridge;
+		private final Queue.Bridge<Truc> bridge;
 
 		private final Queue<Truc> implementation;
 
-		public Component(final Queue<Truc> implem, final Bridge<Truc> b) {
+		private ComponentImpl(final Queue<Truc> implem,
+				final Queue.Bridge<Truc> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -55,28 +89,16 @@ public abstract class Queue<Truc> {
 
 		private final fr.irit.smac.may.lib.interfaces.Push<Truc> put;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<Truc> put() {
 			return this.put;
 		};
 		private final fr.irit.smac.may.lib.interfaces.Pull<Truc> get;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Pull<Truc> get() {
 			return this.get;
 		};
 		private final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll() {
 			return this.getAll;
 		};
@@ -85,6 +107,7 @@ public abstract class Queue<Truc> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -97,10 +120,18 @@ public abstract class Queue<Truc> {
 	protected void start() {
 	}
 
-	public static final <Truc> Component<Truc> createComponent(
-			Queue<Truc> _compo) {
-		return new Component<Truc>(_compo, new Bridge<Truc>() {
+	public Queue.Component<Truc> createComponent(Queue.Bridge<Truc> b) {
+		return new Queue.ComponentImpl<Truc>(this, b);
+	}
+
+	public Queue.Component<Truc> createComponent() {
+		return this.createComponent(new Queue.Bridge<Truc>() {
 		});
+	}
+
+	public static final <Truc> Queue.Component<Truc> createComponent(
+			Queue<Truc> _compo) {
+		return _compo.createComponent();
 	}
 
 }

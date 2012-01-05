@@ -1,49 +1,58 @@
 package fr.irit.smac.may.lib.components.controlflow;
 
 import fr.irit.smac.may.lib.components.collections.Queue;
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 
 public abstract class SequentialDispatcher<Truc> {
 
-	private Component<Truc> structure = null;
+	private SequentialDispatcher.ComponentImpl<Truc> structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final java.util.concurrent.Executor executor() {
+	protected SequentialDispatcher.Component<Truc> self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected java.util.concurrent.Executor executor() {
 		assert this.structure != null;
 		return this.structure.bridge.executor();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Push<Truc> handler() {
+	protected fr.irit.smac.may.lib.interfaces.Push<Truc> handler() {
 		assert this.structure != null;
 		return this.structure.bridge.handler();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch();
 
 	/**
-	 * This should be overridden by the implementation to define how to create this sub-component
-	 * This will be called once during the construction of the component to initialize this sub-component
+	 * This should be overridden by the implementation to define how to create this sub-component.
+	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
 	protected abstract Queue<Truc> make_queue();
 
 	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized
+	 * This can be called by the implementation to access the sub-component instance and its provided ports.
+	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
@@ -58,14 +67,27 @@ public abstract class SequentialDispatcher<Truc> {
 
 	}
 
-	public static final class Component<Truc> {
+	public static interface Component<Truc> {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch();
 
-		private final Bridge<Truc> bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl<Truc>
+			implements
+				SequentialDispatcher.Component<Truc> {
+
+		private final SequentialDispatcher.Bridge<Truc> bridge;
 
 		private final SequentialDispatcher<Truc> implementation;
 
-		public Component(final SequentialDispatcher<Truc> implem,
-				final Bridge<Truc> b) {
+		private ComponentImpl(final SequentialDispatcher<Truc> implem,
+				final SequentialDispatcher.Bridge<Truc> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -75,8 +97,8 @@ public abstract class SequentialDispatcher<Truc> {
 
 			this.dispatch = implem.dispatch();
 
-			this.queue = new Queue.Component<Truc>(implem.make_queue(),
-					new Bridge_queue());
+			this.queue = implem.make_queue()
+					.createComponent(new Bridge_queue());
 
 		}
 
@@ -88,10 +110,6 @@ public abstract class SequentialDispatcher<Truc> {
 
 		private final fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch() {
 			return this.dispatch;
 		};
@@ -101,6 +119,7 @@ public abstract class SequentialDispatcher<Truc> {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -111,6 +130,11 @@ public abstract class SequentialDispatcher<Truc> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public SequentialDispatcher.Component<Truc> createComponent(
+			SequentialDispatcher.Bridge<Truc> b) {
+		return new SequentialDispatcher.ComponentImpl<Truc>(this, b);
 	}
 
 }

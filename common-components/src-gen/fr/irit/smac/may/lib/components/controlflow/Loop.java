@@ -1,35 +1,45 @@
 package fr.irit.smac.may.lib.components.controlflow;
 
+import fr.irit.smac.may.lib.components.controlflow.Loop;
+
 public abstract class Loop {
 
-	private Component structure = null;
+	private Loop.ComponentImpl structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
+	protected Loop.Component self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 		assert this.structure != null;
 		return this.structure.bridge.executor();
 	};
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.interfaces.Do handler() {
+	protected fr.irit.smac.may.lib.interfaces.Do handler() {
 		assert this.structure != null;
 		return this.structure.bridge.handler();
 	};
 
 	/**
-	 * This should be overridden by the implementation to define the provided port
-	 * This will be called once during the construction of the component to initialize the port
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called on from the outside by hand.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
 
@@ -39,13 +49,24 @@ public abstract class Loop {
 
 	}
 
-	public static final class Component {
+	public static interface Component {
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Do stop();
 
-		private final Bridge bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl implements Loop.Component {
+
+		private final Loop.Bridge bridge;
 
 		private final Loop implementation;
 
-		public Component(final Loop implem, final Bridge b) {
+		private ComponentImpl(final Loop implem, final Loop.Bridge b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -59,10 +80,6 @@ public abstract class Loop {
 
 		private final fr.irit.smac.may.lib.interfaces.Do stop;
 
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
 		public final fr.irit.smac.may.lib.interfaces.Do stop() {
 			return this.stop;
 		};
@@ -71,6 +88,7 @@ public abstract class Loop {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -81,6 +99,10 @@ public abstract class Loop {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public Loop.Component createComponent(Loop.Bridge b) {
+		return new Loop.ComponentImpl(this, b);
 	}
 
 }

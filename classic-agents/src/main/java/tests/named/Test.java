@@ -8,7 +8,7 @@ import fr.irit.smac.may.lib.interfaces.Push;
 public class Test {
 
 	public static void main(String[] args) {
-		ClassicNamed.Component<String> infra = new ClassicNamed.Component<String>(new ClassicNamedImpl<String>(), new ClassicNamed.Bridge<String>() {}) ;
+		ClassicNamed.Component<String> infra = ClassicNamed.createComponent(new ClassicNamedImpl<String>()) ;
 		infra.start();
 		
 		infra.create().create(new ClassicNamedBehaviour<String, String>() {

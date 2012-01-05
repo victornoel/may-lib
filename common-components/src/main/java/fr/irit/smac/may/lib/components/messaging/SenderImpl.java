@@ -14,4 +14,9 @@ public class SenderImpl<Msg, Ref> extends Sender<Msg, Ref> {
 			};
 		}
 	}
+	
+	@Override
+	protected fr.irit.smac.may.lib.components.messaging.Sender.Agent<Msg, Ref> make_Agent() {
+		return new AgentSide();
+	}
 }

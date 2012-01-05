@@ -9,7 +9,7 @@ import fr.irit.smac.may.lib.interfaces.Push;
 public class Test {
 
 	public static void main(String[] args) {
-		Classic.Component<String> infra = new Classic.Component<String>(new ClassicImpl<String>(), new Classic.Bridge<String>() {}) ;
+		Classic.Component<String> infra = Classic.createComponent(new ClassicImpl<String>()) ;
 		infra.start();
 		
 		final AgentRef create = infra.create().create(new ClassicBehaviour<String, AgentRef>() {

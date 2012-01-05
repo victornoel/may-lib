@@ -1,16 +1,27 @@
 package fr.irit.smac.may.lib.components.scheduling;
 
+import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI;
+
 public abstract class SchedulingControllerGUI {
 
-	private Component structure = null;
+	private SchedulingControllerGUI.ComponentImpl structure = null;
 
 	/**
-	 * This can be called by the implementation to access this required port
-	 * It will be initialized before the provided ports are initialized
+	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
-	 * This is not meant to be called on the object by hand.
+	 * This is not meant to be called from the outside by hand.
 	 */
-	protected final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control() {
+	protected SchedulingControllerGUI.Component self() {
+		assert this.structure != null;
+		return this.structure;
+	};
+
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside by hand.
+	 */
+	protected fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control() {
 		assert this.structure != null;
 		return this.structure.bridge.control();
 	};
@@ -20,13 +31,22 @@ public abstract class SchedulingControllerGUI {
 
 	}
 
-	public static final class Component {
+	public static interface Component {
 
-		private final Bridge bridge;
+		public void start();
+
+	}
+
+	private static class ComponentImpl
+			implements
+				SchedulingControllerGUI.Component {
+
+		private final SchedulingControllerGUI.Bridge bridge;
 
 		private final SchedulingControllerGUI implementation;
 
-		public Component(final SchedulingControllerGUI implem, final Bridge b) {
+		private ComponentImpl(final SchedulingControllerGUI implem,
+				final SchedulingControllerGUI.Bridge b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -40,6 +60,7 @@ public abstract class SchedulingControllerGUI {
 
 			this.implementation.start();
 		}
+
 	}
 
 	/**
@@ -50,6 +71,11 @@ public abstract class SchedulingControllerGUI {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected void start() {
+	}
+
+	public SchedulingControllerGUI.Component createComponent(
+			SchedulingControllerGUI.Bridge b) {
+		return new SchedulingControllerGUI.ComponentImpl(this, b);
 	}
 
 }
