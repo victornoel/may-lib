@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
+import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
@@ -18,17 +19,11 @@ import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
 
-	private SchedulerImpl scheduler;
-	private ForwardImpl<Send<Msg, AgentRef>> send;
-	private ReceiverImpl<Msg> receive;
-	private ForwardImpl<CreateClassic<Msg,AgentRef>> forward;
-
 	private volatile int i = 0;
 	
 	@Override
 	protected Scheduler make_scheduler() {
-		scheduler = new SchedulerImpl();
-		return scheduler;
+		return new SchedulerImpl();
 	}
 
 	@Override
@@ -38,29 +33,38 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	@Override
 	protected Forward<Send<Msg, AgentRef>> make_sender() {
-		send = new ForwardImpl<Send<Msg, AgentRef>>();
-		return send;
+		return new ForwardImpl<Send<Msg, AgentRef>>();
 	}
 
 	@Override
 	protected Receiver<Msg> make_receive() {
-		receive = new ReceiverImpl<Msg>();
-		return receive;
+		return new ReceiverImpl<Msg>();
 	}
 
 	@Override
 	protected Forward<CreateClassic<Msg, AgentRef>> make_fact() {
-		forward = new ForwardImpl<CreateClassic<Msg,AgentRef>>();
-		return forward;
+		return new ForwardImpl<CreateClassic<Msg,AgentRef>>();
 	}
+	
 	@Override
 	protected CreateClassic<Msg, AgentRef> create() {
 		return new CreateClassic<Msg, AgentRef>() {
 			public AgentRef create(
 					final ClassicBehaviour<Msg, AgentRef> beh) {
-				ClassicAgent<Msg> agent = createClassicAgent(new ClassicAgentComponentImpl<Msg>(beh), "agent"+(i++));
+				ClassicAgent.Component<Msg> agent = createClassicAgent(beh, "agent"+(i++));
 				agent.start();
-				return agent.receive().me().pull();
+				return agent.ref().pull();
+			}
+		};
+	}
+
+	@Override
+	protected fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent<Msg> make_ClassicAgent(
+			final ClassicBehaviour<Msg, AgentRef> beh, String name) {
+		return new ClassicAgent<Msg>() {
+			@Override
+			protected ClassicAgentComponent<Msg, AgentRef> make_arch() {
+				return new ClassicAgentComponentImpl<Msg>(beh);
 			}
 		};
 	}

@@ -1,81 +1,61 @@
 
-import fr.irit.smac.may.lib.interfaces.*
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
-import fr.irit.smac.may.lib.components.messaging.callable.CallRef
-import fr.irit.smac.may.lib.components.messaging.interfaces.*
-import java.lang.String
 
 namespace fr.irit.smac.may.lib.components.messaging {
 
-	/**
-	 * Deprecated
-	 * Should be replaced by meta.Forward[Send[MsgType, Ref]]
-	 */
-	transverse Sender[MsgType, Ref] {
-		agent {
-			provides send: Send[MsgType, Ref]
-		}
-		infra {
-			requires deposit: Send[MsgType, Ref]
-		}
-	}
+	import fr.irit.smac.may.lib.interfaces.*
+	import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
+	import fr.irit.smac.may.lib.components.messaging.callable.CallRef
+	import fr.irit.smac.may.lib.components.messaging.interfaces.*
+	import java.lang.String
 	
-	transverse Broadcaster[T, Ref] {
-		agent {
+	ecosystem Broadcaster[T, Ref] {
+		species Agent {
 			provides bc: Broadcast[T]
 		}
-		infra {
-			requires deposit: Send[T, Ref]
-			provides broadcast: Push[T]
-			provides add: Push[Ref]
-			provides remove: Push[Ref]
-		}
+		requires deposit: Send[T, Ref]
+		provides broadcast: Push[T]
+		provides add: Push[Ref]
+		provides remove: Push[Ref]
 	}
 
 	namespace receiver {
-		transverse Receiver[MsgType] {
-			agent(name:String) {
+		ecosystem Receiver[MsgType] {
+			species Agent(name:String) {
 				requires put: Push[MsgType]
 				provides me: Pull[AgentRef]
 				provides stop: Do
 				provides send: ReliableSend[MsgType, AgentRef]
 			}
-			infra {
-				provides deposit: ReliableSend[MsgType, AgentRef]
-			}
+			provides deposit: ReliableSend[MsgType, AgentRef]
 		}
 	}
 	
 	namespace callable {
 		// est-ce que ce n'est juste une version spéciale du collection map sans map ? si!
-		transverse Callable[I] {
-			agent {
+		ecosystem Callable[I] {
+			species Agent {
 				requires toCall: I
 				provides me: Pull[CallRef]
 				provides stop: Do
 			}
-			infra {
-				provides call: MapGet[CallRef,I]
-			}
+			provides call: MapGet[CallRef,I]
 		}
 	}
 	
 	// to combine for example with meta.Data and an infrastructure component generating the references...
-	transverse MapReceiver[Msg,RealRef,Ref] {
-		agent {
+	ecosystem MapReceiver[Msg,RealRef,Ref] {
+		species Agent {
 			// value
 			requires value: Pull[RealRef]
 			// key
 			requires key: Pull[Ref]
 			provides disconnect: Do
 		}
-		infra {
-			// send for the key
-			provides depositKey: Send[Msg,Ref]
-			
-			// send for the value
-			requires depositValue: Send[Msg,RealRef]
-		}
+		// send for the key
+		provides depositKey: Send[Msg,Ref]
+		
+		// send for the value
+		requires depositValue: Send[Msg,RealRef]
 	}
 	
 	namespace distributed {

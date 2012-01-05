@@ -19,7 +19,7 @@ public abstract class Scheduler {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
 		assert this.structure != null;
@@ -33,13 +33,13 @@ public abstract class Scheduler {
 
 	public static interface Component {
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public Scheduler.Agent createAgent();
-
 	}
 
-	private static class ComponentImpl implements Scheduler.Component {
+	private final static class ComponentImpl implements Scheduler.Component {
 
 		private final Scheduler.Bridge bridge;
 
@@ -59,13 +59,26 @@ public abstract class Scheduler {
 
 			this.implementation.start();
 		}
+	}
 
-		public Scheduler.Agent createAgent() {
-			Scheduler.Agent agentSide = this.implementation.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract Scheduler.Agent make_Agent();
 
+	public Scheduler.Agent createImplementationOfAgent() {
+		Scheduler.Agent implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
+	}
+
+	public Scheduler.Agent.Component createAgent() {
+		Scheduler.Agent implem = createImplementationOfAgent();
+		return implem.createComponent(new Scheduler.Agent.Bridge() {
+		});
 	}
 
 	public static abstract class Agent {
@@ -86,7 +99,7 @@ public abstract class Scheduler {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched();
 
@@ -94,15 +107,28 @@ public abstract class Scheduler {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+
+		private Scheduler.ComponentImpl infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Scheduler.Component infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge {
 
 		}
 
 		public static interface Component {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
@@ -114,11 +140,15 @@ public abstract class Scheduler {
 			 */
 			public fr.irit.smac.may.lib.interfaces.Do stop();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl implements Scheduler.Agent.Component {
+		private final static class ComponentImpl
+				implements
+					Scheduler.Agent.Component {
 
 			@SuppressWarnings("unused")
 			private final Scheduler.Agent.Bridge bridge;
@@ -154,30 +184,7 @@ public abstract class Scheduler {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private Scheduler.ComponentImpl infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Scheduler.Component infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port from the infrastructure.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
-			assert this.infraStructure != null;
-			return this.infraStructure.bridge.infraSched();
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -195,8 +202,6 @@ public abstract class Scheduler {
 		}
 
 	}
-
-	protected abstract Scheduler.Agent make_Agent();
 
 	/**
 	 * Can be overridden by the implementation

@@ -26,7 +26,7 @@ public abstract class ClassicNamed<Msg> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create();
 
@@ -137,6 +137,7 @@ public abstract class ClassicNamed<Msg> {
 	}
 
 	public static interface Component<Msg> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -148,15 +149,13 @@ public abstract class ClassicNamed<Msg> {
 		 */
 		public fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public ClassicNamed.ClassicNamedAgent<Msg> createClassicNamedAgent(
-				ClassicNamedAgentComponent<Msg, java.lang.String> _component,
-				java.lang.String name);
-
 	}
 
-	private static class ComponentImpl<Msg>
+	private final static class ComponentImpl<Msg>
 			implements
 				ClassicNamed.Component<Msg> {
 
@@ -176,23 +175,36 @@ public abstract class ClassicNamed<Msg> {
 
 			this.create = implem.create();
 
-			this.scheduler = implem.make_scheduler().createComponent(
-					new Bridge_scheduler());
-			this.sender = implem.make_sender().createComponent(
-					new Bridge_sender());
-			this.fact = implem.make_fact().createComponent(new Bridge_fact());
-			this.realReceive = implem.make_realReceive().createComponent(
-					new Bridge_realReceive());
-			this.receive = implem.make_receive().createComponent(
-					new Bridge_receive());
-			this.executor = implem.make_executor().createComponent(
-					new Bridge_executor());
-
+			assert this.implem_scheduler == null;
+			this.implem_scheduler = implem.make_scheduler();
+			this.scheduler = this.implem_scheduler
+					.createComponent(new BridgeImpl_scheduler());
+			assert this.implem_sender == null;
+			this.implem_sender = implem.make_sender();
+			this.sender = this.implem_sender
+					.createComponent(new BridgeImpl_sender());
+			assert this.implem_fact == null;
+			this.implem_fact = implem.make_fact();
+			this.fact = this.implem_fact.createComponent(new BridgeImpl_fact());
+			assert this.implem_realReceive == null;
+			this.implem_realReceive = implem.make_realReceive();
+			this.realReceive = this.implem_realReceive
+					.createComponent(new BridgeImpl_realReceive());
+			assert this.implem_receive == null;
+			this.implem_receive = implem.make_receive();
+			this.receive = this.implem_receive
+					.createComponent(new BridgeImpl_receive());
+			assert this.implem_executor == null;
+			this.implem_executor = implem.make_executor();
+			this.executor = this.implem_executor
+					.createComponent(new BridgeImpl_executor());
 		}
 
 		private final Scheduler.Component scheduler;
 
-		private final class Bridge_scheduler implements Scheduler.Bridge {
+		private Scheduler implem_scheduler = null;
+
+		private final class BridgeImpl_scheduler implements Scheduler.Bridge {
 
 			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
 				return ComponentImpl.this.executor.exec();
@@ -202,7 +214,9 @@ public abstract class ClassicNamed<Msg> {
 		}
 		private final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender;
 
-		private final class Bridge_sender
+		private Forward<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> implem_sender = null;
+
+		private final class BridgeImpl_sender
 				implements
 					Forward.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
 
@@ -214,7 +228,9 @@ public abstract class ClassicNamed<Msg> {
 		}
 		private final Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> fact;
 
-		private final class Bridge_fact
+		private Forward<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> implem_fact = null;
+
+		private final class BridgeImpl_fact
 				implements
 					Forward.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> {
 
@@ -226,12 +242,18 @@ public abstract class ClassicNamed<Msg> {
 		}
 		private final Receiver.Component<Msg> realReceive;
 
-		private final class Bridge_realReceive implements Receiver.Bridge<Msg> {
+		private Receiver<Msg> implem_realReceive = null;
+
+		private final class BridgeImpl_realReceive
+				implements
+					Receiver.Bridge<Msg> {
 
 		}
 		private final MapReceiver.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> receive;
 
-		private final class Bridge_receive
+		private MapReceiver<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> implem_receive = null;
+
+		private final class BridgeImpl_receive
 				implements
 					MapReceiver.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> {
 
@@ -243,7 +265,11 @@ public abstract class ClassicNamed<Msg> {
 		}
 		private final ExecutorService.Component executor;
 
-		private final class Bridge_executor implements ExecutorService.Bridge {
+		private ExecutorService implem_executor = null;
+
+		private final class BridgeImpl_executor
+				implements
+					ExecutorService.Bridge {
 
 		}
 
@@ -266,196 +292,325 @@ public abstract class ClassicNamed<Msg> {
 
 			this.implementation.start();
 		}
-
-		public ClassicNamed.ClassicNamedAgent<Msg> createClassicNamedAgent(
-				ClassicNamedAgentComponent<Msg, java.lang.String> _component,
-				java.lang.String name) {
-			return new ClassicNamed.ClassicNamedAgent<Msg>(_component,
-					this.scheduler.createAgent(), this.fact.createAgent(),
-					this.receive.createAgent(),
-					this.realReceive.createAgent(name),
-					this.sender.createAgent());
-		}
-
 	}
 
-	protected ClassicNamed.ClassicNamedAgent<Msg> createClassicNamedAgent(
-			ClassicNamedAgentComponent<Msg, java.lang.String> _component,
+	/**
+	 * Should not be called
+	 */
+	protected abstract ClassicNamed.ClassicNamedAgent<Msg> make_ClassicNamedAgent(
+			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
+			java.lang.String name);
+
+	public ClassicNamed.ClassicNamedAgent<Msg> createImplementationOfClassicNamedAgent(
+			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name) {
-		return this.structure.createClassicNamedAgent(_component, name);
+		ClassicNamed.ClassicNamedAgent<Msg> implem = make_ClassicNamedAgent(
+				beh, name);
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+		assert this.structure.implem_scheduler != null;
+		assert implem.with_s == null;
+		implem.with_s = this.structure.implem_scheduler
+				.createImplementationOfAgent();
+		assert this.structure.implem_fact != null;
+		assert implem.with_f == null;
+		implem.with_f = this.structure.implem_fact
+				.createImplementationOfAgent();
+		assert this.structure.implem_receive != null;
+		assert implem.with_r == null;
+		implem.with_r = this.structure.implem_receive
+				.createImplementationOfAgent();
+		assert this.structure.implem_realReceive != null;
+		assert implem.with_rr == null;
+		implem.with_rr = this.structure.implem_realReceive
+				.createImplementationOfAgent(name);
+		assert this.structure.implem_sender != null;
+		assert implem.with_ss == null;
+		implem.with_ss = this.structure.implem_sender
+				.createImplementationOfAgent();
+
+		return implem;
 	}
 
-	public static final class ClassicNamedAgent<Msg> {
-		public ClassicNamedAgent(
-				final ClassicNamedAgentComponent<Msg, java.lang.String> _component,
-				final Scheduler.Agent _scheduler,
-				final Forward.Agent<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> _fact,
-				final MapReceiver.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> _receive,
-				final Receiver.Agent<Msg> _realReceive,
-				final Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> _sender) {
-			this.component = _component
-					.createComponent(new ClassicNamedAgent_component());
+	public ClassicNamed.ClassicNamedAgent.Component<Msg> createClassicNamedAgent(
+			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
+			java.lang.String name) {
+		ClassicNamed.ClassicNamedAgent<Msg> implem = createImplementationOfClassicNamedAgent(
+				beh, name);
+		return implem
+				.createComponent(new ClassicNamed.ClassicNamedAgent.Bridge<Msg>() {
+				});
+	}
 
-			this.scheduler = _scheduler
-					.createComponent(new ClassicNamedAgent_scheduler());
+	public static abstract class ClassicNamedAgent<Msg> {
 
-			this.fact = _fact.createComponent(new ClassicNamedAgent_fact());
-
-			this.receive = _receive
-					.createComponent(new ClassicNamedAgent_receive());
-
-			this.realReceive = _realReceive
-					.createComponent(new ClassicNamedAgent_realReceive());
-
-			this.sender = _sender
-					.createComponent(new ClassicNamedAgent_sender());
-
-		}
-
-		private final ClassicNamedAgentComponent.Component<Msg, java.lang.String> component;
+		private ClassicNamed.ClassicNamedAgent.ComponentImpl<Msg> structure = null;
 
 		/**
-		 * This can be called to access the provided port.
-		 * start() must have been called before.
+		 * This can be called by the implementation to access the component itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
 		 */
-		public final ClassicNamedAgentComponent.Component<Msg, java.lang.String> component() {
-			return this.component;
-		};
-
-		private final class ClassicNamedAgent_component
-				implements
-					ClassicNamedAgentComponent.Bridge<Msg, java.lang.String> {
-
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send() {
-				return ClassicNamedAgent.this.sender.a();
-
-			};
-
-			public final java.util.concurrent.Executor executor() {
-				return ClassicNamedAgent.this.scheduler.sched();
-
-			};
-
-			public final fr.irit.smac.may.lib.interfaces.Do die() {
-				return ClassicNamedAgent.this.scheduler.stop();
-
-			};
-
-			public final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create() {
-				return ClassicNamedAgent.this.fact.a();
-
-			};
-
-		}
-
-		private final Scheduler.Agent.Component scheduler;
-
-		private final class ClassicNamedAgent_scheduler
-				implements
-					Scheduler.Agent.Bridge {
-
-		}
-
-		/**
-		 * This can be called to access the provided port.
-		 * start() must have been called before.
-		 */
-		public final Scheduler.Agent.Component scheduler() {
-			return this.scheduler;
-		};
-		private final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> fact;
-
-		private final class ClassicNamedAgent_fact
-				implements
-					Forward.Agent.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> {
-
-		}
-
-		/**
-		 * This can be called to access the provided port.
-		 * start() must have been called before.
-		 */
-		public final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> fact() {
-			return this.fact;
-		};
-		private final MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> receive;
-
-		private final class ClassicNamedAgent_receive
-				implements
-					MapReceiver.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> {
-
-			public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> key() {
-				return ClassicNamedAgent.this.component.me();
-
-			};
-
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> value() {
-				return ClassicNamedAgent.this.realReceive.me();
-
-			};
-
-		}
-
-		/**
-		 * This can be called to access the provided port.
-		 * start() must have been called before.
-		 */
-		public final MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> receive() {
-			return this.receive;
-		};
-		private final Receiver.Agent.Component<Msg> realReceive;
-
-		private final class ClassicNamedAgent_realReceive
-				implements
-					Receiver.Agent.Bridge<Msg> {
-
-			public final fr.irit.smac.may.lib.interfaces.Push<Msg> put() {
-				return ClassicNamedAgent.this.component.put();
-
-			};
-
-		}
-
-		/**
-		 * This can be called to access the provided port.
-		 * start() must have been called before.
-		 */
-		public final Receiver.Agent.Component<Msg> realReceive() {
-			return this.realReceive;
-		};
-		private final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender;
-
-		private final class ClassicNamedAgent_sender
-				implements
-					Forward.Agent.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
-
-		}
-
-		/**
-		 * This can be called to access the provided port.
-		 * start() must have been called before.
-		 */
-		public final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender() {
-			return this.sender;
+		protected ClassicNamed.ClassicNamedAgent.Component<Msg> self() {
+			assert this.structure != null;
+			return this.structure;
 		};
 
 		/**
-		 * This must be called to start the agent and its sub-components.
+		 * This should be overridden by the implementation to define how to create this sub-component.
+		 * This will be called once during the construction of the component to initialize this sub-component.
 		 */
-		public final void start() {
+		protected abstract ClassicNamedAgentComponent<Msg, java.lang.String> make_arch();
 
-			this.scheduler.start();
-
-			this.fact.start();
-
-			this.receive.start();
-
-			this.realReceive.start();
-
-			this.sender.start();
-
-			this.component.start();
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ClassicNamedAgentComponent.Component<Msg, java.lang.String> arch() {
+			assert this.structure != null;
+			return this.structure.arch;
 		}
+
+		private Scheduler.Agent with_s = null;
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Scheduler.Agent.Component s() {
+			assert this.structure != null;
+			return this.structure.s;
+		}
+
+		private Forward.Agent<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> with_f = null;
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> f() {
+			assert this.structure != null;
+			return this.structure.f;
+		}
+
+		private MapReceiver.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> with_r = null;
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> r() {
+			assert this.structure != null;
+			return this.structure.r;
+		}
+
+		private Receiver.Agent<Msg> with_rr = null;
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Receiver.Agent.Component<Msg> rr() {
+			assert this.structure != null;
+			return this.structure.rr;
+		}
+
+		private Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> with_ss = null;
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> ss() {
+			assert this.structure != null;
+			return this.structure.ss;
+		}
+
+		private ClassicNamed.ComponentImpl<Msg> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected ClassicNamed.Component<Msg> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
+
+		public static interface Bridge<Msg> {
+
+		}
+
+		public static interface Component<Msg> {
+
+			/**
+			 * This should be called to start the component
+			 */
+			public void start();
+		}
+
+		private final static class ComponentImpl<Msg>
+				implements
+					ClassicNamed.ClassicNamedAgent.Component<Msg> {
+
+			@SuppressWarnings("unused")
+			private final ClassicNamed.ClassicNamedAgent.Bridge<Msg> bridge;
+
+			private final ClassicNamed.ClassicNamedAgent<Msg> implementation;
+
+			private ComponentImpl(
+					final ClassicNamed.ClassicNamedAgent<Msg> implem,
+					final ClassicNamed.ClassicNamedAgent.Bridge<Msg> b) {
+				this.bridge = b;
+
+				this.implementation = implem;
+
+				assert implem.structure == null;
+				implem.structure = this;
+
+				assert this.implem_arch == null;
+				this.implem_arch = implem.make_arch();
+				this.arch = this.implem_arch
+						.createComponent(new BridgeImpl_arch());
+				assert this.implementation.with_s != null;
+				this.s = this.implementation.with_s
+						.createComponent(new BridgeImplschedulerAgent());
+				assert this.implementation.with_f != null;
+				this.f = this.implementation.with_f
+						.createComponent(new BridgeImplfactAgent());
+				assert this.implementation.with_r != null;
+				this.r = this.implementation.with_r
+						.createComponent(new BridgeImplreceiveAgent());
+				assert this.implementation.with_rr != null;
+				this.rr = this.implementation.with_rr
+						.createComponent(new BridgeImplrealReceiveAgent());
+				assert this.implementation.with_ss != null;
+				this.ss = this.implementation.with_ss
+						.createComponent(new BridgeImplsenderAgent());
+			}
+
+			private final ClassicNamedAgentComponent.Component<Msg, java.lang.String> arch;
+
+			private ClassicNamedAgentComponent<Msg, java.lang.String> implem_arch = null;
+
+			private final class BridgeImpl_arch
+					implements
+						ClassicNamedAgentComponent.Bridge<Msg, java.lang.String> {
+
+				public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send() {
+					return ComponentImpl.this.ss.a();
+
+				};
+
+				public final java.util.concurrent.Executor executor() {
+					return ComponentImpl.this.s.sched();
+
+				};
+
+				public final fr.irit.smac.may.lib.interfaces.Do die() {
+					return ComponentImpl.this.s.stop();
+
+				};
+
+				public final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create() {
+					return ComponentImpl.this.f.a();
+
+				};
+
+			}
+			private final Scheduler.Agent.Component s;
+
+			private final class BridgeImplschedulerAgent
+					implements
+						Scheduler.Agent.Bridge {
+
+			}
+			private final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> f;
+
+			private final class BridgeImplfactAgent
+					implements
+						Forward.Agent.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> {
+
+			}
+			private final MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> r;
+
+			private final class BridgeImplreceiveAgent
+					implements
+						MapReceiver.Agent.Bridge<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> {
+
+				public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> key() {
+					return ComponentImpl.this.arch.me();
+
+				};
+
+				public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> value() {
+					return ComponentImpl.this.rr.me();
+
+				};
+
+			}
+			private final Receiver.Agent.Component<Msg> rr;
+
+			private final class BridgeImplrealReceiveAgent
+					implements
+						Receiver.Agent.Bridge<Msg> {
+
+				public final fr.irit.smac.may.lib.interfaces.Push<Msg> put() {
+					return ComponentImpl.this.arch.put();
+
+				};
+
+			}
+			private final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> ss;
+
+			private final class BridgeImplsenderAgent
+					implements
+						Forward.Agent.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
+
+			}
+
+			public final void start() {
+				this.arch.start();
+				this.s.start();
+				this.f.start();
+				this.r.start();
+				this.rr.start();
+				this.ss.start();
+
+				this.implementation.start();
+			}
+		}
+
+		/**
+		 * Can be overridden by the implementation
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected void start() {
+		}
+
+		public ClassicNamed.ClassicNamedAgent.Component<Msg> createComponent(
+				ClassicNamed.ClassicNamedAgent.Bridge<Msg> b) {
+			return new ClassicNamed.ClassicNamedAgent.ComponentImpl<Msg>(this,
+					b);
+		}
+
 	}
 
 	/**
@@ -477,7 +632,6 @@ public abstract class ClassicNamed<Msg> {
 		return this.createComponent(new ClassicNamed.Bridge<Msg>() {
 		});
 	}
-
 	public static final <Msg> ClassicNamed.Component<Msg> createComponent(
 			ClassicNamed<Msg> _compo) {
 		return _compo.createComponent();

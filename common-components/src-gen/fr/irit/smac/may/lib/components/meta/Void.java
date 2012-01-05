@@ -20,7 +20,7 @@ public abstract class Void<I> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract I port();
 
@@ -29,17 +29,20 @@ public abstract class Void<I> {
 	}
 
 	public static interface Component<I> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public I port();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<I> implements Void.Component<I> {
+	private final static class ComponentImpl<I> implements Void.Component<I> {
 
 		@SuppressWarnings("unused")
 		private final Void.Bridge<I> bridge;
@@ -68,7 +71,6 @@ public abstract class Void<I> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -89,7 +91,6 @@ public abstract class Void<I> {
 		return this.createComponent(new Void.Bridge<I>() {
 		});
 	}
-
 	public static final <I> Void.Component<I> createComponent(Void<I> _compo) {
 		return _compo.createComponent();
 	}

@@ -19,7 +19,7 @@ public abstract class DistributedCommunication<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<T> out() {
 		assert this.structure != null;
@@ -28,7 +28,7 @@ public abstract class DistributedCommunication<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> broadcast() {
 		assert this.structure != null;
@@ -39,7 +39,7 @@ public abstract class DistributedCommunication<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> nodeName();
 
@@ -47,7 +47,7 @@ public abstract class DistributedCommunication<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> in();
 
@@ -55,7 +55,7 @@ public abstract class DistributedCommunication<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> handle();
 
@@ -66,6 +66,7 @@ public abstract class DistributedCommunication<T> {
 	}
 
 	public static interface Component<T> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -82,11 +83,13 @@ public abstract class DistributedCommunication<T> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> handle();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<T>
+	private final static class ComponentImpl<T>
 			implements
 				DistributedCommunication.Component<T> {
 
@@ -129,7 +132,6 @@ public abstract class DistributedCommunication<T> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

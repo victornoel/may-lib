@@ -20,7 +20,7 @@ public abstract class JSONTransformer<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer();
 
@@ -28,7 +28,7 @@ public abstract class JSONTransformer<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
 
@@ -37,6 +37,7 @@ public abstract class JSONTransformer<T> {
 	}
 
 	public static interface Component<T> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -48,11 +49,13 @@ public abstract class JSONTransformer<T> {
 		 */
 		public fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<T>
+	private final static class ComponentImpl<T>
 			implements
 				JSONTransformer.Component<T> {
 
@@ -90,7 +93,6 @@ public abstract class JSONTransformer<T> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -112,7 +114,6 @@ public abstract class JSONTransformer<T> {
 		return this.createComponent(new JSONTransformer.Bridge<T>() {
 		});
 	}
-
 	public static final <T> JSONTransformer.Component<T> createComponent(
 			JSONTransformer<T> _compo) {
 		return _compo.createComponent();

@@ -20,7 +20,7 @@ public abstract class SequentialDispatcher<Truc> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor executor() {
 		assert this.structure != null;
@@ -29,7 +29,7 @@ public abstract class SequentialDispatcher<Truc> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<Truc> handler() {
 		assert this.structure != null;
@@ -40,7 +40,7 @@ public abstract class SequentialDispatcher<Truc> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch();
 
@@ -68,17 +68,20 @@ public abstract class SequentialDispatcher<Truc> {
 	}
 
 	public static interface Component<Truc> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<Truc>
+	private final static class ComponentImpl<Truc>
 			implements
 				SequentialDispatcher.Component<Truc> {
 
@@ -97,14 +100,17 @@ public abstract class SequentialDispatcher<Truc> {
 
 			this.dispatch = implem.dispatch();
 
-			this.queue = implem.make_queue()
-					.createComponent(new Bridge_queue());
-
+			assert this.implem_queue == null;
+			this.implem_queue = implem.make_queue();
+			this.queue = this.implem_queue
+					.createComponent(new BridgeImpl_queue());
 		}
 
 		private final Queue.Component<Truc> queue;
 
-		private final class Bridge_queue implements Queue.Bridge<Truc> {
+		private Queue<Truc> implem_queue = null;
+
+		private final class BridgeImpl_queue implements Queue.Bridge<Truc> {
 
 		}
 
@@ -119,7 +125,6 @@ public abstract class SequentialDispatcher<Truc> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

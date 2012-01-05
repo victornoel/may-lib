@@ -19,7 +19,7 @@ public abstract class WebServiceEndpoint<I> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected I service() {
 		assert this.structure != null;
@@ -33,11 +33,13 @@ public abstract class WebServiceEndpoint<I> {
 
 	public static interface Component<I> {
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<I>
+	private final static class ComponentImpl<I>
 			implements
 				WebServiceEndpoint.Component<I> {
 
@@ -60,7 +62,6 @@ public abstract class WebServiceEndpoint<I> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

@@ -4,13 +4,14 @@ import java.util.concurrent.Executors;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
+import fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
-import fr.irit.smac.may.lib.components.messaging.Sender;
-import fr.irit.smac.may.lib.components.messaging.SenderImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
+import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
+import fr.irit.smac.may.lib.components.meta.Forward;
+import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiverImpl;
@@ -21,18 +22,13 @@ import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
+import fr.irit.smac.may.lib.interfaces.Send;
 
 public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	private final int port;
-	private SchedulerImpl scheduler;
-	private SenderImpl<Msg, RemoteAgentRef> send;
-	private ReceiverImpl<Msg> receive;
-	private RemoteReceiverImpl<Msg, AgentRef> remoteRefReceive;
-	private RemoteFactoryImpl<Msg, RemoteAgentRef> factory;
 
 	private volatile int i = 0;
-	private PlacedImpl placed; 
 	
 	public RemoteClassicImpl(final int port) {
 		this.port = port;
@@ -40,26 +36,22 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	@Override
 	protected Scheduler make_scheduler() {
-		scheduler = new SchedulerImpl();
-		return scheduler;
+		return new SchedulerImpl();
 	}
 
 	@Override
-	public Sender<Msg, RemoteAgentRef> make_sender() {
-		send = new SenderImpl<Msg, RemoteAgentRef>();
-		return send;
+	protected Forward<Send<Msg, RemoteAgentRef>> make_sender() {
+		return new ForwardImpl<Send<Msg,RemoteAgentRef>>();
 	}
 
 	@Override
 	public Receiver<Msg> make_receive() {
-		receive = new ReceiverImpl<Msg>();
-		return receive;
+		return new ReceiverImpl<Msg>();
 	}
 
 	@Override
 	public RemoteReceiver<Msg, AgentRef> make_remReceive() {
-		remoteRefReceive = new RemoteReceiverImpl<Msg, AgentRef>();
-		return remoteRefReceive;
+		return new RemoteReceiverImpl<Msg, AgentRef>();
 	}
 
 	@Override
@@ -69,8 +61,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	@Override
 	protected RemoteFactory<Msg, RemoteAgentRef> make_fact() {
-		factory = new RemoteFactoryImpl<Msg, RemoteAgentRef>();
-		return factory;
+		return new RemoteFactoryImpl<Msg, RemoteAgentRef>();
 	}
 
 	@Override
@@ -78,10 +69,10 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 		return new CreateRemoteClassic<Msg, RemoteAgentRef>() {
 			public RemoteAgentRef create(
 					final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
-
-				ClassicAgent<Msg> agent = createClassicAgent(new RemoteClassicAgentComponentImpl<Msg>(beh), "agent"+(i++));
+				
+				ClassicAgent.Component<Msg> agent = createClassicAgent(beh, "agent"+(i++));
 				agent.start();
-				return agent.remReceive().me().pull();
+				return agent.ref().pull();
 			}
 
 			public RemoteAgentRef create(
@@ -94,7 +85,17 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	@Override
 	protected Placed make_placed() {
-		placed = new PlacedImpl(this.port);
-		return placed;
+		return new PlacedImpl(this.port);
+	}
+
+	@Override
+	protected fr.irit.smac.may.lib.classic.remote.RemoteClassic.ClassicAgent<Msg> make_ClassicAgent(
+			final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, String name) {
+		return new ClassicAgent<Msg>() {
+			@Override
+			protected RemoteClassicAgentComponent<Msg, RemoteAgentRef> make_arch() {
+				return new RemoteClassicAgentComponentImpl<Msg>(beh);
+			}
+		};
 	}
 }

@@ -1,9 +1,9 @@
 
-import java.lang.*
-import fr.irit.smac.may.lib.interfaces.*
-
 namespace fr.irit.smac.may.lib.components.meta {
 	
+	import java.lang.*
+	import fr.irit.smac.may.lib.interfaces.*
+
 	component Data[T] {
 		provides data: Pull[T]
 	}
@@ -17,39 +17,35 @@ namespace fr.irit.smac.may.lib.components.meta {
 	 * This transverse enables to realise collection ports
 	 * with integer keys to retrieve the wanted port
 	 */
-	transverse CollectionInteger[I] {
-		agent {
+	ecosystem CollectionInteger[I] {
+		species Agent {
 			requires p: I
 			provides idx: Pull[Integer]
 		}
-		infra {
-			provides get: MapGet[Integer,I]
-		}
+		provides get: MapGet[Integer,I]
 	}
 	
 	/**
 	 * This transverse enables to realise collection ports
 	 * with keys to retrieve the wanted port
 	 */
-	transverse CollectionMap[K,I] {
-		agent {
+	ecosystem CollectionMap[K,I] {
+		species Agent {
 			requires p: I
 			requires key: Pull[K]
 		}
-		infra {
-			provides get: MapGet[K,I]
-		}
+
+		provides get: MapGet[K,I]
 	}
 	
 	/**
 	 * Simply forward a port from the agents to the infrastructure
 	 */
-	transverse Forward[I] {
-		agent {
+	ecosystem Forward[I] {
+		species Agent {
 			provides a: I
 		}
-		infra {
-			requires i: I
-		}
+
+		requires i: I
 	}
 }

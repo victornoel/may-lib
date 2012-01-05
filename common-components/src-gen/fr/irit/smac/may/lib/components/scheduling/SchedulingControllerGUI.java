@@ -19,7 +19,7 @@ public abstract class SchedulingControllerGUI {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control() {
 		assert this.structure != null;
@@ -33,11 +33,13 @@ public abstract class SchedulingControllerGUI {
 
 	public static interface Component {
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl
+	private final static class ComponentImpl
 			implements
 				SchedulingControllerGUI.Component {
 
@@ -60,7 +62,6 @@ public abstract class SchedulingControllerGUI {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

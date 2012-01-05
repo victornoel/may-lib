@@ -20,7 +20,7 @@ public abstract class ExecutorService {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
 
@@ -29,17 +29,22 @@ public abstract class ExecutorService {
 	}
 
 	public static interface Component {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl implements ExecutorService.Component {
+	private final static class ComponentImpl
+			implements
+				ExecutorService.Component {
 
 		@SuppressWarnings("unused")
 		private final ExecutorService.Bridge bridge;
@@ -69,7 +74,6 @@ public abstract class ExecutorService {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -90,7 +94,6 @@ public abstract class ExecutorService {
 		return this.createComponent(new ExecutorService.Bridge() {
 		});
 	}
-
 	public static final ExecutorService.Component createComponent(
 			ExecutorService _compo) {
 		return _compo.createComponent();

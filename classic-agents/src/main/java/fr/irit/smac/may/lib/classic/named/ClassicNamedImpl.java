@@ -17,19 +17,10 @@ import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
-
-	private SchedulerImpl scheduler;
-	private ForwardImpl<Send<Msg, String>> send;
-	private ReceiverImpl<Msg> realReceive;
-	private ForwardImpl<CreateNamed<Msg,String>> forward;
-	private MapReceiverImpl<Msg, AgentRef, String> receive;
-	
-	private volatile int i = 0;
 	
 	@Override
 	protected Scheduler make_scheduler() {
-		scheduler = new SchedulerImpl();
-		return scheduler;
+		return new SchedulerImpl();
 	}
 
 	@Override
@@ -39,35 +30,42 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 
 	@Override
 	protected Forward<Send<Msg, String>> make_sender() {
-		send = new ForwardImpl<Send<Msg, String>>();
-		return send;
+		return new ForwardImpl<Send<Msg, String>>();
 	}
 
 	@Override
 	protected Receiver<Msg> make_realReceive() {
-		realReceive = new ReceiverImpl<Msg>();
-		return realReceive;
+		return new ReceiverImpl<Msg>();
 	}
 	
 	@Override
 	protected MapReceiver<Msg,AgentRef,String> make_receive() {
-		receive = new MapReceiverImpl<Msg,AgentRef,String>();
-		return receive;
+		return new MapReceiverImpl<Msg,AgentRef,String>();
 	}
 
 	@Override
 	protected Forward<CreateNamed<Msg, String>> make_fact() {
-		forward = new ForwardImpl<CreateNamed<Msg,String>>();
-		return forward;
+		return new ForwardImpl<CreateNamed<Msg,String>>();
 	}
 	@Override
 	protected CreateNamed<Msg, String> create() {
 		return new CreateNamed<Msg, String>() {
 			public String create(
 					final ClassicNamedBehaviour<Msg, String> beh, String name) {
-				ClassicNamedAgent<Msg> agent = createClassicNamedAgent(new ClassicNamedAgentComponentImpl<Msg,String>(name,beh), name);
+				ClassicNamedAgent.Component<Msg> agent = createClassicNamedAgent(beh, name);
 				agent.start();
-				return agent.component().me().pull();
+				return name;
+			}
+		};
+	}
+
+	@Override
+	protected fr.irit.smac.may.lib.classic.named.ClassicNamed.ClassicNamedAgent<Msg> make_ClassicNamedAgent(
+			final ClassicNamedBehaviour<Msg, String> beh, final String name) {
+		return new ClassicNamedAgent<Msg>() {
+			@Override
+			protected ClassicNamedAgentComponent<Msg, String> make_arch() {
+				return new ClassicNamedAgentComponentImpl<Msg,String>(name,beh);
 			}
 		};
 	}

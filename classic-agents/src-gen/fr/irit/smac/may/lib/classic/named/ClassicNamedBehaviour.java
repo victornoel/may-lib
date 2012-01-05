@@ -19,7 +19,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
 		assert this.structure != null;
@@ -28,7 +28,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
 		assert this.structure != null;
@@ -37,7 +37,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do die() {
 		assert this.structure != null;
@@ -46,7 +46,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
 		assert this.structure != null;
@@ -57,7 +57,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Msg> cycle();
 
@@ -70,17 +70,20 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	}
 
 	public static interface Component<Msg, Ref> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<Msg> cycle();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<Msg, Ref>
+	private final static class ComponentImpl<Msg, Ref>
 			implements
 				ClassicNamedBehaviour.Component<Msg, Ref> {
 
@@ -111,7 +114,6 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

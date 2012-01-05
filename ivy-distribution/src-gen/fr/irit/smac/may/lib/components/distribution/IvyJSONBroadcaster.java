@@ -23,7 +23,7 @@ public abstract class IvyJSONBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<T> handle() {
 		assert this.structure != null;
@@ -32,7 +32,7 @@ public abstract class IvyJSONBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor exec() {
 		assert this.structure != null;
@@ -114,17 +114,20 @@ public abstract class IvyJSONBroadcaster<T> {
 	}
 
 	public static interface Component<T> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<T> send();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<T>
+	private final static class ComponentImpl<T>
 			implements
 				IvyJSONBroadcaster.Component<T> {
 
@@ -141,17 +144,26 @@ public abstract class IvyJSONBroadcaster<T> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.ivy = implem.make_ivy().createComponent(new Bridge_ivy());
-			this.json = implem.make_json().createComponent(new Bridge_json());
-			this.binder = implem.make_binder().createComponent(
-					new Bridge_binder());
-			this.bc = implem.make_bc().createComponent(new Bridge_bc());
-
+			assert this.implem_ivy == null;
+			this.implem_ivy = implem.make_ivy();
+			this.ivy = this.implem_ivy.createComponent(new BridgeImpl_ivy());
+			assert this.implem_json == null;
+			this.implem_json = implem.make_json();
+			this.json = this.implem_json.createComponent(new BridgeImpl_json());
+			assert this.implem_binder == null;
+			this.implem_binder = implem.make_binder();
+			this.binder = this.implem_binder
+					.createComponent(new BridgeImpl_binder());
+			assert this.implem_bc == null;
+			this.implem_bc = implem.make_bc();
+			this.bc = this.implem_bc.createComponent(new BridgeImpl_bc());
 		}
 
 		private final IvyBus.Component ivy;
 
-		private final class Bridge_ivy implements IvyBus.Bridge {
+		private IvyBus implem_ivy = null;
+
+		private final class BridgeImpl_ivy implements IvyBus.Bridge {
 
 			public final java.util.concurrent.Executor exec() {
 				return ComponentImpl.this.bridge.exec();
@@ -161,12 +173,18 @@ public abstract class IvyJSONBroadcaster<T> {
 		}
 		private final JSONTransformer.Component<T> json;
 
-		private final class Bridge_json implements JSONTransformer.Bridge<T> {
+		private JSONTransformer<T> implem_json = null;
+
+		private final class BridgeImpl_json
+				implements
+					JSONTransformer.Bridge<T> {
 
 		}
 		private final IvyBinder.Component binder;
 
-		private final class Bridge_binder implements IvyBinder.Bridge {
+		private IvyBinder implem_binder = null;
+
+		private final class BridgeImpl_binder implements IvyBinder.Bridge {
 
 			public final fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
 				return ComponentImpl.this.ivy.bindMsg();
@@ -186,7 +204,9 @@ public abstract class IvyJSONBroadcaster<T> {
 		}
 		private final IvyBroadcaster.Component<T> bc;
 
-		private final class Bridge_bc implements IvyBroadcaster.Bridge<T> {
+		private IvyBroadcaster<T> implem_bc = null;
+
+		private final class BridgeImpl_bc implements IvyBroadcaster.Bridge<T> {
 
 			public final fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
 				return ComponentImpl.this.json.deserializer();
@@ -227,7 +247,6 @@ public abstract class IvyJSONBroadcaster<T> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

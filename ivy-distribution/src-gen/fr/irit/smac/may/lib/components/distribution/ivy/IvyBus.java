@@ -19,7 +19,7 @@ public abstract class IvyBus {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor exec() {
 		assert this.structure != null;
@@ -30,7 +30,7 @@ public abstract class IvyBus {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
 
@@ -38,7 +38,7 @@ public abstract class IvyBus {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
 
@@ -46,7 +46,7 @@ public abstract class IvyBus {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg();
 
@@ -54,7 +54,7 @@ public abstract class IvyBus {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send();
 
@@ -64,6 +64,7 @@ public abstract class IvyBus {
 	}
 
 	public static interface Component {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -85,11 +86,13 @@ public abstract class IvyBus {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl implements IvyBus.Component {
+	private final static class ComponentImpl implements IvyBus.Component {
 
 		private final IvyBus.Bridge bridge;
 
@@ -135,7 +138,6 @@ public abstract class IvyBus {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

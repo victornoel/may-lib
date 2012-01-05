@@ -21,7 +21,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
 		assert this.structure != null;
@@ -30,7 +30,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
 		assert this.structure != null;
@@ -39,7 +39,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor executor() {
 		assert this.structure != null;
@@ -48,7 +48,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do die() {
 		assert this.structure != null;
@@ -57,7 +57,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, Ref> create() {
 		assert this.structure != null;
@@ -108,17 +108,20 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 	}
 
 	public static interface Component<Msg, Ref> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<Msg> put();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<Msg, Ref>
+	private final static class ComponentImpl<Msg, Ref>
 			implements
 				ClassicAgentComponent.Component<Msg, Ref> {
 
@@ -135,15 +138,20 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 			assert implem.structure == null;
 			implem.structure = this;
 
-			this.dispatcher = implem.make_dispatcher().createComponent(
-					new Bridge_dispatcher());
-			this.beh = implem.make_beh().createComponent(new Bridge_beh());
-
+			assert this.implem_dispatcher == null;
+			this.implem_dispatcher = implem.make_dispatcher();
+			this.dispatcher = this.implem_dispatcher
+					.createComponent(new BridgeImpl_dispatcher());
+			assert this.implem_beh == null;
+			this.implem_beh = implem.make_beh();
+			this.beh = this.implem_beh.createComponent(new BridgeImpl_beh());
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
 
-		private final class Bridge_dispatcher
+		private SequentialDispatcher<Msg> implem_dispatcher = null;
+
+		private final class BridgeImpl_dispatcher
 				implements
 					SequentialDispatcher.Bridge<Msg> {
 
@@ -160,7 +168,9 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 		}
 		private final ClassicBehaviour.Component<Msg, Ref> beh;
 
-		private final class Bridge_beh
+		private ClassicBehaviour<Msg, Ref> implem_beh = null;
+
+		private final class BridgeImpl_beh
 				implements
 					ClassicBehaviour.Bridge<Msg, Ref> {
 
@@ -196,7 +206,6 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

@@ -1,8 +1,7 @@
 
-import fr.irit.smac.may.lib.interfaces.*
-import java.lang.*
-
 namespace fr.irit.smac.may.lib.webservices {
+	import fr.irit.smac.may.lib.interfaces.*
+	import java.lang.*
 	
 	// this component provides the logic
 	// to publish a webservice of type I

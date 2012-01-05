@@ -19,7 +19,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> depositValue() {
 		assert this.structure != null;
@@ -30,7 +30,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> depositKey();
 
@@ -40,19 +40,20 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	}
 
 	public static interface Component<Msg, RealRef, Ref> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> depositKey();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public MapReceiver.Agent<Msg, RealRef, Ref> createAgent();
-
 	}
 
-	private static class ComponentImpl<Msg, RealRef, Ref>
+	private final static class ComponentImpl<Msg, RealRef, Ref>
 			implements
 				MapReceiver.Component<Msg, RealRef, Ref> {
 
@@ -83,14 +84,20 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 
 			this.implementation.start();
 		}
+	}
 
-		public MapReceiver.Agent<Msg, RealRef, Ref> createAgent() {
-			MapReceiver.Agent<Msg, RealRef, Ref> agentSide = this.implementation
-					.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract MapReceiver.Agent<Msg, RealRef, Ref> make_Agent();
 
+	public MapReceiver.Agent<Msg, RealRef, Ref> createImplementationOfAgent() {
+		MapReceiver.Agent<Msg, RealRef, Ref> implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
 	}
 
 	public static abstract class Agent<Msg, RealRef, Ref> {
@@ -110,7 +117,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		/**
 		 * This can be called by the implementation to access this required port.
 		 *
-		 * This is not meant to be called from the outside by hand.
+		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Pull<RealRef> value() {
 			assert this.structure != null;
@@ -119,7 +126,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		/**
 		 * This can be called by the implementation to access this required port.
 		 *
-		 * This is not meant to be called from the outside by hand.
+		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Pull<Ref> key() {
 			assert this.structure != null;
@@ -130,9 +137,21 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
+
+		private MapReceiver.ComponentImpl<Msg, RealRef, Ref> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected MapReceiver.Component<Msg, RealRef, Ref> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge<Msg, RealRef, Ref> {
 			public fr.irit.smac.may.lib.interfaces.Pull<RealRef> value();
@@ -141,17 +160,20 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		}
 
 		public static interface Component<Msg, RealRef, Ref> {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
 			public fr.irit.smac.may.lib.interfaces.Do disconnect();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl<Msg, RealRef, Ref>
+		private final static class ComponentImpl<Msg, RealRef, Ref>
 				implements
 					MapReceiver.Agent.Component<Msg, RealRef, Ref> {
 
@@ -183,30 +205,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private MapReceiver.ComponentImpl<Msg, RealRef, Ref> infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected MapReceiver.Component<Msg, RealRef, Ref> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port from the infrastructure.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> depositValue() {
-			assert this.infraStructure != null;
-			return this.infraStructure.bridge.depositValue();
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -225,8 +224,6 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		}
 
 	}
-
-	protected abstract MapReceiver.Agent<Msg, RealRef, Ref> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation

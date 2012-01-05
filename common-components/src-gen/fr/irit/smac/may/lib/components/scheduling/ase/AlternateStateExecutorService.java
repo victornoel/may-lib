@@ -20,7 +20,7 @@ public abstract class AlternateStateExecutorService {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract java.util.concurrent.Executor exec();
 
@@ -28,7 +28,7 @@ public abstract class AlternateStateExecutorService {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
 
@@ -37,6 +37,7 @@ public abstract class AlternateStateExecutorService {
 	}
 
 	public static interface Component {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -48,11 +49,13 @@ public abstract class AlternateStateExecutorService {
 		 */
 		public fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl
+	private final static class ComponentImpl
 			implements
 				AlternateStateExecutorService.Component {
 
@@ -90,7 +93,6 @@ public abstract class AlternateStateExecutorService {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -112,7 +114,6 @@ public abstract class AlternateStateExecutorService {
 		return this.createComponent(new AlternateStateExecutorService.Bridge() {
 		});
 	}
-
 	public static final AlternateStateExecutorService.Component createComponent(
 			AlternateStateExecutorService _compo) {
 		return _compo.createComponent();

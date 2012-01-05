@@ -20,7 +20,7 @@ public abstract class Data<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<T> data();
 
@@ -29,17 +29,20 @@ public abstract class Data<T> {
 	}
 
 	public static interface Component<T> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Pull<T> data();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<T> implements Data.Component<T> {
+	private final static class ComponentImpl<T> implements Data.Component<T> {
 
 		@SuppressWarnings("unused")
 		private final Data.Bridge<T> bridge;
@@ -68,7 +71,6 @@ public abstract class Data<T> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -89,7 +91,6 @@ public abstract class Data<T> {
 		return this.createComponent(new Data.Bridge<T>() {
 		});
 	}
-
 	public static final <T> Data.Component<T> createComponent(Data<T> _compo) {
 		return _compo.createComponent();
 	}

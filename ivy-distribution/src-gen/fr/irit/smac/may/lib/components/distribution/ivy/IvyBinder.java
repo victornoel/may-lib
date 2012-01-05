@@ -19,7 +19,7 @@ public abstract class IvyBinder {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
 		assert this.structure != null;
@@ -28,7 +28,7 @@ public abstract class IvyBinder {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
 		assert this.structure != null;
@@ -37,7 +37,7 @@ public abstract class IvyBinder {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
 		assert this.structure != null;
@@ -48,7 +48,7 @@ public abstract class IvyBinder {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg();
 
@@ -60,17 +60,20 @@ public abstract class IvyBinder {
 	}
 
 	public static interface Component {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl implements IvyBinder.Component {
+	private final static class ComponentImpl implements IvyBinder.Component {
 
 		private final IvyBinder.Bridge bridge;
 
@@ -98,7 +101,6 @@ public abstract class IvyBinder {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

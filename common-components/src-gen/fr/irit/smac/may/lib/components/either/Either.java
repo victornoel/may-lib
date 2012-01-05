@@ -19,7 +19,7 @@ public abstract class Either<L, R> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out() {
 		assert this.structure != null;
@@ -30,7 +30,7 @@ public abstract class Either<L, R> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<L> left();
 
@@ -38,7 +38,7 @@ public abstract class Either<L, R> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<R> right();
 
@@ -48,6 +48,7 @@ public abstract class Either<L, R> {
 	}
 
 	public static interface Component<L, R> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -59,11 +60,15 @@ public abstract class Either<L, R> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<R> right();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<L, R> implements Either.Component<L, R> {
+	private final static class ComponentImpl<L, R>
+			implements
+				Either.Component<L, R> {
 
 		private final Either.Bridge<L, R> bridge;
 
@@ -98,7 +103,6 @@ public abstract class Either<L, R> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

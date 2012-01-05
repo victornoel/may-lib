@@ -20,7 +20,7 @@ public abstract class Callable<I> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
 
@@ -29,19 +29,22 @@ public abstract class Callable<I> {
 	}
 
 	public static interface Component<I> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public Callable.Agent<I> createAgent();
-
 	}
 
-	private static class ComponentImpl<I> implements Callable.Component<I> {
+	private final static class ComponentImpl<I>
+			implements
+				Callable.Component<I> {
 
 		@SuppressWarnings("unused")
 		private final Callable.Bridge<I> bridge;
@@ -71,13 +74,20 @@ public abstract class Callable<I> {
 
 			this.implementation.start();
 		}
+	}
 
-		public Callable.Agent<I> createAgent() {
-			Callable.Agent<I> agentSide = this.implementation.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract Callable.Agent<I> make_Agent();
 
+	public Callable.Agent<I> createImplementationOfAgent() {
+		Callable.Agent<I> implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
 	}
 
 	public static abstract class Agent<I> {
@@ -97,7 +107,7 @@ public abstract class Callable<I> {
 		/**
 		 * This can be called by the implementation to access this required port.
 		 *
-		 * This is not meant to be called from the outside by hand.
+		 * This is not meant to be called from the outside.
 		 */
 		protected I toCall() {
 			assert this.structure != null;
@@ -108,7 +118,7 @@ public abstract class Callable<I> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me();
 
@@ -116,9 +126,21 @@ public abstract class Callable<I> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+
+		private Callable.ComponentImpl<I> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Callable.Component<I> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge<I> {
 			public I toCall();
@@ -126,6 +148,7 @@ public abstract class Callable<I> {
 		}
 
 		public static interface Component<I> {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
@@ -137,11 +160,13 @@ public abstract class Callable<I> {
 			 */
 			public fr.irit.smac.may.lib.interfaces.Do stop();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl<I>
+		private final static class ComponentImpl<I>
 				implements
 					Callable.Agent.Component<I> {
 
@@ -178,20 +203,7 @@ public abstract class Callable<I> {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private Callable.ComponentImpl<I> infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Callable.Component<I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -210,8 +222,6 @@ public abstract class Callable<I> {
 
 	}
 
-	protected abstract Callable.Agent<I> make_Agent();
-
 	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
@@ -224,6 +234,15 @@ public abstract class Callable<I> {
 
 	public Callable.Component<I> createComponent(Callable.Bridge<I> b) {
 		return new Callable.ComponentImpl<I>(this, b);
+	}
+
+	public Callable.Component<I> createComponent() {
+		return this.createComponent(new Callable.Bridge<I>() {
+		});
+	}
+	public static final <I> Callable.Component<I> createComponent(
+			Callable<I> _compo) {
+		return _compo.createComponent();
 	}
 
 }

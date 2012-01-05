@@ -1,9 +1,10 @@
 
-import fr.irit.smac.may.lib.components.either.datatypes.Either
-import fr.irit.smac.may.lib.interfaces.*
 
 namespace fr.irit.smac.may.lib.components.either {
 	
+	import fr.irit.smac.may.lib.components.either.datatypes.Either
+	import fr.irit.smac.may.lib.interfaces.*
+
 	component Either[L,R] {
 		provides left: Push[L]
 		provides right: Push[R]

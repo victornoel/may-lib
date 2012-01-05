@@ -1,25 +1,24 @@
 
-import fr.irit.smac.may.lib.interfaces.*
-import fr.irit.smac.may.lib.components.scheduling.interfaces.*
-import java.util.concurrent.Executor
-
 namespace fr.irit.smac.may.lib.components.scheduling {
 	
+	import fr.irit.smac.may.lib.interfaces.*
+	import fr.irit.smac.may.lib.components.scheduling.interfaces.*
+	import java.util.concurrent.Executor
 	
-	transverse Scheduled {
-		agent {
+	ecosystem Scheduled {
+		species Agent {
 			requires cycle: Do
 			provides stop: Do
 		}
-		infra {
-			/**
-			 * when called, all agents are called concurrently
-			 * (using sched) on their cycle port
-			 * return upon completion of all agents 
-			 */
-			provides tick: Do
-			requires sched: Executor
-		}
+		
+		/**
+		 * when called, all agents are called concurrently
+		 * (using sched) on their cycle port
+		 * return upon completion of all agents 
+		 */
+		provides tick: Do
+		requires sched: Executor
+		
 	}
 	
 	/**
@@ -41,14 +40,13 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 	 * Will schedule as much tasks as needed
 	 * Stop will stop any task not finished
 	 */
-	transverse Scheduler {
-		agent {
+	ecosystem Scheduler {
+		species Agent {
 			provides sched: AdvancedExecutor
 			provides stop: Do
 		}
-		infra {
-			requires infraSched: AdvancedExecutor
-		}
+		
+		requires infraSched: AdvancedExecutor
 	}
 	
 	namespace ase {

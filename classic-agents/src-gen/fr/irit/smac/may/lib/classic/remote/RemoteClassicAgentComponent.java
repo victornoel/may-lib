@@ -21,7 +21,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
 		assert this.structure != null;
@@ -30,7 +30,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
 		assert this.structure != null;
@@ -39,7 +39,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor executor() {
 		assert this.structure != null;
@@ -48,7 +48,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do stopExec() {
 		assert this.structure != null;
@@ -57,7 +57,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do stopReceive() {
 		assert this.structure != null;
@@ -66,7 +66,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> create() {
 		assert this.structure != null;
@@ -77,7 +77,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Do die();
 
@@ -126,6 +126,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	}
 
 	public static interface Component<Msg, Ref> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -137,11 +138,13 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Do die();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<Msg, Ref>
+	private final static class ComponentImpl<Msg, Ref>
 			implements
 				RemoteClassicAgentComponent.Component<Msg, Ref> {
 
@@ -161,15 +164,20 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 
 			this.die = implem.die();
 
-			this.dispatcher = implem.make_dispatcher().createComponent(
-					new Bridge_dispatcher());
-			this.beh = implem.make_beh().createComponent(new Bridge_beh());
-
+			assert this.implem_dispatcher == null;
+			this.implem_dispatcher = implem.make_dispatcher();
+			this.dispatcher = this.implem_dispatcher
+					.createComponent(new BridgeImpl_dispatcher());
+			assert this.implem_beh == null;
+			this.implem_beh = implem.make_beh();
+			this.beh = this.implem_beh.createComponent(new BridgeImpl_beh());
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
 
-		private final class Bridge_dispatcher
+		private SequentialDispatcher<Msg> implem_dispatcher = null;
+
+		private final class BridgeImpl_dispatcher
 				implements
 					SequentialDispatcher.Bridge<Msg> {
 
@@ -186,7 +194,9 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 		}
 		private final RemoteClassicBehaviour.Component<Msg, Ref> beh;
 
-		private final class Bridge_beh
+		private RemoteClassicBehaviour<Msg, Ref> implem_beh = null;
+
+		private final class BridgeImpl_beh
 				implements
 					RemoteClassicBehaviour.Bridge<Msg, Ref> {
 
@@ -227,7 +237,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

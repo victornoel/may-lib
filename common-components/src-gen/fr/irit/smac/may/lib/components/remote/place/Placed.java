@@ -20,7 +20,7 @@ public abstract class Placed {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace();
 
@@ -29,19 +29,20 @@ public abstract class Placed {
 	}
 
 	public static interface Component {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public Placed.Agent createAgent();
-
 	}
 
-	private static class ComponentImpl implements Placed.Component {
+	private final static class ComponentImpl implements Placed.Component {
 
 		@SuppressWarnings("unused")
 		private final Placed.Bridge bridge;
@@ -70,13 +71,26 @@ public abstract class Placed {
 
 			this.implementation.start();
 		}
+	}
 
-		public Placed.Agent createAgent() {
-			Placed.Agent agentSide = this.implementation.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract Placed.Agent make_Agent();
 
+	public Placed.Agent createImplementationOfAgent() {
+		Placed.Agent implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
+	}
+
+	public Placed.Agent.Component createAgent() {
+		Placed.Agent implem = createImplementationOfAgent();
+		return implem.createComponent(new Placed.Agent.Bridge() {
+		});
 	}
 
 	public static abstract class Agent {
@@ -97,26 +111,43 @@ public abstract class Placed {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace();
+
+		private Placed.ComponentImpl infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Placed.Component infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge {
 
 		}
 
 		public static interface Component {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
 			public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl implements Placed.Agent.Component {
+		private final static class ComponentImpl
+				implements
+					Placed.Agent.Component {
 
 			@SuppressWarnings("unused")
 			private final Placed.Agent.Bridge bridge;
@@ -146,20 +177,7 @@ public abstract class Placed {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private Placed.ComponentImpl infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Placed.Component infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -177,8 +195,6 @@ public abstract class Placed {
 
 	}
 
-	protected abstract Placed.Agent make_Agent();
-
 	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
@@ -191,6 +207,14 @@ public abstract class Placed {
 
 	public Placed.Component createComponent(Placed.Bridge b) {
 		return new Placed.ComponentImpl(this, b);
+	}
+
+	public Placed.Component createComponent() {
+		return this.createComponent(new Placed.Bridge() {
+		});
+	}
+	public static final Placed.Component createComponent(Placed _compo) {
+		return _compo.createComponent();
 	}
 
 }

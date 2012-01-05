@@ -20,7 +20,7 @@ public abstract class WebServiceClient<I> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.RemoteCall<I, java.lang.String> service();
 
@@ -29,17 +29,20 @@ public abstract class WebServiceClient<I> {
 	}
 
 	public static interface Component<I> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.RemoteCall<I, java.lang.String> service();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<I>
+	private final static class ComponentImpl<I>
 			implements
 				WebServiceClient.Component<I> {
 
@@ -71,7 +74,6 @@ public abstract class WebServiceClient<I> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -93,7 +95,6 @@ public abstract class WebServiceClient<I> {
 		return this.createComponent(new WebServiceClient.Bridge<I>() {
 		});
 	}
-
 	public static final <I> WebServiceClient.Component<I> createComponent(
 			WebServiceClient<I> _compo) {
 		return _compo.createComponent();

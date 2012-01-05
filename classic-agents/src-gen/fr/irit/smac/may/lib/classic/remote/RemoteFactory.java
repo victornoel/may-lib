@@ -19,7 +19,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> infraCreate() {
 		assert this.structure != null;
@@ -28,7 +28,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace() {
 		assert this.structure != null;
@@ -39,7 +39,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> factCreate();
 
@@ -50,19 +50,20 @@ public abstract class RemoteFactory<Msg, Ref> {
 	}
 
 	public static interface Component<Msg, Ref> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> factCreate();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public RemoteFactory.Agent<Msg, Ref> createAgent();
-
 	}
 
-	private static class ComponentImpl<Msg, Ref>
+	private final static class ComponentImpl<Msg, Ref>
 			implements
 				RemoteFactory.Component<Msg, Ref> {
 
@@ -93,14 +94,27 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 			this.implementation.start();
 		}
+	}
 
-		public RemoteFactory.Agent<Msg, Ref> createAgent() {
-			RemoteFactory.Agent<Msg, Ref> agentSide = this.implementation
-					.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract RemoteFactory.Agent<Msg, Ref> make_Agent();
 
+	public RemoteFactory.Agent<Msg, Ref> createImplementationOfAgent() {
+		RemoteFactory.Agent<Msg, Ref> implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
+	}
+
+	public RemoteFactory.Agent.Component<Msg, Ref> createAgent() {
+		RemoteFactory.Agent<Msg, Ref> implem = createImplementationOfAgent();
+		return implem
+				.createComponent(new RemoteFactory.Agent.Bridge<Msg, Ref>() {
+				});
 	}
 
 	public static abstract class Agent<Msg, Ref> {
@@ -121,26 +135,41 @@ public abstract class RemoteFactory<Msg, Ref> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> create();
+
+		private RemoteFactory.ComponentImpl<Msg, Ref> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected RemoteFactory.Component<Msg, Ref> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge<Msg, Ref> {
 
 		}
 
 		public static interface Component<Msg, Ref> {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
 			public fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> create();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl<Msg, Ref>
+		private final static class ComponentImpl<Msg, Ref>
 				implements
 					RemoteFactory.Agent.Component<Msg, Ref> {
 
@@ -172,39 +201,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private RemoteFactory.ComponentImpl<Msg, Ref> infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected RemoteFactory.Component<Msg, Ref> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port from the infrastructure.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> infraCreate() {
-			assert this.infraStructure != null;
-			return this.infraStructure.bridge.infraCreate();
-		};
-		/**
-		 * This can be called by the implementation to access this required port from the infrastructure.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace() {
-			assert this.infraStructure != null;
-			return this.infraStructure.bridge.thisPlace();
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -222,8 +219,6 @@ public abstract class RemoteFactory<Msg, Ref> {
 		}
 
 	}
-
-	protected abstract RemoteFactory.Agent<Msg, Ref> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation

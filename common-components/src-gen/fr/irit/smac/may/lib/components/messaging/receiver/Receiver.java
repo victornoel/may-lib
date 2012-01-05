@@ -20,7 +20,7 @@ public abstract class Receiver<MsgType> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit();
 
@@ -29,19 +29,20 @@ public abstract class Receiver<MsgType> {
 	}
 
 	public static interface Component<MsgType> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public Receiver.Agent<MsgType> createAgent(java.lang.String name);
-
 	}
 
-	private static class ComponentImpl<MsgType>
+	private final static class ComponentImpl<MsgType>
 			implements
 				Receiver.Component<MsgType> {
 
@@ -73,14 +74,21 @@ public abstract class Receiver<MsgType> {
 
 			this.implementation.start();
 		}
+	}
 
-		public Receiver.Agent<MsgType> createAgent(java.lang.String name) {
-			Receiver.Agent<MsgType> agentSide = this.implementation
-					.make_Agent(name);
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract Receiver.Agent<MsgType> make_Agent(java.lang.String name);
 
+	public Receiver.Agent<MsgType> createImplementationOfAgent(
+			java.lang.String name) {
+		Receiver.Agent<MsgType> implem = make_Agent(name);
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
 	}
 
 	public static abstract class Agent<MsgType> {
@@ -100,7 +108,7 @@ public abstract class Receiver<MsgType> {
 		/**
 		 * This can be called by the implementation to access this required port.
 		 *
-		 * This is not meant to be called from the outside by hand.
+		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Push<MsgType> put() {
 			assert this.structure != null;
@@ -111,7 +119,7 @@ public abstract class Receiver<MsgType> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> me();
 
@@ -119,7 +127,7 @@ public abstract class Receiver<MsgType> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
 
@@ -127,9 +135,21 @@ public abstract class Receiver<MsgType> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> send();
+
+		private Receiver.ComponentImpl<MsgType> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Receiver.Component<MsgType> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge<MsgType> {
 			public fr.irit.smac.may.lib.interfaces.Push<MsgType> put();
@@ -137,6 +157,7 @@ public abstract class Receiver<MsgType> {
 		}
 
 		public static interface Component<MsgType> {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
@@ -153,11 +174,13 @@ public abstract class Receiver<MsgType> {
 			 */
 			public fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> send();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl<MsgType>
+		private final static class ComponentImpl<MsgType>
 				implements
 					Receiver.Agent.Component<MsgType> {
 
@@ -200,20 +223,7 @@ public abstract class Receiver<MsgType> {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private Receiver.ComponentImpl<MsgType> infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Receiver.Component<MsgType> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -232,8 +242,6 @@ public abstract class Receiver<MsgType> {
 
 	}
 
-	protected abstract Receiver.Agent<MsgType> make_Agent(java.lang.String name);
-
 	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
@@ -247,6 +255,15 @@ public abstract class Receiver<MsgType> {
 	public Receiver.Component<MsgType> createComponent(
 			Receiver.Bridge<MsgType> b) {
 		return new Receiver.ComponentImpl<MsgType>(this, b);
+	}
+
+	public Receiver.Component<MsgType> createComponent() {
+		return this.createComponent(new Receiver.Bridge<MsgType>() {
+		});
+	}
+	public static final <MsgType> Receiver.Component<MsgType> createComponent(
+			Receiver<MsgType> _compo) {
+		return _compo.createComponent();
 	}
 
 }

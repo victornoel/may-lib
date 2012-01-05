@@ -1,71 +1,73 @@
 
-import java.lang.String
-import fr.irit.smac.may.lib.interfaces.*
-import fr.irit.smac.may.lib.classic.interfaces.*
-import fr.irit.smac.may.lib.components.meta.*
-import fr.irit.smac.may.lib.components.scheduling.*
-import fr.irit.smac.may.lib.components.messaging.*
-import fr.irit.smac.may.lib.components.messaging.receiver.*
-import fr.irit.smac.may.lib.components.controlflow.*
-import fr.irit.smac.may.lib.components.remote.place.*
-import fr.irit.smac.may.lib.components.remote.messaging.receiver.*
-import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
-import fr.irit.smac.may.lib.components.remote.place.Place
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
-
-import java.util.concurrent.Executor
-
 namespace fr.irit.smac.may.lib.classic {
+	
+	import java.lang.String
+	import fr.irit.smac.may.lib.interfaces.*
+	import fr.irit.smac.may.lib.classic.interfaces.*
+	import fr.irit.smac.may.lib.components.meta.*
+	import fr.irit.smac.may.lib.components.scheduling.*
+	import fr.irit.smac.may.lib.components.messaging.*
+	import fr.irit.smac.may.lib.components.messaging.receiver.*
+	import fr.irit.smac.may.lib.components.controlflow.*
+	import fr.irit.smac.may.lib.components.remote.place.*
+	import fr.irit.smac.may.lib.components.remote.messaging.receiver.*
+	import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
+	import fr.irit.smac.may.lib.components.remote.place.Place
+	import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
+	
+	import java.util.concurrent.Executor
 
 	import fr.irit.smac.may.lib.classic.*
 
 	namespace named {
 		
-		infrastructure ClassicNamed[Msg] {
+		ecosystem ClassicNamed[Msg] {
 			provides send: Send[Msg, String] = receive.depositKey
 			provides create: CreateNamed[Msg, String]
 			
-			transverse scheduler: Scheduler {
+			component scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			transverse sender: Forward[Send[Msg, String]] {
+			component sender: Forward[Send[Msg, String]] {
 				bind i to receive.depositKey
 			}
 			
-			transverse fact: Forward[CreateNamed[Msg, String]] {
+			component fact: Forward[CreateNamed[Msg, String]] {
 				bind i toThis create
 			}
 			
-			transverse realReceive: Receiver[Msg]
+			component realReceive: Receiver[Msg]
 			
-			transverse receive: MapReceiver[Msg,AgentRef,String] {
+			component receive: MapReceiver[Msg,AgentRef,String] {
 				bind depositValue to realReceive.deposit
 			}
 			
-			instance executor: ExecutorService
+			component executor: ExecutorService
 			
-			species ClassicNamedAgent(name: String) for ClassicNamedAgentComponent[Msg, String] {
+			species ClassicNamedAgent(beh: named.ClassicNamedBehaviour[Msg,String], name: String) {
+				
+				component arch: ClassicNamedAgentComponent[Msg, String] {
+					bind send to ss.a
+					bind executor to s.sched
+					bind die to s.stop
+					bind create to f.a
+				}
 
-				bind send to sender.a
-				bind executor to scheduler.sched
-				bind die to scheduler.stop
-				bind create to fact.a
+				with s: scheduler.Agent
 
-				use scheduler
+				with f: fact.Agent
 
-				use fact
-
-				use receive {
-					bind key toThis me
-					bind value to realReceive.me
+				with r: receive.Agent {
+					bind key to arch.me
+					bind value to rr.me
 				}
 				
-				use realReceive(name) {
-					bind put toThis put
+				with rr: realReceive.Agent(name) {
+					bind put to arch.put
 				}
 
-				use sender
+				with ss: sender.Agent
 			}
 		}
 		
@@ -87,14 +89,14 @@ namespace fr.irit.smac.may.lib.classic {
 			requires die: Do
 			requires create: CreateNamed[Msg, Ref]
 
-			instance name: Data[Ref]
+			component name: Data[Ref]
 
-			instance dispatcher: SequentialDispatcher[Msg] {
+			component dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
 				bind handler to beh.cycle
 			}
 			
-			instance beh: ClassicNamedBehaviour[Msg, Ref] {
+			component beh: ClassicNamedBehaviour[Msg, Ref] {
 				bind send toThis send
 				bind me toThis me
 				bind die toThis die
@@ -114,44 +116,48 @@ namespace fr.irit.smac.may.lib.classic {
 			requires create: CreateClassic[Msg, Ref]
 		}
 		
-		infrastructure Classic[Msg] {
+		ecosystem Classic[Msg] {
 
 			provides send: Send[Msg, AgentRef] = receive.deposit
 			provides create: CreateClassic[Msg, AgentRef]
 
-			transverse scheduler: Scheduler {
+			component scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			transverse sender: Forward[Send[Msg, AgentRef]] {
+			component sender: Forward[Send[Msg, AgentRef]] {
 				bind i to receive.deposit
 			}
 
-			transverse receive: Receiver[Msg]
+			component receive: Receiver[Msg]
 
-			transverse fact: fr.irit.smac.may.lib.components.meta.Forward[CreateClassic[Msg, AgentRef]] {
+			component fact: fr.irit.smac.may.lib.components.meta.Forward[CreateClassic[Msg, AgentRef]] {
 				bind i toThis create
 			}
 
-			instance executor: ExecutorService
+			component executor: ExecutorService
 
-			species ClassicAgent(name: String) for ClassicAgentComponent[Msg, AgentRef] {
-
-				bind send to sender.a
-				bind me to receive.me
-				bind executor to scheduler.sched
-				bind die to scheduler.stop
-				bind create to fact.a
-
-				use scheduler
-
-				use fact
-
-				use receive(name) { 
-					bind put toThis put
+			species ClassicAgent(beh: local.ClassicBehaviour[Msg,AgentRef], name: String) {
+				
+				provides ref: Pull[AgentRef] = r.me
+				
+				component arch: ClassicAgentComponent[Msg, AgentRef] {
+					bind send to ss.a
+					bind me to r.me
+					bind executor to s.sched
+					bind die to s.stop
+					bind create to f.a
 				}
 
-				use sender
+				with s: scheduler.Agent
+
+				with f: fact.Agent
+
+				with r: receive.Agent(name) { 
+					bind put to arch.put
+				}
+
+				with ss: sender.Agent
 			}
 		}
 
@@ -163,22 +169,17 @@ namespace fr.irit.smac.may.lib.classic {
 			requires die: Do
 			requires create: CreateClassic[Msg, Ref]
 
-			instance dispatcher: SequentialDispatcher[Msg] {
+			component dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
 				bind handler to beh.cycle
 			}
-			instance beh: ClassicBehaviour[Msg, Ref] {
+			component beh: ClassicBehaviour[Msg, Ref] {
 				bind send toThis send
 				bind me toThis me
 				bind die toThis die
 				bind create toThis create
 			}
 		}
-
-		// infrastructure de mise au point vs infra finale
-
-
-
 	}
 
 	namespace remote {
@@ -201,11 +202,11 @@ namespace fr.irit.smac.may.lib.classic {
 			requires stopReceive: Do
 			requires create: CreateRemoteClassic[Msg, Ref]
 
-			instance dispatcher: SequentialDispatcher[Msg] {
+			component dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
 				bind handler to beh.cycle
 			}
-			instance beh: RemoteClassicBehaviour[Msg, Ref] {
+			component beh: RemoteClassicBehaviour[Msg, Ref] {
 				bind send toThis send
 				bind me toThis me
 				bind die toThis die
@@ -213,65 +214,67 @@ namespace fr.irit.smac.may.lib.classic {
 			}
 		}
 
-		transverse RemoteFactory[Msg, Ref] {
-			agent {
+		ecosystem RemoteFactory[Msg, Ref] {
+			species Agent {
 				provides create: CreateRemoteClassic[Msg, Ref]
 			}
-			infra {
-				requires infraCreate: CreateRemoteClassic[Msg, Ref]
-				provides factCreate: CreateRemoteClassic[Msg, Ref]
-				requires thisPlace: Pull[Place]
-			}
+			requires infraCreate: CreateRemoteClassic[Msg, Ref]
+			provides factCreate: CreateRemoteClassic[Msg, Ref]
+			requires thisPlace: Pull[Place]
 		}
 		
 
 
-		infrastructure RemoteClassic[Msg] {
+		ecosystem RemoteClassic[Msg] {
 
 			provides send: Send[Msg, RemoteAgentRef] = remReceive.deposit
 			provides thisPlace: Pull[Place] = placed.thisPlace
 			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
 
-			transverse scheduler: Scheduler {
+			component scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			transverse sender: Sender[Msg, RemoteAgentRef] {
-				bind deposit to remReceive.deposit
+			component sender: Forward[Send[Msg, RemoteAgentRef]] {
+				bind i to remReceive.deposit
 			}
 
-			transverse receive: Receiver[Msg]
+			component receive: Receiver[Msg]
 
-			transverse placed: Placed
+			component placed: Placed
 
-			transverse remReceive: RemoteReceiver[Msg, AgentRef] {
+			component remReceive: RemoteReceiver[Msg, AgentRef] {
 				bind localDeposit to receive.deposit
 				bind myPlace to placed.thisPlace
 			}
 
-			transverse fact: RemoteFactory[Msg, RemoteAgentRef] {
+			component fact: RemoteFactory[Msg, RemoteAgentRef] {
 				bind infraCreate toThis create
 				bind thisPlace to placed.thisPlace
 			}
 
-			instance executor: ExecutorService
+			component executor: ExecutorService
 
-			species ClassicAgent(name: String) for RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
-				bind send to sender.send
-				bind me to remReceive.me
-				bind stopExec to scheduler.stop
-				bind stopReceive to remReceive.disconnect
-				bind executor to scheduler.sched
-				bind create to fact.create
-				use placed
-				use fact
-				use scheduler
-				use receive(name) {
-					bind put toThis put
+			species ClassicAgent(beh: remote.RemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
+				
+				provides ref: Pull[RemoteAgentRef] = rr.me
+				component arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
+					bind send to ss.a
+					bind me to rr.me
+					bind stopExec to s.stop
+					bind stopReceive to rr.disconnect
+					bind executor to s.sched
+					bind create to f.create
 				}
-				use sender
-				use remReceive {
-					bind localMe to receive.me
+				with p: placed.Agent
+				with f: fact.Agent
+				with s: scheduler.Agent
+				with r: receive.Agent(name) {
+					bind put to arch.put
+				}
+				with ss: sender.Agent
+				with rr: remReceive.Agent {
+					bind localMe to r.me
 				}
 			}
 		}

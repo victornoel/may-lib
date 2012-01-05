@@ -20,7 +20,7 @@ public abstract class Queue<Truc> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> put();
 
@@ -28,7 +28,7 @@ public abstract class Queue<Truc> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<Truc> get();
 
@@ -36,7 +36,7 @@ public abstract class Queue<Truc> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll();
 
@@ -45,6 +45,7 @@ public abstract class Queue<Truc> {
 	}
 
 	public static interface Component<Truc> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -61,11 +62,15 @@ public abstract class Queue<Truc> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<Truc> implements Queue.Component<Truc> {
+	private final static class ComponentImpl<Truc>
+			implements
+				Queue.Component<Truc> {
 
 		@SuppressWarnings("unused")
 		private final Queue.Bridge<Truc> bridge;
@@ -107,7 +112,6 @@ public abstract class Queue<Truc> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
@@ -128,7 +132,6 @@ public abstract class Queue<Truc> {
 		return this.createComponent(new Queue.Bridge<Truc>() {
 		});
 	}
-
 	public static final <Truc> Queue.Component<Truc> createComponent(
 			Queue<Truc> _compo) {
 		return _compo.createComponent();

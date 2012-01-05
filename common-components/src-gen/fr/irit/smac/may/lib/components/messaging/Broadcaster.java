@@ -19,7 +19,7 @@ public abstract class Broadcaster<T, Ref> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<T, Ref> deposit() {
 		assert this.structure != null;
@@ -30,7 +30,7 @@ public abstract class Broadcaster<T, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> broadcast();
 
@@ -38,7 +38,7 @@ public abstract class Broadcaster<T, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> add();
 
@@ -46,7 +46,7 @@ public abstract class Broadcaster<T, Ref> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> remove();
 
@@ -56,6 +56,7 @@ public abstract class Broadcaster<T, Ref> {
 	}
 
 	public static interface Component<T, Ref> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -72,13 +73,13 @@ public abstract class Broadcaster<T, Ref> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<Ref> remove();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public Broadcaster.Agent<T, Ref> createAgent();
-
 	}
 
-	private static class ComponentImpl<T, Ref>
+	private final static class ComponentImpl<T, Ref>
 			implements
 				Broadcaster.Component<T, Ref> {
 
@@ -121,14 +122,26 @@ public abstract class Broadcaster<T, Ref> {
 
 			this.implementation.start();
 		}
+	}
 
-		public Broadcaster.Agent<T, Ref> createAgent() {
-			Broadcaster.Agent<T, Ref> agentSide = this.implementation
-					.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract Broadcaster.Agent<T, Ref> make_Agent();
 
+	public Broadcaster.Agent<T, Ref> createImplementationOfAgent() {
+		Broadcaster.Agent<T, Ref> implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
+	}
+
+	public Broadcaster.Agent.Component<T, Ref> createAgent() {
+		Broadcaster.Agent<T, Ref> implem = createImplementationOfAgent();
+		return implem.createComponent(new Broadcaster.Agent.Bridge<T, Ref>() {
+		});
 	}
 
 	public static abstract class Agent<T, Ref> {
@@ -149,26 +162,41 @@ public abstract class Broadcaster<T, Ref> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Broadcast<T> bc();
+
+		private Broadcaster.ComponentImpl<T, Ref> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Broadcaster.Component<T, Ref> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge<T, Ref> {
 
 		}
 
 		public static interface Component<T, Ref> {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
 			public fr.irit.smac.may.lib.interfaces.Broadcast<T> bc();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl<T, Ref>
+		private final static class ComponentImpl<T, Ref>
 				implements
 					Broadcaster.Agent.Component<T, Ref> {
 
@@ -200,30 +228,7 @@ public abstract class Broadcaster<T, Ref> {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private Broadcaster.ComponentImpl<T, Ref> infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Broadcaster.Component<T, Ref> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port from the infrastructure.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected fr.irit.smac.may.lib.interfaces.Send<T, Ref> deposit() {
-			assert this.infraStructure != null;
-			return this.infraStructure.bridge.deposit();
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -241,8 +246,6 @@ public abstract class Broadcaster<T, Ref> {
 		}
 
 	}
-
-	protected abstract Broadcaster.Agent<T, Ref> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation

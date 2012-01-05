@@ -1,36 +1,35 @@
-import fr.irit.smac.may.lib.interfaces.*
-import java.lang.*
-import java.util.List
-import org.javatuples.*
-import java.util.concurrent.Executor
 
-
-
-import fr.irit.smac.may.lib.components.distribution.ivy.*
-import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.*
-import fr.irit.smac.may.lib.components.distribution.interfaces.*
 
 namespace fr.irit.smac.may.lib.components.distribution {
+	import fr.irit.smac.may.lib.interfaces.*
+	import java.lang.*
+	import java.util.List
+	import org.javatuples.*
+	import java.util.concurrent.Executor
 	
+	import fr.irit.smac.may.lib.components.distribution.ivy.*
+	import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.*
+	import fr.irit.smac.may.lib.components.distribution.interfaces.*
+
 	component IvyJSONBroadcaster[T] {
 		provides send: Push[T] = bc.send
 		requires handle: Push[T]
 		
 		requires exec: Executor
 		
-		instance ivy: IvyBus {
+		component ivy: IvyBus {
 			bind exec toThis exec
 		}
 		
-		instance json: JSONTransformer[T]
+		component json: JSONTransformer[T]
 		
-		instance binder: IvyBinder {
+		component binder: IvyBinder {
 			bind bindMsg to ivy.bindMsg
 			bind receive to bc.ivyReceive
 			bind unBindMsg to ivy.unBindMsg
 		}
 		
-		instance bc: IvyBroadcaster[T] {
+		component bc: IvyBroadcaster[T] {
 			bind deserializer to json.deserializer
 			bind serializer to json.serializer
 			bind handle toThis handle

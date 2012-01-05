@@ -19,7 +19,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<NodeRef> myNode() {
 		assert this.structure != null;
@@ -28,7 +28,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> deposit() {
 		assert this.structure != null;
@@ -37,7 +37,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg, NodeRef>, NodeRef> distOut() {
 		assert this.structure != null;
@@ -48,7 +48,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> generateRef();
 
@@ -56,7 +56,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> send();
 
@@ -64,7 +64,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg, NodeRef>> distIn();
 
@@ -76,6 +76,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	}
 
 	public static interface Component<Msg, NodeRef> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -92,11 +93,13 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg, NodeRef>> distIn();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<Msg, NodeRef>
+	private final static class ComponentImpl<Msg, NodeRef>
 			implements
 				DistributedMessaging.Component<Msg, NodeRef> {
 
@@ -139,7 +142,6 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**

@@ -19,7 +19,7 @@ public abstract class Forward<I> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected I i() {
 		assert this.structure != null;
@@ -33,13 +33,13 @@ public abstract class Forward<I> {
 
 	public static interface Component<I> {
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
-		public Forward.Agent<I> createAgent();
-
 	}
 
-	private static class ComponentImpl<I> implements Forward.Component<I> {
+	private final static class ComponentImpl<I> implements Forward.Component<I> {
 
 		private final Forward.Bridge<I> bridge;
 
@@ -59,13 +59,26 @@ public abstract class Forward<I> {
 
 			this.implementation.start();
 		}
+	}
 
-		public Forward.Agent<I> createAgent() {
-			Forward.Agent<I> agentSide = this.implementation.make_Agent();
-			agentSide.infraStructure = this;
-			return agentSide;
-		}
+	/**
+	 * Should not be called
+	 */
+	protected abstract Forward.Agent<I> make_Agent();
 
+	public Forward.Agent<I> createImplementationOfAgent() {
+		Forward.Agent<I> implem = make_Agent();
+		assert implem.infraStructure == null;
+		assert this.structure == null;
+		implem.infraStructure = this.structure;
+
+		return implem;
+	}
+
+	public Forward.Agent.Component<I> createAgent() {
+		Forward.Agent<I> implem = createImplementationOfAgent();
+		return implem.createComponent(new Forward.Agent.Bridge<I>() {
+		});
 	}
 
 	public static abstract class Agent<I> {
@@ -86,26 +99,41 @@ public abstract class Forward<I> {
 		 * This should be overridden by the implementation to define the provided port.
 		 * This will be called once during the construction of the component to initialize the port.
 		 *
-		 * This is not meant to be called on from the outside by hand.
+		 * This is not meant to be called on from the outside.
 		 */
 		protected abstract I a();
+
+		private Forward.ComponentImpl<I> infraStructure = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected Forward.Component<I> infraSelf() {
+			assert this.infraStructure != null;
+			return this.infraStructure;
+		};
 
 		public static interface Bridge<I> {
 
 		}
 
 		public static interface Component<I> {
+
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
 			public I a();
 
+			/**
+			 * This should be called to start the component
+			 */
 			public void start();
-
 		}
 
-		private static class ComponentImpl<I>
+		private final static class ComponentImpl<I>
 				implements
 					Forward.Agent.Component<I> {
 
@@ -137,30 +165,7 @@ public abstract class Forward<I> {
 
 				this.implementation.start();
 			}
-
 		}
-
-		private Forward.ComponentImpl<I> infraStructure = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Forward.Component<I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port from the infrastructure.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected I i() {
-			assert this.infraStructure != null;
-			return this.infraStructure.bridge.i();
-		};
 
 		/**
 		 * Can be overridden by the implementation
@@ -178,8 +183,6 @@ public abstract class Forward<I> {
 		}
 
 	}
-
-	protected abstract Forward.Agent<I> make_Agent();
 
 	/**
 	 * Can be overridden by the implementation

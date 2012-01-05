@@ -19,7 +19,7 @@ public abstract class IvyBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg() {
 		assert this.structure != null;
@@ -28,7 +28,7 @@ public abstract class IvyBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend() {
 		assert this.structure != null;
@@ -37,7 +37,7 @@ public abstract class IvyBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
 		assert this.structure != null;
@@ -46,7 +46,7 @@ public abstract class IvyBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
 		assert this.structure != null;
@@ -55,7 +55,7 @@ public abstract class IvyBroadcaster<T> {
 	/**
 	 * This can be called by the implementation to access this required port.
 	 *
-	 * This is not meant to be called from the outside by hand.
+	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<T> handle() {
 		assert this.structure != null;
@@ -66,7 +66,7 @@ public abstract class IvyBroadcaster<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> ivyReceive();
 
@@ -74,7 +74,7 @@ public abstract class IvyBroadcaster<T> {
 	 * This should be overridden by the implementation to define the provided port.
 	 * This will be called once during the construction of the component to initialize the port.
 	 *
-	 * This is not meant to be called on from the outside by hand.
+	 * This is not meant to be called on from the outside.
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> send();
 
@@ -88,6 +88,7 @@ public abstract class IvyBroadcaster<T> {
 	}
 
 	public static interface Component<T> {
+
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
@@ -99,11 +100,13 @@ public abstract class IvyBroadcaster<T> {
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<T> send();
 
+		/**
+		 * This should be called to start the component
+		 */
 		public void start();
-
 	}
 
-	private static class ComponentImpl<T>
+	private final static class ComponentImpl<T>
 			implements
 				IvyBroadcaster.Component<T> {
 
@@ -140,7 +143,6 @@ public abstract class IvyBroadcaster<T> {
 
 			this.implementation.start();
 		}
-
 	}
 
 	/**
