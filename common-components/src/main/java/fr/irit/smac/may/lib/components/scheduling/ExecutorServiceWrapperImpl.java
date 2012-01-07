@@ -3,6 +3,7 @@ package fr.irit.smac.may.lib.components.scheduling;
 import java.util.concurrent.Executors;
 
 import fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor;
+import fr.irit.smac.may.lib.interfaces.Do;
 
 public class ExecutorServiceWrapperImpl extends ExecutorService {
 
@@ -54,5 +55,14 @@ public class ExecutorServiceWrapperImpl extends ExecutorService {
 				System.out.println("should be first");
 			}
 		}, 1000);
+	}
+
+	@Override
+	protected Do stop() {
+		return new Do() {
+			public void doIt() {
+				service.shutdownNow();
+			}
+		};
 	}
 }

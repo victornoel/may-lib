@@ -118,6 +118,7 @@ namespace fr.irit.smac.may.lib.classic {
 
 			provides send: Send[Msg, AgentRef] = receive.deposit
 			provides create: CreateClassic[Msg, AgentRef]
+			provides stop: Do = executor.stop
 
 			transverse scheduler: Scheduler {
 				bind infraSched to executor.exec

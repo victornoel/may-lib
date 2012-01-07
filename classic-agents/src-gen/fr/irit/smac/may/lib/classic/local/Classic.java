@@ -199,6 +199,14 @@ public abstract class Classic<Msg> {
 			return this.create;
 		};
 
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public final fr.irit.smac.may.lib.interfaces.Do stop() {
+			return this.executor.stop();
+		};
+
 		public final void start() {
 			this.scheduler.start();
 			this.sender.start();
