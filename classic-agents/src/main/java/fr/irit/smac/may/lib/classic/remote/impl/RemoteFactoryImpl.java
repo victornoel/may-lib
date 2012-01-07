@@ -18,6 +18,12 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 
 	public RemoteFactoryImpl() {
 		
+		
+	}
+	
+	@Override
+	protected void start() {
+		super.start();
 		RemoteMedium<Msg,Ref> rmedium = new RemoteMedium<Msg,Ref>() {
 			public Ref create(RemoteClassicBehaviour<Msg, Ref> beh)
 					throws RemoteException {
@@ -45,10 +51,10 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 		protected CreateRemoteClassic<Msg, Ref> create() {
 			return new CreateRemoteClassic<Msg, Ref>() {
 				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh, Place place) {
-					return RemoteFactoryImpl.this.factCreate().create(beh,place);
+					return infraSelf().factCreate().create(beh,place);
 				}
 				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) {
-					return RemoteFactoryImpl.this.factCreate().create(beh);
+					return infraSelf().factCreate().create(beh);
 				}
 			};
 		}
