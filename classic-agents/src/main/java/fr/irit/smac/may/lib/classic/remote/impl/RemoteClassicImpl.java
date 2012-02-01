@@ -1,6 +1,7 @@
 package fr.irit.smac.may.lib.classic.remote.impl;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
@@ -31,7 +32,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	private RemoteReceiverImpl<Msg, AgentRef> remoteRefReceive;
 	private RemoteFactoryImpl<Msg, RemoteAgentRef> factory;
 
-	private volatile int i = 0;
+	private AtomicInteger i = new AtomicInteger(0);
 	private PlacedImpl placed; 
 	
 	public RemoteClassicImpl(final int port) {
@@ -82,7 +83,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
 						new RemoteClassicAgentComponentImpl<Msg>(beh),
 						placed.new AgentSide(), factory.new AgentSide(), scheduler.new AgentSide(),
-						receive.new AgentSide("agent"+(i++)), send.new AgentSide(),
+						receive.new AgentSide("agent"+i.getAndIncrement()), send.new AgentSide(),
 						remoteRefReceive.new AgentSide());
 				agent.start();
 				return agent.remReceive().me().pull();

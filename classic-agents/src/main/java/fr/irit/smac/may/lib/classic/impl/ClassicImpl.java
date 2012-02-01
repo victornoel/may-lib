@@ -1,6 +1,7 @@
 package fr.irit.smac.may.lib.classic.impl;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
@@ -23,7 +24,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	private ReceiverImpl<Msg> receive;
 	private ForwardImpl<CreateClassic<Msg,AgentRef>> forward;
 
-	private volatile int i = 0;
+	private AtomicInteger i = new AtomicInteger(0);
 	
 	@Override
 	protected Scheduler make_scheduler() {
@@ -61,7 +62,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 				ClassicAgent<Msg> agent = new ClassicAgent<Msg>(
 						new ClassicAgentComponentImpl<Msg>(beh),
 						scheduler.new AgentSide(), forward.new AgentSide(),
-						receive.new AgentSide("agent"+(i++)), send.new AgentSide());
+						receive.new AgentSide("agent"+i.getAndIncrement()), send.new AgentSide());
 				agent.start();
 				return agent.receive().me().pull();
 			}

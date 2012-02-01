@@ -1,19 +1,20 @@
 package fr.irit.smac.may.lib.components.messaging.distributed;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.interfaces.Send;
 
 public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<Msg,NodeRef> {
 
-	private volatile int i = 0;
+	private AtomicInteger i = new AtomicInteger(0);
 	
 	@Override
 	protected Pull<DistRef<NodeRef>> generateRef() {
 		return new Pull<DistRef<NodeRef>>() {
 			public DistRef<NodeRef> pull() {
-				int me = i++;
-				return new DistRef<NodeRef>("agent" + me, myNode().pull());
+				return new DistRef<NodeRef>("agent" + i.getAndIncrement(), myNode().pull());
 			}
 		};
 	}

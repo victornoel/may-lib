@@ -1,6 +1,7 @@
 package fr.irit.smac.may.lib.classic.named;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateNamed;
 import fr.irit.smac.may.lib.components.messaging.MapReceiver;
@@ -24,7 +25,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 	private ForwardImpl<CreateNamed<Msg,String>> forward;
 	private MapReceiverImpl<Msg, AgentRef, String> receive;
 	
-	private volatile int i = 0;
+	private AtomicInteger i = new AtomicInteger(0);
 	
 	@Override
 	protected Scheduler make_scheduler() {
@@ -68,7 +69,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 				ClassicNamedAgent<Msg> agent = new ClassicNamedAgent<Msg>(
 						new ClassicNamedAgentComponentImpl<Msg,String>(name,beh),
 						scheduler.new AgentSide(), forward.new AgentSide(),
-						receive.new AgentSide(), realReceive.new AgentSide("agent"+(i++)), send.new AgentSide());
+						receive.new AgentSide(), realReceive.new AgentSide("agent"+i.getAndIncrement()), send.new AgentSide());
 				agent.start();
 				return agent.component().me().pull();
 			}
