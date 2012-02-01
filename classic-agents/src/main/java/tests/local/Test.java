@@ -38,5 +38,14 @@ public class Test {
 		});
 		
 		infra.send().send("start", create2);
+		
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		infra.stop().doIt();
 	}
 }

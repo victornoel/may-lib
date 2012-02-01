@@ -130,6 +130,11 @@ public abstract class Classic<Msg> {
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> create();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.interfaces.Do stop();
 
 		/**
 		 * This should be called to start the component
@@ -242,6 +247,10 @@ public abstract class Classic<Msg> {
 
 		public final fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> create() {
 			return this.create;
+		};
+
+		public final fr.irit.smac.may.lib.interfaces.Do stop() {
+			return this.executor.stop();
 		};
 
 		public final void start() {

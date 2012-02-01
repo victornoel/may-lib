@@ -1,23 +1,23 @@
 
-namespace fr.irit.smac.may.lib.classic {
-	
-	import java.lang.String
-	import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.classic.interfaces.*
-	import fr.irit.smac.may.lib.components.meta.*
-	import fr.irit.smac.may.lib.components.scheduling.*
-	import fr.irit.smac.may.lib.components.messaging.*
-	import fr.irit.smac.may.lib.components.messaging.receiver.*
-	import fr.irit.smac.may.lib.components.controlflow.*
-	import fr.irit.smac.may.lib.components.remote.place.*
-	import fr.irit.smac.may.lib.components.remote.messaging.receiver.*
-	import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
-	import fr.irit.smac.may.lib.components.remote.place.Place
-	import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
-	
-	import java.util.concurrent.Executor
+import java.lang.String
+import fr.irit.smac.may.lib.interfaces.*
+import fr.irit.smac.may.lib.classic.interfaces.*
+import fr.irit.smac.may.lib.components.meta.*
+import fr.irit.smac.may.lib.components.scheduling.*
+import fr.irit.smac.may.lib.components.messaging.*
+import fr.irit.smac.may.lib.components.messaging.receiver.*
+import fr.irit.smac.may.lib.components.controlflow.*
+import fr.irit.smac.may.lib.components.remote.place.*
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.*
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
+import fr.irit.smac.may.lib.components.remote.place.Place
+import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
 
-	import fr.irit.smac.may.lib.classic.*
+import java.util.concurrent.Executor
+
+import fr.irit.smac.may.lib.classic.*
+
+namespace fr.irit.smac.may.lib.classic {
 
 	namespace named {
 		
@@ -120,6 +120,7 @@ namespace fr.irit.smac.may.lib.classic {
 
 			provides send: Send[Msg, AgentRef] = receive.deposit
 			provides create: CreateClassic[Msg, AgentRef]
+			provides stop: Do = executor.stop
 
 			component scheduler: Scheduler {
 				bind infraSched to executor.exec
