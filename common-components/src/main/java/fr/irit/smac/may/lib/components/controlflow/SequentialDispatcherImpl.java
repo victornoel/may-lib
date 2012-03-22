@@ -18,20 +18,24 @@ public class SequentialDispatcherImpl<Truc> extends SequentialDispatcher<Truc> {
 				queue().put().push(t);
 				
 				if (working.compareAndSet(false, true)) {
-					executor().execute(new Runnable() {
-						public void run() {
-							Truc truc = queue().get().pull();
-							while (truc != null) {
-								handler().push(truc);
-								truc = queue().get().pull();
-							}
-							working.set(false);
-						}
-					});
+					emptyQueue();
 				}
-				
 			};
 		};
+	}
+
+	private void emptyQueue() {
+		final Truc truc = queue().get().pull();
+		if (truc != null) {
+			executor().execute(new Runnable() {
+				public void run() {
+					handler().push(truc);
+					emptyQueue();
+				}
+			});
+		} else {
+			working.set(false);
+		}
 	}
 
 	@Override
