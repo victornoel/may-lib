@@ -20,10 +20,14 @@ import javax.swing.event.ChangeListener;
 
 public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 
-	private final JFrame frame;
+	private final int ms;
 	
-	public SchedulingControllerGUIImpl() {
-		frame = new JFrame();
+	public SchedulingControllerGUIImpl(int ms) {
+		this.ms = ms;
+	}
+	
+	private void createAndShowGUI() {
+		JFrame frame = new JFrame();
 		frame.add(new ControlComponent());
 		frame.setLayout(new FlowLayout());
 		frame.addWindowListener(new WindowAdapter() {
@@ -33,12 +37,17 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 			}
 		});
 		frame.pack();
+		frame.setVisible(true);
 	}
 	
 	@Override
 	protected void start() {
 		super.start();
-		frame.setVisible(true);
+		javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                createAndShowGUI();
+            }
+        });
 	}
 	
 	private class ControlComponent extends JPanel {
@@ -74,7 +83,7 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 
 				Dictionary<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
 				labelTable.put(new Integer(1), new JLabel("Pause"));
-				labelTable.put(new Integer(2), new JLabel("Slow (1sec)"));
+				labelTable.put(new Integer(2), new JLabel("Slow (" + ms +"msec)"));
 				labelTable.put(new Integer(3), new JLabel("Fast "));
 
 				setLabelTable(labelTable);
@@ -118,7 +127,7 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 						stepButton.setEnabled(true);
 						break;
 					case 2:
-						control().run(1000);
+						control().run(ms);
 						stepButton.setEnabled(false);
 						break;
 					case 3:
