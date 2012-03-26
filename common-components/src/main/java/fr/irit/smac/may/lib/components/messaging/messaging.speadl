@@ -3,10 +3,8 @@
 namespace fr.irit.smac.may.lib.components.messaging {
 
 	import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
-	import fr.irit.smac.may.lib.components.messaging.callable.CallRef
 	import fr.irit.smac.may.lib.components.messaging.interfaces.*
-	import java.lang.String
+	import java.lang.*
 	
 	ecosystem Broadcaster[T, Ref] {
 		species Agent {
@@ -19,6 +17,7 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	}
 
 	namespace receiver {
+		import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
 		ecosystem Receiver[MsgType] {
 			species Agent(name:String) {
 				requires put: Push[MsgType]
@@ -31,12 +30,17 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	}
 	
 	namespace callable {
+		import fr.irit.smac.may.lib.components.messaging.callable.CallRef
+		
 		// est-ce que ce n'est juste une version spéciale du collection map sans map ? si!
 		ecosystem Callable[I] {
-			species Agent {
+			species Callee {
 				requires toCall: I
 				provides me: Pull[CallRef]
 				provides stop: Do
+			}
+			species Caller {
+				provides call: MapGet[CallRef,I]
 			}
 			provides call: MapGet[CallRef,I]
 		}

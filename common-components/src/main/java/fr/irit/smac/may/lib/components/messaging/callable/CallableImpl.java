@@ -9,14 +9,14 @@ public class CallableImpl<I> extends Callable<I> {
 
 	private class CallRefImpl implements CallRef {
 		
-		private AgentSide ref;
+		private CalleeImpl ref;
 		
-		public CallRefImpl(AgentSide ref) {
+		private CallRefImpl(CalleeImpl ref) {
 			this.ref = ref;
 		}
 
 		private void stop() {
-			this.ref = null; // enable GC
+			this.ref = null; // allow for GC
 		}
 
 		public I call() {
@@ -39,11 +39,11 @@ public class CallableImpl<I> extends Callable<I> {
 		};
 	};
 	
-	public class AgentSide extends Agent<I> {
+	private class CalleeImpl extends Callee<I> {
 
 		private final CallRefImpl me;
 		
-		public AgentSide() {
+		private CalleeImpl() {
 			this.me = new CallRefImpl(this);
 		}
 		
@@ -66,10 +66,24 @@ public class CallableImpl<I> extends Callable<I> {
 		}
 		
 	}
+	
+	private class CallerImpl extends Caller<I> {
+
+		@Override
+		protected MapGet<CallRef, I> call() {
+			return infraSelf().call();
+		}
+		
+	}
 
 	@Override
-	protected Agent<I> make_Agent() {
-		return new AgentSide();
+	protected Callee<I> make_Callee() {
+		return new CalleeImpl();
+	}
+
+	@Override
+	protected Caller<I> make_Caller() {
+		return new CallerImpl();
 	}
 	
 

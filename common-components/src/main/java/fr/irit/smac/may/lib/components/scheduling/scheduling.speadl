@@ -13,8 +13,8 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		
 		/**
 		 * when called, all agents are called concurrently
-		 * (using sched) on their cycle port
-		 * return upon completion of all agents 
+		 * (using sched) on their cycle port.
+		 * returns upon completion of all agents
 		 */
 		provides tick: Do
 		requires sched: Executor
@@ -37,8 +37,8 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 
 
 	/**
-	 * Will schedule as much tasks as needed
-	 * Stop will stop any task not finished
+	 * Will schedule as much tasks as needed.
+	 * Stop will stop any task not finished.
 	 */
 	ecosystem Scheduler {
 		species Agent {
