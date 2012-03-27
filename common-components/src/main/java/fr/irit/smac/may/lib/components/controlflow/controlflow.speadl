@@ -1,18 +1,19 @@
 
+
+import fr.irit.smac.may.lib.components.collections.Queue
+import fr.irit.smac.may.lib.interfaces.*
+import fr.irit.smac.may.lib.components.scheduling.interfaces.*
+
+import java.util.concurrent.Executor
+
 namespace fr.irit.smac.may.lib.components.controlflow {
-	
-	import fr.irit.smac.may.lib.components.collections.Queue
-	import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.components.scheduling.interfaces.*
-	
-	import java.util.concurrent.Executor
 
 	component SequentialDispatcher[Truc] {
 		provides dispatch: Push[Truc]
 
 		requires executor: Executor
 
-		component queue: Queue[Truc]
+		part queue: Queue[Truc]
 
 		requires handler: Push[Truc]
 	}

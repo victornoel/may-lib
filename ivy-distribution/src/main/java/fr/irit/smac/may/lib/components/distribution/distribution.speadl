@@ -17,19 +17,19 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		
 		requires exec: Executor
 		
-		component ivy: IvyBus {
+		part ivy: IvyBus {
 			bind exec toThis exec
 		}
 		
-		component json: JSONTransformer[T]
+		part json: JSONTransformer[T]
 		
-		component binder: IvyBinder {
+		part binder: IvyBinder {
 			bind bindMsg to ivy.bindMsg
 			bind receive to bc.ivyReceive
 			bind unBindMsg to ivy.unBindMsg
 		}
 		
-		component bc: IvyBroadcaster[T] {
+		part bc: IvyBroadcaster[T] {
 			bind deserializer to json.deserializer
 			bind serializer to json.serializer
 			bind handle toThis handle

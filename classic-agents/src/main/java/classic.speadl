@@ -25,49 +25,49 @@ namespace fr.irit.smac.may.lib.classic {
 			provides send: Send[Msg, String] = receive.depositKey
 			provides create: CreateNamed[Msg, String]
 			
-			component scheduler: Scheduler {
+			part scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			component sender: Forward[Send[Msg, String]] {
+			part sender: Forward[Send[Msg, String]] {
 				bind i to receive.depositKey
 			}
 			
-			component fact: Forward[CreateNamed[Msg, String]] {
+			part fact: Forward[CreateNamed[Msg, String]] {
 				bind i toThis create
 			}
 			
-			component realReceive: Receiver[Msg]
+			part realReceive: Receiver[Msg]
 			
-			component receive: MapReceiver[Msg,AgentRef,String] {
+			part receive: MapReceiver[Msg,AgentRef,String] {
 				bind depositValue to realReceive.deposit
 			}
 			
-			component executor: ExecutorService
+			part executor: ExecutorService
 			
 			species ClassicNamedAgent(beh: named.ClassicNamedBehaviour[Msg,String], name: String) {
-				
-				component arch: ClassicNamedAgentComponent[Msg, String] {
+			//species ClassicNamedAgent(name: String) {
+				part arch: ClassicNamedAgentComponent[Msg, String] {
 					bind send to ss.a
 					bind executor to s.sched
 					bind die to s.stop
 					bind create to f.a
 				}
 
-				with s: scheduler.Agent
+				use s: scheduler.Agent
 
-				with f: fact.Agent
+				use f: fact.Agent
 
-				with r: receive.Agent {
+				use r: receive.Agent {
 					bind key to arch.me
 					bind value to rr.me
 				}
 				
-				with rr: realReceive.Agent(name) {
+				use rr: realReceive.Agent(name) {
 					bind put to arch.put
 				}
 
-				with ss: sender.Agent
+				use ss: sender.Agent
 			}
 		}
 		
@@ -89,14 +89,14 @@ namespace fr.irit.smac.may.lib.classic {
 			requires die: Do
 			requires create: CreateNamed[Msg, Ref]
 
-			component name: Data[Ref]
+			part name: Data[Ref]
 
-			component dispatcher: SequentialDispatcher[Msg] {
+			part dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
 				bind handler to beh.cycle
 			}
 			
-			component beh: ClassicNamedBehaviour[Msg, Ref] {
+			part beh: ClassicNamedBehaviour[Msg, Ref] {
 				bind send toThis send
 				bind me toThis me
 				bind die toThis die
@@ -122,27 +122,27 @@ namespace fr.irit.smac.may.lib.classic {
 			provides create: CreateClassic[Msg, AgentRef]
 			provides stop: Do = executor.stop
 
-			component scheduler: Scheduler {
+			part scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			component sender: Forward[Send[Msg, AgentRef]] {
+			part sender: Forward[Send[Msg, AgentRef]] {
 				bind i to receive.deposit
 			}
 
-			component receive: Receiver[Msg]
+			part receive: Receiver[Msg]
 
-			component fact: fr.irit.smac.may.lib.components.meta.Forward[CreateClassic[Msg, AgentRef]] {
+			part fact: fr.irit.smac.may.lib.components.meta.Forward[CreateClassic[Msg, AgentRef]] {
 				bind i toThis create
 			}
 
-			component executor: ExecutorService
+			part executor: ExecutorService
 
 			species ClassicAgent(beh: local.ClassicBehaviour[Msg,AgentRef], name: String) {
-				
+			//species ClassicAgent(name: String) {
 				provides ref: Pull[AgentRef] = r.me
 				
-				component arch: ClassicAgentComponent[Msg, AgentRef] {
+				part arch: ClassicAgentComponent[Msg, AgentRef] {
 					bind send to ss.a
 					bind me to r.me
 					bind executor to s.sched
@@ -150,15 +150,15 @@ namespace fr.irit.smac.may.lib.classic {
 					bind create to f.a
 				}
 
-				with s: scheduler.Agent
+				use s: scheduler.Agent
 
-				with f: fact.Agent
+				use f: fact.Agent
 
-				with r: receive.Agent(name) { 
+				use r: receive.Agent(name) { 
 					bind put to arch.put
 				}
 
-				with ss: sender.Agent
+				use ss: sender.Agent
 			}
 		}
 
@@ -170,11 +170,11 @@ namespace fr.irit.smac.may.lib.classic {
 			requires die: Do
 			requires create: CreateClassic[Msg, Ref]
 
-			component dispatcher: SequentialDispatcher[Msg] {
+			part dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
 				bind handler to beh.cycle
 			}
-			component beh: ClassicBehaviour[Msg, Ref] {
+			part beh: ClassicBehaviour[Msg, Ref] {
 				bind send toThis send
 				bind me toThis me
 				bind die toThis die
@@ -203,11 +203,11 @@ namespace fr.irit.smac.may.lib.classic {
 			requires stopReceive: Do
 			requires create: CreateRemoteClassic[Msg, Ref]
 
-			component dispatcher: SequentialDispatcher[Msg] {
+			part dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
 				bind handler to beh.cycle
 			}
-			component beh: RemoteClassicBehaviour[Msg, Ref] {
+			part beh: RemoteClassicBehaviour[Msg, Ref] {
 				bind send toThis send
 				bind me toThis me
 				bind die toThis die
@@ -232,34 +232,34 @@ namespace fr.irit.smac.may.lib.classic {
 			provides thisPlace: Pull[Place] = placed.thisPlace
 			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
 
-			component scheduler: Scheduler {
+			part scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			component sender: Forward[Send[Msg, RemoteAgentRef]] {
+			part sender: Forward[Send[Msg, RemoteAgentRef]] {
 				bind i to remReceive.deposit
 			}
 
-			component receive: Receiver[Msg]
+			part receive: Receiver[Msg]
 
-			component placed: Placed
+			part placed: Placed
 
-			component remReceive: RemoteReceiver[Msg, AgentRef] {
+			part remReceive: RemoteReceiver[Msg, AgentRef] {
 				bind localDeposit to receive.deposit
 				bind myPlace to placed.thisPlace
 			}
 
-			component fact: RemoteFactory[Msg, RemoteAgentRef] {
+			part fact: RemoteFactory[Msg, RemoteAgentRef] {
 				bind infraCreate toThis create
 				bind thisPlace to placed.thisPlace
 			}
 
-			component executor: ExecutorService
+			part executor: ExecutorService
 
 			species ClassicAgent(beh: remote.RemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
-				
+			//species ClassicAgent(name: String) {
 				provides ref: Pull[RemoteAgentRef] = rr.me
-				component arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
+				part arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
 					bind send to ss.a
 					bind me to rr.me
 					bind stopExec to s.stop
@@ -267,14 +267,14 @@ namespace fr.irit.smac.may.lib.classic {
 					bind executor to s.sched
 					bind create to f.create
 				}
-				with p: placed.Agent
-				with f: fact.Agent
-				with s: scheduler.Agent
-				with r: receive.Agent(name) {
+				use p: placed.Agent
+				use f: fact.Agent
+				use s: scheduler.Agent
+				use r: receive.Agent(name) {
 					bind put to arch.put
 				}
-				with ss: sender.Agent
-				with rr: remReceive.Agent {
+				use ss: sender.Agent
+				use rr: remReceive.Agent {
 					bind localMe to r.me
 				}
 			}
