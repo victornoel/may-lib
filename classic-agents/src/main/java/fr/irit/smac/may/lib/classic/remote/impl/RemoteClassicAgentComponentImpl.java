@@ -22,7 +22,7 @@ public class RemoteClassicAgentComponentImpl<Msg> extends RemoteClassicAgentComp
 	}
 	
 	@Override
-	protected Do die() {
+	protected Do make_die() {
 		return new Do() {
 			public void doIt() {
 				stopExec().doIt();

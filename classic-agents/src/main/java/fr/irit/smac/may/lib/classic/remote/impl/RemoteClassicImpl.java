@@ -65,7 +65,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	protected CreateRemoteClassic<Msg, RemoteAgentRef> create() {
+	protected CreateRemoteClassic<Msg, RemoteAgentRef> make_create() {
 		return new CreateRemoteClassic<Msg, RemoteAgentRef>() {
 			public RemoteAgentRef create(
 					final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {

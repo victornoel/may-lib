@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.webservices.WebServiceClient;
 
 public abstract class WebServiceClient<I> {
 
-	private WebServiceClient.ComponentImpl<I> structure = null;
+	private WebServiceClient.ComponentImpl<I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class WebServiceClient<I> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected WebServiceClient.Component<I> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class WebServiceClient<I> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.RemoteCall<I, java.lang.String> service();
+	protected abstract fr.irit.smac.may.lib.interfaces.RemoteCall<I, java.lang.String> make_service();
 
 	public static interface Bridge<I> {
 
@@ -57,10 +57,10 @@ public abstract class WebServiceClient<I> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.service = implem.service();
+			this.service = implem.make_service();
 
 		}
 

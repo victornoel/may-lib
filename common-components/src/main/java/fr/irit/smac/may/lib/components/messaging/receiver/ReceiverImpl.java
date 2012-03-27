@@ -6,7 +6,7 @@ import fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend;
 public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	
 	@Override
-	public ReliableSend<Msg, AgentRef> deposit() {
+	public ReliableSend<Msg, AgentRef> make_deposit() {
 		return new ReliableSend<Msg, AgentRef>() {
 			public void send(Msg msg, AgentRef receiver) {
 				try {
@@ -27,7 +27,7 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 	}
 
 	@Override
-	protected fr.irit.smac.may.lib.components.messaging.receiver.Receiver.Agent<Msg> make_Agent(
+	protected Agent<Msg> make_Agent(
 			String name) {
 		return new ReceiverAgentImpl<Msg>(name);
 	}

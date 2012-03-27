@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 
 public abstract class RemoteFactory<Msg, Ref> {
 
-	private RemoteFactory.ComponentImpl<Msg, Ref> structure = null;
+	private RemoteFactory.ComponentImpl<Msg, Ref> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected RemoteFactory.Component<Msg, Ref> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> infraCreate() {
-		assert this.structure != null;
-		return this.structure.bridge.infraCreate();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.infraCreate();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace() {
-		assert this.structure != null;
-		return this.structure.bridge.thisPlace();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.thisPlace();
 	};
 
 	/**
@@ -41,7 +41,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> factCreate();
+	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> make_factCreate();
 
 	public static interface Bridge<Msg, Ref> {
 		public fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> infraCreate();
@@ -77,10 +77,10 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.factCreate = implem.factCreate();
+			this.factCreate = implem.make_factCreate();
 
 		}
 
@@ -101,15 +101,23 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 */
 	protected abstract RemoteFactory.Agent<Msg, Ref> make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public RemoteFactory.Agent<Msg, Ref> createImplementationOfAgent() {
 		RemoteFactory.Agent<Msg, Ref> implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public RemoteFactory.Agent.Component<Msg, Ref> createAgent() {
 		RemoteFactory.Agent<Msg, Ref> implem = createImplementationOfAgent();
 		return implem
@@ -119,7 +127,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 	public static abstract class Agent<Msg, Ref> {
 
-		private RemoteFactory.Agent.ComponentImpl<Msg, Ref> structure = null;
+		private RemoteFactory.Agent.ComponentImpl<Msg, Ref> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -127,8 +135,8 @@ public abstract class RemoteFactory<Msg, Ref> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected RemoteFactory.Agent.Component<Msg, Ref> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -137,18 +145,18 @@ public abstract class RemoteFactory<Msg, Ref> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> create();
+		protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> make_create();
 
-		private RemoteFactory.ComponentImpl<Msg, Ref> infraStructure = null;
+		private RemoteFactory.ComponentImpl<Msg, Ref> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected RemoteFactory.Component<Msg, Ref> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected RemoteFactory.Component<Msg, Ref> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<Msg, Ref> {
@@ -184,10 +192,10 @@ public abstract class RemoteFactory<Msg, Ref> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.create = implem.create();
+				this.create = implem.make_create();
 
 			}
 

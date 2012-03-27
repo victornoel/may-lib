@@ -13,7 +13,7 @@ public class ConcurrentQueueImpl<Truc> extends Queue<Truc> {
 	private final BlockingQueue<Truc> l = new LinkedBlockingQueue<Truc>();
 	
 	@Override
-	public Push<Truc> put() {
+	public Push<Truc> make_put() {
 		return new Push<Truc>() {
 			public void push(Truc t) {
 				l.offer(t);
@@ -22,7 +22,7 @@ public class ConcurrentQueueImpl<Truc> extends Queue<Truc> {
 	}
 
 	@Override
-	public Pull<Truc> get() {
+	public Pull<Truc> make_get() {
 		return new Pull<Truc>() {
 			public Truc pull() {
 				return l.poll();
@@ -31,7 +31,7 @@ public class ConcurrentQueueImpl<Truc> extends Queue<Truc> {
 	}
 	
 	@Override
-	protected Pull<Collection<Truc>> getAll() {
+	protected Pull<Collection<Truc>> make_getAll() {
 		return new Pull<Collection<Truc>>() {
 			public Collection<Truc> pull() {
 				Collection<Truc> c = new LinkedList<Truc>();

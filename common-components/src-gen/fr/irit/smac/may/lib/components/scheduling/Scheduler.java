@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 
 public abstract class Scheduler {
 
-	private Scheduler.ComponentImpl structure = null;
+	private Scheduler.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Scheduler {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Scheduler.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Scheduler {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
-		assert this.structure != null;
-		return this.structure.bridge.infraSched();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.infraSched();
 	};
 
 	public static interface Bridge {
@@ -50,8 +50,8 @@ public abstract class Scheduler {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
 		}
 
@@ -66,15 +66,23 @@ public abstract class Scheduler {
 	 */
 	protected abstract Scheduler.Agent make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public Scheduler.Agent createImplementationOfAgent() {
 		Scheduler.Agent implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public Scheduler.Agent.Component createAgent() {
 		Scheduler.Agent implem = createImplementationOfAgent();
 		return implem.createComponent(new Scheduler.Agent.Bridge() {
@@ -83,7 +91,7 @@ public abstract class Scheduler {
 
 	public static abstract class Agent {
 
-		private Scheduler.Agent.ComponentImpl structure = null;
+		private Scheduler.Agent.ComponentImpl selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -91,8 +99,8 @@ public abstract class Scheduler {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Scheduler.Agent.Component self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -101,7 +109,7 @@ public abstract class Scheduler {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched();
+		protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor make_sched();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -109,18 +117,18 @@ public abstract class Scheduler {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
-		private Scheduler.ComponentImpl infraStructure = null;
+		private Scheduler.ComponentImpl ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Scheduler.Component infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Scheduler.Component ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge {
@@ -161,11 +169,11 @@ public abstract class Scheduler {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.sched = implem.sched();
-				this.stop = implem.stop();
+				this.sched = implem.make_sched();
+				this.stop = implem.make_stop();
 
 			}
 

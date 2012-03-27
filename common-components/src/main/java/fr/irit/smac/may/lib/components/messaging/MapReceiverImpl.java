@@ -11,7 +11,7 @@ public class MapReceiverImpl<Msg, RealRef, Ref> extends MapReceiver<Msg, RealRef
 	private final Map<Ref,RealRef> map = new ConcurrentHashMap<Ref, RealRef>();
 	
 	@Override
-	protected Send<Msg, Ref> depositKey() {
+	protected Send<Msg, Ref> make_depositKey() {
 		return new Send<Msg, Ref>() {
 			public void send(Msg message, Ref receiver) {
 				if (MapReceiverImpl.this.map.containsKey(receiver)) {
@@ -32,7 +32,7 @@ public class MapReceiverImpl<Msg, RealRef, Ref> extends MapReceiver<Msg, RealRef
 		}
 
 		@Override
-		protected Do disconnect() {
+		protected Do make_disconnect() {
 			return new Do() {
 				public void doIt() {
 					MapReceiverImpl.this.map.remove(key().pull());

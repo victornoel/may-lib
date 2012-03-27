@@ -29,7 +29,7 @@ public class ClockImpl extends Clock {
 	}
 	
 	@Override
-	protected SchedulingControl control() {
+	protected SchedulingControl make_control() {
 		return new SchedulingControl() {
 			
 			public void pause() {

@@ -6,8 +6,6 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
 import fr.irit.smac.may.lib.components.remote.place.Place;
-import fr.irit.smac.may.lib.components.remote.place.Placed.Agent;
-import fr.irit.smac.may.lib.components.remote.place.PlacedImpl.AgentSide;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Send;
@@ -73,7 +71,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 		}
 
 		@Override
-		public Pull<RemoteAgentRef> me() {
+		public Pull<RemoteAgentRef> make_me() {
 			return new Pull<RemoteAgentRef>() {
 				public RemoteAgentRef pull() {
 					return AgentSide.this.me;
@@ -82,7 +80,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 		}
 		
 		@Override
-		protected Do disconnect() {
+		protected Do make_disconnect() {
 			return new Do() {
 				public void doIt() {
 					try {
@@ -96,7 +94,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 	}
 
 	@Override
-	public Send<Msg, RemoteAgentRef> deposit() {
+	public Send<Msg, RemoteAgentRef> make_deposit() {
 		return new Send<Msg, RemoteAgentRef>() {
 			public void send(Msg msg, RemoteAgentRef receiver) {
 				try {

@@ -33,7 +33,7 @@ public class ScheduledImpl extends Scheduled {
 		}
 		
 		@Override
-		protected Do stop() {
+		protected Do make_stop() {
 			return new Do() {
 				public void doIt() {
 					run.set(false);
@@ -74,7 +74,7 @@ public class ScheduledImpl extends Scheduled {
 	}
 
 	@Override
-	protected Do tick() {
+	protected Do make_tick() {
 		return new Do() {
 			public void doIt() {
 				synchronized (agents) {

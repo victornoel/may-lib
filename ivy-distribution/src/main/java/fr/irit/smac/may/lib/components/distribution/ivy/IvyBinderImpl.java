@@ -9,7 +9,7 @@ public class IvyBinderImpl extends IvyBinder {
 	private int bindId = -1;
 	
 	@Override
-	protected Push<String> reBindMsg() {
+	protected Push<String> make_reBindMsg() {
 		return new Push<String>() {
 			public void push(String thing) {
 				if (bindId != -1) {

@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 
 public abstract class ExecutorService {
 
-	private ExecutorService.ComponentImpl structure = null;
+	private ExecutorService.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class ExecutorService {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected ExecutorService.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class ExecutorService {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
+	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor make_exec();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -30,7 +30,7 @@ public abstract class ExecutorService {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+	protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
 	public static interface Bridge {
 
@@ -70,11 +70,11 @@ public abstract class ExecutorService {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.exec = implem.exec();
-			this.stop = implem.stop();
+			this.exec = implem.make_exec();
+			this.stop = implem.make_stop();
 
 		}
 

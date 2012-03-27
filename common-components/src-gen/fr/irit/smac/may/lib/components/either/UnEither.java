@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.either.UnEither;
 
 public abstract class UnEither<L, R> {
 
-	private UnEither.ComponentImpl<L, R> structure = null;
+	private UnEither.ComponentImpl<L, R> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class UnEither<L, R> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected UnEither.Component<L, R> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class UnEither<L, R> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<L> left() {
-		assert this.structure != null;
-		return this.structure.bridge.left();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.left();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class UnEither<L, R> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<R> right() {
-		assert this.structure != null;
-		return this.structure.bridge.right();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.right();
 	};
 
 	/**
@@ -41,7 +41,7 @@ public abstract class UnEither<L, R> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> in();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> make_in();
 
 	public static interface Bridge<L, R> {
 		public fr.irit.smac.may.lib.interfaces.Push<L> left();
@@ -77,10 +77,10 @@ public abstract class UnEither<L, R> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.in = implem.in();
+			this.in = implem.make_in();
 
 		}
 

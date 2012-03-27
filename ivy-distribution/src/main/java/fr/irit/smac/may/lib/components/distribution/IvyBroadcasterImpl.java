@@ -23,7 +23,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 	}
 	
 	@Override
-	protected Push<List<String>> ivyReceive() {
+	protected Push<List<String>> make_ivyReceive() {
 		return new Push<List<String>>() {
 			public void push(List<String> thing) {
 				// there should be only one String
@@ -35,7 +35,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 	}
 
 	@Override
-	protected Push<T> send() {
+	protected Push<T> make_send() {
 		return new Push<T>() {
 			public void push(T thing) {
 				String m = serializer().transform(thing);

@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.scheduling.ase.AlternateStateExecutorServ
 
 public abstract class AlternateStateExecutorService {
 
-	private AlternateStateExecutorService.ComponentImpl structure = null;
+	private AlternateStateExecutorService.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class AlternateStateExecutorService {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected AlternateStateExecutorService.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class AlternateStateExecutorService {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract java.util.concurrent.Executor exec();
+	protected abstract java.util.concurrent.Executor make_exec();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -30,7 +30,7 @@ public abstract class AlternateStateExecutorService {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
+	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl make_control();
 
 	public static interface Bridge {
 
@@ -70,11 +70,11 @@ public abstract class AlternateStateExecutorService {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.exec = implem.exec();
-			this.control = implem.control();
+			this.exec = implem.make_exec();
+			this.control = implem.make_control();
 
 		}
 

@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.scheduling.Clock;
 
 public abstract class Clock {
 
-	private Clock.ComponentImpl structure = null;
+	private Clock.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Clock {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Clock.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Clock {
 	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor sched() {
-		assert this.structure != null;
-		return this.structure.bridge.sched();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.sched();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class Clock {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do tick() {
-		assert this.structure != null;
-		return this.structure.bridge.tick();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.tick();
 	};
 
 	/**
@@ -41,7 +41,7 @@ public abstract class Clock {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control();
+	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl make_control();
 
 	public static interface Bridge {
 		public java.util.concurrent.Executor sched();
@@ -74,10 +74,10 @@ public abstract class Clock {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.control = implem.control();
+			this.control = implem.make_control();
 
 		}
 

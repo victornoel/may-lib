@@ -11,7 +11,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 	private final List<AgentSide> interfaces = new ArrayList<AgentSide>();
 	
 	@Override
-	protected MapGet<Integer,I> get() {
+	protected MapGet<Integer,I> make_get() {
 		return new MapGet<Integer,I>() {
 			public I get(Integer i) {
 				return interfaces.get(i).getIf();
@@ -33,7 +33,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 		}
 		
 		@Override
-		protected Pull<Integer> idx() {
+		protected Pull<Integer> make_idx() {
 			return new Pull<Integer>() {
 				public Integer pull() {
 					return k;
@@ -43,7 +43,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 	}
 	
 	@Override
-	protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> make_Agent() {
+	protected Agent<I> make_Agent() {
 		return new AgentSide();
 	}
 

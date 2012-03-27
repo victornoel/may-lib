@@ -13,7 +13,7 @@ public class IvySendImpl extends IvySend {
 	private boolean connected = false;
 
 	@Override
-	protected Push<String> send() {
+	protected Push<String> make_send() {
 		return new Push<String>() {
 
 			public void push(String ivyMessage) {
@@ -34,7 +34,7 @@ public class IvySendImpl extends IvySend {
 	}
 
 	@Override
-	protected Pull<IvyConnectionStatus> connectionStatus() {
+	protected Pull<IvyConnectionStatus> make_connectionStatus() {
 		return new Pull<IvyConnectionStatus>() {
 
 			public IvyConnectionStatus pull() {
@@ -51,7 +51,7 @@ public class IvySendImpl extends IvySend {
 	}
 
 	@Override
-	protected Push<IvyConnectionConfig> connect() {
+	protected Push<IvyConnectionConfig> make_connect() {
 		return new Push<IvyConnectionConfig>() {
 
 			public void push(IvyConnectionConfig config) {
@@ -89,7 +89,7 @@ public class IvySendImpl extends IvySend {
 	}
 
 	@Override
-	protected Do disconnect() {
+	protected Do make_disconnect() {
 		return new Do() {
 
 			public void doIt() {

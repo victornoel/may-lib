@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.distribution.JSONTransformer;
 
 public abstract class JSONTransformer<T> {
 
-	private JSONTransformer.ComponentImpl<T> structure = null;
+	private JSONTransformer.ComponentImpl<T> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class JSONTransformer<T> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected JSONTransformer.Component<T> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class JSONTransformer<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer();
+	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> make_serializer();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -30,7 +30,7 @@ public abstract class JSONTransformer<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer();
+	protected abstract fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> make_deserializer();
 
 	public static interface Bridge<T> {
 
@@ -70,11 +70,11 @@ public abstract class JSONTransformer<T> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.serializer = implem.serializer();
-			this.deserializer = implem.deserializer();
+			this.serializer = implem.make_serializer();
+			this.deserializer = implem.make_deserializer();
 
 		}
 

@@ -9,7 +9,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 	private volatile int i = 0;
 	
 	@Override
-	protected Pull<DistRef<NodeRef>> generateRef() {
+	protected Pull<DistRef<NodeRef>> make_generateRef() {
 		return new Pull<DistRef<NodeRef>>() {
 			public DistRef<NodeRef> pull() {
 				int me = i++;
@@ -19,7 +19,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 	}
 
 	@Override
-	protected Send<Msg, DistRef<NodeRef>> send() {
+	protected Send<Msg, DistRef<NodeRef>> make_send() {
 		return new Send<Msg, DistRef<NodeRef>>() {
 			public void send(Msg message, DistRef<NodeRef> receiver) {
 				DistributedMessage<Msg,NodeRef> m = new DistributedMessage<Msg,NodeRef>(receiver, message);
@@ -29,7 +29,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 	}
 
 	@Override
-	protected Push<DistributedMessage<Msg, NodeRef>> distIn() {
+	protected Push<DistributedMessage<Msg, NodeRef>> make_distIn() {
 		return new Push<DistributedMessage<Msg, NodeRef>>() {
 			public void push(DistributedMessage<Msg, NodeRef> thing) {
 				deposit().send(thing.msg, thing.ref);

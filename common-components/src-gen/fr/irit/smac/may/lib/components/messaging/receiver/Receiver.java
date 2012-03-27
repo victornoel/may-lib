@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
 
 public abstract class Receiver<MsgType> {
 
-	private Receiver.ComponentImpl<MsgType> structure = null;
+	private Receiver.ComponentImpl<MsgType> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Receiver<MsgType> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Receiver.Component<MsgType> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class Receiver<MsgType> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> deposit();
+	protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> make_deposit();
 
 	public static interface Bridge<MsgType> {
 
@@ -57,10 +57,10 @@ public abstract class Receiver<MsgType> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.deposit = implem.deposit();
+			this.deposit = implem.make_deposit();
 
 		}
 
@@ -81,19 +81,22 @@ public abstract class Receiver<MsgType> {
 	 */
 	protected abstract Receiver.Agent<MsgType> make_Agent(java.lang.String name);
 
+	/**
+	 * Should not be called
+	 */
 	public Receiver.Agent<MsgType> createImplementationOfAgent(
 			java.lang.String name) {
 		Receiver.Agent<MsgType> implem = make_Agent(name);
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
 	public static abstract class Agent<MsgType> {
 
-		private Receiver.Agent.ComponentImpl<MsgType> structure = null;
+		private Receiver.Agent.ComponentImpl<MsgType> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -101,8 +104,8 @@ public abstract class Receiver<MsgType> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Receiver.Agent.Component<MsgType> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -111,8 +114,8 @@ public abstract class Receiver<MsgType> {
 		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Push<MsgType> put() {
-			assert this.structure != null;
-			return this.structure.bridge.put();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.put();
 		};
 
 		/**
@@ -121,7 +124,7 @@ public abstract class Receiver<MsgType> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> me();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> make_me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -129,7 +132,7 @@ public abstract class Receiver<MsgType> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -137,18 +140,18 @@ public abstract class Receiver<MsgType> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> send();
+		protected abstract fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend<MsgType, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> make_send();
 
-		private Receiver.ComponentImpl<MsgType> infraStructure = null;
+		private Receiver.ComponentImpl<MsgType> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Receiver.Component<MsgType> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Receiver.Component<MsgType> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<MsgType> {
@@ -194,12 +197,12 @@ public abstract class Receiver<MsgType> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.me = implem.me();
-				this.stop = implem.stop();
-				this.send = implem.send();
+				this.me = implem.make_me();
+				this.stop = implem.make_stop();
+				this.send = implem.make_send();
 
 			}
 

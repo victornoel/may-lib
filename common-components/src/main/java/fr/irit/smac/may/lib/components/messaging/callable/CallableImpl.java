@@ -25,7 +25,8 @@ public class CallableImpl<I> extends Callable<I> {
 		}
 	}
 	
-	protected MapGet<CallRef, I> call() {
+	@Override
+	protected MapGet<CallRef, I> make_call() {
 		return new MapGet<CallRef, I>() {
 			public I get(CallRef k) throws KeyDoesNotExistException {
 				if (k instanceof CallableImpl.CallRefImpl) {
@@ -48,7 +49,7 @@ public class CallableImpl<I> extends Callable<I> {
 		}
 		
 		@Override
-		protected Pull<CallRef> me() {
+		protected Pull<CallRef> make_me() {
 			return new Pull<CallRef>() {
 				public CallRef pull() {
 					return me;
@@ -57,7 +58,7 @@ public class CallableImpl<I> extends Callable<I> {
 		}
 
 		@Override
-		protected Do stop() {
+		protected Do make_stop() {
 			return new Do() {
 				public void doIt() {
 					me.stop();
@@ -70,8 +71,8 @@ public class CallableImpl<I> extends Callable<I> {
 	private class CallerImpl extends Caller<I> {
 
 		@Override
-		protected MapGet<CallRef, I> call() {
-			return infraSelf().call();
+		protected MapGet<CallRef, I> make_call() {
+			return ecoSelf().call();
 		}
 		
 	}

@@ -6,7 +6,7 @@ import fr.irit.smac.may.lib.interfaces.Push;
 public class UnEitherImpl<L, R> extends UnEither<L, R> {
 
 	@Override
-	protected Push<Either<L, R>> in() {
+	protected Push<Either<L, R>> make_in() {
 		return new Push<Either<L,R>>() {
 			public void push(Either<L, R> thing) {
 				if (thing.hasLeft()) {

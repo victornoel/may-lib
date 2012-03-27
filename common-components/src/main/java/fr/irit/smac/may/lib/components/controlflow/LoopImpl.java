@@ -34,7 +34,7 @@ public class LoopImpl extends Loop {
 	}
 	
 	@Override
-	protected Do stop() {
+	protected Do make_stop() {
 		return new Do() {
 			public void doIt() {
 				run.set(false);

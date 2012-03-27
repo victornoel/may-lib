@@ -11,7 +11,7 @@ public class DataImpl<T> extends Data<T> {
 	}
 	
 	@Override
-	protected Pull<T> data() {
+	protected Pull<T> make_data() {
 		return new Pull<T>() {
 			public T pull() {
 				return data;

@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.meta.Data;
 
 public abstract class Data<T> {
 
-	private Data.ComponentImpl<T> structure = null;
+	private Data.ComponentImpl<T> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Data<T> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Data.Component<T> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class Data<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<T> data();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<T> make_data();
 
 	public static interface Bridge<T> {
 
@@ -54,10 +54,10 @@ public abstract class Data<T> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.data = implem.data();
+			this.data = implem.make_data();
 
 		}
 

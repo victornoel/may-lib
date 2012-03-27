@@ -11,7 +11,7 @@ public class SequentialDispatcherImpl<Truc> extends SequentialDispatcher<Truc> {
 	private AtomicBoolean working = new AtomicBoolean(false);
 	
 	@Override
-	protected Push<Truc> dispatch() {
+	protected Push<Truc> make_dispatch() {
 		return new Push<Truc>() {
 			public void push(Truc t) {
 				

@@ -5,7 +5,7 @@ import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 
 public abstract class SequentialDispatcher<Truc> {
 
-	private SequentialDispatcher.ComponentImpl<Truc> structure = null;
+	private SequentialDispatcher.ComponentImpl<Truc> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -13,8 +13,8 @@ public abstract class SequentialDispatcher<Truc> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected SequentialDispatcher.Component<Truc> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -23,8 +23,8 @@ public abstract class SequentialDispatcher<Truc> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor executor() {
-		assert this.structure != null;
-		return this.structure.bridge.executor();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.executor();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -32,8 +32,8 @@ public abstract class SequentialDispatcher<Truc> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<Truc> handler() {
-		assert this.structure != null;
-		return this.structure.bridge.handler();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.handler();
 	};
 
 	/**
@@ -42,7 +42,7 @@ public abstract class SequentialDispatcher<Truc> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> make_dispatch();
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component.
@@ -57,8 +57,8 @@ public abstract class SequentialDispatcher<Truc> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final Queue.Component<Truc> queue() {
-		assert this.structure != null;
-		return this.structure.queue;
+		assert this.selfComponent != null;
+		return this.selfComponent.queue;
 	}
 
 	public static interface Bridge<Truc> {
@@ -95,10 +95,10 @@ public abstract class SequentialDispatcher<Truc> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.dispatch = implem.dispatch();
+			this.dispatch = implem.make_dispatch();
 
 			assert this.implem_queue == null;
 			this.implem_queue = implem.make_queue();

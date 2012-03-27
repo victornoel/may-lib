@@ -8,7 +8,7 @@ import fr.irit.smac.may.lib.components.distribution.ivy.IvyBus;
 
 public abstract class IvyJSONBroadcaster<T> {
 
-	private IvyJSONBroadcaster.ComponentImpl<T> structure = null;
+	private IvyJSONBroadcaster.ComponentImpl<T> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -16,8 +16,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected IvyJSONBroadcaster.Component<T> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -26,8 +26,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<T> handle() {
-		assert this.structure != null;
-		return this.structure.bridge.handle();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.handle();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -35,8 +35,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor exec() {
-		assert this.structure != null;
-		return this.structure.bridge.exec();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.exec();
 	};
 
 	/**
@@ -52,8 +52,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final IvyBus.Component ivy() {
-		assert this.structure != null;
-		return this.structure.ivy;
+		assert this.selfComponent != null;
+		return this.selfComponent.ivy;
 	}
 
 	/**
@@ -69,8 +69,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final JSONTransformer.Component<T> json() {
-		assert this.structure != null;
-		return this.structure.json;
+		assert this.selfComponent != null;
+		return this.selfComponent.json;
 	}
 
 	/**
@@ -86,8 +86,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final IvyBinder.Component binder() {
-		assert this.structure != null;
-		return this.structure.binder;
+		assert this.selfComponent != null;
+		return this.selfComponent.binder;
 	}
 
 	/**
@@ -103,8 +103,8 @@ public abstract class IvyJSONBroadcaster<T> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final IvyBroadcaster.Component<T> bc() {
-		assert this.structure != null;
-		return this.structure.bc;
+		assert this.selfComponent != null;
+		return this.selfComponent.bc;
 	}
 
 	public static interface Bridge<T> {
@@ -141,8 +141,8 @@ public abstract class IvyJSONBroadcaster<T> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
 			assert this.implem_ivy == null;
 			this.implem_ivy = implem.make_ivy();

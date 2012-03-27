@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.controlflow.Loop;
 
 public abstract class Loop {
 
-	private Loop.ComponentImpl structure = null;
+	private Loop.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Loop {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Loop.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Loop {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
-		assert this.structure != null;
-		return this.structure.bridge.executor();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.executor();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class Loop {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do handler() {
-		assert this.structure != null;
-		return this.structure.bridge.handler();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.handler();
 	};
 
 	/**
@@ -41,7 +41,7 @@ public abstract class Loop {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+	protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
 	public static interface Bridge {
 		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor();
@@ -74,10 +74,10 @@ public abstract class Loop {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.stop = implem.stop();
+			this.stop = implem.make_stop();
 
 		}
 

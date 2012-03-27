@@ -14,7 +14,7 @@ public class Test {
 		
 		final AgentRef create = infra.create().create(new ClassicBehaviour<String, AgentRef>() {
 			@Override
-			public Push<String> cycle() {
+			public Push<String> make_cycle() {
 				return new Push<String>() {
 					public void push(String msg) {
 						System.out.println("test");
@@ -26,7 +26,7 @@ public class Test {
 		
 		AgentRef create2 = infra.create().create(new ClassicBehaviour<String, AgentRef>() {
 			@Override
-			public Push<String> cycle() {
+			public Push<String> make_cycle() {
 				return new Push<String>() {
 					public void push(String msg) {
 						System.out.println(msg);

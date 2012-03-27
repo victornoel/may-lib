@@ -16,7 +16,7 @@ public abstract class VoidImpl<I> extends Void<I> {
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	protected I port() {
+	protected I make_port() {
 		InvocationHandler handler = new InvocationHandler() {
 			public Object invoke(Object proxy, Method method, Object[] args)
 					throws Throwable {

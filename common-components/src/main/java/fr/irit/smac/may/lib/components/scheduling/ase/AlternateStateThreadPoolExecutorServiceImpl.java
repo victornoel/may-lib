@@ -18,7 +18,7 @@ public class AlternateStateThreadPoolExecutorServiceImpl extends
 	}
 	
 	@Override
-	protected Executor exec() {
+	protected Executor make_exec() {
 		return new Executor() {
 			public void execute(Runnable command) {
 				exec.execute(command);
@@ -27,7 +27,7 @@ public class AlternateStateThreadPoolExecutorServiceImpl extends
 	}
 
 	@Override
-	protected SchedulingControl control() {
+	protected SchedulingControl make_control() {
 		return new SchedulingControl() {
 			
 			public void pause() {

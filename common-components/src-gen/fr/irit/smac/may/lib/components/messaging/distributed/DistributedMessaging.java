@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessagin
 
 public abstract class DistributedMessaging<Msg, NodeRef> {
 
-	private DistributedMessaging.ComponentImpl<Msg, NodeRef> structure = null;
+	private DistributedMessaging.ComponentImpl<Msg, NodeRef> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected DistributedMessaging.Component<Msg, NodeRef> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<NodeRef> myNode() {
-		assert this.structure != null;
-		return this.structure.bridge.myNode();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.myNode();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> deposit() {
-		assert this.structure != null;
-		return this.structure.bridge.deposit();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.deposit();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -40,8 +40,8 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg, NodeRef>, NodeRef> distOut() {
-		assert this.structure != null;
-		return this.structure.bridge.distOut();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.distOut();
 	};
 
 	/**
@@ -50,7 +50,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> generateRef();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> make_generateRef();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -58,7 +58,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> send();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.messaging.distributed.DistRef<NodeRef>> make_send();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -66,7 +66,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg, NodeRef>> distIn();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedMessage<Msg, NodeRef>> make_distIn();
 
 	public static interface Bridge<Msg, NodeRef> {
 		public fr.irit.smac.may.lib.interfaces.Pull<NodeRef> myNode();
@@ -113,12 +113,12 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.generateRef = implem.generateRef();
-			this.send = implem.send();
-			this.distIn = implem.distIn();
+			this.generateRef = implem.make_generateRef();
+			this.send = implem.make_send();
+			this.distIn = implem.make_distIn();
 
 		}
 

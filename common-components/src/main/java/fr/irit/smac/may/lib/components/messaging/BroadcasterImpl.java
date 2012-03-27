@@ -15,7 +15,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 
 	public class AgentSide extends Broadcaster.Agent<T, Ref> {
 		@Override
-		protected Broadcast<T> bc() {
+		protected Broadcast<T> make_bc() {
 			return new Broadcast<T>() {
 				public void broadcast(T msg) {
 					doBroadcast(msg);
@@ -25,7 +25,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 	}
 	
 	@Override
-	protected Push<Ref> add() {
+	protected Push<Ref> make_add() {
 		return new Push<Ref>() {
 			public void push(Ref t) {
 				s.add(t);
@@ -34,7 +34,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 	}
 
 	@Override
-	protected Push<Ref> remove() {
+	protected Push<Ref> make_remove() {
 		return new Push<Ref>() {
 			public void push(Ref t) {
 				s.remove(t);
@@ -51,7 +51,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 	}
 
 	@Override
-	protected Push<T> broadcast() {
+	protected Push<T> make_broadcast() {
 		return new Push<T>() {
 			public void push(T thing) {
 				doBroadcast(thing);
@@ -61,7 +61,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 
 
 	@Override
-	protected fr.irit.smac.may.lib.components.messaging.Broadcaster.Agent<T, Ref> make_Agent() {
+	protected Agent<T, Ref> make_Agent() {
 		return new AgentSide();
 	}
 

@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.meta.Forward;
 
 public abstract class Forward<I> {
 
-	private Forward.ComponentImpl<I> structure = null;
+	private Forward.ComponentImpl<I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Forward<I> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Forward.Component<I> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Forward<I> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected I i() {
-		assert this.structure != null;
-		return this.structure.bridge.i();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.i();
 	};
 
 	public static interface Bridge<I> {
@@ -50,8 +50,8 @@ public abstract class Forward<I> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
 		}
 
@@ -66,15 +66,23 @@ public abstract class Forward<I> {
 	 */
 	protected abstract Forward.Agent<I> make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public Forward.Agent<I> createImplementationOfAgent() {
 		Forward.Agent<I> implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public Forward.Agent.Component<I> createAgent() {
 		Forward.Agent<I> implem = createImplementationOfAgent();
 		return implem.createComponent(new Forward.Agent.Bridge<I>() {
@@ -83,7 +91,7 @@ public abstract class Forward<I> {
 
 	public static abstract class Agent<I> {
 
-		private Forward.Agent.ComponentImpl<I> structure = null;
+		private Forward.Agent.ComponentImpl<I> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -91,8 +99,8 @@ public abstract class Forward<I> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Forward.Agent.Component<I> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -101,18 +109,18 @@ public abstract class Forward<I> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract I a();
+		protected abstract I make_a();
 
-		private Forward.ComponentImpl<I> infraStructure = null;
+		private Forward.ComponentImpl<I> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Forward.Component<I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Forward.Component<I> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<I> {
@@ -148,10 +156,10 @@ public abstract class Forward<I> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.a = implem.a();
+				this.a = implem.make_a();
 
 			}
 

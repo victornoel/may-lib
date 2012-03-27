@@ -36,7 +36,7 @@ public class WebServiceClientImpl<I> extends WebServiceClient<I> {
 	}
 
 	@Override
-	protected RemoteCall<I, String> service() {
+	protected RemoteCall<I, String> make_service() {
 		return new RemoteCall<I, String>() {
 			public I call(String to) {
 				JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();

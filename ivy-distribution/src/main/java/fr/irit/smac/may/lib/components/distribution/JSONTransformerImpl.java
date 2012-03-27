@@ -22,7 +22,7 @@ public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 	}
 
 	@Override
-	protected Transform<Msg, String> serializer() {
+	protected Transform<Msg, String> make_serializer() {
 		return new Transform<Msg, String>() {
 			public String transform(Msg message) {
 				String m = null;
@@ -44,7 +44,7 @@ public class JSONTransformerImpl<Msg> extends JSONTransformer<Msg> {
 	}
 
 	@Override
-	protected Transform<String, Msg> deserializer() {
+	protected Transform<String, Msg> make_deserializer() {
 		return new Transform<String, Msg>() {
 			public Msg transform(String thing) {
 				Msg message = null;

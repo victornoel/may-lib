@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder;
 
 public abstract class IvyBinder {
 
-	private IvyBinder.ComponentImpl structure = null;
+	private IvyBinder.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class IvyBinder {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected IvyBinder.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class IvyBinder {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
-		assert this.structure != null;
-		return this.structure.bridge.bindMsg();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.bindMsg();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class IvyBinder {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
-		assert this.structure != null;
-		return this.structure.bridge.unBindMsg();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.unBindMsg();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -40,8 +40,8 @@ public abstract class IvyBinder {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
-		assert this.structure != null;
-		return this.structure.bridge.receive();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.receive();
 	};
 
 	/**
@@ -50,7 +50,7 @@ public abstract class IvyBinder {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> make_reBindMsg();
 
 	public static interface Bridge {
 		public fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
@@ -84,10 +84,10 @@ public abstract class IvyBinder {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.reBindMsg = implem.reBindMsg();
+			this.reBindMsg = implem.make_reBindMsg();
 
 		}
 

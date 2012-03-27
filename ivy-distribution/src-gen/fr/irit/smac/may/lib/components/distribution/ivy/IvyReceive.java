@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive;
 
 public abstract class IvyReceive {
 
-	private IvyReceive.ComponentImpl structure = null;
+	private IvyReceive.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class IvyReceive {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected IvyReceive.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class IvyReceive {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
-		assert this.structure != null;
-		return this.structure.bridge.receive();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.receive();
 	};
 
 	/**
@@ -32,7 +32,7 @@ public abstract class IvyReceive {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> bindMsg();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> make_bindMsg();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -40,7 +40,7 @@ public abstract class IvyReceive {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionStatus> connectionStatus();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionStatus> make_connectionStatus();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -48,7 +48,7 @@ public abstract class IvyReceive {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionConfig> connect();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionConfig> make_connect();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -56,7 +56,7 @@ public abstract class IvyReceive {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
+	protected abstract fr.irit.smac.may.lib.interfaces.Do make_disconnect();
 
 	public static interface Bridge {
 		public fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive();
@@ -103,13 +103,13 @@ public abstract class IvyReceive {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.bindMsg = implem.bindMsg();
-			this.connectionStatus = implem.connectionStatus();
-			this.connect = implem.connect();
-			this.disconnect = implem.disconnect();
+			this.bindMsg = implem.make_bindMsg();
+			this.connectionStatus = implem.make_connectionStatus();
+			this.connect = implem.make_connect();
+			this.disconnect = implem.make_disconnect();
 
 		}
 

@@ -50,7 +50,7 @@ public class IvyBusImpl extends IvyBus {
 	}
 
 	@Override
-	protected Do disconnect() {
+	protected Do make_disconnect() {
 		return new Do() {
 			public void doIt() {
 				IvyBusImpl.this.bus.stop();
@@ -61,7 +61,7 @@ public class IvyBusImpl extends IvyBus {
 	}
 
 	@Override
-	protected Push<String> send() {
+	protected Push<String> make_send() {
 		return new Push<String>() {
 			public void push(String ivyMessage) {
 				if (IvyBusImpl.this.connected) {
@@ -79,7 +79,7 @@ public class IvyBusImpl extends IvyBus {
 	}
 
 	@Override
-	protected Bind bindMsg() {
+	protected Bind make_bindMsg() {
 		return new Bind() {
 			public int bind(String regex, final Push<List<String>> callback) {
 				
@@ -109,7 +109,7 @@ public class IvyBusImpl extends IvyBus {
 	}
 
 	@Override
-	protected Push<Integer> unBindMsg() {
+	protected Push<Integer> make_unBindMsg() {
 		return new Push<Integer>() {
 			public void push(Integer thing) {
 				try {

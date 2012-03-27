@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.messaging.Broadcaster;
 
 public abstract class Broadcaster<T, Ref> {
 
-	private Broadcaster.ComponentImpl<T, Ref> structure = null;
+	private Broadcaster.ComponentImpl<T, Ref> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Broadcaster<T, Ref> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Broadcaster.Component<T, Ref> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Broadcaster<T, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<T, Ref> deposit() {
-		assert this.structure != null;
-		return this.structure.bridge.deposit();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.deposit();
 	};
 
 	/**
@@ -32,7 +32,7 @@ public abstract class Broadcaster<T, Ref> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> broadcast();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> make_broadcast();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -40,7 +40,7 @@ public abstract class Broadcaster<T, Ref> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> add();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> make_add();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -48,7 +48,7 @@ public abstract class Broadcaster<T, Ref> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> remove();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<Ref> make_remove();
 
 	public static interface Bridge<T, Ref> {
 		public fr.irit.smac.may.lib.interfaces.Send<T, Ref> deposit();
@@ -93,12 +93,12 @@ public abstract class Broadcaster<T, Ref> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.broadcast = implem.broadcast();
-			this.add = implem.add();
-			this.remove = implem.remove();
+			this.broadcast = implem.make_broadcast();
+			this.add = implem.make_add();
+			this.remove = implem.make_remove();
 
 		}
 
@@ -129,15 +129,23 @@ public abstract class Broadcaster<T, Ref> {
 	 */
 	protected abstract Broadcaster.Agent<T, Ref> make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public Broadcaster.Agent<T, Ref> createImplementationOfAgent() {
 		Broadcaster.Agent<T, Ref> implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public Broadcaster.Agent.Component<T, Ref> createAgent() {
 		Broadcaster.Agent<T, Ref> implem = createImplementationOfAgent();
 		return implem.createComponent(new Broadcaster.Agent.Bridge<T, Ref>() {
@@ -146,7 +154,7 @@ public abstract class Broadcaster<T, Ref> {
 
 	public static abstract class Agent<T, Ref> {
 
-		private Broadcaster.Agent.ComponentImpl<T, Ref> structure = null;
+		private Broadcaster.Agent.ComponentImpl<T, Ref> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -154,8 +162,8 @@ public abstract class Broadcaster<T, Ref> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Broadcaster.Agent.Component<T, Ref> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -164,18 +172,18 @@ public abstract class Broadcaster<T, Ref> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Broadcast<T> bc();
+		protected abstract fr.irit.smac.may.lib.interfaces.Broadcast<T> make_bc();
 
-		private Broadcaster.ComponentImpl<T, Ref> infraStructure = null;
+		private Broadcaster.ComponentImpl<T, Ref> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Broadcaster.Component<T, Ref> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Broadcaster.Component<T, Ref> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<T, Ref> {
@@ -211,10 +219,10 @@ public abstract class Broadcaster<T, Ref> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.bc = implem.bc();
+				this.bc = implem.make_bc();
 
 			}
 

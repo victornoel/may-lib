@@ -59,7 +59,7 @@ public class ReceiverAgentImpl<Msg> extends Receiver.Agent<Msg> {
 	}
 	
 	@Override
-	protected Pull<AgentRef> me() {
+	protected Pull<AgentRef> make_me() {
 		return new Pull<AgentRef>() {
 			public AgentRef pull() {
 				return ReceiverAgentImpl.this.agentRef;
@@ -68,7 +68,7 @@ public class ReceiverAgentImpl<Msg> extends Receiver.Agent<Msg> {
 	}
 
 	@Override
-	protected Do stop() {
+	protected Do make_stop() {
 		return new Do() {
 			public void doIt() {
 				ReceiverAgentImpl.this.agentRef.stop();
@@ -77,13 +77,13 @@ public class ReceiverAgentImpl<Msg> extends Receiver.Agent<Msg> {
 	}
 
 	@Override
-	protected ReliableSend<Msg, AgentRef> send() {
+	protected ReliableSend<Msg, AgentRef> make_send() {
 		return new ReliableSend<Msg, AgentRef>() {
 			public void reliableSend(Msg message, AgentRef receiver) throws AgentDoesNotExistException {
-				infraSelf().deposit().reliableSend(message, receiver);
+				ecoSelf().deposit().reliableSend(message, receiver);
 			};
 			public void send(Msg message, AgentRef receiver) {
-				infraSelf().deposit().send(message, receiver);
+				ecoSelf().deposit().send(message, receiver);
 			};
 		};
 	}

@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.distribution.IvyBroadcaster;
 
 public abstract class IvyBroadcaster<T> {
 
-	private IvyBroadcaster.ComponentImpl<T> structure = null;
+	private IvyBroadcaster.ComponentImpl<T> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class IvyBroadcaster<T> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected IvyBroadcaster.Component<T> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class IvyBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg() {
-		assert this.structure != null;
-		return this.structure.bridge.ivyBindMsg();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.ivyBindMsg();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class IvyBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivySend() {
-		assert this.structure != null;
-		return this.structure.bridge.ivySend();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.ivySend();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -40,8 +40,8 @@ public abstract class IvyBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.distribution.interfaces.Transform<T, java.lang.String> serializer() {
-		assert this.structure != null;
-		return this.structure.bridge.serializer();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.serializer();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -49,8 +49,8 @@ public abstract class IvyBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.distribution.interfaces.Transform<java.lang.String, T> deserializer() {
-		assert this.structure != null;
-		return this.structure.bridge.deserializer();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.deserializer();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -58,8 +58,8 @@ public abstract class IvyBroadcaster<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<T> handle() {
-		assert this.structure != null;
-		return this.structure.bridge.handle();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.handle();
 	};
 
 	/**
@@ -68,7 +68,7 @@ public abstract class IvyBroadcaster<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> ivyReceive();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> make_ivyReceive();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -76,7 +76,7 @@ public abstract class IvyBroadcaster<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> send();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> make_send();
 
 	public static interface Bridge<T> {
 		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> ivyBindMsg();
@@ -120,11 +120,11 @@ public abstract class IvyBroadcaster<T> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.ivyReceive = implem.ivyReceive();
-			this.send = implem.send();
+			this.ivyReceive = implem.make_ivyReceive();
+			this.send = implem.make_send();
 
 		}
 

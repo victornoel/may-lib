@@ -13,7 +13,7 @@ public class DistributedCommunicationImpl<T> extends DistributedCommunication<T>
 	}
 	
 	@Override
-	protected Send<T, String> in() {
+	protected Send<T, String> make_in() {
 		return new Send<T, String>() {
 			public void send(T message, String receiver) {
 				broadcast().push(new DistributedInfo<T>(message, receiver));
@@ -22,7 +22,7 @@ public class DistributedCommunicationImpl<T> extends DistributedCommunication<T>
 	}
 
 	@Override
-	protected Push<DistributedInfo<T>> handle() {
+	protected Push<DistributedInfo<T>> make_handle() {
 		return new Push<DistributedInfo<T>>() {
 			public void push(DistributedInfo<T> thing) {
 				if (thing.getDest().equals(nodeName)) {
@@ -33,7 +33,7 @@ public class DistributedCommunicationImpl<T> extends DistributedCommunication<T>
 	}
 
 	@Override
-	protected Pull<String> nodeName() {
+	protected Pull<String> make_nodeName() {
 		return new Pull<String>() {
 			public String pull() {
 				return nodeName;

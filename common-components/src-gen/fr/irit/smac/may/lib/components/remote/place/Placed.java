@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.remote.place.Placed;
 
 public abstract class Placed {
 
-	private Placed.ComponentImpl structure = null;
+	private Placed.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Placed {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Placed.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class Placed {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> make_thisPlace();
 
 	public static interface Bridge {
 
@@ -54,10 +54,10 @@ public abstract class Placed {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.thisPlace = implem.thisPlace();
+			this.thisPlace = implem.make_thisPlace();
 
 		}
 
@@ -78,15 +78,23 @@ public abstract class Placed {
 	 */
 	protected abstract Placed.Agent make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public Placed.Agent createImplementationOfAgent() {
 		Placed.Agent implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public Placed.Agent.Component createAgent() {
 		Placed.Agent implem = createImplementationOfAgent();
 		return implem.createComponent(new Placed.Agent.Bridge() {
@@ -95,7 +103,7 @@ public abstract class Placed {
 
 	public static abstract class Agent {
 
-		private Placed.Agent.ComponentImpl structure = null;
+		private Placed.Agent.ComponentImpl selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -103,8 +111,8 @@ public abstract class Placed {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Placed.Agent.Component self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -113,18 +121,18 @@ public abstract class Placed {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> make_myPlace();
 
-		private Placed.ComponentImpl infraStructure = null;
+		private Placed.ComponentImpl ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Placed.Component infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Placed.Component ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge {
@@ -160,10 +168,10 @@ public abstract class Placed {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.myPlace = implem.myPlace();
+				this.myPlace = implem.make_myPlace();
 
 			}
 

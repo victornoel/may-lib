@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.messaging.callable.Callable;
 
 public abstract class Callable<I> {
 
-	private Callable.ComponentImpl<I> structure = null;
+	private Callable.ComponentImpl<I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Callable<I> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Callable.Component<I> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class Callable<I> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
+	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> make_call();
 
 	public static interface Bridge<I> {
 
@@ -57,10 +57,10 @@ public abstract class Callable<I> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.call = implem.call();
+			this.call = implem.make_call();
 
 		}
 
@@ -81,18 +81,21 @@ public abstract class Callable<I> {
 	 */
 	protected abstract Callable.Callee<I> make_Callee();
 
+	/**
+	 * Should not be called
+	 */
 	public Callable.Callee<I> createImplementationOfCallee() {
 		Callable.Callee<I> implem = make_Callee();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
 	public static abstract class Callee<I> {
 
-		private Callable.Callee.ComponentImpl<I> structure = null;
+		private Callable.Callee.ComponentImpl<I> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -100,8 +103,8 @@ public abstract class Callable<I> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Callable.Callee.Component<I> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -110,8 +113,8 @@ public abstract class Callable<I> {
 		 * This is not meant to be called from the outside.
 		 */
 		protected I toCall() {
-			assert this.structure != null;
-			return this.structure.bridge.toCall();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.toCall();
 		};
 
 		/**
@@ -120,7 +123,7 @@ public abstract class Callable<I> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> make_me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -128,18 +131,18 @@ public abstract class Callable<I> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
-		private Callable.ComponentImpl<I> infraStructure = null;
+		private Callable.ComponentImpl<I> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Callable.Component<I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Callable.Component<I> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<I> {
@@ -180,11 +183,11 @@ public abstract class Callable<I> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.me = implem.me();
-				this.stop = implem.stop();
+				this.me = implem.make_me();
+				this.stop = implem.make_stop();
 
 			}
 
@@ -227,15 +230,23 @@ public abstract class Callable<I> {
 	 */
 	protected abstract Callable.Caller<I> make_Caller();
 
+	/**
+	 * Should not be called
+	 */
 	public Callable.Caller<I> createImplementationOfCaller() {
 		Callable.Caller<I> implem = make_Caller();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public Callable.Caller.Component<I> createCaller() {
 		Callable.Caller<I> implem = createImplementationOfCaller();
 		return implem.createComponent(new Callable.Caller.Bridge<I>() {
@@ -244,7 +255,7 @@ public abstract class Callable<I> {
 
 	public static abstract class Caller<I> {
 
-		private Callable.Caller.ComponentImpl<I> structure = null;
+		private Callable.Caller.ComponentImpl<I> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -252,8 +263,8 @@ public abstract class Callable<I> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Callable.Caller.Component<I> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -262,18 +273,18 @@ public abstract class Callable<I> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
+		protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> make_call();
 
-		private Callable.ComponentImpl<I> infraStructure = null;
+		private Callable.ComponentImpl<I> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Callable.Component<I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Callable.Component<I> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<I> {
@@ -309,10 +320,10 @@ public abstract class Callable<I> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.call = implem.call();
+				this.call = implem.make_call();
 
 			}
 

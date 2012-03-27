@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
 
 public abstract class RemoteReceiver<Msg, LocalRef> {
 
-	private RemoteReceiver.ComponentImpl<Msg, LocalRef> structure = null;
+	private RemoteReceiver.ComponentImpl<Msg, LocalRef> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected RemoteReceiver.Component<Msg, LocalRef> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit() {
-		assert this.structure != null;
-		return this.structure.bridge.localDeposit();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.localDeposit();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace() {
-		assert this.structure != null;
-		return this.structure.bridge.myPlace();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.myPlace();
 	};
 
 	/**
@@ -41,7 +41,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> deposit();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> make_deposit();
 
 	public static interface Bridge<Msg, LocalRef> {
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> localDeposit();
@@ -77,10 +77,10 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.deposit = implem.deposit();
+			this.deposit = implem.make_deposit();
 
 		}
 
@@ -101,18 +101,21 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	 */
 	protected abstract RemoteReceiver.Agent<Msg, LocalRef> make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public RemoteReceiver.Agent<Msg, LocalRef> createImplementationOfAgent() {
 		RemoteReceiver.Agent<Msg, LocalRef> implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
 	public static abstract class Agent<Msg, LocalRef> {
 
-		private RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef> structure = null;
+		private RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -120,8 +123,8 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected RemoteReceiver.Agent.Component<Msg, LocalRef> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -130,8 +133,8 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Pull<LocalRef> localMe() {
-			assert this.structure != null;
-			return this.structure.bridge.localMe();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.localMe();
 		};
 
 		/**
@@ -140,7 +143,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> me();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> make_me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -148,18 +151,18 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
+		protected abstract fr.irit.smac.may.lib.interfaces.Do make_disconnect();
 
-		private RemoteReceiver.ComponentImpl<Msg, LocalRef> infraStructure = null;
+		private RemoteReceiver.ComponentImpl<Msg, LocalRef> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected RemoteReceiver.Component<Msg, LocalRef> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected RemoteReceiver.Component<Msg, LocalRef> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<Msg, LocalRef> {
@@ -201,11 +204,11 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.me = implem.me();
-				this.disconnect = implem.disconnect();
+				this.me = implem.make_me();
+				this.disconnect = implem.make_disconnect();
 
 			}
 

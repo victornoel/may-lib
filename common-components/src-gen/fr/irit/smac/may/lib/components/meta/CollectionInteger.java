@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.meta.CollectionInteger;
 
 public abstract class CollectionInteger<I> {
 
-	private CollectionInteger.ComponentImpl<I> structure = null;
+	private CollectionInteger.ComponentImpl<I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class CollectionInteger<I> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected CollectionInteger.Component<I> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class CollectionInteger<I> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get();
+	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> make_get();
 
 	public static interface Bridge<I> {
 
@@ -57,10 +57,10 @@ public abstract class CollectionInteger<I> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.get = implem.get();
+			this.get = implem.make_get();
 
 		}
 
@@ -81,18 +81,21 @@ public abstract class CollectionInteger<I> {
 	 */
 	protected abstract CollectionInteger.Agent<I> make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public CollectionInteger.Agent<I> createImplementationOfAgent() {
 		CollectionInteger.Agent<I> implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
 	public static abstract class Agent<I> {
 
-		private CollectionInteger.Agent.ComponentImpl<I> structure = null;
+		private CollectionInteger.Agent.ComponentImpl<I> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -100,8 +103,8 @@ public abstract class CollectionInteger<I> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected CollectionInteger.Agent.Component<I> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -110,8 +113,8 @@ public abstract class CollectionInteger<I> {
 		 * This is not meant to be called from the outside.
 		 */
 		protected I p() {
-			assert this.structure != null;
-			return this.structure.bridge.p();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.p();
 		};
 
 		/**
@@ -120,18 +123,18 @@ public abstract class CollectionInteger<I> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> make_idx();
 
-		private CollectionInteger.ComponentImpl<I> infraStructure = null;
+		private CollectionInteger.ComponentImpl<I> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected CollectionInteger.Component<I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected CollectionInteger.Component<I> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<I> {
@@ -167,10 +170,10 @@ public abstract class CollectionInteger<I> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.idx = implem.idx();
+				this.idx = implem.make_idx();
 
 			}
 

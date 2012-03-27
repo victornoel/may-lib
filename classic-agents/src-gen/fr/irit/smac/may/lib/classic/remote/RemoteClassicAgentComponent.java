@@ -6,7 +6,7 @@ import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 
 public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 
-	private RemoteClassicAgentComponent.ComponentImpl<Msg, Ref> structure = null;
+	private RemoteClassicAgentComponent.ComponentImpl<Msg, Ref> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -14,8 +14,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected RemoteClassicAgentComponent.Component<Msg, Ref> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -24,8 +24,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
-		assert this.structure != null;
-		return this.structure.bridge.send();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.send();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -33,8 +33,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
-		assert this.structure != null;
-		return this.structure.bridge.me();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.me();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -42,8 +42,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor executor() {
-		assert this.structure != null;
-		return this.structure.bridge.executor();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.executor();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -51,8 +51,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do stopExec() {
-		assert this.structure != null;
-		return this.structure.bridge.stopExec();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.stopExec();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -60,8 +60,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do stopReceive() {
-		assert this.structure != null;
-		return this.structure.bridge.stopReceive();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.stopReceive();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -69,8 +69,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> create() {
-		assert this.structure != null;
-		return this.structure.bridge.create();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.create();
 	};
 
 	/**
@@ -79,7 +79,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Do die();
+	protected abstract fr.irit.smac.may.lib.interfaces.Do make_die();
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component.
@@ -94,8 +94,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final SequentialDispatcher.Component<Msg> dispatcher() {
-		assert this.structure != null;
-		return this.structure.dispatcher;
+		assert this.selfComponent != null;
+		return this.selfComponent.dispatcher;
 	}
 
 	/**
@@ -111,8 +111,8 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final RemoteClassicBehaviour.Component<Msg, Ref> beh() {
-		assert this.structure != null;
-		return this.structure.beh;
+		assert this.selfComponent != null;
+		return this.selfComponent.beh;
 	}
 
 	public static interface Bridge<Msg, Ref> {
@@ -159,10 +159,10 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.die = implem.die();
+			this.die = implem.make_die();
 
 			assert this.implem_dispatcher == null;
 			this.implem_dispatcher = implem.make_dispatcher();

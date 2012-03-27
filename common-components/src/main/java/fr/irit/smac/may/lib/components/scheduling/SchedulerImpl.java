@@ -2,7 +2,6 @@ package fr.irit.smac.may.lib.components.scheduling;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +22,7 @@ public class SchedulerImpl extends Scheduler {
 		private final Set<Future<?>> s = new HashSet<Future<?>>();
 
 		@Override
-		protected AdvancedExecutor sched() {
+		protected AdvancedExecutor make_sched() {
 			return new AdvancedExecutor() {
 				public void execute(final Runnable command) {
 					executeAfter(command,0);
@@ -58,7 +57,7 @@ public class SchedulerImpl extends Scheduler {
 		}
 
 		@Override
-		protected Do stop() {
+		protected Do make_stop() {
 			return new Do() {
 				public void doIt() {
 					run.set(false);

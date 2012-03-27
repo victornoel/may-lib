@@ -31,7 +31,7 @@ public class BehaviorWithRef<Ref> extends ClassicBehaviour<PatternMatchingMessag
 	}
 	
 	@Override
-	protected Push<PatternMatchingMessage> cycle() {
+	protected Push<PatternMatchingMessage> make_cycle() {
 		return new Push<PatternMatchingMessage>() {
 			public void push(PatternMatchingMessage thing) {
 				matcher.match(thing);

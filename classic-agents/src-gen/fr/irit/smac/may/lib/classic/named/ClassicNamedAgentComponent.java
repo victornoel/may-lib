@@ -7,7 +7,7 @@ import fr.irit.smac.may.lib.components.meta.Data;
 
 public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
-	private ClassicNamedAgentComponent.ComponentImpl<Msg, Ref> structure = null;
+	private ClassicNamedAgentComponent.ComponentImpl<Msg, Ref> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -15,8 +15,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected ClassicNamedAgentComponent.Component<Msg, Ref> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -25,8 +25,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
-		assert this.structure != null;
-		return this.structure.bridge.send();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.send();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -34,8 +34,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor executor() {
-		assert this.structure != null;
-		return this.structure.bridge.executor();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.executor();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -43,8 +43,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do die() {
-		assert this.structure != null;
-		return this.structure.bridge.die();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.die();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -52,8 +52,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
-		assert this.structure != null;
-		return this.structure.bridge.create();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.create();
 	};
 
 	/**
@@ -69,8 +69,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final Data.Component<Ref> name() {
-		assert this.structure != null;
-		return this.structure.name;
+		assert this.selfComponent != null;
+		return this.selfComponent.name;
 	}
 
 	/**
@@ -86,8 +86,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final SequentialDispatcher.Component<Msg> dispatcher() {
-		assert this.structure != null;
-		return this.structure.dispatcher;
+		assert this.selfComponent != null;
+		return this.selfComponent.dispatcher;
 	}
 
 	/**
@@ -103,8 +103,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final ClassicNamedBehaviour.Component<Msg, Ref> beh() {
-		assert this.structure != null;
-		return this.structure.beh;
+		assert this.selfComponent != null;
+		return this.selfComponent.beh;
 	}
 
 	public static interface Bridge<Msg, Ref> {
@@ -149,8 +149,8 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
 			assert this.implem_name == null;
 			this.implem_name = implem.make_name();

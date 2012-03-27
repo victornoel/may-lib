@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.meta.CollectionMap;
 
 public abstract class CollectionMap<K, I> {
 
-	private CollectionMap.ComponentImpl<K, I> structure = null;
+	private CollectionMap.ComponentImpl<K, I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class CollectionMap<K, I> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected CollectionMap.Component<K, I> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class CollectionMap<K, I> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<K, I> get();
+	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<K, I> make_get();
 
 	public static interface Bridge<K, I> {
 
@@ -57,10 +57,10 @@ public abstract class CollectionMap<K, I> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.get = implem.get();
+			this.get = implem.make_get();
 
 		}
 
@@ -81,18 +81,21 @@ public abstract class CollectionMap<K, I> {
 	 */
 	protected abstract CollectionMap.Agent<K, I> make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public CollectionMap.Agent<K, I> createImplementationOfAgent() {
 		CollectionMap.Agent<K, I> implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
 	public static abstract class Agent<K, I> {
 
-		private CollectionMap.Agent.ComponentImpl<K, I> structure = null;
+		private CollectionMap.Agent.ComponentImpl<K, I> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -100,8 +103,8 @@ public abstract class CollectionMap<K, I> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected CollectionMap.Agent.Component<K, I> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -110,8 +113,8 @@ public abstract class CollectionMap<K, I> {
 		 * This is not meant to be called from the outside.
 		 */
 		protected I p() {
-			assert this.structure != null;
-			return this.structure.bridge.p();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.p();
 		};
 		/**
 		 * This can be called by the implementation to access this required port.
@@ -119,20 +122,20 @@ public abstract class CollectionMap<K, I> {
 		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Pull<K> key() {
-			assert this.structure != null;
-			return this.structure.bridge.key();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.key();
 		};
 
-		private CollectionMap.ComponentImpl<K, I> infraStructure = null;
+		private CollectionMap.ComponentImpl<K, I> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected CollectionMap.Component<K, I> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected CollectionMap.Component<K, I> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<K, I> {
@@ -163,8 +166,8 @@ public abstract class CollectionMap<K, I> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
 			}
 

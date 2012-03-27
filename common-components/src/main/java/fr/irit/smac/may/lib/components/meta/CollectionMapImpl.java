@@ -10,7 +10,7 @@ public class CollectionMapImpl<K, I> extends CollectionMap<K, I> {
 	private final Map<K, AgentSide> interfaces = new HashMap<K, AgentSide>();
 	
 	@Override
-	protected MapGet<K, I> get() {
+	protected MapGet<K, I> make_get() {
 		return new MapGet<K, I>() {
 			public I get(K key) {
 				return interfaces.get(key).getIf();
@@ -32,7 +32,7 @@ public class CollectionMapImpl<K, I> extends CollectionMap<K, I> {
 	}
 	
 	@Override
-	protected fr.irit.smac.may.lib.components.meta.CollectionMap.Agent<K, I> make_Agent() {
+	protected Agent<K, I> make_Agent() {
 		return new AgentSide();
 	}
 }

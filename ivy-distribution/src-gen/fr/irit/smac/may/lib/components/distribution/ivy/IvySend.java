@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.distribution.ivy.IvySend;
 
 public abstract class IvySend {
 
-	private IvySend.ComponentImpl structure = null;
+	private IvySend.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class IvySend {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected IvySend.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class IvySend {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> send();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> make_send();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -30,7 +30,7 @@ public abstract class IvySend {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionStatus> connectionStatus();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionStatus> make_connectionStatus();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -38,7 +38,7 @@ public abstract class IvySend {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionConfig> connect();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.distribution.ivy.IvyConnectionConfig> make_connect();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -46,7 +46,7 @@ public abstract class IvySend {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Do disconnect();
+	protected abstract fr.irit.smac.may.lib.interfaces.Do make_disconnect();
 
 	public static interface Bridge {
 
@@ -93,13 +93,13 @@ public abstract class IvySend {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.send = implem.send();
-			this.connectionStatus = implem.connectionStatus();
-			this.connect = implem.connect();
-			this.disconnect = implem.disconnect();
+			this.send = implem.make_send();
+			this.connectionStatus = implem.make_connectionStatus();
+			this.connect = implem.make_connect();
+			this.disconnect = implem.make_disconnect();
 
 		}
 

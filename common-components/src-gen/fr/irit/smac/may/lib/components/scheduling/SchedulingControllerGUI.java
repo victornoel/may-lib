@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI;
 
 public abstract class SchedulingControllerGUI {
 
-	private SchedulingControllerGUI.ComponentImpl structure = null;
+	private SchedulingControllerGUI.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class SchedulingControllerGUI {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected SchedulingControllerGUI.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class SchedulingControllerGUI {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl control() {
-		assert this.structure != null;
-		return this.structure.bridge.control();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.control();
 	};
 
 	public static interface Bridge {
@@ -53,8 +53,8 @@ public abstract class SchedulingControllerGUI {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
 		}
 

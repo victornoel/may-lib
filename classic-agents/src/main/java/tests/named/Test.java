@@ -13,7 +13,7 @@ public class Test {
 		
 		infra.create().create(new ClassicNamedBehaviour<String, String>() {
 			@Override
-			public Push<String> cycle() {
+			public Push<String> make_cycle() {
 				return new Push<String>() {
 					public void push(String msg) {
 						System.out.println("test");
@@ -25,7 +25,7 @@ public class Test {
 		
 		infra.create().create(new ClassicNamedBehaviour<String, String>() {
 			@Override
-			public Push<String> cycle() {
+			public Push<String> make_cycle() {
 				return new Push<String>() {
 					public void push(String msg) {
 						System.out.println(msg);

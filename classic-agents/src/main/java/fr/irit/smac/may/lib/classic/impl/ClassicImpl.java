@@ -47,7 +47,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 	
 	@Override
-	protected CreateClassic<Msg, AgentRef> create() {
+	protected CreateClassic<Msg, AgentRef> make_create() {
 		return new CreateClassic<Msg, AgentRef>() {
 			public AgentRef create(
 					final ClassicBehaviour<Msg, AgentRef> beh) {

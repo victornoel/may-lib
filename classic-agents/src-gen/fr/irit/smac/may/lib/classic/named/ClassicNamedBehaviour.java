@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour;
 
 public abstract class ClassicNamedBehaviour<Msg, Ref> {
 
-	private ClassicNamedBehaviour.ComponentImpl<Msg, Ref> structure = null;
+	private ClassicNamedBehaviour.ComponentImpl<Msg, Ref> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected ClassicNamedBehaviour.Component<Msg, Ref> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
-		assert this.structure != null;
-		return this.structure.bridge.send();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.send();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
-		assert this.structure != null;
-		return this.structure.bridge.me();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.me();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -40,8 +40,8 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Do die() {
-		assert this.structure != null;
-		return this.structure.bridge.die();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.die();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -49,8 +49,8 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
-		assert this.structure != null;
-		return this.structure.bridge.create();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.create();
 	};
 
 	/**
@@ -59,7 +59,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Msg> cycle();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<Msg> make_cycle();
 
 	public static interface Bridge<Msg, Ref> {
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send();
@@ -97,10 +97,10 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.cycle = implem.cycle();
+			this.cycle = implem.make_cycle();
 
 		}
 

@@ -19,7 +19,7 @@ public class PlacedImpl extends Placed {
 	}
 	
 	@Override
-	protected Pull<Place> thisPlace() {
+	protected Pull<Place> make_thisPlace() {
 		return new Pull<Place>() {
 			public Place pull() {
 				return place;
@@ -29,7 +29,7 @@ public class PlacedImpl extends Placed {
 	
 	public class AgentSide extends Placed.Agent {
 		@Override
-		protected Pull<Place> myPlace() {
+		protected Pull<Place> make_myPlace() {
 			return new Pull<Place>() {
 				public Place pull() {
 					return place;

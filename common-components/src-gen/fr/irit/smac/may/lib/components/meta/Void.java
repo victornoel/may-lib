@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.meta.Void;
 
 public abstract class Void<I> {
 
-	private Void.ComponentImpl<I> structure = null;
+	private Void.ComponentImpl<I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Void<I> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Void.Component<I> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class Void<I> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract I port();
+	protected abstract I make_port();
 
 	public static interface Bridge<I> {
 
@@ -54,10 +54,10 @@ public abstract class Void<I> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.port = implem.port();
+			this.port = implem.make_port();
 
 		}
 

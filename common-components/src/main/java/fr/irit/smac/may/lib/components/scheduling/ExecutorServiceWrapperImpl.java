@@ -14,7 +14,7 @@ public class ExecutorServiceWrapperImpl extends ExecutorService {
 	}
 	
 	@Override
-	public AdvancedExecutor exec() {
+	public AdvancedExecutor make_exec() {
 		return new AdvancedExecutor() {
 			public void execute(Runnable command) {
 				service.execute(command);
@@ -58,7 +58,7 @@ public class ExecutorServiceWrapperImpl extends ExecutorService {
 	}
 
 	@Override
-	protected Do stop() {
+	protected Do make_stop() {
 		return new Do() {
 			public void doIt() {
 				service.shutdownNow();

@@ -48,7 +48,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 		return new ForwardImpl<CreateNamed<Msg,String>>();
 	}
 	@Override
-	protected CreateNamed<Msg, String> create() {
+	protected CreateNamed<Msg, String> make_create() {
 		return new CreateNamed<Msg, String>() {
 			public String create(
 					final ClassicNamedBehaviour<Msg, String> beh, String name) {

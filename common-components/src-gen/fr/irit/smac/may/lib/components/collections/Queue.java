@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.collections.Queue;
 
 public abstract class Queue<Truc> {
 
-	private Queue.ComponentImpl<Truc> structure = null;
+	private Queue.ComponentImpl<Truc> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Queue<Truc> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Queue.Component<Truc> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,7 +22,7 @@ public abstract class Queue<Truc> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> put();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> make_put();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -30,7 +30,7 @@ public abstract class Queue<Truc> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<Truc> get();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<Truc> make_get();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -38,7 +38,7 @@ public abstract class Queue<Truc> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> getAll();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<Truc>> make_getAll();
 
 	public static interface Bridge<Truc> {
 
@@ -83,12 +83,12 @@ public abstract class Queue<Truc> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.put = implem.put();
-			this.get = implem.get();
-			this.getAll = implem.getAll();
+			this.put = implem.make_put();
+			this.get = implem.make_get();
+			this.getAll = implem.make_getAll();
 
 		}
 

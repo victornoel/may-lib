@@ -20,7 +20,7 @@ public class IvyReceiveImpl extends IvyReceive {
 	private IvyMessageListener listener;
 
 	@Override
-	protected Pull<IvyConnectionStatus> connectionStatus() {
+	protected Pull<IvyConnectionStatus> make_connectionStatus() {
 		return new Pull<IvyConnectionStatus>() {
 
 			public IvyConnectionStatus pull() {
@@ -38,7 +38,7 @@ public class IvyReceiveImpl extends IvyReceive {
 	}
 
 	@Override
-	protected Push<String> bindMsg() {
+	protected Push<String> make_bindMsg() {
 		return new Push<String>() {
 
 			public void push(String thing) {
@@ -65,7 +65,7 @@ public class IvyReceiveImpl extends IvyReceive {
 	}
 
 	@Override
-	protected Push<IvyConnectionConfig> connect() {
+	protected Push<IvyConnectionConfig> make_connect() {
 		return new Push<IvyConnectionConfig>() {
 
 			public void push(IvyConnectionConfig config) {
@@ -103,7 +103,7 @@ public class IvyReceiveImpl extends IvyReceive {
 	}
 
 	@Override
-	protected Do disconnect() {
+	protected Do make_disconnect() {
 		return new Do() {
 
 			public void doIt() {

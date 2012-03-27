@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunic
 
 public abstract class DistributedCommunication<T> {
 
-	private DistributedCommunication.ComponentImpl<T> structure = null;
+	private DistributedCommunication.ComponentImpl<T> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class DistributedCommunication<T> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected DistributedCommunication.Component<T> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class DistributedCommunication<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<T> out() {
-		assert this.structure != null;
-		return this.structure.bridge.out();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.out();
 	};
 	/**
 	 * This can be called by the implementation to access this required port.
@@ -31,8 +31,8 @@ public abstract class DistributedCommunication<T> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> broadcast() {
-		assert this.structure != null;
-		return this.structure.bridge.broadcast();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.broadcast();
 	};
 
 	/**
@@ -41,7 +41,7 @@ public abstract class DistributedCommunication<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> nodeName();
+	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> make_nodeName();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -49,7 +49,7 @@ public abstract class DistributedCommunication<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> in();
+	protected abstract fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> make_in();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -57,7 +57,7 @@ public abstract class DistributedCommunication<T> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> handle();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> make_handle();
 
 	public static interface Bridge<T> {
 		public fr.irit.smac.may.lib.interfaces.Push<T> out();
@@ -103,12 +103,12 @@ public abstract class DistributedCommunication<T> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.nodeName = implem.nodeName();
-			this.in = implem.in();
-			this.handle = implem.handle();
+			this.nodeName = implem.make_nodeName();
+			this.in = implem.make_in();
+			this.handle = implem.make_handle();
 
 		}
 

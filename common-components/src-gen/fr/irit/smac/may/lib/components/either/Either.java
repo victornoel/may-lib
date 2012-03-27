@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.either.Either;
 
 public abstract class Either<L, R> {
 
-	private Either.ComponentImpl<L, R> structure = null;
+	private Either.ComponentImpl<L, R> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Either<L, R> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Either.Component<L, R> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Either<L, R> {
 	 * This is not meant to be called from the outside.
 	 */
 	protected fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out() {
-		assert this.structure != null;
-		return this.structure.bridge.out();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.out();
 	};
 
 	/**
@@ -32,7 +32,7 @@ public abstract class Either<L, R> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<L> left();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<L> make_left();
 
 	/**
 	 * This should be overridden by the implementation to define the provided port.
@@ -40,7 +40,7 @@ public abstract class Either<L, R> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<R> right();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<R> make_right();
 
 	public static interface Bridge<L, R> {
 		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out();
@@ -80,11 +80,11 @@ public abstract class Either<L, R> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.left = implem.left();
-			this.right = implem.right();
+			this.left = implem.make_left();
+			this.right = implem.make_right();
 
 		}
 

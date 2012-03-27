@@ -10,7 +10,7 @@ import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 
 public abstract class ClassicNamed<Msg> {
 
-	private ClassicNamed.ComponentImpl<Msg> structure = null;
+	private ClassicNamed.ComponentImpl<Msg> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -18,8 +18,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected ClassicNamed.Component<Msg> self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -28,7 +28,7 @@ public abstract class ClassicNamed<Msg> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create();
+	protected abstract fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> make_create();
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component.
@@ -43,8 +43,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final Scheduler.Component scheduler() {
-		assert this.structure != null;
-		return this.structure.scheduler;
+		assert this.selfComponent != null;
+		return this.selfComponent.scheduler;
 	}
 
 	/**
@@ -60,8 +60,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender() {
-		assert this.structure != null;
-		return this.structure.sender;
+		assert this.selfComponent != null;
+		return this.selfComponent.sender;
 	}
 
 	/**
@@ -77,8 +77,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> fact() {
-		assert this.structure != null;
-		return this.structure.fact;
+		assert this.selfComponent != null;
+		return this.selfComponent.fact;
 	}
 
 	/**
@@ -94,8 +94,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final Receiver.Component<Msg> realReceive() {
-		assert this.structure != null;
-		return this.structure.realReceive;
+		assert this.selfComponent != null;
+		return this.selfComponent.realReceive;
 	}
 
 	/**
@@ -111,8 +111,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final MapReceiver.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> receive() {
-		assert this.structure != null;
-		return this.structure.receive;
+		assert this.selfComponent != null;
+		return this.selfComponent.receive;
 	}
 
 	/**
@@ -128,8 +128,8 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	protected final ExecutorService.Component executor() {
-		assert this.structure != null;
-		return this.structure.executor;
+		assert this.selfComponent != null;
+		return this.selfComponent.executor;
 	}
 
 	public static interface Bridge<Msg> {
@@ -170,10 +170,10 @@ public abstract class ClassicNamed<Msg> {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.create = implem.create();
+			this.create = implem.make_create();
 
 			assert this.implem_scheduler == null;
 			this.implem_scheduler = implem.make_scheduler();
@@ -301,38 +301,46 @@ public abstract class ClassicNamed<Msg> {
 			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name);
 
+	/**
+	 * Should not be called
+	 */
 	public ClassicNamed.ClassicNamedAgent<Msg> createImplementationOfClassicNamedAgent(
 			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name) {
 		ClassicNamed.ClassicNamedAgent<Msg> implem = make_ClassicNamedAgent(
 				beh, name);
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
-		assert this.structure.implem_scheduler != null;
-		assert implem.with_s == null;
-		implem.with_s = this.structure.implem_scheduler
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
+		assert this.selfComponent.implem_scheduler != null;
+		assert implem.use_s == null;
+		implem.use_s = this.selfComponent.implem_scheduler
 				.createImplementationOfAgent();
-		assert this.structure.implem_fact != null;
-		assert implem.with_f == null;
-		implem.with_f = this.structure.implem_fact
+		assert this.selfComponent.implem_fact != null;
+		assert implem.use_f == null;
+		implem.use_f = this.selfComponent.implem_fact
 				.createImplementationOfAgent();
-		assert this.structure.implem_receive != null;
-		assert implem.with_r == null;
-		implem.with_r = this.structure.implem_receive
+		assert this.selfComponent.implem_receive != null;
+		assert implem.use_r == null;
+		implem.use_r = this.selfComponent.implem_receive
 				.createImplementationOfAgent();
-		assert this.structure.implem_realReceive != null;
-		assert implem.with_rr == null;
-		implem.with_rr = this.structure.implem_realReceive
+		assert this.selfComponent.implem_realReceive != null;
+		assert implem.use_rr == null;
+		implem.use_rr = this.selfComponent.implem_realReceive
 				.createImplementationOfAgent(name);
-		assert this.structure.implem_sender != null;
-		assert implem.with_ss == null;
-		implem.with_ss = this.structure.implem_sender
+		assert this.selfComponent.implem_sender != null;
+		assert implem.use_ss == null;
+		implem.use_ss = this.selfComponent.implem_sender
 				.createImplementationOfAgent();
 
 		return implem;
 	}
 
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
 	public ClassicNamed.ClassicNamedAgent.Component<Msg> createClassicNamedAgent(
 			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name) {
@@ -345,7 +353,7 @@ public abstract class ClassicNamed<Msg> {
 
 	public static abstract class ClassicNamedAgent<Msg> {
 
-		private ClassicNamed.ClassicNamedAgent.ComponentImpl<Msg> structure = null;
+		private ClassicNamed.ClassicNamedAgent.ComponentImpl<Msg> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -353,8 +361,8 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected ClassicNamed.ClassicNamedAgent.Component<Msg> self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -370,11 +378,11 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected final ClassicNamedAgentComponent.Component<Msg, java.lang.String> arch() {
-			assert this.structure != null;
-			return this.structure.arch;
+			assert this.selfComponent != null;
+			return this.selfComponent.arch;
 		}
 
-		private Scheduler.Agent with_s = null;
+		private Scheduler.Agent use_s = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -383,11 +391,11 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected final Scheduler.Agent.Component s() {
-			assert this.structure != null;
-			return this.structure.s;
+			assert this.selfComponent != null;
+			return this.selfComponent.s;
 		}
 
-		private Forward.Agent<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> with_f = null;
+		private Forward.Agent<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> use_f = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -396,11 +404,11 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> f() {
-			assert this.structure != null;
-			return this.structure.f;
+			assert this.selfComponent != null;
+			return this.selfComponent.f;
 		}
 
-		private MapReceiver.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> with_r = null;
+		private MapReceiver.Agent<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> use_r = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -409,11 +417,11 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected final MapReceiver.Agent.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef, java.lang.String> r() {
-			assert this.structure != null;
-			return this.structure.r;
+			assert this.selfComponent != null;
+			return this.selfComponent.r;
 		}
 
-		private Receiver.Agent<Msg> with_rr = null;
+		private Receiver.Agent<Msg> use_rr = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -422,11 +430,11 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected final Receiver.Agent.Component<Msg> rr() {
-			assert this.structure != null;
-			return this.structure.rr;
+			assert this.selfComponent != null;
+			return this.selfComponent.rr;
 		}
 
-		private Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> with_ss = null;
+		private Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> use_ss = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -435,20 +443,20 @@ public abstract class ClassicNamed<Msg> {
 		 * This is not meant to be called on the object by hand.
 		 */
 		protected final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> ss() {
-			assert this.structure != null;
-			return this.structure.ss;
+			assert this.selfComponent != null;
+			return this.selfComponent.ss;
 		}
 
-		private ClassicNamed.ComponentImpl<Msg> infraStructure = null;
+		private ClassicNamed.ComponentImpl<Msg> ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected ClassicNamed.Component<Msg> infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected ClassicNamed.Component<Msg> ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<Msg> {
@@ -479,27 +487,27 @@ public abstract class ClassicNamed<Msg> {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
 				assert this.implem_arch == null;
 				this.implem_arch = implem.make_arch();
 				this.arch = this.implem_arch
 						.createComponent(new BridgeImpl_arch());
-				assert this.implementation.with_s != null;
-				this.s = this.implementation.with_s
+				assert this.implementation.use_s != null;
+				this.s = this.implementation.use_s
 						.createComponent(new BridgeImplschedulerAgent());
-				assert this.implementation.with_f != null;
-				this.f = this.implementation.with_f
+				assert this.implementation.use_f != null;
+				this.f = this.implementation.use_f
 						.createComponent(new BridgeImplfactAgent());
-				assert this.implementation.with_r != null;
-				this.r = this.implementation.with_r
+				assert this.implementation.use_r != null;
+				this.r = this.implementation.use_r
 						.createComponent(new BridgeImplreceiveAgent());
-				assert this.implementation.with_rr != null;
-				this.rr = this.implementation.with_rr
+				assert this.implementation.use_rr != null;
+				this.rr = this.implementation.use_rr
 						.createComponent(new BridgeImplrealReceiveAgent());
-				assert this.implementation.with_ss != null;
-				this.ss = this.implementation.with_ss
+				assert this.implementation.use_ss != null;
+				this.ss = this.implementation.use_ss
 						.createComponent(new BridgeImplsenderAgent());
 			}
 

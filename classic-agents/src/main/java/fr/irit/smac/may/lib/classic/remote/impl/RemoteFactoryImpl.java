@@ -48,20 +48,20 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 	
 	public class AgentSide extends RemoteFactory.Agent<Msg, Ref> {
 		@Override
-		protected CreateRemoteClassic<Msg, Ref> create() {
+		protected CreateRemoteClassic<Msg, Ref> make_create() {
 			return new CreateRemoteClassic<Msg, Ref>() {
 				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh, Place place) {
-					return infraSelf().factCreate().create(beh,place);
+					return ecoSelf().factCreate().create(beh,place);
 				}
 				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) {
-					return infraSelf().factCreate().create(beh);
+					return ecoSelf().factCreate().create(beh);
 				}
 			};
 		}
 	}
 
 	@Override
-	protected CreateRemoteClassic<Msg, Ref> factCreate() {
+	protected CreateRemoteClassic<Msg, Ref> make_factCreate() {
 		return new CreateRemoteClassic<Msg, Ref>() {
 			public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) {
 				return infraCreate().create(beh);

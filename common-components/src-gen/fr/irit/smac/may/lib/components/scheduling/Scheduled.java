@@ -4,7 +4,7 @@ import fr.irit.smac.may.lib.components.scheduling.Scheduled;
 
 public abstract class Scheduled {
 
-	private Scheduled.ComponentImpl structure = null;
+	private Scheduled.ComponentImpl selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
@@ -12,8 +12,8 @@ public abstract class Scheduled {
 	 * This is not meant to be called from the outside by hand.
 	 */
 	protected Scheduled.Component self() {
-		assert this.structure != null;
-		return this.structure;
+		assert this.selfComponent != null;
+		return this.selfComponent;
 	};
 
 	/**
@@ -22,8 +22,8 @@ public abstract class Scheduled {
 	 * This is not meant to be called from the outside.
 	 */
 	protected java.util.concurrent.Executor sched() {
-		assert this.structure != null;
-		return this.structure.bridge.sched();
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.sched();
 	};
 
 	/**
@@ -32,7 +32,7 @@ public abstract class Scheduled {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Do tick();
+	protected abstract fr.irit.smac.may.lib.interfaces.Do make_tick();
 
 	public static interface Bridge {
 		public java.util.concurrent.Executor sched();
@@ -64,10 +64,10 @@ public abstract class Scheduled {
 
 			this.implementation = implem;
 
-			assert implem.structure == null;
-			implem.structure = this;
+			assert implem.selfComponent == null;
+			implem.selfComponent = this;
 
-			this.tick = implem.tick();
+			this.tick = implem.make_tick();
 
 		}
 
@@ -88,18 +88,21 @@ public abstract class Scheduled {
 	 */
 	protected abstract Scheduled.Agent make_Agent();
 
+	/**
+	 * Should not be called
+	 */
 	public Scheduled.Agent createImplementationOfAgent() {
 		Scheduled.Agent implem = make_Agent();
-		assert implem.infraStructure == null;
-		assert this.structure == null;
-		implem.infraStructure = this.structure;
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent == null;
+		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
 	}
 
 	public static abstract class Agent {
 
-		private Scheduled.Agent.ComponentImpl structure = null;
+		private Scheduled.Agent.ComponentImpl selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
@@ -107,8 +110,8 @@ public abstract class Scheduled {
 		 * This is not meant to be called from the outside by hand.
 		 */
 		protected Scheduled.Agent.Component self() {
-			assert this.structure != null;
-			return this.structure;
+			assert this.selfComponent != null;
+			return this.selfComponent;
 		};
 
 		/**
@@ -117,8 +120,8 @@ public abstract class Scheduled {
 		 * This is not meant to be called from the outside.
 		 */
 		protected fr.irit.smac.may.lib.interfaces.Do cycle() {
-			assert this.structure != null;
-			return this.structure.bridge.cycle();
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.cycle();
 		};
 
 		/**
@@ -127,18 +130,18 @@ public abstract class Scheduled {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
-		private Scheduled.ComponentImpl infraStructure = null;
+		private Scheduled.ComponentImpl ecosystemComponent = null;
 
 		/**
-		 * This can be called by the implementation to access the component of the infrastructure itself and its provided ports.
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Scheduled.Component infraSelf() {
-			assert this.infraStructure != null;
-			return this.infraStructure;
+		protected Scheduled.Component ecoSelf() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge {
@@ -174,10 +177,10 @@ public abstract class Scheduled {
 
 				this.implementation = implem;
 
-				assert implem.structure == null;
-				implem.structure = this;
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
 
-				this.stop = implem.stop();
+				this.stop = implem.make_stop();
 
 			}
 
