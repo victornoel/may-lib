@@ -6,9 +6,10 @@ import java.lang.reflect.Proxy;
 
 public abstract class VoidImpl<I> extends Void<I> {
 
-	private final Class<I> clazz;
+	@SuppressWarnings("rawtypes")
+	private final Class clazz;
 
-	public VoidImpl(Class<I> clazz) {
+	public VoidImpl(@SuppressWarnings("rawtypes") Class clazz) {
 		this.clazz = clazz;
 	}
 	

@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 public class VoidEmpty<I> extends VoidImpl<I> {
 
-	public VoidEmpty(Class<I> clazz) {
+	public VoidEmpty(@SuppressWarnings("rawtypes") Class clazz) {
 		super(clazz);
 	}
 
