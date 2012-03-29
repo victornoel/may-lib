@@ -4,14 +4,14 @@ import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcherImpl;
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
 
-public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, AgentRef> {
+public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, DirRef> {
 	
-	private final ClassicBehaviour<Msg, AgentRef> beh;
+	private final ClassicBehaviour<Msg, DirRef> beh;
 
 	public ClassicAgentComponentImpl(
-			ClassicBehaviour<Msg, AgentRef> beh) {
+			ClassicBehaviour<Msg, DirRef> beh) {
 		this.beh = beh;
 	}
 
@@ -21,7 +21,7 @@ public class ClassicAgentComponentImpl<Msg> extends ClassicAgentComponent<Msg, A
 	}
 
 	@Override
-	public ClassicBehaviour<Msg, AgentRef> make_beh() {
+	public ClassicBehaviour<Msg, DirRef> make_beh() {
 		return beh;
 	}
 }

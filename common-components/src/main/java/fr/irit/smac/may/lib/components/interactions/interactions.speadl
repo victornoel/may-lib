@@ -1,0 +1,102 @@
+
+import fr.irit.smac.may.lib.interfaces.*
+	import fr.irit.smac.may.lib.components.interactions.interfaces.*
+import java.lang.*
+
+namespace fr.irit.smac.may.lib.components.interactions {
+	
+
+	import fr.irit.smac.may.lib.components.interactions.directreferences.*
+	
+	ecosystem DirectReferences[I] {
+		
+		species Callee(name: String) {
+			requires toCall: I
+			provides me: Pull[DirRef]
+			provides stop: Do
+		}
+		
+		provides call: Call[I,DirRef]
+		
+	}
+	
+	ecosystem MapReferences[I,K] {
+		
+		species Callee(key: K) {
+			requires toCall: I
+			provides me: Pull[K]
+			provides stop: Do
+		}
+		
+		species CalleePullKey {
+			requires toCall: I
+			requires key: Pull[K]
+			
+			provides me: Pull[K]
+			provides stop: Do
+		}
+		
+		provides call: Call[I,K]
+		
+	}
+	
+	import java.util.Collection
+	import fr.irit.smac.may.lib.components.collections.Queue
+	
+	ecosystem AsyncReceiver[M,K] {
+		
+		// does not take care of buffering messages
+		// put cannot be blocking!
+//		species Receiver(name: String) {
+//			
+//			requires put: Push[M]
+			
+//			use dr: dr.Callee(name) {
+//				bind toCall toThis put
+//			}
+			
+//			provides me: Pull[DirRef] = dr.me
+//			provides stop: Do = dr.stop
+//		}
+		
+		// takes care of buffering messages
+		species ReceiverBuf {
+			
+			provides get: Pull[M] = q.get
+			provides getAll: Pull[Collection[M]] = q.getAll
+			
+			part q: Queue[M]
+			
+			provides put: Push[M] = q.put
+			
+//			use dr: dr.Callee(name) {
+//				bind toCall to q.put
+//			}
+//			
+//			provides me: Pull[DirRef] = dr.me
+//			provides stop: Do = dr.stop
+		}
+		
+		//part dr: DirectReferences[Push[M]]
+		
+		requires call: Call[Push[M],K]
+		provides deposit: ReliableSend[M, K]
+	}
+	
+	ecosystem ValuePublisher[T,K] {
+		
+		species PublisherPush {
+			provides set: Push[T]
+			provides get: Pull[T]
+		}
+		
+		species PublisherPull {
+			provides get: Pull[T]
+			requires getValue: Pull[T]
+		}
+		
+		requires call: Call[Pull[T],K]
+		provides observe: ReliableObserve[T, K]
+	}
+
+}

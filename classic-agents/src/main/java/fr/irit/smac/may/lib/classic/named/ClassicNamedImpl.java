@@ -3,17 +3,17 @@ package fr.irit.smac.may.lib.classic.named;
 import java.util.concurrent.Executors;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateNamed;
-import fr.irit.smac.may.lib.components.messaging.MapReceiver;
-import fr.irit.smac.may.lib.components.messaging.MapReceiverImpl;
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.AsyncReceiver;
+import fr.irit.smac.may.lib.components.interactions.MapReferences;
+import fr.irit.smac.may.lib.components.interactions.asyncreceiver.AsyncReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.mapreferences.MapReferencesImpl;
 import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
+import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
@@ -34,13 +34,13 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 	}
 
 	@Override
-	protected Receiver<Msg> make_realReceive() {
-		return new ReceiverImpl<Msg>();
+	protected AsyncReceiver<Msg, String> make_receive() {
+		return new AsyncReceiverImpl<Msg, String>();
 	}
 	
 	@Override
-	protected MapReceiver<Msg,AgentRef,String> make_receive() {
-		return new MapReceiverImpl<Msg,AgentRef,String>();
+	protected MapReferences<Push<Msg>, String> make_refs() {
+		return new MapReferencesImpl<Push<Msg>, String>();
 	}
 
 	@Override
@@ -65,7 +65,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 		return new ClassicNamedAgent<Msg>() {
 			@Override
 			protected ClassicNamedAgentComponent<Msg, String> make_arch() {
-				return new ClassicNamedAgentComponentImpl<Msg,String>(name,beh);
+				return new ClassicNamedAgentComponentImpl<Msg,String>(beh);
 			}
 		};
 	}

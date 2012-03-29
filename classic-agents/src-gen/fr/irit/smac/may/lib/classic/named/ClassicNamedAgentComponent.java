@@ -3,7 +3,6 @@ package fr.irit.smac.may.lib.classic.named;
 import fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent;
 import fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour;
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
-import fr.irit.smac.may.lib.components.meta.Data;
 
 public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
@@ -33,6 +32,15 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	 *
 	 * This is not meant to be called from the outside.
 	 */
+	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
+		assert this.selfComponent != null;
+		return this.selfComponent.bridge.me();
+	};
+	/**
+	 * This can be called by the implementation to access this required port.
+	 *
+	 * This is not meant to be called from the outside.
+	 */
 	protected java.util.concurrent.Executor executor() {
 		assert this.selfComponent != null;
 		return this.selfComponent.bridge.executor();
@@ -55,23 +63,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 		assert this.selfComponent != null;
 		return this.selfComponent.bridge.create();
 	};
-
-	/**
-	 * This should be overridden by the implementation to define how to create this sub-component.
-	 * This will be called once during the construction of the component to initialize this sub-component.
-	 */
-	protected abstract Data<Ref> make_name();
-
-	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports.
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final Data.Component<Ref> name() {
-		assert this.selfComponent != null;
-		return this.selfComponent.name;
-	}
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component.
@@ -109,6 +100,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 
 	public static interface Bridge<Msg, Ref> {
 		public fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send();
+		public fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
 		public java.util.concurrent.Executor executor();
 		public fr.irit.smac.may.lib.interfaces.Do die();
 		public fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create();
@@ -122,11 +114,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Push<Msg> put();
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
 
 		/**
 		 * This should be called to start the component
@@ -152,9 +139,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 			assert implem.selfComponent == null;
 			implem.selfComponent = this;
 
-			assert this.implem_name == null;
-			this.implem_name = implem.make_name();
-			this.name = this.implem_name.createComponent(new BridgeImpl_name());
 			assert this.implem_dispatcher == null;
 			this.implem_dispatcher = implem.make_dispatcher();
 			this.dispatcher = this.implem_dispatcher
@@ -164,13 +148,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 			this.beh = this.implem_beh.createComponent(new BridgeImpl_beh());
 		}
 
-		private final Data.Component<Ref> name;
-
-		private Data<Ref> implem_name = null;
-
-		private final class BridgeImpl_name implements Data.Bridge<Ref> {
-
-		}
 		private final SequentialDispatcher.Component<Msg> dispatcher;
 
 		private SequentialDispatcher<Msg> implem_dispatcher = null;
@@ -204,7 +181,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
-				return ComponentImpl.this.me();
+				return ComponentImpl.this.bridge.me();
 
 			};
 
@@ -224,12 +201,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 			return this.dispatcher.dispatch();
 		};
 
-		public final fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
-			return this.name.data();
-		};
-
 		public final void start() {
-			this.name.start();
 			this.dispatcher.start();
 			this.beh.start();
 

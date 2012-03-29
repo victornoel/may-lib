@@ -22,7 +22,7 @@ namespace fr.irit.smac.may.lib.classic {
 	namespace named {
 		
 		ecosystem ClassicNamed[Msg] {
-			provides send: Send[Msg, String] = receive.depositKey
+			provides send: Send[Msg, String] = receive.deposit
 			provides create: CreateNamed[Msg, String]
 			
 			part scheduler: Scheduler {
@@ -30,17 +30,16 @@ namespace fr.irit.smac.may.lib.classic {
 			}
 
 			part sender: Forward[Send[Msg, String]] {
-				bind i to receive.depositKey
+				bind i to receive.deposit
 			}
 			
 			part fact: Forward[CreateNamed[Msg, String]] {
 				bind i toThis create
 			}
 			
-			part realReceive: Receiver[Msg]
-			
-			part receive: MapReceiver[Msg,AgentRef,String] {
-				bind depositValue to realReceive.deposit
+			part refs: fr.irit.smac.may.lib.components.interactions.MapReferences[Push[Msg],String]
+			part receive: fr.irit.smac.may.lib.components.interactions.AsyncReceiver[Msg,String] {
+				bind call to refs.call
 			}
 			
 			part executor: ExecutorService
@@ -52,19 +51,17 @@ namespace fr.irit.smac.may.lib.classic {
 					bind executor to s.sched
 					bind die to s.stop
 					bind create to f.a
+					bind me to ref.me
 				}
 
 				use s: scheduler.Agent
 
 				use f: fact.Agent
 
-				use r: receive.Agent {
-					bind key to arch.me
-					bind value to rr.me
-				}
-				
-				use rr: realReceive.Agent(name) {
-					bind put to arch.put
+				// no need for receiver because we don't want the buffer
+				// that's a bit ugly btw
+				use ref: refs.Callee(name) {
+					bind toCall to arch.put
 				}
 
 				use ss: sender.Agent
@@ -82,14 +79,12 @@ namespace fr.irit.smac.may.lib.classic {
 		component ClassicNamedAgentComponent[Msg, Ref] {
 			
 			provides put: Push[Msg] = dispatcher.dispatch
-			provides me: Pull[Ref] = name.data
 			
 			requires send: Send[Msg, Ref]
+			requires me: Pull[Ref]
 			requires executor: Executor
 			requires die: Do
 			requires create: CreateNamed[Msg, Ref]
-
-			part name: Data[Ref]
 
 			part dispatcher: SequentialDispatcher[Msg] {
 				bind executor toThis executor
@@ -107,6 +102,7 @@ namespace fr.irit.smac.may.lib.classic {
 	}
 
 	namespace local {
+		import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
 		
 		component ClassicBehaviour[Msg, Ref] {
 			provides cycle: Push[Msg]
@@ -118,33 +114,36 @@ namespace fr.irit.smac.may.lib.classic {
 		
 		ecosystem Classic[Msg] {
 
-			provides send: Send[Msg, AgentRef] = receive.deposit
-			provides create: CreateClassic[Msg, AgentRef]
+			provides send: Send[Msg, DirRef] = receive.deposit
+			provides create: CreateClassic[Msg, DirRef]
 			provides stop: Do = executor.stop
 
 			part scheduler: Scheduler {
 				bind infraSched to executor.exec
 			}
 
-			part sender: Forward[Send[Msg, AgentRef]] {
+			part sender: Forward[Send[Msg, DirRef]] {
 				bind i to receive.deposit
 			}
+			
+			part refs: fr.irit.smac.may.lib.components.interactions.DirectReferences[Push[Msg]]
+			part receive: fr.irit.smac.may.lib.components.interactions.AsyncReceiver[Msg,DirRef] {
+				bind call to refs.call
+			}
 
-			part receive: Receiver[Msg]
-
-			part fact: fr.irit.smac.may.lib.components.meta.Forward[CreateClassic[Msg, AgentRef]] {
+			part fact: Forward[CreateClassic[Msg, DirRef]] {
 				bind i toThis create
 			}
 
 			part executor: ExecutorService
 
-			species ClassicAgent(beh: local.ClassicBehaviour[Msg,AgentRef], name: String) {
+			species ClassicAgent(beh: local.ClassicBehaviour[Msg,DirRef], name: String) {
 			//species ClassicAgent(name: String) {
-				provides ref: Pull[AgentRef] = r.me
+				provides me: Pull[DirRef] = ref.me
 				
-				part arch: ClassicAgentComponent[Msg, AgentRef] {
+				part arch: ClassicAgentComponent[Msg, DirRef] {
 					bind send to ss.a
-					bind me to r.me
+					bind me to ref.me
 					bind executor to s.sched
 					bind die to s.stop
 					bind create to f.a
@@ -153,9 +152,11 @@ namespace fr.irit.smac.may.lib.classic {
 				use s: scheduler.Agent
 
 				use f: fact.Agent
-
-				use r: receive.Agent(name) { 
-					bind put to arch.put
+				
+				// no need for receiver because we don't want the buffer
+				// that's a bit ugly btw
+				use ref: refs.Callee(name) {
+					bind toCall to arch.put
 				}
 
 				use ss: sender.Agent

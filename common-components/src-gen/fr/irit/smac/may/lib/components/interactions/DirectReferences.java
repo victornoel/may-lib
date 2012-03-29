@@ -1,17 +1,17 @@
-package fr.irit.smac.may.lib.components.meta;
+package fr.irit.smac.may.lib.components.interactions;
 
-import fr.irit.smac.may.lib.components.meta.CollectionInteger;
+import fr.irit.smac.may.lib.components.interactions.DirectReferences;
 
-public abstract class CollectionInteger<I> {
+public abstract class DirectReferences<I> {
 
-	private CollectionInteger.ComponentImpl<I> selfComponent = null;
+	private DirectReferences.ComponentImpl<I> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
 	 * This is not meant to be called from the outside by hand.
 	 */
-	protected CollectionInteger.Component<I> self() {
+	protected DirectReferences.Component<I> self() {
 		assert this.selfComponent != null;
 		return this.selfComponent;
 	};
@@ -22,23 +22,7 @@ public abstract class CollectionInteger<I> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> make_get();
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> make_size();
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fj.F<I, fj.Unit>> make_forAll();
+	protected abstract fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> make_call();
 
 	public static interface Bridge<I> {
 
@@ -50,17 +34,7 @@ public abstract class CollectionInteger<I> {
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get();
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> size();
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Push<fj.F<I, fj.Unit>> forAll();
+		public fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> call();
 
 		/**
 		 * This should be called to start the component
@@ -70,15 +44,15 @@ public abstract class CollectionInteger<I> {
 
 	private final static class ComponentImpl<I>
 			implements
-				CollectionInteger.Component<I> {
+				DirectReferences.Component<I> {
 
 		@SuppressWarnings("unused")
-		private final CollectionInteger.Bridge<I> bridge;
+		private final DirectReferences.Bridge<I> bridge;
 
-		private final CollectionInteger<I> implementation;
+		private final DirectReferences<I> implementation;
 
-		private ComponentImpl(final CollectionInteger<I> implem,
-				final CollectionInteger.Bridge<I> b) {
+		private ComponentImpl(final DirectReferences<I> implem,
+				final DirectReferences.Bridge<I> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -86,26 +60,14 @@ public abstract class CollectionInteger<I> {
 			assert implem.selfComponent == null;
 			implem.selfComponent = this;
 
-			this.get = implem.make_get();
-			this.size = implem.make_size();
-			this.forAll = implem.make_forAll();
+			this.call = implem.make_call();
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get;
+		private final fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> call;
 
-		public final fr.irit.smac.may.lib.interfaces.MapGet<java.lang.Integer, I> get() {
-			return this.get;
-		};
-		private final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> size;
-
-		public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> size() {
-			return this.size;
-		};
-		private final fr.irit.smac.may.lib.interfaces.Push<fj.F<I, fj.Unit>> forAll;
-
-		public final fr.irit.smac.may.lib.interfaces.Push<fj.F<I, fj.Unit>> forAll() {
-			return this.forAll;
+		public final fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> call() {
+			return this.call;
 		};
 
 		public final void start() {
@@ -117,13 +79,15 @@ public abstract class CollectionInteger<I> {
 	/**
 	 * Should not be called
 	 */
-	protected abstract CollectionInteger.Agent<I> make_Agent();
+	protected abstract DirectReferences.Callee<I> make_Callee(
+			java.lang.String name);
 
 	/**
 	 * Should not be called
 	 */
-	public CollectionInteger.Agent<I> createImplementationOfAgent() {
-		CollectionInteger.Agent<I> implem = make_Agent();
+	public DirectReferences.Callee<I> createImplementationOfCallee(
+			java.lang.String name) {
+		DirectReferences.Callee<I> implem = make_Callee(name);
 		assert implem.ecosystemComponent == null;
 		assert this.selfComponent == null;
 		implem.ecosystemComponent = this.selfComponent;
@@ -131,16 +95,16 @@ public abstract class CollectionInteger<I> {
 		return implem;
 	}
 
-	public static abstract class Agent<I> {
+	public static abstract class Callee<I> {
 
-		private CollectionInteger.Agent.ComponentImpl<I> selfComponent = null;
+		private DirectReferences.Callee.ComponentImpl<I> selfComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected CollectionInteger.Agent.Component<I> self() {
+		protected DirectReferences.Callee.Component<I> self() {
 			assert this.selfComponent != null;
 			return this.selfComponent;
 		};
@@ -150,9 +114,9 @@ public abstract class CollectionInteger<I> {
 		 *
 		 * This is not meant to be called from the outside.
 		 */
-		protected I p() {
+		protected I toCall() {
 			assert this.selfComponent != null;
-			return this.selfComponent.bridge.p();
+			return this.selfComponent.bridge.toCall();
 		};
 
 		/**
@@ -161,7 +125,7 @@ public abstract class CollectionInteger<I> {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> make_idx();
+		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> make_me();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -171,20 +135,20 @@ public abstract class CollectionInteger<I> {
 		 */
 		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
 
-		private CollectionInteger.ComponentImpl<I> ecosystemComponent = null;
+		private DirectReferences.ComponentImpl<I> ecosystemComponent = null;
 
 		/**
 		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected CollectionInteger.Component<I> ecoSelf() {
+		protected DirectReferences.Component<I> ecoSelf() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
 
 		public static interface Bridge<I> {
-			public I p();
+			public I toCall();
 
 		}
 
@@ -194,7 +158,7 @@ public abstract class CollectionInteger<I> {
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx();
+			public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> me();
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
@@ -209,14 +173,14 @@ public abstract class CollectionInteger<I> {
 
 		private final static class ComponentImpl<I>
 				implements
-					CollectionInteger.Agent.Component<I> {
+					DirectReferences.Callee.Component<I> {
 
-			private final CollectionInteger.Agent.Bridge<I> bridge;
+			private final DirectReferences.Callee.Bridge<I> bridge;
 
-			private final CollectionInteger.Agent<I> implementation;
+			private final DirectReferences.Callee<I> implementation;
 
-			private ComponentImpl(final CollectionInteger.Agent<I> implem,
-					final CollectionInteger.Agent.Bridge<I> b) {
+			private ComponentImpl(final DirectReferences.Callee<I> implem,
+					final DirectReferences.Callee.Bridge<I> b) {
 				this.bridge = b;
 
 				this.implementation = implem;
@@ -224,15 +188,15 @@ public abstract class CollectionInteger<I> {
 				assert implem.selfComponent == null;
 				implem.selfComponent = this;
 
-				this.idx = implem.make_idx();
+				this.me = implem.make_me();
 				this.stop = implem.make_stop();
 
 			}
 
-			private final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx;
+			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> me;
 
-			public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> idx() {
-				return this.idx;
+			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> me() {
+				return this.me;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do stop;
 
@@ -256,9 +220,9 @@ public abstract class CollectionInteger<I> {
 		protected void start() {
 		}
 
-		public CollectionInteger.Agent.Component<I> createComponent(
-				CollectionInteger.Agent.Bridge<I> b) {
-			return new CollectionInteger.Agent.ComponentImpl<I>(this, b);
+		public DirectReferences.Callee.Component<I> createComponent(
+				DirectReferences.Callee.Bridge<I> b) {
+			return new DirectReferences.Callee.ComponentImpl<I>(this, b);
 		}
 
 	}
@@ -273,17 +237,17 @@ public abstract class CollectionInteger<I> {
 	protected void start() {
 	}
 
-	public CollectionInteger.Component<I> createComponent(
-			CollectionInteger.Bridge<I> b) {
-		return new CollectionInteger.ComponentImpl<I>(this, b);
+	public DirectReferences.Component<I> createComponent(
+			DirectReferences.Bridge<I> b) {
+		return new DirectReferences.ComponentImpl<I>(this, b);
 	}
 
-	public CollectionInteger.Component<I> createComponent() {
-		return this.createComponent(new CollectionInteger.Bridge<I>() {
+	public DirectReferences.Component<I> createComponent() {
+		return this.createComponent(new DirectReferences.Bridge<I>() {
 		});
 	}
-	public static final <I> CollectionInteger.Component<I> createComponent(
-			CollectionInteger<I> _compo) {
+	public static final <I> DirectReferences.Component<I> createComponent(
+			DirectReferences<I> _compo) {
 		return _compo.createComponent();
 	}
 

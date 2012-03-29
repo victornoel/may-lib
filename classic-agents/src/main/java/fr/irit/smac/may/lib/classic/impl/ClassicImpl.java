@@ -6,15 +6,18 @@ import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.AsyncReceiver;
+import fr.irit.smac.may.lib.components.interactions.DirectReferences;
+import fr.irit.smac.may.lib.components.interactions.asyncreceiver.AsyncReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirectReferencesImpl;
 import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
+import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
@@ -32,38 +35,42 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected Forward<Send<Msg, AgentRef>> make_sender() {
-		return new ForwardImpl<Send<Msg, AgentRef>>();
+	protected Forward<Send<Msg, DirRef>> make_sender() {
+		return new ForwardImpl<Send<Msg, DirRef>>();
 	}
 
 	@Override
-	protected Receiver<Msg> make_receive() {
-		return new ReceiverImpl<Msg>();
-	}
-
-	@Override
-	protected Forward<CreateClassic<Msg, AgentRef>> make_fact() {
-		return new ForwardImpl<CreateClassic<Msg,AgentRef>>();
+	protected AsyncReceiver<Msg, DirRef> make_receive() {
+		return new AsyncReceiverImpl<Msg, DirRef>();
 	}
 	
 	@Override
-	protected CreateClassic<Msg, AgentRef> make_create() {
-		return new CreateClassic<Msg, AgentRef>() {
-			public AgentRef create(
-					final ClassicBehaviour<Msg, AgentRef> beh) {
+	protected DirectReferences<Push<Msg>> make_refs() {
+		return new DirectReferencesImpl<Push<Msg>>();
+	}
+
+	@Override
+	protected Forward<CreateClassic<Msg, DirRef>> make_fact() {
+		return new ForwardImpl<CreateClassic<Msg,DirRef>>();
+	}
+	
+	@Override
+	protected CreateClassic<Msg, DirRef> make_create() {
+		return new CreateClassic<Msg, DirRef>() {
+			public DirRef create(
+					final ClassicBehaviour<Msg, DirRef> beh) {
 				ClassicAgent.Component<Msg> agent = createClassicAgent(beh, "agent"+(i++));
 				agent.start();
-				return agent.ref().pull();
+				return agent.me().pull();
 			}
 		};
 	}
 
 	@Override
-	protected fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent<Msg> make_ClassicAgent(
-			final ClassicBehaviour<Msg, AgentRef> beh, String name) {
+	protected ClassicAgent<Msg> make_ClassicAgent(final ClassicBehaviour<Msg, DirRef> beh, String name) {
 		return new ClassicAgent<Msg>() {
 			@Override
-			protected ClassicAgentComponent<Msg, AgentRef> make_arch() {
+			protected ClassicAgentComponent<Msg, DirRef> make_arch() {
 				return new ClassicAgentComponentImpl<Msg>(beh);
 			}
 		};

@@ -3,7 +3,7 @@ package tests.local;
 import fr.irit.smac.may.lib.classic.impl.ClassicImpl;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
 import fr.irit.smac.may.lib.interfaces.Push;
 
 public class Test {
@@ -12,7 +12,7 @@ public class Test {
 		Classic.Component<String> infra = Classic.createComponent(new ClassicImpl<String>()) ;
 		infra.start();
 		
-		final AgentRef create = infra.create().create(new ClassicBehaviour<String, AgentRef>() {
+		final DirRef create = infra.create().create(new ClassicBehaviour<String, DirRef>() {
 			@Override
 			public Push<String> make_cycle() {
 				return new Push<String>() {
@@ -24,7 +24,7 @@ public class Test {
 			}
 		});
 		
-		AgentRef create2 = infra.create().create(new ClassicBehaviour<String, AgentRef>() {
+		DirRef create2 = infra.create().create(new ClassicBehaviour<String, DirRef>() {
 			@Override
 			public Push<String> make_cycle() {
 				return new Push<String>() {

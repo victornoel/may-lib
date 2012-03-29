@@ -4,10 +4,6 @@ namespace fr.irit.smac.may.lib.components.meta {
 	import java.lang.*
 	import fr.irit.smac.may.lib.interfaces.*
 
-	component Data[T] {
-		provides data: Pull[T]
-	}
-	
 	// to explicitely do nothing with a requires, plug it a Void
 	component Void[I] {
 		provides port: I
@@ -21,21 +17,11 @@ namespace fr.irit.smac.may.lib.components.meta {
 		species Agent {
 			requires p: I
 			provides idx: Pull[Integer]
+			provides stop: Do
 		}
 		provides get: MapGet[Integer,I]
-	}
-	
-	/**
-	 * This transverse enables to realise collection ports
-	 * with keys to retrieve the wanted port
-	 */
-	ecosystem CollectionMap[K,I] {
-		species Agent {
-			requires p: I
-			requires key: Pull[K]
-		}
-
-		provides get: MapGet[K,I]
+		provides size: Pull[Integer]
+		provides forAll: Push[fj.F[I,fj.Unit]]
 	}
 	
 	/**
