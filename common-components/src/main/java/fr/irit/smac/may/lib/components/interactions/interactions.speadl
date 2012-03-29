@@ -50,13 +50,6 @@ namespace fr.irit.smac.may.lib.components.interactions {
 //		species Receiver(name: String) {
 //			
 //			requires put: Push[M]
-			
-//			use dr: dr.Callee(name) {
-//				bind toCall toThis put
-//			}
-			
-//			provides me: Pull[DirRef] = dr.me
-//			provides stop: Do = dr.stop
 //		}
 		
 		// takes care of buffering messages
@@ -68,16 +61,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			part q: Queue[M]
 			
 			provides put: Push[M] = q.put
-			
-//			use dr: dr.Callee(name) {
-//				bind toCall to q.put
-//			}
-//			
-//			provides me: Pull[DirRef] = dr.me
-//			provides stop: Do = dr.stop
 		}
-		
-		//part dr: DirectReferences[Push[M]]
 		
 		requires call: Call[Push[M],K]
 		provides deposit: ReliableSend[M, K]
