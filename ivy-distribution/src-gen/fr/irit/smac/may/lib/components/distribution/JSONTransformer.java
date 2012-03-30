@@ -105,18 +105,17 @@ public abstract class JSONTransformer<T> {
 	protected void start() {
 	}
 
-	public JSONTransformer.Component<T> createComponent(
-			JSONTransformer.Bridge<T> b) {
+	public JSONTransformer.Component<T> newComponent(JSONTransformer.Bridge<T> b) {
 		return new JSONTransformer.ComponentImpl<T>(this, b);
 	}
 
-	public JSONTransformer.Component<T> createComponent() {
-		return this.createComponent(new JSONTransformer.Bridge<T>() {
+	public JSONTransformer.Component<T> newComponent() {
+		return this.newComponent(new JSONTransformer.Bridge<T>() {
 		});
 	}
-	public static final <T> JSONTransformer.Component<T> createComponent(
+	public static final <T> JSONTransformer.Component<T> newComponent(
 			JSONTransformer<T> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

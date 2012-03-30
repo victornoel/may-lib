@@ -239,7 +239,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		protected void start() {
 		}
 
-		public RemoteReceiver.Agent.Component<Msg, LocalRef> createComponent(
+		public RemoteReceiver.Agent.Component<Msg, LocalRef> newComponent(
 				RemoteReceiver.Agent.Bridge<Msg, LocalRef> b) {
 			return new RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef>(this,
 					b);
@@ -257,7 +257,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	protected void start() {
 	}
 
-	public RemoteReceiver.Component<Msg, LocalRef> createComponent(
+	public RemoteReceiver.Component<Msg, LocalRef> newComponent(
 			RemoteReceiver.Bridge<Msg, LocalRef> b) {
 		return new RemoteReceiver.ComponentImpl<Msg, LocalRef>(this, b);
 	}

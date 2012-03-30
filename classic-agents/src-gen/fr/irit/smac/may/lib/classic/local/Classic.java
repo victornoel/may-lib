@@ -183,25 +183,25 @@ public abstract class Classic<Msg> {
 			assert this.implem_scheduler == null;
 			this.implem_scheduler = implem.make_scheduler();
 			this.scheduler = this.implem_scheduler
-					.createComponent(new BridgeImpl_scheduler());
+					.newComponent(new BridgeImpl_scheduler());
 			assert this.implem_sender == null;
 			this.implem_sender = implem.make_sender();
 			this.sender = this.implem_sender
-					.createComponent(new BridgeImpl_sender());
+					.newComponent(new BridgeImpl_sender());
 			assert this.implem_refs == null;
 			this.implem_refs = implem.make_refs();
-			this.refs = this.implem_refs.createComponent(new BridgeImpl_refs());
+			this.refs = this.implem_refs.newComponent(new BridgeImpl_refs());
 			assert this.implem_receive == null;
 			this.implem_receive = implem.make_receive();
 			this.receive = this.implem_receive
-					.createComponent(new BridgeImpl_receive());
+					.newComponent(new BridgeImpl_receive());
 			assert this.implem_fact == null;
 			this.implem_fact = implem.make_fact();
-			this.fact = this.implem_fact.createComponent(new BridgeImpl_fact());
+			this.fact = this.implem_fact.newComponent(new BridgeImpl_fact());
 			assert this.implem_executor == null;
 			this.implem_executor = implem.make_executor();
 			this.executor = this.implem_executor
-					.createComponent(new BridgeImpl_executor());
+					.newComponent(new BridgeImpl_executor());
 		}
 
 		private final Scheduler.Component scheduler;
@@ -344,12 +344,12 @@ public abstract class Classic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public Classic.ClassicAgent.Component<Msg> createClassicAgent(
+	public Classic.ClassicAgent.Component<Msg> newClassicAgent(
 			fr.irit.smac.may.lib.classic.local.ClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
 			java.lang.String name) {
 		Classic.ClassicAgent<Msg> implem = createImplementationOfClassicAgent(
 				beh, name);
-		return implem.createComponent(new Classic.ClassicAgent.Bridge<Msg>() {
+		return implem.newComponent(new Classic.ClassicAgent.Bridge<Msg>() {
 		});
 	}
 
@@ -487,19 +487,19 @@ public abstract class Classic<Msg> {
 				assert this.implem_arch == null;
 				this.implem_arch = implem.make_arch();
 				this.arch = this.implem_arch
-						.createComponent(new BridgeImpl_arch());
+						.newComponent(new BridgeImpl_arch());
 				assert this.implementation.use_s != null;
 				this.s = this.implementation.use_s
-						.createComponent(new BridgeImplschedulerAgent());
+						.newComponent(new BridgeImplschedulerAgent());
 				assert this.implementation.use_f != null;
 				this.f = this.implementation.use_f
-						.createComponent(new BridgeImplfactAgent());
+						.newComponent(new BridgeImplfactAgent());
 				assert this.implementation.use_ref != null;
 				this.ref = this.implementation.use_ref
-						.createComponent(new BridgeImplrefsCallee());
+						.newComponent(new BridgeImplrefsCallee());
 				assert this.implementation.use_ss != null;
 				this.ss = this.implementation.use_ss
-						.createComponent(new BridgeImplsenderAgent());
+						.newComponent(new BridgeImplsenderAgent());
 			}
 
 			private final ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> arch;
@@ -595,7 +595,7 @@ public abstract class Classic<Msg> {
 		protected void start() {
 		}
 
-		public Classic.ClassicAgent.Component<Msg> createComponent(
+		public Classic.ClassicAgent.Component<Msg> newComponent(
 				Classic.ClassicAgent.Bridge<Msg> b) {
 			return new Classic.ClassicAgent.ComponentImpl<Msg>(this, b);
 		}
@@ -612,17 +612,17 @@ public abstract class Classic<Msg> {
 	protected void start() {
 	}
 
-	public Classic.Component<Msg> createComponent(Classic.Bridge<Msg> b) {
+	public Classic.Component<Msg> newComponent(Classic.Bridge<Msg> b) {
 		return new Classic.ComponentImpl<Msg>(this, b);
 	}
 
-	public Classic.Component<Msg> createComponent() {
-		return this.createComponent(new Classic.Bridge<Msg>() {
+	public Classic.Component<Msg> newComponent() {
+		return this.newComponent(new Classic.Bridge<Msg>() {
 		});
 	}
-	public static final <Msg> Classic.Component<Msg> createComponent(
+	public static final <Msg> Classic.Component<Msg> newComponent(
 			Classic<Msg> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

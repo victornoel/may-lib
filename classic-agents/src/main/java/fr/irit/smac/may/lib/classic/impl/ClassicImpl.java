@@ -59,7 +59,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 		return new CreateClassic<Msg, DirRef>() {
 			public DirRef create(
 					final ClassicBehaviour<Msg, DirRef> beh) {
-				ClassicAgent.Component<Msg> agent = createClassicAgent(beh, "agent"+(i++));
+				ClassicAgent.Component<Msg> agent = newClassicAgent(beh, "agent"+(i++));
 				agent.start();
 				return agent.me().pull();
 			}

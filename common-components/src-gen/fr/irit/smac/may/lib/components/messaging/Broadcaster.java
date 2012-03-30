@@ -146,9 +146,9 @@ public abstract class Broadcaster<T, Ref> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public Broadcaster.Agent.Component<T, Ref> createAgent() {
+	public Broadcaster.Agent.Component<T, Ref> newAgent() {
 		Broadcaster.Agent<T, Ref> implem = createImplementationOfAgent();
-		return implem.createComponent(new Broadcaster.Agent.Bridge<T, Ref>() {
+		return implem.newComponent(new Broadcaster.Agent.Bridge<T, Ref>() {
 		});
 	}
 
@@ -248,7 +248,7 @@ public abstract class Broadcaster<T, Ref> {
 		protected void start() {
 		}
 
-		public Broadcaster.Agent.Component<T, Ref> createComponent(
+		public Broadcaster.Agent.Component<T, Ref> newComponent(
 				Broadcaster.Agent.Bridge<T, Ref> b) {
 			return new Broadcaster.Agent.ComponentImpl<T, Ref>(this, b);
 		}
@@ -265,7 +265,7 @@ public abstract class Broadcaster<T, Ref> {
 	protected void start() {
 	}
 
-	public Broadcaster.Component<T, Ref> createComponent(
+	public Broadcaster.Component<T, Ref> newComponent(
 			Broadcaster.Bridge<T, Ref> b) {
 		return new Broadcaster.ComponentImpl<T, Ref>(this, b);
 	}

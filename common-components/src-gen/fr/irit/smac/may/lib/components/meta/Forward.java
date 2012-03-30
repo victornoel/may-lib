@@ -83,9 +83,9 @@ public abstract class Forward<I> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public Forward.Agent.Component<I> createAgent() {
+	public Forward.Agent.Component<I> newAgent() {
 		Forward.Agent<I> implem = createImplementationOfAgent();
-		return implem.createComponent(new Forward.Agent.Bridge<I>() {
+		return implem.newComponent(new Forward.Agent.Bridge<I>() {
 		});
 	}
 
@@ -185,8 +185,7 @@ public abstract class Forward<I> {
 		protected void start() {
 		}
 
-		public Forward.Agent.Component<I> createComponent(
-				Forward.Agent.Bridge<I> b) {
+		public Forward.Agent.Component<I> newComponent(Forward.Agent.Bridge<I> b) {
 			return new Forward.Agent.ComponentImpl<I>(this, b);
 		}
 
@@ -202,7 +201,7 @@ public abstract class Forward<I> {
 	protected void start() {
 	}
 
-	public Forward.Component<I> createComponent(Forward.Bridge<I> b) {
+	public Forward.Component<I> newComponent(Forward.Bridge<I> b) {
 		return new Forward.ComponentImpl<I>(this, b);
 	}
 

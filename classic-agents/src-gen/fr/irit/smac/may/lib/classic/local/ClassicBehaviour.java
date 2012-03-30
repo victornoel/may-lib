@@ -126,7 +126,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
 	protected void start() {
 	}
 
-	public ClassicBehaviour.Component<Msg, Ref> createComponent(
+	public ClassicBehaviour.Component<Msg, Ref> newComponent(
 			ClassicBehaviour.Bridge<Msg, Ref> b) {
 		return new ClassicBehaviour.ComponentImpl<Msg, Ref>(this, b);
 	}

@@ -105,17 +105,17 @@ public abstract class ExecutorService {
 	protected void start() {
 	}
 
-	public ExecutorService.Component createComponent(ExecutorService.Bridge b) {
+	public ExecutorService.Component newComponent(ExecutorService.Bridge b) {
 		return new ExecutorService.ComponentImpl(this, b);
 	}
 
-	public ExecutorService.Component createComponent() {
-		return this.createComponent(new ExecutorService.Bridge() {
+	public ExecutorService.Component newComponent() {
+		return this.newComponent(new ExecutorService.Bridge() {
 		});
 	}
-	public static final ExecutorService.Component createComponent(
+	public static final ExecutorService.Component newComponent(
 			ExecutorService _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

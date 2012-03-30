@@ -218,7 +218,7 @@ public abstract class MapReferences<I, K> {
 		protected void start() {
 		}
 
-		public MapReferences.Callee.Component<I, K> createComponent(
+		public MapReferences.Callee.Component<I, K> newComponent(
 				MapReferences.Callee.Bridge<I, K> b) {
 			return new MapReferences.Callee.ComponentImpl<I, K>(this, b);
 		}
@@ -378,7 +378,7 @@ public abstract class MapReferences<I, K> {
 		protected void start() {
 		}
 
-		public MapReferences.CalleePullKey.Component<I, K> createComponent(
+		public MapReferences.CalleePullKey.Component<I, K> newComponent(
 				MapReferences.CalleePullKey.Bridge<I, K> b) {
 			return new MapReferences.CalleePullKey.ComponentImpl<I, K>(this, b);
 		}
@@ -395,18 +395,18 @@ public abstract class MapReferences<I, K> {
 	protected void start() {
 	}
 
-	public MapReferences.Component<I, K> createComponent(
+	public MapReferences.Component<I, K> newComponent(
 			MapReferences.Bridge<I, K> b) {
 		return new MapReferences.ComponentImpl<I, K>(this, b);
 	}
 
-	public MapReferences.Component<I, K> createComponent() {
-		return this.createComponent(new MapReferences.Bridge<I, K>() {
+	public MapReferences.Component<I, K> newComponent() {
+		return this.newComponent(new MapReferences.Bridge<I, K>() {
 		});
 	}
-	public static final <I, K> MapReferences.Component<I, K> createComponent(
+	public static final <I, K> MapReferences.Component<I, K> newComponent(
 			MapReferences<I, K> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

@@ -146,17 +146,17 @@ public abstract class IvyJSONBroadcaster<T> {
 
 			assert this.implem_ivy == null;
 			this.implem_ivy = implem.make_ivy();
-			this.ivy = this.implem_ivy.createComponent(new BridgeImpl_ivy());
+			this.ivy = this.implem_ivy.newComponent(new BridgeImpl_ivy());
 			assert this.implem_json == null;
 			this.implem_json = implem.make_json();
-			this.json = this.implem_json.createComponent(new BridgeImpl_json());
+			this.json = this.implem_json.newComponent(new BridgeImpl_json());
 			assert this.implem_binder == null;
 			this.implem_binder = implem.make_binder();
 			this.binder = this.implem_binder
-					.createComponent(new BridgeImpl_binder());
+					.newComponent(new BridgeImpl_binder());
 			assert this.implem_bc == null;
 			this.implem_bc = implem.make_bc();
-			this.bc = this.implem_bc.createComponent(new BridgeImpl_bc());
+			this.bc = this.implem_bc.newComponent(new BridgeImpl_bc());
 		}
 
 		private final IvyBus.Component ivy;
@@ -259,7 +259,7 @@ public abstract class IvyJSONBroadcaster<T> {
 	protected void start() {
 	}
 
-	public IvyJSONBroadcaster.Component<T> createComponent(
+	public IvyJSONBroadcaster.Component<T> newComponent(
 			IvyJSONBroadcaster.Bridge<T> b) {
 		return new IvyJSONBroadcaster.ComponentImpl<T>(this, b);
 	}

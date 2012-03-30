@@ -220,7 +220,7 @@ public abstract class DirectReferences<I> {
 		protected void start() {
 		}
 
-		public DirectReferences.Callee.Component<I> createComponent(
+		public DirectReferences.Callee.Component<I> newComponent(
 				DirectReferences.Callee.Bridge<I> b) {
 			return new DirectReferences.Callee.ComponentImpl<I>(this, b);
 		}
@@ -237,18 +237,18 @@ public abstract class DirectReferences<I> {
 	protected void start() {
 	}
 
-	public DirectReferences.Component<I> createComponent(
+	public DirectReferences.Component<I> newComponent(
 			DirectReferences.Bridge<I> b) {
 		return new DirectReferences.ComponentImpl<I>(this, b);
 	}
 
-	public DirectReferences.Component<I> createComponent() {
-		return this.createComponent(new DirectReferences.Bridge<I>() {
+	public DirectReferences.Component<I> newComponent() {
+		return this.newComponent(new DirectReferences.Bridge<I>() {
 		});
 	}
-	public static final <I> DirectReferences.Component<I> createComponent(
+	public static final <I> DirectReferences.Component<I> newComponent(
 			DirectReferences<I> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

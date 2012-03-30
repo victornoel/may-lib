@@ -102,8 +102,7 @@ public abstract class SequentialDispatcher<Truc> {
 
 			assert this.implem_queue == null;
 			this.implem_queue = implem.make_queue();
-			this.queue = this.implem_queue
-					.createComponent(new BridgeImpl_queue());
+			this.queue = this.implem_queue.newComponent(new BridgeImpl_queue());
 		}
 
 		private final Queue.Component<Truc> queue;
@@ -137,7 +136,7 @@ public abstract class SequentialDispatcher<Truc> {
 	protected void start() {
 	}
 
-	public SequentialDispatcher.Component<Truc> createComponent(
+	public SequentialDispatcher.Component<Truc> newComponent(
 			SequentialDispatcher.Bridge<Truc> b) {
 		return new SequentialDispatcher.ComponentImpl<Truc>(this, b);
 	}

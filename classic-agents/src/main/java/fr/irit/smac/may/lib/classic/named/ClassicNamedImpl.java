@@ -52,7 +52,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 		return new CreateNamed<Msg, String>() {
 			public String create(
 					final ClassicNamedBehaviour<Msg, String> beh, String name) {
-				ClassicNamedAgent.Component<Msg> agent = createClassicNamedAgent(beh, name);
+				ClassicNamedAgent.Component<Msg> agent = newClassicNamedAgent(beh, name);
 				agent.start();
 				return name;
 			}

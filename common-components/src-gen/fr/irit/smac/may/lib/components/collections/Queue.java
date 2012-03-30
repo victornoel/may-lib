@@ -124,17 +124,17 @@ public abstract class Queue<Truc> {
 	protected void start() {
 	}
 
-	public Queue.Component<Truc> createComponent(Queue.Bridge<Truc> b) {
+	public Queue.Component<Truc> newComponent(Queue.Bridge<Truc> b) {
 		return new Queue.ComponentImpl<Truc>(this, b);
 	}
 
-	public Queue.Component<Truc> createComponent() {
-		return this.createComponent(new Queue.Bridge<Truc>() {
+	public Queue.Component<Truc> newComponent() {
+		return this.newComponent(new Queue.Bridge<Truc>() {
 		});
 	}
-	public static final <Truc> Queue.Component<Truc> createComponent(
+	public static final <Truc> Queue.Component<Truc> newComponent(
 			Queue<Truc> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

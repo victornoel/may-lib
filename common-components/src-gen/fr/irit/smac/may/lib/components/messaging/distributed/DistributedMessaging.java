@@ -154,7 +154,7 @@ public abstract class DistributedMessaging<Msg, NodeRef> {
 	protected void start() {
 	}
 
-	public DistributedMessaging.Component<Msg, NodeRef> createComponent(
+	public DistributedMessaging.Component<Msg, NodeRef> newComponent(
 			DistributedMessaging.Bridge<Msg, NodeRef> b) {
 		return new DistributedMessaging.ComponentImpl<Msg, NodeRef>(this, b);
 	}

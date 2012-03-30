@@ -113,7 +113,7 @@ public abstract class IvyBinder {
 	protected void start() {
 	}
 
-	public IvyBinder.Component createComponent(IvyBinder.Bridge b) {
+	public IvyBinder.Component newComponent(IvyBinder.Bridge b) {
 		return new IvyBinder.ComponentImpl(this, b);
 	}
 

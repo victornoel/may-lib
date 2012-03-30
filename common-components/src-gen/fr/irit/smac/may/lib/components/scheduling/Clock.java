@@ -103,7 +103,7 @@ public abstract class Clock {
 	protected void start() {
 	}
 
-	public Clock.Component createComponent(Clock.Bridge b) {
+	public Clock.Component newComponent(Clock.Bridge b) {
 		return new Clock.ComponentImpl(this, b);
 	}
 

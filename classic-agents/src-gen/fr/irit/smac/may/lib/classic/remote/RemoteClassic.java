@@ -202,30 +202,30 @@ public abstract class RemoteClassic<Msg> {
 			assert this.implem_scheduler == null;
 			this.implem_scheduler = implem.make_scheduler();
 			this.scheduler = this.implem_scheduler
-					.createComponent(new BridgeImpl_scheduler());
+					.newComponent(new BridgeImpl_scheduler());
 			assert this.implem_sender == null;
 			this.implem_sender = implem.make_sender();
 			this.sender = this.implem_sender
-					.createComponent(new BridgeImpl_sender());
+					.newComponent(new BridgeImpl_sender());
 			assert this.implem_receive == null;
 			this.implem_receive = implem.make_receive();
 			this.receive = this.implem_receive
-					.createComponent(new BridgeImpl_receive());
+					.newComponent(new BridgeImpl_receive());
 			assert this.implem_placed == null;
 			this.implem_placed = implem.make_placed();
 			this.placed = this.implem_placed
-					.createComponent(new BridgeImpl_placed());
+					.newComponent(new BridgeImpl_placed());
 			assert this.implem_remReceive == null;
 			this.implem_remReceive = implem.make_remReceive();
 			this.remReceive = this.implem_remReceive
-					.createComponent(new BridgeImpl_remReceive());
+					.newComponent(new BridgeImpl_remReceive());
 			assert this.implem_fact == null;
 			this.implem_fact = implem.make_fact();
-			this.fact = this.implem_fact.createComponent(new BridgeImpl_fact());
+			this.fact = this.implem_fact.newComponent(new BridgeImpl_fact());
 			assert this.implem_executor == null;
 			this.implem_executor = implem.make_executor();
 			this.executor = this.implem_executor
-					.createComponent(new BridgeImpl_executor());
+					.newComponent(new BridgeImpl_executor());
 		}
 
 		private final Scheduler.Component scheduler;
@@ -392,13 +392,13 @@ public abstract class RemoteClassic<Msg> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public RemoteClassic.ClassicAgent.Component<Msg> createClassicAgent(
+	public RemoteClassic.ClassicAgent.Component<Msg> newClassicAgent(
 			fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> beh,
 			java.lang.String name) {
 		RemoteClassic.ClassicAgent<Msg> implem = createImplementationOfClassicAgent(
 				beh, name);
 		return implem
-				.createComponent(new RemoteClassic.ClassicAgent.Bridge<Msg>() {
+				.newComponent(new RemoteClassic.ClassicAgent.Bridge<Msg>() {
 				});
 	}
 
@@ -562,25 +562,25 @@ public abstract class RemoteClassic<Msg> {
 				assert this.implem_arch == null;
 				this.implem_arch = implem.make_arch();
 				this.arch = this.implem_arch
-						.createComponent(new BridgeImpl_arch());
+						.newComponent(new BridgeImpl_arch());
 				assert this.implementation.use_p != null;
 				this.p = this.implementation.use_p
-						.createComponent(new BridgeImplplacedAgent());
+						.newComponent(new BridgeImplplacedAgent());
 				assert this.implementation.use_f != null;
 				this.f = this.implementation.use_f
-						.createComponent(new BridgeImplfactAgent());
+						.newComponent(new BridgeImplfactAgent());
 				assert this.implementation.use_s != null;
 				this.s = this.implementation.use_s
-						.createComponent(new BridgeImplschedulerAgent());
+						.newComponent(new BridgeImplschedulerAgent());
 				assert this.implementation.use_r != null;
 				this.r = this.implementation.use_r
-						.createComponent(new BridgeImplreceiveAgent());
+						.newComponent(new BridgeImplreceiveAgent());
 				assert this.implementation.use_ss != null;
 				this.ss = this.implementation.use_ss
-						.createComponent(new BridgeImplsenderAgent());
+						.newComponent(new BridgeImplsenderAgent());
 				assert this.implementation.use_rr != null;
 				this.rr = this.implementation.use_rr
-						.createComponent(new BridgeImplremReceiveAgent());
+						.newComponent(new BridgeImplremReceiveAgent());
 			}
 
 			private final RemoteClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> arch;
@@ -702,7 +702,7 @@ public abstract class RemoteClassic<Msg> {
 		protected void start() {
 		}
 
-		public RemoteClassic.ClassicAgent.Component<Msg> createComponent(
+		public RemoteClassic.ClassicAgent.Component<Msg> newComponent(
 				RemoteClassic.ClassicAgent.Bridge<Msg> b) {
 			return new RemoteClassic.ClassicAgent.ComponentImpl<Msg>(this, b);
 		}
@@ -719,18 +719,17 @@ public abstract class RemoteClassic<Msg> {
 	protected void start() {
 	}
 
-	public RemoteClassic.Component<Msg> createComponent(
-			RemoteClassic.Bridge<Msg> b) {
+	public RemoteClassic.Component<Msg> newComponent(RemoteClassic.Bridge<Msg> b) {
 		return new RemoteClassic.ComponentImpl<Msg>(this, b);
 	}
 
-	public RemoteClassic.Component<Msg> createComponent() {
-		return this.createComponent(new RemoteClassic.Bridge<Msg>() {
+	public RemoteClassic.Component<Msg> newComponent() {
+		return this.newComponent(new RemoteClassic.Bridge<Msg>() {
 		});
 	}
-	public static final <Msg> RemoteClassic.Component<Msg> createComponent(
+	public static final <Msg> RemoteClassic.Component<Msg> newComponent(
 			RemoteClassic<Msg> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

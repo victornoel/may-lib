@@ -95,9 +95,9 @@ public abstract class Placed {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public Placed.Agent.Component createAgent() {
+	public Placed.Agent.Component newAgent() {
 		Placed.Agent implem = createImplementationOfAgent();
-		return implem.createComponent(new Placed.Agent.Bridge() {
+		return implem.newComponent(new Placed.Agent.Bridge() {
 		});
 	}
 
@@ -197,7 +197,7 @@ public abstract class Placed {
 		protected void start() {
 		}
 
-		public Placed.Agent.Component createComponent(Placed.Agent.Bridge b) {
+		public Placed.Agent.Component newComponent(Placed.Agent.Bridge b) {
 			return new Placed.Agent.ComponentImpl(this, b);
 		}
 
@@ -213,16 +213,16 @@ public abstract class Placed {
 	protected void start() {
 	}
 
-	public Placed.Component createComponent(Placed.Bridge b) {
+	public Placed.Component newComponent(Placed.Bridge b) {
 		return new Placed.ComponentImpl(this, b);
 	}
 
-	public Placed.Component createComponent() {
-		return this.createComponent(new Placed.Bridge() {
+	public Placed.Component newComponent() {
+		return this.newComponent(new Placed.Bridge() {
 		});
 	}
-	public static final Placed.Component createComponent(Placed _compo) {
-		return _compo.createComponent();
+	public static final Placed.Component newComponent(Placed _compo) {
+		return _compo.newComponent();
 	}
 
 }

@@ -144,7 +144,7 @@ public abstract class DistributedCommunication<T> {
 	protected void start() {
 	}
 
-	public DistributedCommunication.Component<T> createComponent(
+	public DistributedCommunication.Component<T> newComponent(
 			DistributedCommunication.Bridge<T> b) {
 		return new DistributedCommunication.ComponentImpl<T>(this, b);
 	}

@@ -39,7 +39,7 @@ public class ExecutorServiceWrapperImpl extends ExecutorService {
 	}
 	
 	public static void main(String[] args) {
-		Component component = ExecutorService.createComponent(new ExecutorServiceWrapperImpl(Executors.newSingleThreadExecutor()));
+		Component component = ExecutorService.newComponent(new ExecutorServiceWrapperImpl(Executors.newSingleThreadExecutor()));
 		component.start();
 		
 		// this should not block even with one thread

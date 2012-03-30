@@ -86,18 +86,18 @@ public abstract class WebServiceClient<I> {
 	protected void start() {
 	}
 
-	public WebServiceClient.Component<I> createComponent(
+	public WebServiceClient.Component<I> newComponent(
 			WebServiceClient.Bridge<I> b) {
 		return new WebServiceClient.ComponentImpl<I>(this, b);
 	}
 
-	public WebServiceClient.Component<I> createComponent() {
-		return this.createComponent(new WebServiceClient.Bridge<I>() {
+	public WebServiceClient.Component<I> newComponent() {
+		return this.newComponent(new WebServiceClient.Bridge<I>() {
 		});
 	}
-	public static final <I> WebServiceClient.Component<I> createComponent(
+	public static final <I> WebServiceClient.Component<I> newComponent(
 			WebServiceClient<I> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

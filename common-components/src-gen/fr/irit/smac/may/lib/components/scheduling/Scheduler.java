@@ -83,9 +83,9 @@ public abstract class Scheduler {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public Scheduler.Agent.Component createAgent() {
+	public Scheduler.Agent.Component newAgent() {
 		Scheduler.Agent implem = createImplementationOfAgent();
-		return implem.createComponent(new Scheduler.Agent.Bridge() {
+		return implem.newComponent(new Scheduler.Agent.Bridge() {
 		});
 	}
 
@@ -204,8 +204,7 @@ public abstract class Scheduler {
 		protected void start() {
 		}
 
-		public Scheduler.Agent.Component createComponent(
-				Scheduler.Agent.Bridge b) {
+		public Scheduler.Agent.Component newComponent(Scheduler.Agent.Bridge b) {
 			return new Scheduler.Agent.ComponentImpl(this, b);
 		}
 
@@ -221,7 +220,7 @@ public abstract class Scheduler {
 	protected void start() {
 	}
 
-	public Scheduler.Component createComponent(Scheduler.Bridge b) {
+	public Scheduler.Component newComponent(Scheduler.Bridge b) {
 		return new Scheduler.ComponentImpl(this, b);
 	}
 

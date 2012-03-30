@@ -238,7 +238,7 @@ public abstract class Receiver<MsgType> {
 		protected void start() {
 		}
 
-		public Receiver.Agent.Component<MsgType> createComponent(
+		public Receiver.Agent.Component<MsgType> newComponent(
 				Receiver.Agent.Bridge<MsgType> b) {
 			return new Receiver.Agent.ComponentImpl<MsgType>(this, b);
 		}
@@ -255,18 +255,17 @@ public abstract class Receiver<MsgType> {
 	protected void start() {
 	}
 
-	public Receiver.Component<MsgType> createComponent(
-			Receiver.Bridge<MsgType> b) {
+	public Receiver.Component<MsgType> newComponent(Receiver.Bridge<MsgType> b) {
 		return new Receiver.ComponentImpl<MsgType>(this, b);
 	}
 
-	public Receiver.Component<MsgType> createComponent() {
-		return this.createComponent(new Receiver.Bridge<MsgType>() {
+	public Receiver.Component<MsgType> newComponent() {
+		return this.newComponent(new Receiver.Bridge<MsgType>() {
 		});
 	}
-	public static final <MsgType> Receiver.Component<MsgType> createComponent(
+	public static final <MsgType> Receiver.Component<MsgType> newComponent(
 			Receiver<MsgType> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

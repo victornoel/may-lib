@@ -106,7 +106,7 @@ public abstract class UnEither<L, R> {
 	protected void start() {
 	}
 
-	public UnEither.Component<L, R> createComponent(UnEither.Bridge<L, R> b) {
+	public UnEither.Component<L, R> newComponent(UnEither.Bridge<L, R> b) {
 		return new UnEither.ComponentImpl<L, R>(this, b);
 	}
 

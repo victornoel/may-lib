@@ -150,7 +150,7 @@ public abstract class IvyReceive {
 	protected void start() {
 	}
 
-	public IvyReceive.Component createComponent(IvyReceive.Bridge b) {
+	public IvyReceive.Component newComponent(IvyReceive.Bridge b) {
 		return new IvyReceive.ComponentImpl(this, b);
 	}
 

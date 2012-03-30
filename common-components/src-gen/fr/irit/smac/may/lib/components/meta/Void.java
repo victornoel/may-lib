@@ -83,16 +83,16 @@ public abstract class Void<I> {
 	protected void start() {
 	}
 
-	public Void.Component<I> createComponent(Void.Bridge<I> b) {
+	public Void.Component<I> newComponent(Void.Bridge<I> b) {
 		return new Void.ComponentImpl<I>(this, b);
 	}
 
-	public Void.Component<I> createComponent() {
-		return this.createComponent(new Void.Bridge<I>() {
+	public Void.Component<I> newComponent() {
+		return this.newComponent(new Void.Bridge<I>() {
 		});
 	}
-	public static final <I> Void.Component<I> createComponent(Void<I> _compo) {
-		return _compo.createComponent();
+	public static final <I> Void.Component<I> newComponent(Void<I> _compo) {
+		return _compo.newComponent();
 	}
 
 }

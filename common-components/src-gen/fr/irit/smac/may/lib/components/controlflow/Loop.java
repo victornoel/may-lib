@@ -103,7 +103,7 @@ public abstract class Loop {
 	protected void start() {
 	}
 
-	public Loop.Component createComponent(Loop.Bridge b) {
+	public Loop.Component newComponent(Loop.Bridge b) {
 		return new Loop.ComponentImpl(this, b);
 	}
 

@@ -9,7 +9,7 @@ import fr.irit.smac.may.lib.interfaces.Push;
 public class Test {
 
 	public static void main(String[] args) {
-		Classic.Component<String> infra = Classic.createComponent(new ClassicImpl<String>()) ;
+		Classic.Component<String> infra = Classic.newComponent(new ClassicImpl<String>()) ;
 		infra.start();
 		
 		final DirRef create = infra.create().create(new ClassicBehaviour<String, DirRef>() {

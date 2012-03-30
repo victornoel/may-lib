@@ -109,10 +109,10 @@ public abstract class AsyncReceiver<M, K> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public AsyncReceiver.ReceiverBuf.Component<M, K> createReceiverBuf() {
+	public AsyncReceiver.ReceiverBuf.Component<M, K> newReceiverBuf() {
 		AsyncReceiver.ReceiverBuf<M, K> implem = createImplementationOfReceiverBuf();
 		return implem
-				.createComponent(new AsyncReceiver.ReceiverBuf.Bridge<M, K>() {
+				.newComponent(new AsyncReceiver.ReceiverBuf.Bridge<M, K>() {
 				});
 	}
 
@@ -207,7 +207,7 @@ public abstract class AsyncReceiver<M, K> {
 
 				assert this.implem_q == null;
 				this.implem_q = implem.make_q();
-				this.q = this.implem_q.createComponent(new BridgeImpl_q());
+				this.q = this.implem_q.newComponent(new BridgeImpl_q());
 			}
 
 			private final Queue.Component<M> q;
@@ -247,7 +247,7 @@ public abstract class AsyncReceiver<M, K> {
 		protected void start() {
 		}
 
-		public AsyncReceiver.ReceiverBuf.Component<M, K> createComponent(
+		public AsyncReceiver.ReceiverBuf.Component<M, K> newComponent(
 				AsyncReceiver.ReceiverBuf.Bridge<M, K> b) {
 			return new AsyncReceiver.ReceiverBuf.ComponentImpl<M, K>(this, b);
 		}
@@ -264,7 +264,7 @@ public abstract class AsyncReceiver<M, K> {
 	protected void start() {
 	}
 
-	public AsyncReceiver.Component<M, K> createComponent(
+	public AsyncReceiver.Component<M, K> newComponent(
 			AsyncReceiver.Bridge<M, K> b) {
 		return new AsyncReceiver.ComponentImpl<M, K>(this, b);
 	}

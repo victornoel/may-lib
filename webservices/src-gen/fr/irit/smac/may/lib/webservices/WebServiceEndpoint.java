@@ -74,7 +74,7 @@ public abstract class WebServiceEndpoint<I> {
 	protected void start() {
 	}
 
-	public WebServiceEndpoint.Component<I> createComponent(
+	public WebServiceEndpoint.Component<I> newComponent(
 			WebServiceEndpoint.Bridge<I> b) {
 		return new WebServiceEndpoint.ComponentImpl<I>(this, b);
 	}

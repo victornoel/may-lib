@@ -74,7 +74,7 @@ public abstract class SchedulingControllerGUI {
 	protected void start() {
 	}
 
-	public SchedulingControllerGUI.Component createComponent(
+	public SchedulingControllerGUI.Component newComponent(
 			SchedulingControllerGUI.Bridge b) {
 		return new SchedulingControllerGUI.ComponentImpl(this, b);
 	}

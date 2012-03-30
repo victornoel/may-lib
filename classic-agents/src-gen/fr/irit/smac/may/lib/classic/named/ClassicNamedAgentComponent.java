@@ -142,10 +142,10 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 			assert this.implem_dispatcher == null;
 			this.implem_dispatcher = implem.make_dispatcher();
 			this.dispatcher = this.implem_dispatcher
-					.createComponent(new BridgeImpl_dispatcher());
+					.newComponent(new BridgeImpl_dispatcher());
 			assert this.implem_beh == null;
 			this.implem_beh = implem.make_beh();
-			this.beh = this.implem_beh.createComponent(new BridgeImpl_beh());
+			this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
@@ -219,7 +219,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
 	protected void start() {
 	}
 
-	public ClassicNamedAgentComponent.Component<Msg, Ref> createComponent(
+	public ClassicNamedAgentComponent.Component<Msg, Ref> newComponent(
 			ClassicNamedAgentComponent.Bridge<Msg, Ref> b) {
 		return new ClassicNamedAgentComponent.ComponentImpl<Msg, Ref>(this, b);
 	}

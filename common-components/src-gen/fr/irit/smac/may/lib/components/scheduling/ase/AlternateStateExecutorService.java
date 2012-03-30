@@ -105,18 +105,18 @@ public abstract class AlternateStateExecutorService {
 	protected void start() {
 	}
 
-	public AlternateStateExecutorService.Component createComponent(
+	public AlternateStateExecutorService.Component newComponent(
 			AlternateStateExecutorService.Bridge b) {
 		return new AlternateStateExecutorService.ComponentImpl(this, b);
 	}
 
-	public AlternateStateExecutorService.Component createComponent() {
-		return this.createComponent(new AlternateStateExecutorService.Bridge() {
+	public AlternateStateExecutorService.Component newComponent() {
+		return this.newComponent(new AlternateStateExecutorService.Bridge() {
 		});
 	}
-	public static final AlternateStateExecutorService.Component createComponent(
+	public static final AlternateStateExecutorService.Component newComponent(
 			AlternateStateExecutorService _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

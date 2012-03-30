@@ -115,7 +115,7 @@ public abstract class Either<L, R> {
 	protected void start() {
 	}
 
-	public Either.Component<L, R> createComponent(Either.Bridge<L, R> b) {
+	public Either.Component<L, R> newComponent(Either.Bridge<L, R> b) {
 		return new Either.ComponentImpl<L, R>(this, b);
 	}
 

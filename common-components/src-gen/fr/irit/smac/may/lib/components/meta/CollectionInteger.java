@@ -256,7 +256,7 @@ public abstract class CollectionInteger<I> {
 		protected void start() {
 		}
 
-		public CollectionInteger.Agent.Component<I> createComponent(
+		public CollectionInteger.Agent.Component<I> newComponent(
 				CollectionInteger.Agent.Bridge<I> b) {
 			return new CollectionInteger.Agent.ComponentImpl<I>(this, b);
 		}
@@ -273,18 +273,18 @@ public abstract class CollectionInteger<I> {
 	protected void start() {
 	}
 
-	public CollectionInteger.Component<I> createComponent(
+	public CollectionInteger.Component<I> newComponent(
 			CollectionInteger.Bridge<I> b) {
 		return new CollectionInteger.ComponentImpl<I>(this, b);
 	}
 
-	public CollectionInteger.Component<I> createComponent() {
-		return this.createComponent(new CollectionInteger.Bridge<I>() {
+	public CollectionInteger.Component<I> newComponent() {
+		return this.newComponent(new CollectionInteger.Bridge<I>() {
 		});
 	}
-	public static final <I> CollectionInteger.Component<I> createComponent(
+	public static final <I> CollectionInteger.Component<I> newComponent(
 			CollectionInteger<I> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

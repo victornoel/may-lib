@@ -155,8 +155,7 @@ public abstract class IvyBroadcaster<T> {
 	protected void start() {
 	}
 
-	public IvyBroadcaster.Component<T> createComponent(
-			IvyBroadcaster.Bridge<T> b) {
+	public IvyBroadcaster.Component<T> newComponent(IvyBroadcaster.Bridge<T> b) {
 		return new IvyBroadcaster.ComponentImpl<T>(this, b);
 	}
 

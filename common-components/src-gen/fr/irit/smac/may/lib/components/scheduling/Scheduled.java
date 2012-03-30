@@ -206,8 +206,7 @@ public abstract class Scheduled {
 		protected void start() {
 		}
 
-		public Scheduled.Agent.Component createComponent(
-				Scheduled.Agent.Bridge b) {
+		public Scheduled.Agent.Component newComponent(Scheduled.Agent.Bridge b) {
 			return new Scheduled.Agent.ComponentImpl(this, b);
 		}
 
@@ -223,7 +222,7 @@ public abstract class Scheduled {
 	protected void start() {
 	}
 
-	public Scheduled.Component createComponent(Scheduled.Bridge b) {
+	public Scheduled.Component newComponent(Scheduled.Bridge b) {
 		return new Scheduled.ComponentImpl(this, b);
 	}
 

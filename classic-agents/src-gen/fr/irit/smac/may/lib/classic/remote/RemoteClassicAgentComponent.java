@@ -167,10 +167,10 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 			assert this.implem_dispatcher == null;
 			this.implem_dispatcher = implem.make_dispatcher();
 			this.dispatcher = this.implem_dispatcher
-					.createComponent(new BridgeImpl_dispatcher());
+					.newComponent(new BridgeImpl_dispatcher());
 			assert this.implem_beh == null;
 			this.implem_beh = implem.make_beh();
-			this.beh = this.implem_beh.createComponent(new BridgeImpl_beh());
+			this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
 		}
 
 		private final SequentialDispatcher.Component<Msg> dispatcher;
@@ -249,7 +249,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
 	protected void start() {
 	}
 
-	public RemoteClassicAgentComponent.Component<Msg, Ref> createComponent(
+	public RemoteClassicAgentComponent.Component<Msg, Ref> newComponent(
 			RemoteClassicAgentComponent.Bridge<Msg, Ref> b) {
 		return new RemoteClassicAgentComponent.ComponentImpl<Msg, Ref>(this, b);
 	}

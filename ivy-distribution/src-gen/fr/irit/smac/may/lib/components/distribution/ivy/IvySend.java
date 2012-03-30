@@ -140,16 +140,16 @@ public abstract class IvySend {
 	protected void start() {
 	}
 
-	public IvySend.Component createComponent(IvySend.Bridge b) {
+	public IvySend.Component newComponent(IvySend.Bridge b) {
 		return new IvySend.ComponentImpl(this, b);
 	}
 
-	public IvySend.Component createComponent() {
-		return this.createComponent(new IvySend.Bridge() {
+	public IvySend.Component newComponent() {
+		return this.newComponent(new IvySend.Bridge() {
 		});
 	}
-	public static final IvySend.Component createComponent(IvySend _compo) {
-		return _compo.createComponent();
+	public static final IvySend.Component newComponent(IvySend _compo) {
+		return _compo.newComponent();
 	}
 
 }

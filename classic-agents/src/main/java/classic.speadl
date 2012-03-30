@@ -17,7 +17,81 @@ import java.util.concurrent.Executor
 
 import fr.irit.smac.may.lib.classic.*
 
+import java.lang.*
+
 namespace fr.irit.smac.may.lib.classic {
+
+	namespace namedPublish {
+		
+		import fr.irit.smac.may.lib.components.interactions.*
+		import fr.irit.smac.may.lib.components.interactions.interfaces.Observe
+		
+		component ObservedBehaviour {
+			provides cycle: Do
+			requires changeValue: Push[Integer]
+		}
+		
+		component ObserverBehaviour[Ref] {
+			provides cycle: Do
+			requires observe: Observe[Integer,Ref]
+		}
+		
+		ecosystem NamedPublishMAS {
+			
+			provides create: namedpub.NamedPublishMASFactory
+			
+			part refs: MapReferences[Pull[Integer],String]
+			part observeds: ValuePublisher[Integer,String] {
+				bind call to refs.call
+			}
+			part observers: Forward[Observe[Integer,String]] {
+				bind i to observeds.observe
+			}
+			
+			part executor: ExecutorService
+			part schedule: Scheduled {
+				bind sched to executor.exec
+			}
+			part clock: Clock {
+				bind sched to executor.exec
+				bind tick to schedule.tick
+			}
+			part gui: SchedulingControllerGUI {
+				bind control to clock.control
+			}
+
+			species Observed(name: String, beha: namedpub.AbstractObservedBehaviour) {
+
+				use sched: schedule.Agent {
+					bind cycle to beh.cycle
+				}
+				
+				part beh: ObservedBehaviour {
+					bind changeValue to observed.set
+				}
+			
+				use ref: refs.Callee(name) {
+					bind toCall to observed.get
+				}
+				use observed: observeds.PublisherPush
+				
+			}
+			
+			species Observer(beha: namedpub.AbstractObserverBehaviour[String]) {
+				
+				use sched: schedule.Agent {
+					bind cycle to beh.cycle
+				}
+				
+				part beh: ObserverBehaviour[String] {
+					bind observe to observer.a
+				}
+				use observer: observers.Agent
+				
+			}
+			
+		}
+	}
 
 	namespace named {
 		

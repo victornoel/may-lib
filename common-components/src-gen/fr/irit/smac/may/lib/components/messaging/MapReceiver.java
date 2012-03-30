@@ -220,7 +220,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		protected void start() {
 		}
 
-		public MapReceiver.Agent.Component<Msg, RealRef, Ref> createComponent(
+		public MapReceiver.Agent.Component<Msg, RealRef, Ref> newComponent(
 				MapReceiver.Agent.Bridge<Msg, RealRef, Ref> b) {
 			return new MapReceiver.Agent.ComponentImpl<Msg, RealRef, Ref>(this,
 					b);
@@ -238,7 +238,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	protected void start() {
 	}
 
-	public MapReceiver.Component<Msg, RealRef, Ref> createComponent(
+	public MapReceiver.Component<Msg, RealRef, Ref> newComponent(
 			MapReceiver.Bridge<Msg, RealRef, Ref> b) {
 		return new MapReceiver.ComponentImpl<Msg, RealRef, Ref>(this, b);
 	}

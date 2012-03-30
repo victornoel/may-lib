@@ -70,7 +70,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 			public RemoteAgentRef create(
 					final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
 				
-				ClassicAgent.Component<Msg> agent = createClassicAgent(beh, "agent"+(i++));
+				ClassicAgent.Component<Msg> agent = newClassicAgent(beh, "agent"+(i++));
 				agent.start();
 				return agent.ref().pull();
 			}

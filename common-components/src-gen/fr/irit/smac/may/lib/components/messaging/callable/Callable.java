@@ -218,7 +218,7 @@ public abstract class Callable<I> {
 		protected void start() {
 		}
 
-		public Callable.Callee.Component<I> createComponent(
+		public Callable.Callee.Component<I> newComponent(
 				Callable.Callee.Bridge<I> b) {
 			return new Callable.Callee.ComponentImpl<I>(this, b);
 		}
@@ -247,9 +247,9 @@ public abstract class Callable<I> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public Callable.Caller.Component<I> createCaller() {
+	public Callable.Caller.Component<I> newCaller() {
 		Callable.Caller<I> implem = createImplementationOfCaller();
-		return implem.createComponent(new Callable.Caller.Bridge<I>() {
+		return implem.newComponent(new Callable.Caller.Bridge<I>() {
 		});
 	}
 
@@ -349,7 +349,7 @@ public abstract class Callable<I> {
 		protected void start() {
 		}
 
-		public Callable.Caller.Component<I> createComponent(
+		public Callable.Caller.Component<I> newComponent(
 				Callable.Caller.Bridge<I> b) {
 			return new Callable.Caller.ComponentImpl<I>(this, b);
 		}
@@ -366,17 +366,17 @@ public abstract class Callable<I> {
 	protected void start() {
 	}
 
-	public Callable.Component<I> createComponent(Callable.Bridge<I> b) {
+	public Callable.Component<I> newComponent(Callable.Bridge<I> b) {
 		return new Callable.ComponentImpl<I>(this, b);
 	}
 
-	public Callable.Component<I> createComponent() {
-		return this.createComponent(new Callable.Bridge<I>() {
+	public Callable.Component<I> newComponent() {
+		return this.newComponent(new Callable.Bridge<I>() {
 		});
 	}
-	public static final <I> Callable.Component<I> createComponent(
+	public static final <I> Callable.Component<I> newComponent(
 			Callable<I> _compo) {
-		return _compo.createComponent();
+		return _compo.newComponent();
 	}
 
 }

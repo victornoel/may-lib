@@ -118,11 +118,10 @@ public abstract class RemoteFactory<Msg, Ref> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public RemoteFactory.Agent.Component<Msg, Ref> createAgent() {
+	public RemoteFactory.Agent.Component<Msg, Ref> newAgent() {
 		RemoteFactory.Agent<Msg, Ref> implem = createImplementationOfAgent();
-		return implem
-				.createComponent(new RemoteFactory.Agent.Bridge<Msg, Ref>() {
-				});
+		return implem.newComponent(new RemoteFactory.Agent.Bridge<Msg, Ref>() {
+		});
 	}
 
 	public static abstract class Agent<Msg, Ref> {
@@ -221,7 +220,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 		protected void start() {
 		}
 
-		public RemoteFactory.Agent.Component<Msg, Ref> createComponent(
+		public RemoteFactory.Agent.Component<Msg, Ref> newComponent(
 				RemoteFactory.Agent.Bridge<Msg, Ref> b) {
 			return new RemoteFactory.Agent.ComponentImpl<Msg, Ref>(this, b);
 		}
@@ -238,7 +237,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	protected void start() {
 	}
 
-	public RemoteFactory.Component<Msg, Ref> createComponent(
+	public RemoteFactory.Component<Msg, Ref> newComponent(
 			RemoteFactory.Bridge<Msg, Ref> b) {
 		return new RemoteFactory.ComponentImpl<Msg, Ref>(this, b);
 	}

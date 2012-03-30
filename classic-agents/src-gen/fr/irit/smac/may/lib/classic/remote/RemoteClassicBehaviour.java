@@ -126,7 +126,7 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
 	protected void start() {
 	}
 
-	public RemoteClassicBehaviour.Component<Msg, Ref> createComponent(
+	public RemoteClassicBehaviour.Component<Msg, Ref> newComponent(
 			RemoteClassicBehaviour.Bridge<Msg, Ref> b) {
 		return new RemoteClassicBehaviour.ComponentImpl<Msg, Ref>(this, b);
 	}

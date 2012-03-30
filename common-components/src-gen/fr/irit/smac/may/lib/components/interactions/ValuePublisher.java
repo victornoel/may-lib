@@ -108,10 +108,10 @@ public abstract class ValuePublisher<T, K> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	public ValuePublisher.PublisherPush.Component<T, K> createPublisherPush() {
+	public ValuePublisher.PublisherPush.Component<T, K> newPublisherPush() {
 		ValuePublisher.PublisherPush<T, K> implem = createImplementationOfPublisherPush();
 		return implem
-				.createComponent(new ValuePublisher.PublisherPush.Bridge<T, K>() {
+				.newComponent(new ValuePublisher.PublisherPush.Bridge<T, K>() {
 				});
 	}
 
@@ -231,7 +231,7 @@ public abstract class ValuePublisher<T, K> {
 		protected void start() {
 		}
 
-		public ValuePublisher.PublisherPush.Component<T, K> createComponent(
+		public ValuePublisher.PublisherPush.Component<T, K> newComponent(
 				ValuePublisher.PublisherPush.Bridge<T, K> b) {
 			return new ValuePublisher.PublisherPush.ComponentImpl<T, K>(this, b);
 		}
@@ -362,7 +362,7 @@ public abstract class ValuePublisher<T, K> {
 		protected void start() {
 		}
 
-		public ValuePublisher.PublisherPull.Component<T, K> createComponent(
+		public ValuePublisher.PublisherPull.Component<T, K> newComponent(
 				ValuePublisher.PublisherPull.Bridge<T, K> b) {
 			return new ValuePublisher.PublisherPull.ComponentImpl<T, K>(this, b);
 		}
@@ -379,7 +379,7 @@ public abstract class ValuePublisher<T, K> {
 	protected void start() {
 	}
 
-	public ValuePublisher.Component<T, K> createComponent(
+	public ValuePublisher.Component<T, K> newComponent(
 			ValuePublisher.Bridge<T, K> b) {
 		return new ValuePublisher.ComponentImpl<T, K>(this, b);
 	}

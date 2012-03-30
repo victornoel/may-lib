@@ -11,7 +11,7 @@ public class MyPlaceStart {
 
 	public static void main(String[] args) {
 
-		RemoteClassic.Component<PatternMatchingMessage> infra = RemoteClassic.createComponent(new RemoteClassicImpl<PatternMatchingMessage>(1099));
+		RemoteClassic.Component<PatternMatchingMessage> infra = RemoteClassic.newComponent(new RemoteClassicImpl<PatternMatchingMessage>(1099));
 		
 		RemoteAgentRef starter = infra.create().create(new BehaviorSetup<RemoteAgentRef>());
 
