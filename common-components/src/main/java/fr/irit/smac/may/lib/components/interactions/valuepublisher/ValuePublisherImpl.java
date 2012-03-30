@@ -7,7 +7,7 @@ import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
 
-public class ValuePublisherImpl<T,K> extends ValuePublisher<T,K> {
+public class ValuePublisherImpl<T, K> extends ValuePublisher<T, K> {
 
 	@Override
 	protected ReliableObserve<T, K> make_observe() {
@@ -19,16 +19,16 @@ public class ValuePublisherImpl<T,K> extends ValuePublisher<T,K> {
 					return Option.none();
 				}
 			}
-			
+
 			public T reliableObserve(K ref) throws RefDoesNotExistsException {
 				return call().call(ref).pull();
 			}
 		};
 	}
-	
+
 	@Override
-	protected PublisherPull<T,K> make_PublisherPull() {
-		return new PublisherPull<T,K>() {
+	protected PublisherPull<T, K> make_PublisherPull() {
+		return new PublisherPull<T, K>() {
 			@Override
 			protected Pull<T> make_get() {
 				return new Pull<T>() {
@@ -41,11 +41,11 @@ public class ValuePublisherImpl<T,K> extends ValuePublisher<T,K> {
 	}
 
 	@Override
-	protected PublisherPush<T,K> make_PublisherPush() {
-		return new PublisherPush<T,K>() {
+	protected PublisherPush<T, K> make_PublisherPush() {
+		return new PublisherPush<T, K>() {
 
 			private T value;
-			
+
 			@Override
 			protected Push<T> make_set() {
 				return new Push<T>() {
@@ -63,8 +63,7 @@ public class ValuePublisherImpl<T,K> extends ValuePublisher<T,K> {
 					}
 				};
 			}
-			
+
 		};
 	}
-
 }

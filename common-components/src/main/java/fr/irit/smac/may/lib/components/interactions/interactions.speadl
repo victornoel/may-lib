@@ -9,7 +9,9 @@ namespace fr.irit.smac.may.lib.components.interactions {
 	import fr.irit.smac.may.lib.components.interactions.directreferences.*
 	
 	ecosystem DirectReferences[I] {
-		
+
+		// name is only used for pretty
+  		// printing the reference with toString()
 		species Callee(name: String) {
 			requires toCall: I
 			provides me: Pull[DirRef]
