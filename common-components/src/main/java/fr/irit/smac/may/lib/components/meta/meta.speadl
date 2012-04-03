@@ -34,4 +34,11 @@ namespace fr.irit.smac.may.lib.components.meta {
 
 		requires i: I
 	}
+	
+	ecosystem Buffer[I] {
+		provides port: I
+		provides release: Do
+		
+		requires realPort: I
+	}
 }
