@@ -88,7 +88,7 @@ public abstract class Receiver<MsgType> {
 			java.lang.String name) {
 		Receiver.Agent<MsgType> implem = make_Agent(name);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -149,7 +149,7 @@ public abstract class Receiver<MsgType> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Receiver.Component<MsgType> ecoSelf() {
+		protected Receiver.Component<MsgType> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};

@@ -107,7 +107,7 @@ public abstract class RemoteFactory<Msg, Ref> {
 	public RemoteFactory.Agent<Msg, Ref> createImplementationOfAgent() {
 		RemoteFactory.Agent<Msg, Ref> implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -153,9 +153,28 @@ public abstract class RemoteFactory<Msg, Ref> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected RemoteFactory.Component<Msg, Ref> ecoSelf() {
+		protected RemoteFactory.Component<Msg, Ref> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, Ref> eco_infraCreate() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.infraCreate();
+		};
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> eco_thisPlace() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.thisPlace();
 		};
 
 		public static interface Bridge<Msg, Ref> {

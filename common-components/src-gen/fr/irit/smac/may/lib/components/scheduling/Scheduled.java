@@ -94,7 +94,7 @@ public abstract class Scheduled {
 	public Scheduled.Agent createImplementationOfAgent() {
 		Scheduled.Agent implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -139,9 +139,19 @@ public abstract class Scheduled {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Scheduled.Component ecoSelf() {
+		protected Scheduled.Component eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected java.util.concurrent.Executor eco_sched() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.sched();
 		};
 
 		public static interface Bridge {

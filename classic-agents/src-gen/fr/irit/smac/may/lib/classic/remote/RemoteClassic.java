@@ -357,7 +357,7 @@ public abstract class RemoteClassic<Msg> {
 			java.lang.String name) {
 		RemoteClassic.ClassicAgent<Msg> implem = make_ClassicAgent(beh, name);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 		assert this.selfComponent.implem_placed != null;
 		assert implem.use_p == null;
@@ -518,10 +518,87 @@ public abstract class RemoteClassic<Msg> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected RemoteClassic.Component<Msg> ecoSelf() {
+		protected RemoteClassic.Component<Msg> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Scheduler.Component eco_scheduler() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.scheduler;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef>> eco_sender() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.sender;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Receiver.Component<Msg> eco_receive() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.receive;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Placed.Component eco_placed() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.placed;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final RemoteReceiver.Component<Msg, fr.irit.smac.may.lib.components.messaging.receiver.AgentRef> eco_remReceive() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.remReceive;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final RemoteFactory.Component<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> eco_fact() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.fact;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ExecutorService.Component eco_executor() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.executor;
+		}
 
 		public static interface Bridge<Msg> {
 

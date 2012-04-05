@@ -87,7 +87,7 @@ public abstract class MapReferences<I, K> {
 	public MapReferences.Callee<I, K> createImplementationOfCallee(K key) {
 		MapReferences.Callee<I, K> implem = make_Callee(key);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -140,7 +140,7 @@ public abstract class MapReferences<I, K> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected MapReferences.Component<I, K> ecoSelf() {
+		protected MapReferences.Component<I, K> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
@@ -236,7 +236,7 @@ public abstract class MapReferences<I, K> {
 	public MapReferences.CalleePullKey<I, K> createImplementationOfCalleePullKey() {
 		MapReferences.CalleePullKey<I, K> implem = make_CalleePullKey();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -298,7 +298,7 @@ public abstract class MapReferences<I, K> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected MapReferences.Component<I, K> ecoSelf() {
+		protected MapReferences.Component<I, K> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};

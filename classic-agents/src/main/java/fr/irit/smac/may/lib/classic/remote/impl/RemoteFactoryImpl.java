@@ -51,10 +51,10 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 		protected CreateRemoteClassic<Msg, Ref> make_create() {
 			return new CreateRemoteClassic<Msg, Ref>() {
 				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh, Place place) {
-					return ecoSelf().factCreate().create(beh,place);
+					return eco_self().factCreate().create(beh,place);
 				}
 				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) {
-					return ecoSelf().factCreate().create(beh);
+					return eco_self().factCreate().create(beh);
 				}
 			};
 		}

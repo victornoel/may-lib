@@ -97,7 +97,7 @@ public abstract class ValuePublisher<T, K> {
 	public ValuePublisher.PublisherPush<T, K> createImplementationOfPublisherPush() {
 		ValuePublisher.PublisherPush<T, K> implem = make_PublisherPush();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -152,9 +152,19 @@ public abstract class ValuePublisher<T, K> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected ValuePublisher.Component<T, K> ecoSelf() {
+		protected ValuePublisher.Component<T, K> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Pull<T>, K> eco_call() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.call();
 		};
 
 		public static interface Bridge<T, K> {
@@ -249,7 +259,7 @@ public abstract class ValuePublisher<T, K> {
 	public ValuePublisher.PublisherPull<T, K> createImplementationOfPublisherPull() {
 		ValuePublisher.PublisherPull<T, K> implem = make_PublisherPull();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -294,9 +304,19 @@ public abstract class ValuePublisher<T, K> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected ValuePublisher.Component<T, K> ecoSelf() {
+		protected ValuePublisher.Component<T, K> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Pull<T>, K> eco_call() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.call();
 		};
 
 		public static interface Bridge<T, K> {

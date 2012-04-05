@@ -98,7 +98,7 @@ public abstract class AsyncReceiver<M, K> {
 	public AsyncReceiver.ReceiverBuf<M, K> createImplementationOfReceiverBuf() {
 		AsyncReceiver.ReceiverBuf<M, K> implem = make_ReceiverBuf();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -154,9 +154,19 @@ public abstract class AsyncReceiver<M, K> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected AsyncReceiver.Component<M, K> ecoSelf() {
+		protected AsyncReceiver.Component<M, K> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Push<M>, K> eco_call() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.call();
 		};
 
 		public static interface Bridge<M, K> {

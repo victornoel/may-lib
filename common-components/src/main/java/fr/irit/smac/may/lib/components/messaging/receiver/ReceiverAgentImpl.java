@@ -80,10 +80,10 @@ public class ReceiverAgentImpl<Msg> extends Receiver.Agent<Msg> {
 	protected ReliableSend<Msg, AgentRef> make_send() {
 		return new ReliableSend<Msg, AgentRef>() {
 			public void reliableSend(Msg message, AgentRef receiver) throws AgentDoesNotExistException {
-				ecoSelf().deposit().reliableSend(message, receiver);
+				eco_self().deposit().reliableSend(message, receiver);
 			};
 			public void send(Msg message, AgentRef receiver) {
-				ecoSelf().deposit().send(message, receiver);
+				eco_self().deposit().send(message, receiver);
 			};
 		};
 	}

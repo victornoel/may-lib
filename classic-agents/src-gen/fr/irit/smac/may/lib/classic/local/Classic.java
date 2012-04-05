@@ -317,7 +317,7 @@ public abstract class Classic<Msg> {
 			java.lang.String name) {
 		Classic.ClassicAgent<Msg> implem = make_ClassicAgent(beh, name);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 		assert this.selfComponent.implem_scheduler != null;
 		assert implem.use_s == null;
@@ -443,10 +443,76 @@ public abstract class Classic<Msg> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Classic.Component<Msg> ecoSelf() {
+		protected Classic.Component<Msg> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Scheduler.Component eco_scheduler() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.scheduler;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> eco_sender() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.sender;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final DirectReferences.Component<fr.irit.smac.may.lib.interfaces.Push<Msg>> eco_refs() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.refs;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final AsyncReceiver.Component<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> eco_receive() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.receive;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateClassic<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> eco_fact() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.fact;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ExecutorService.Component eco_executor() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.executor;
+		}
 
 		public static interface Bridge<Msg> {
 

@@ -125,7 +125,7 @@ public abstract class CollectionInteger<I> {
 	public CollectionInteger.Agent<I> createImplementationOfAgent() {
 		CollectionInteger.Agent<I> implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -178,7 +178,7 @@ public abstract class CollectionInteger<I> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected CollectionInteger.Component<I> ecoSelf() {
+		protected CollectionInteger.Component<I> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};

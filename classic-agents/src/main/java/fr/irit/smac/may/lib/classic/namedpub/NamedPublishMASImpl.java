@@ -84,12 +84,12 @@ public class NamedPublishMASImpl extends NamedPublishMAS {
 		return new NamedPublishMASFactory() {
 
 			public void createObserver(AbstractObserverBehaviour<String> beh) {
-				Observer.Component agent = NamedPublishMASImpl.this.newObserver(beh);
+				Observer.Component agent = newObserver(beh);
 				agent.start();
 			}
 
 			public void createObserved(String name,	AbstractObservedBehaviour beh) {
-				Observed.Component agent = NamedPublishMASImpl.this.newObserved(name,beh);
+				Observed.Component agent = newObserved(name,beh);
 				agent.start();
 				
 			}

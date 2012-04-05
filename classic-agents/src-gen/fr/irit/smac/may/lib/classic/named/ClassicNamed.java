@@ -309,7 +309,7 @@ public abstract class ClassicNamed<Msg> {
 		ClassicNamed.ClassicNamedAgent<Msg> implem = make_ClassicNamedAgent(
 				beh, name);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 		assert this.selfComponent.implem_scheduler != null;
 		assert implem.use_s == null;
@@ -436,10 +436,76 @@ public abstract class ClassicNamed<Msg> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected ClassicNamed.Component<Msg> ecoSelf() {
+		protected ClassicNamed.Component<Msg> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Scheduler.Component eco_scheduler() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.scheduler;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> eco_sender() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.sender;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> eco_fact() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.fact;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final MapReferences.Component<fr.irit.smac.may.lib.interfaces.Push<Msg>, java.lang.String> eco_refs() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.refs;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final AsyncReceiver.Component<Msg, java.lang.String> eco_receive() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.receive;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ExecutorService.Component eco_executor() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.executor;
+		}
 
 		public static interface Bridge<Msg> {
 

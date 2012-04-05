@@ -72,7 +72,7 @@ public abstract class Forward<I> {
 	public Forward.Agent<I> createImplementationOfAgent() {
 		Forward.Agent<I> implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -118,9 +118,19 @@ public abstract class Forward<I> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Forward.Component<I> ecoSelf() {
+		protected Forward.Component<I> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected I eco_i() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.i();
 		};
 
 		public static interface Bridge<I> {

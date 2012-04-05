@@ -97,7 +97,7 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 	public MapReceiver.Agent<Msg, RealRef, Ref> createImplementationOfAgent() {
 		MapReceiver.Agent<Msg, RealRef, Ref> implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -151,9 +151,19 @@ public abstract class MapReceiver<Msg, RealRef, Ref> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected MapReceiver.Component<Msg, RealRef, Ref> ecoSelf() {
+		protected MapReceiver.Component<Msg, RealRef, Ref> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Send<Msg, RealRef> eco_depositValue() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.depositValue();
 		};
 
 		public static interface Bridge<Msg, RealRef, Ref> {

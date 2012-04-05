@@ -87,7 +87,7 @@ public abstract class Callable<I> {
 	public Callable.Callee<I> createImplementationOfCallee() {
 		Callable.Callee<I> implem = make_Callee();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -140,7 +140,7 @@ public abstract class Callable<I> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Callable.Component<I> ecoSelf() {
+		protected Callable.Component<I> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
@@ -236,7 +236,7 @@ public abstract class Callable<I> {
 	public Callable.Caller<I> createImplementationOfCaller() {
 		Callable.Caller<I> implem = make_Caller();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -282,7 +282,7 @@ public abstract class Callable<I> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Callable.Component<I> ecoSelf() {
+		protected Callable.Component<I> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};

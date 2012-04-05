@@ -89,7 +89,7 @@ public abstract class DirectReferences<I> {
 			java.lang.String name) {
 		DirectReferences.Callee<I> implem = make_Callee(name);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -142,7 +142,7 @@ public abstract class DirectReferences<I> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected DirectReferences.Component<I> ecoSelf() {
+		protected DirectReferences.Component<I> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};

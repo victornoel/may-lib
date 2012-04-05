@@ -107,7 +107,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 	public RemoteReceiver.Agent<Msg, LocalRef> createImplementationOfAgent() {
 		RemoteReceiver.Agent<Msg, LocalRef> implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -160,9 +160,28 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected RemoteReceiver.Component<Msg, LocalRef> ecoSelf() {
+		protected RemoteReceiver.Component<Msg, LocalRef> eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Send<Msg, LocalRef> eco_localDeposit() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.localDeposit();
+		};
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> eco_myPlace() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.myPlace();
 		};
 
 		public static interface Bridge<Msg, LocalRef> {

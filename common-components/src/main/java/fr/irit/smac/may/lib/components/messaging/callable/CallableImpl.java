@@ -72,7 +72,7 @@ public class CallableImpl<I> extends Callable<I> {
 
 		@Override
 		protected MapGet<CallRef, I> make_call() {
-			return ecoSelf().call();
+			return eco_self().call();
 		}
 		
 	}

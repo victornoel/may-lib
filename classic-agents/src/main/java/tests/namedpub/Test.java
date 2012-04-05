@@ -8,8 +8,6 @@ import fr.irit.smac.may.lib.classic.namedpub.AbstractObserverBehaviour;
 import fr.irit.smac.may.lib.classic.namedpub.NamedPublishMASImpl;
 
 public class Test {
-
-	
 	public static void main(String[] args) {
 		NamedPublishMAS.Component mas = NamedPublishMAS.newComponent(new NamedPublishMASImpl());
 		mas.start();

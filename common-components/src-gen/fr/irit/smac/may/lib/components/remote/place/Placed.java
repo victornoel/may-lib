@@ -84,7 +84,7 @@ public abstract class Placed {
 	public Placed.Agent createImplementationOfAgent() {
 		Placed.Agent implem = make_Agent();
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 
 		return implem;
@@ -130,7 +130,7 @@ public abstract class Placed {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected Placed.Component ecoSelf() {
+		protected Placed.Component eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};

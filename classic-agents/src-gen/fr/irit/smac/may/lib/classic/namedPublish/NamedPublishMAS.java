@@ -341,7 +341,7 @@ public abstract class NamedPublishMAS {
 			fr.irit.smac.may.lib.classic.namedpub.AbstractObservedBehaviour beha) {
 		NamedPublishMAS.Observed implem = make_Observed(name, beha);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 		assert this.selfComponent.implem_schedule != null;
 		assert implem.use_sched == null;
@@ -450,10 +450,87 @@ public abstract class NamedPublishMAS {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected NamedPublishMAS.Component ecoSelf() {
+		protected NamedPublishMAS.Component eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final MapReferences.Component<fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer>, java.lang.String> eco_refs() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.refs;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ValuePublisher.Component<java.lang.Integer, java.lang.String> eco_observeds() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.observeds;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> eco_observers() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.observers;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ExecutorService.Component eco_executor() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.executor;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Scheduled.Component eco_schedule() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.schedule;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Clock.Component eco_clock() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.clock;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final SchedulingControllerGUI.Component eco_gui() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.gui;
+		}
 
 		public static interface Bridge {
 
@@ -585,7 +662,7 @@ public abstract class NamedPublishMAS {
 			fr.irit.smac.may.lib.classic.namedpub.AbstractObserverBehaviour<java.lang.String> beha) {
 		NamedPublishMAS.Observer implem = make_Observer(beha);
 		assert implem.ecosystemComponent == null;
-		assert this.selfComponent == null;
+		assert this.selfComponent != null;
 		implem.ecosystemComponent = this.selfComponent;
 		assert this.selfComponent.implem_schedule != null;
 		assert implem.use_sched == null;
@@ -675,10 +752,87 @@ public abstract class NamedPublishMAS {
 		 *
 		 * This is not meant to be called from the outside by hand.
 		 */
-		protected NamedPublishMAS.Component ecoSelf() {
+		protected NamedPublishMAS.Component eco_self() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent;
 		};
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final MapReferences.Component<fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer>, java.lang.String> eco_refs() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.refs;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ValuePublisher.Component<java.lang.Integer, java.lang.String> eco_observeds() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.observeds;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Forward.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> eco_observers() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.observers;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final ExecutorService.Component eco_executor() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.executor;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Scheduled.Component eco_schedule() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.schedule;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final Clock.Component eco_clock() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.clock;
+		}
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final SchedulingControllerGUI.Component eco_gui() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.gui;
+		}
 
 		public static interface Bridge {
 
