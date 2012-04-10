@@ -49,10 +49,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 		// does not take care of buffering messages
 		// put cannot be blocking!
-//		species Receiver(name: String) {
-//			
-//			requires put: Push[M]
-//		}
+		species Receiver {
+			requires put: Push[M]
+			provides toCall: Push[M] delegateToThis put
+		}
 		
 		// takes care of buffering messages
 		species ReceiverBuf {
@@ -62,7 +62,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			
 			part q: Queue[M]
 			
-			provides put: Push[M] = q.put
+			provides toCall: Push[M] = q.put
 		}
 		
 		requires call: Call[Push[M],K]
@@ -74,11 +74,13 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		species PublisherPush {
 			provides set: Push[T]
 			provides get: Pull[T]
+			provides toCall: Pull[T] delegateToThis get
 		}
 		
 		species PublisherPull {
 			provides get: Pull[T]
 			requires getValue: Pull[T]
+			provides toCall: Pull[T] delegateToThis get
 		}
 		
 		requires call: Call[Pull[T],K]

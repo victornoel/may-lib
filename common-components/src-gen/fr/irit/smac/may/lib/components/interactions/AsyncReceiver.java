@@ -90,6 +90,136 @@ public abstract class AsyncReceiver<M, K> {
 	/**
 	 * Should not be called
 	 */
+	protected abstract AsyncReceiver.Receiver<M, K> make_Receiver();
+
+	/**
+	 * Should not be called
+	 */
+	public AsyncReceiver.Receiver<M, K> createImplementationOfReceiver() {
+		AsyncReceiver.Receiver<M, K> implem = make_Receiver();
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent != null;
+		implem.ecosystemComponent = this.selfComponent;
+
+		return implem;
+	}
+
+	public static abstract class Receiver<M, K> {
+
+		private AsyncReceiver.Receiver.ComponentImpl<M, K> selfComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected AsyncReceiver.Receiver.Component<M, K> self() {
+			assert this.selfComponent != null;
+			return this.selfComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.interfaces.Push<M> put() {
+			assert this.selfComponent != null;
+			return this.selfComponent.bridge.put();
+		};
+
+		private AsyncReceiver.ComponentImpl<M, K> ecosystemComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected AsyncReceiver.Component<M, K> eco_self() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Push<M>, K> eco_call() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.call();
+		};
+
+		public static interface Bridge<M, K> {
+			public fr.irit.smac.may.lib.interfaces.Push<M> put();
+
+		}
+
+		public static interface Component<M, K> {
+
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Push<M> toCall();
+
+			/**
+			 * This should be called to start the component
+			 */
+			public void start();
+		}
+
+		private final static class ComponentImpl<M, K>
+				implements
+					AsyncReceiver.Receiver.Component<M, K> {
+
+			private final AsyncReceiver.Receiver.Bridge<M, K> bridge;
+
+			private final AsyncReceiver.Receiver<M, K> implementation;
+
+			private ComponentImpl(final AsyncReceiver.Receiver<M, K> implem,
+					final AsyncReceiver.Receiver.Bridge<M, K> b) {
+				this.bridge = b;
+
+				this.implementation = implem;
+
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
+
+			}
+
+			public final fr.irit.smac.may.lib.interfaces.Push<M> toCall() {
+
+				return ComponentImpl.this.bridge.put();
+
+			};
+
+			public final void start() {
+
+				this.implementation.start();
+			}
+		}
+
+		/**
+		 * Can be overridden by the implementation
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected void start() {
+		}
+
+		public AsyncReceiver.Receiver.Component<M, K> newComponent(
+				AsyncReceiver.Receiver.Bridge<M, K> b) {
+			return new AsyncReceiver.Receiver.ComponentImpl<M, K>(this, b);
+		}
+
+	}
+
+	/**
+	 * Should not be called
+	 */
 	protected abstract AsyncReceiver.ReceiverBuf<M, K> make_ReceiverBuf();
 
 	/**
@@ -189,7 +319,7 @@ public abstract class AsyncReceiver<M, K> {
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public fr.irit.smac.may.lib.interfaces.Push<M> put();
+			public fr.irit.smac.may.lib.interfaces.Push<M> toCall();
 
 			/**
 			 * This should be called to start the component
@@ -229,15 +359,21 @@ public abstract class AsyncReceiver<M, K> {
 			}
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<M> get() {
-				return this.q.get();
+
+				return ComponentImpl.this.q.get();
+
 			};
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<M>> getAll() {
-				return this.q.getAll();
+
+				return ComponentImpl.this.q.getAll();
+
 			};
 
-			public final fr.irit.smac.may.lib.interfaces.Push<M> put() {
-				return this.q.put();
+			public final fr.irit.smac.may.lib.interfaces.Push<M> toCall() {
+
+				return ComponentImpl.this.q.put();
+
 			};
 
 			public final void start() {

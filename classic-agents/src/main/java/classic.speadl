@@ -71,7 +71,7 @@ namespace fr.irit.smac.may.lib.classic {
 				}
 			
 				use ref: refs.Callee(name) {
-					bind toCall to observed.get
+					bind toCall to observed.toCall
 				}
 				use observed: observeds.PublisherPush
 				
@@ -132,10 +132,11 @@ namespace fr.irit.smac.may.lib.classic {
 
 				use f: fact.Agent
 
-				// no need for receiver because we don't want the buffer
-				// that's a bit ugly btw
+				use receive: receive.Receiver {
+					bind put to arch.put
+				}
 				use ref: refs.Callee(name) {
-					bind toCall to arch.put
+					bind toCall to receive.toCall
 				}
 
 				use ss: sender.Agent
@@ -227,10 +228,11 @@ namespace fr.irit.smac.may.lib.classic {
 
 				use f: fact.Agent
 				
-				// no need for receiver because we don't want the buffer
-				// that's a bit ugly btw
+				use receive: receive.Receiver {
+					bind put to arch.put
+				}
 				use ref: refs.Callee(name) {
-					bind toCall to arch.put
+					bind toCall to receive.toCall
 				}
 
 				use ss: sender.Agent

@@ -236,7 +236,9 @@ public abstract class IvyJSONBroadcaster<T> {
 		}
 
 		public final fr.irit.smac.may.lib.interfaces.Push<T> send() {
-			return this.bc.send();
+
+			return ComponentImpl.this.bc.send();
+
 		};
 
 		public final void start() {

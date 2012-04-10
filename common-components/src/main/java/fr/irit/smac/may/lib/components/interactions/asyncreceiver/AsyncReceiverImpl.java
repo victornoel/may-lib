@@ -27,16 +27,17 @@ public class AsyncReceiverImpl<M,K> extends AsyncReceiver<M,K> {
 	
 	@Override
 	protected ReceiverBuf<M,K> make_ReceiverBuf() {
-		return new ReceiverBufImpl();
+		return new ReceiverBuf<M,K>() {
+			@Override
+			protected Queue<M> make_q() {
+				return new ConcurrentQueueImpl<M>();
+			}
+		};
 	}
-	
-	private class ReceiverBufImpl extends ReceiverBuf<M,K> {
 
-		@Override
-		protected Queue<M> make_q() {
-			return new ConcurrentQueueImpl<M>();
-		}
-		
+	@Override
+	protected Receiver<M, K> make_Receiver() {
+		return new Receiver<M, K>() {};
 	}
 
 }

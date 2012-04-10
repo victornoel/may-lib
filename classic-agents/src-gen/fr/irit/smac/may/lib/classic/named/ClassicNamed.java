@@ -273,7 +273,9 @@ public abstract class ClassicNamed<Msg> {
 		}
 
 		public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send() {
-			return this.receive.deposit();
+
+			return ComponentImpl.this.receive.deposit();
+
 		};
 		private final fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String> create;
 
@@ -319,6 +321,10 @@ public abstract class ClassicNamed<Msg> {
 		assert implem.use_f == null;
 		implem.use_f = this.selfComponent.implem_fact
 				.createImplementationOfAgent();
+		assert this.selfComponent.implem_receive != null;
+		assert implem.use_receive == null;
+		implem.use_receive = this.selfComponent.implem_receive
+				.createImplementationOfReceiver();
 		assert this.selfComponent.implem_refs != null;
 		assert implem.use_ref == null;
 		implem.use_ref = this.selfComponent.implem_refs
@@ -401,6 +407,19 @@ public abstract class ClassicNamed<Msg> {
 		protected final Forward.Agent.Component<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> f() {
 			assert this.selfComponent != null;
 			return this.selfComponent.f;
+		}
+
+		private AsyncReceiver.Receiver<Msg, java.lang.String> use_receive = null;
+
+		/**
+		 * This can be called by the implementation to access the sub-component instance and its provided ports.
+		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected final AsyncReceiver.Receiver.Component<Msg, java.lang.String> receive() {
+			assert this.selfComponent != null;
+			return this.selfComponent.receive;
 		}
 
 		private MapReferences.Callee<fr.irit.smac.may.lib.interfaces.Push<Msg>, java.lang.String> use_ref = null;
@@ -548,6 +567,9 @@ public abstract class ClassicNamed<Msg> {
 				assert this.implementation.use_f != null;
 				this.f = this.implementation.use_f
 						.newComponent(new BridgeImplfactAgent());
+				assert this.implementation.use_receive != null;
+				this.receive = this.implementation.use_receive
+						.newComponent(new BridgeImplreceiveReceiver());
 				assert this.implementation.use_ref != null;
 				this.ref = this.implementation.use_ref
 						.newComponent(new BridgeImplrefsCallee());
@@ -604,6 +626,18 @@ public abstract class ClassicNamed<Msg> {
 						Forward.Agent.Bridge<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> {
 
 			}
+			private final AsyncReceiver.Receiver.Component<Msg, java.lang.String> receive;
+
+			private final class BridgeImplreceiveReceiver
+					implements
+						AsyncReceiver.Receiver.Bridge<Msg, java.lang.String> {
+
+				public final fr.irit.smac.may.lib.interfaces.Push<Msg> put() {
+					return ComponentImpl.this.arch.put();
+
+				};
+
+			}
 			private final MapReferences.Callee.Component<fr.irit.smac.may.lib.interfaces.Push<Msg>, java.lang.String> ref;
 
 			private final class BridgeImplrefsCallee
@@ -611,7 +645,7 @@ public abstract class ClassicNamed<Msg> {
 						MapReferences.Callee.Bridge<fr.irit.smac.may.lib.interfaces.Push<Msg>, java.lang.String> {
 
 				public final fr.irit.smac.may.lib.interfaces.Push<Msg> toCall() {
-					return ComponentImpl.this.arch.put();
+					return ComponentImpl.this.receive.toCall();
 
 				};
 
@@ -628,6 +662,7 @@ public abstract class ClassicNamed<Msg> {
 				this.arch.start();
 				this.s.start();
 				this.f.start();
+				this.receive.start();
 				this.ref.start();
 				this.ss.start();
 

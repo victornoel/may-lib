@@ -197,7 +197,9 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
 		}
 
 		public final fr.irit.smac.may.lib.interfaces.Push<Msg> put() {
-			return this.dispatcher.dispatch();
+
+			return ComponentImpl.this.dispatcher.dispatch();
+
 		};
 
 		public final void start() {

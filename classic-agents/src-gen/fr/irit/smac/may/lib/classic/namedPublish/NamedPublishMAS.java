@@ -609,7 +609,7 @@ public abstract class NamedPublishMAS {
 						MapReferences.Callee.Bridge<fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer>, java.lang.String> {
 
 				public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer> toCall() {
-					return ComponentImpl.this.observed.get();
+					return ComponentImpl.this.observed.toCall();
 
 				};
 

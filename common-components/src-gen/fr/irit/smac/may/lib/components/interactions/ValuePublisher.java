@@ -183,6 +183,11 @@ public abstract class ValuePublisher<T, K> {
 			 * start() must have been called before
 			 */
 			public fr.irit.smac.may.lib.interfaces.Pull<T> get();
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Pull<T> toCall();
 
 			/**
 			 * This should be called to start the component
@@ -223,6 +228,12 @@ public abstract class ValuePublisher<T, K> {
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<T> get() {
 				return this.get;
+			};
+
+			public final fr.irit.smac.may.lib.interfaces.Pull<T> toCall() {
+
+				return ComponentImpl.this.get();
+
 			};
 
 			public final void start() {
@@ -331,6 +342,11 @@ public abstract class ValuePublisher<T, K> {
 			 * start() must have been called before
 			 */
 			public fr.irit.smac.may.lib.interfaces.Pull<T> get();
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.interfaces.Pull<T> toCall();
 
 			/**
 			 * This should be called to start the component
@@ -364,6 +380,12 @@ public abstract class ValuePublisher<T, K> {
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<T> get() {
 				return this.get;
+			};
+
+			public final fr.irit.smac.may.lib.interfaces.Pull<T> toCall() {
+
+				return ComponentImpl.this.get();
+
 			};
 
 			public final void start() {

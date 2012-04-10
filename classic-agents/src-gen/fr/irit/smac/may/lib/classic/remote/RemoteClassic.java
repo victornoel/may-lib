@@ -317,11 +317,15 @@ public abstract class RemoteClassic<Msg> {
 		}
 
 		public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> send() {
-			return this.remReceive.deposit();
+
+			return ComponentImpl.this.remReceive.deposit();
+
 		};
 
 		public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace() {
-			return this.placed.thisPlace();
+
+			return ComponentImpl.this.placed.thisPlace();
+
 		};
 		private final fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic<Msg, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> create;
 
@@ -753,7 +757,9 @@ public abstract class RemoteClassic<Msg> {
 			}
 
 			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef> ref() {
-				return this.rr.me();
+
+				return ComponentImpl.this.rr.me();
+
 			};
 
 			public final void start() {
