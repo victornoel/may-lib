@@ -309,7 +309,7 @@ public abstract class AsyncReceiver<M, K> {
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public fr.irit.smac.may.lib.interfaces.Pull<M> get();
+			public fr.irit.smac.may.lib.interfaces.Pull<M> getNext();
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
@@ -358,7 +358,7 @@ public abstract class AsyncReceiver<M, K> {
 
 			}
 
-			public final fr.irit.smac.may.lib.interfaces.Pull<M> get() {
+			public final fr.irit.smac.may.lib.interfaces.Pull<M> getNext() {
 
 				return ComponentImpl.this.q.get();
 

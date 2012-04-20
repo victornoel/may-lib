@@ -21,13 +21,13 @@ public abstract class Scheduler {
 	 *
 	 * This is not meant to be called from the outside.
 	 */
-	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
+	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 		assert this.selfComponent != null;
-		return this.selfComponent.bridge.infraSched();
+		return this.selfComponent.bridge.executor();
 	};
 
 	public static interface Bridge {
-		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched();
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor();
 
 	}
 
@@ -109,7 +109,7 @@ public abstract class Scheduler {
 		 *
 		 * This is not meant to be called on from the outside.
 		 */
-		protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor make_sched();
+		protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor make_exec();
 
 		/**
 		 * This should be overridden by the implementation to define the provided port.
@@ -136,9 +136,9 @@ public abstract class Scheduler {
 		 *
 		 * This is not meant to be called from the outside.
 		 */
-		protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor eco_infraSched() {
+		protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor eco_executor() {
 			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent.bridge.infraSched();
+			return this.ecosystemComponent.bridge.executor();
 		};
 
 		public static interface Bridge {
@@ -151,7 +151,7 @@ public abstract class Scheduler {
 			 * This can be called to access the provided port
 			 * start() must have been called before
 			 */
-			public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched();
+			public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec();
 			/**
 			 * This can be called to access the provided port
 			 * start() must have been called before
@@ -182,15 +182,15 @@ public abstract class Scheduler {
 				assert implem.selfComponent == null;
 				implem.selfComponent = this;
 
-				this.sched = implem.make_sched();
+				this.exec = implem.make_exec();
 				this.stop = implem.make_stop();
 
 			}
 
-			private final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched;
+			private final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec;
 
-			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched() {
-				return this.sched;
+			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor exec() {
+				return this.exec;
 			};
 			private final fr.irit.smac.may.lib.interfaces.Do stop;
 

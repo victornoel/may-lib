@@ -44,6 +44,8 @@ public class ValuePublisherImpl<T, K> extends ValuePublisher<T, K> {
 	protected PublisherPush<T, K> make_PublisherPush() {
 		return new PublisherPush<T, K>() {
 
+			// must be volatile to be correctly
+			// accessed from different threads
 			private T value;
 
 			@Override

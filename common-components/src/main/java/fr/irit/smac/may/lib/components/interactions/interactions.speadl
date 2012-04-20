@@ -57,7 +57,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		// takes care of buffering messages
 		species ReceiverBuf {
 			
-			provides get: Pull[M] = q.get
+			provides getNext: Pull[M] = q.get
 			provides getAll: Pull[Collection[M]] = q.getAll
 			
 			part q: Queue[M]

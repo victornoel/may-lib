@@ -42,11 +42,11 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 	 */
 	ecosystem Scheduler {
 		species Agent {
-			provides sched: AdvancedExecutor
+			provides exec: AdvancedExecutor
 			provides stop: Do
 		}
 		
-		requires infraSched: AdvancedExecutor
+		requires executor: AdvancedExecutor
 	}
 	
 	namespace ase {

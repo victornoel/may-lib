@@ -3,16 +3,16 @@ package fr.irit.smac.may.lib.components.controlflow;
 import fr.irit.smac.may.lib.components.collections.Queue;
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher;
 
-public abstract class SequentialDispatcher<Truc> {
+public abstract class SequentialDispatcher<T> {
 
-	private SequentialDispatcher.ComponentImpl<Truc> selfComponent = null;
+	private SequentialDispatcher.ComponentImpl<T> selfComponent = null;
 
 	/**
 	 * This can be called by the implementation to access the component itself and its provided ports.
 	 *
 	 * This is not meant to be called from the outside by hand.
 	 */
-	protected SequentialDispatcher.Component<Truc> self() {
+	protected SequentialDispatcher.Component<T> self() {
 		assert this.selfComponent != null;
 		return this.selfComponent;
 	};
@@ -31,7 +31,7 @@ public abstract class SequentialDispatcher<Truc> {
 	 *
 	 * This is not meant to be called from the outside.
 	 */
-	protected fr.irit.smac.may.lib.interfaces.Push<Truc> handler() {
+	protected fr.irit.smac.may.lib.interfaces.Push<T> handler() {
 		assert this.selfComponent != null;
 		return this.selfComponent.bridge.handler();
 	};
@@ -42,13 +42,13 @@ public abstract class SequentialDispatcher<Truc> {
 	 *
 	 * This is not meant to be called on from the outside.
 	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Truc> make_dispatch();
+	protected abstract fr.irit.smac.may.lib.interfaces.Push<T> make_dispatch();
 
 	/**
 	 * This should be overridden by the implementation to define how to create this sub-component.
 	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
-	protected abstract Queue<Truc> make_queue();
+	protected abstract Queue<T> make_queue();
 
 	/**
 	 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -56,24 +56,24 @@ public abstract class SequentialDispatcher<Truc> {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final Queue.Component<Truc> queue() {
+	protected final Queue.Component<T> queue() {
 		assert this.selfComponent != null;
 		return this.selfComponent.queue;
 	}
 
-	public static interface Bridge<Truc> {
+	public static interface Bridge<T> {
 		public java.util.concurrent.Executor executor();
-		public fr.irit.smac.may.lib.interfaces.Push<Truc> handler();
+		public fr.irit.smac.may.lib.interfaces.Push<T> handler();
 
 	}
 
-	public static interface Component<Truc> {
+	public static interface Component<T> {
 
 		/**
 		 * This can be called to access the provided port
 		 * start() must have been called before
 		 */
-		public fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch();
+		public fr.irit.smac.may.lib.interfaces.Push<T> dispatch();
 
 		/**
 		 * This should be called to start the component
@@ -81,16 +81,16 @@ public abstract class SequentialDispatcher<Truc> {
 		public void start();
 	}
 
-	private final static class ComponentImpl<Truc>
+	private final static class ComponentImpl<T>
 			implements
-				SequentialDispatcher.Component<Truc> {
+				SequentialDispatcher.Component<T> {
 
-		private final SequentialDispatcher.Bridge<Truc> bridge;
+		private final SequentialDispatcher.Bridge<T> bridge;
 
-		private final SequentialDispatcher<Truc> implementation;
+		private final SequentialDispatcher<T> implementation;
 
-		private ComponentImpl(final SequentialDispatcher<Truc> implem,
-				final SequentialDispatcher.Bridge<Truc> b) {
+		private ComponentImpl(final SequentialDispatcher<T> implem,
+				final SequentialDispatcher.Bridge<T> b) {
 			this.bridge = b;
 
 			this.implementation = implem;
@@ -105,17 +105,17 @@ public abstract class SequentialDispatcher<Truc> {
 			this.queue = this.implem_queue.newComponent(new BridgeImpl_queue());
 		}
 
-		private final Queue.Component<Truc> queue;
+		private final Queue.Component<T> queue;
 
-		private Queue<Truc> implem_queue = null;
+		private Queue<T> implem_queue = null;
 
-		private final class BridgeImpl_queue implements Queue.Bridge<Truc> {
+		private final class BridgeImpl_queue implements Queue.Bridge<T> {
 
 		}
 
-		private final fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch;
+		private final fr.irit.smac.may.lib.interfaces.Push<T> dispatch;
 
-		public final fr.irit.smac.may.lib.interfaces.Push<Truc> dispatch() {
+		public final fr.irit.smac.may.lib.interfaces.Push<T> dispatch() {
 			return this.dispatch;
 		};
 
@@ -136,9 +136,9 @@ public abstract class SequentialDispatcher<Truc> {
 	protected void start() {
 	}
 
-	public SequentialDispatcher.Component<Truc> newComponent(
-			SequentialDispatcher.Bridge<Truc> b) {
-		return new SequentialDispatcher.ComponentImpl<Truc>(this, b);
+	public SequentialDispatcher.Component<T> newComponent(
+			SequentialDispatcher.Bridge<T> b) {
+		return new SequentialDispatcher.ComponentImpl<T>(this, b);
 	}
 
 }

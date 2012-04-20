@@ -22,7 +22,7 @@ public class SchedulerImpl extends Scheduler {
 		private final Set<Future<?>> s = new HashSet<Future<?>>();
 
 		@Override
-		protected AdvancedExecutor make_sched() {
+		protected AdvancedExecutor make_exec() {
 			return new AdvancedExecutor() {
 				public void execute(final Runnable command) {
 					executeAfter(command,0);
@@ -49,7 +49,7 @@ public class SchedulerImpl extends Scheduler {
 						final FutureTask<?> f = new FutureTask<Object>(mr, null);
 						mr.f = f;
 						s.add(f);
-						infraSched().executeAfter(f,time);
+						eco_executor().executeAfter(f,time);
 					}
 				}
 			};
