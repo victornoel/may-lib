@@ -210,7 +210,7 @@ public abstract class Classic<Msg> {
 
 		private final class BridgeImpl_scheduler implements Scheduler.Bridge {
 
-			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
+			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 				return ComponentImpl.this.executor.exec();
 
 			};
@@ -310,14 +310,14 @@ public abstract class Classic<Msg> {
 	 * Should not be called
 	 */
 	protected abstract Classic.ClassicAgent<Msg> make_ClassicAgent(
-			fr.irit.smac.may.lib.classic.local.ClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
+			fr.irit.smac.may.lib.classic.impl.AbstractClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
 			java.lang.String name);
 
 	/**
 	 * Should not be called
 	 */
 	public Classic.ClassicAgent<Msg> createImplementationOfClassicAgent(
-			fr.irit.smac.may.lib.classic.local.ClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
+			fr.irit.smac.may.lib.classic.impl.AbstractClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
 			java.lang.String name) {
 		Classic.ClassicAgent<Msg> implem = make_ClassicAgent(beh, name);
 		assert implem.ecosystemComponent == null;
@@ -353,7 +353,7 @@ public abstract class Classic<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	public Classic.ClassicAgent.Component<Msg> newClassicAgent(
-			fr.irit.smac.may.lib.classic.local.ClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
+			fr.irit.smac.may.lib.classic.impl.AbstractClassicBehaviour<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> beh,
 			java.lang.String name) {
 		Classic.ClassicAgent<Msg> implem = createImplementationOfClassicAgent(
 				beh, name);
@@ -611,7 +611,7 @@ public abstract class Classic<Msg> {
 				};
 
 				public final java.util.concurrent.Executor executor() {
-					return ComponentImpl.this.s.sched();
+					return ComponentImpl.this.s.exec();
 
 				};
 

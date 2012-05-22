@@ -10,7 +10,6 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.server.UnicastRemoteObject;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
-import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 import fr.irit.smac.may.lib.components.remote.place.Place;
 
@@ -25,7 +24,7 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 	protected void start() {
 		super.start();
 		RemoteMedium<Msg,Ref> rmedium = new RemoteMedium<Msg,Ref>() {
-			public Ref create(RemoteClassicBehaviour<Msg, Ref> beh)
+			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh)
 					throws RemoteException {
 				return RemoteFactoryImpl.this.infraCreate().create(beh);
 			}
@@ -50,10 +49,10 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 		@Override
 		protected CreateRemoteClassic<Msg, Ref> make_create() {
 			return new CreateRemoteClassic<Msg, Ref>() {
-				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh, Place place) {
+				public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh, Place place) {
 					return eco_self().factCreate().create(beh,place);
 				}
-				public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) {
+				public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh) {
 					return eco_self().factCreate().create(beh);
 				}
 			};
@@ -63,10 +62,10 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 	@Override
 	protected CreateRemoteClassic<Msg, Ref> make_factCreate() {
 		return new CreateRemoteClassic<Msg, Ref>() {
-			public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) {
+			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh) {
 				return infraCreate().create(beh);
 			}
-			public Ref create(RemoteClassicBehaviour<Msg, Ref> beh, Place place) {
+			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh, Place place) {
 				if (place.equals(RemoteFactoryImpl.this.thisPlace().pull()))
 					return RemoteFactoryImpl.this.infraCreate().create(beh);
 
@@ -92,7 +91,7 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 	}
 	
 	public interface RemoteMedium<Msg,Ref> extends Remote {
-		  public Ref create(RemoteClassicBehaviour<Msg, Ref> beh) throws RemoteException;
+		  public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh) throws RemoteException;
 	}
 
 	@Override

@@ -1,7 +1,7 @@
 package tests.remote;
 
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
-import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
+import fr.irit.smac.may.lib.classic.remote.impl.AbstractRemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.impl.RemoteClassicImpl;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.interfaces.Push;
@@ -12,7 +12,7 @@ public class Test {
 		RemoteClassic.Component<String> infra = RemoteClassic.newComponent(new RemoteClassicImpl<String>(1099));
 		infra.start();
 		
-		final RemoteAgentRef create = infra.create().create(new RemoteClassicBehaviour<String, RemoteAgentRef>() {
+		final RemoteAgentRef create = infra.create().create(new AbstractRemoteClassicBehaviour<String, RemoteAgentRef>() {
 			@Override
 			public Push<String> make_cycle() {
 				return new Push<String>() {
@@ -24,7 +24,7 @@ public class Test {
 			}
 		});
 		
-		RemoteAgentRef create2 = infra.create().create(new RemoteClassicBehaviour<String, RemoteAgentRef>() {
+		RemoteAgentRef create2 = infra.create().create(new AbstractRemoteClassicBehaviour<String, RemoteAgentRef>() {
 			@Override
 			public Push<String> make_cycle() {
 				return new Push<String>() {

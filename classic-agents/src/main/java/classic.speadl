@@ -100,7 +100,7 @@ namespace fr.irit.smac.may.lib.classic {
 			provides create: CreateNamed[Msg, String]
 			
 			part scheduler: Scheduler {
-				bind infraSched to executor.exec
+				bind executor to executor.exec
 			}
 
 			part sender: Forward[Send[Msg, String]] {
@@ -118,11 +118,11 @@ namespace fr.irit.smac.may.lib.classic {
 			
 			part executor: ExecutorService
 			
-			species ClassicNamedAgent(beh: named.ClassicNamedBehaviour[Msg,String], name: String) {
+			species ClassicNamedAgent(beh: named.AbstractClassicNamedBehaviour[Msg,String], name: String) {
 			//species ClassicNamedAgent(name: String) {
 				part arch: ClassicNamedAgentComponent[Msg, String] {
 					bind send to ss.a
-					bind executor to s.sched
+					bind executor to s.exec
 					bind die to s.stop
 					bind create to f.a
 					bind me to ref.me
@@ -194,7 +194,7 @@ namespace fr.irit.smac.may.lib.classic {
 			provides stop: Do = executor.stop
 
 			part scheduler: Scheduler {
-				bind infraSched to executor.exec
+				bind executor to executor.exec
 			}
 
 			part sender: Forward[Send[Msg, DirRef]] {
@@ -212,14 +212,14 @@ namespace fr.irit.smac.may.lib.classic {
 
 			part executor: ExecutorService
 
-			species ClassicAgent(beh: local.ClassicBehaviour[Msg,DirRef], name: String) {
+			species ClassicAgent(beh: impl.AbstractClassicBehaviour[Msg,DirRef], name: String) {
 			//species ClassicAgent(name: String) {
 				provides me: Pull[DirRef] = ref.me
 				
 				part arch: ClassicAgentComponent[Msg, DirRef] {
 					bind send to ss.a
 					bind me to ref.me
-					bind executor to s.sched
+					bind executor to s.exec
 					bind die to s.stop
 					bind create to f.a
 				}
@@ -310,7 +310,7 @@ namespace fr.irit.smac.may.lib.classic {
 			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
 
 			part scheduler: Scheduler {
-				bind infraSched to executor.exec
+				bind executor to executor.exec
 			}
 
 			part sender: Forward[Send[Msg, RemoteAgentRef]] {
@@ -333,7 +333,7 @@ namespace fr.irit.smac.may.lib.classic {
 
 			part executor: ExecutorService
 
-			species ClassicAgent(beh: remote.RemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
+			species ClassicAgent(beh: remote.impl.AbstractRemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
 			//species ClassicAgent(name: String) {
 				provides ref: Pull[RemoteAgentRef] = rr.me
 				part arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
@@ -341,7 +341,7 @@ namespace fr.irit.smac.may.lib.classic {
 					bind me to rr.me
 					bind stopExec to s.stop
 					bind stopReceive to rr.disconnect
-					bind executor to s.sched
+					bind executor to s.exec
 					bind create to f.create
 				}
 				use p: placed.Agent

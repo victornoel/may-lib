@@ -3,13 +3,13 @@ package tests.remote;
 import java.io.Serializable;
 
 import tests.messages.WithRef;
-import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
+import fr.irit.smac.may.lib.classic.remote.impl.AbstractRemoteClassicBehaviour;
 import fr.irit.smac.may.lib.components.remote.place.Place;
 import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingBehavior;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
-public class Behavior2<Ref> extends RemoteClassicBehaviour<PatternMatchingMessage,Ref> implements Serializable {
+public class Behavior2<Ref> extends AbstractRemoteClassicBehaviour<PatternMatchingMessage,Ref> implements Serializable {
 
 	private static final long serialVersionUID = -7663551892033127305L;
 

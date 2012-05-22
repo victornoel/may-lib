@@ -1,12 +1,12 @@
 package tests.local;
 
 import tests.messages.WithRef;
-import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
+import fr.irit.smac.may.lib.classic.impl.AbstractClassicBehaviour;
 import fr.irit.smac.may.lib.interfaces.Push;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingBehavior;
 import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
-public class Behavior2<Ref> extends ClassicBehaviour<PatternMatchingMessage,Ref> {
+public class Behavior2<Ref> extends AbstractClassicBehaviour<PatternMatchingMessage,Ref> {
 
 	private static final long serialVersionUID = -7663551892033127305L;
 

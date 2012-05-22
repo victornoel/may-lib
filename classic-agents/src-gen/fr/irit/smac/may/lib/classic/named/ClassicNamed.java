@@ -205,7 +205,7 @@ public abstract class ClassicNamed<Msg> {
 
 		private final class BridgeImpl_scheduler implements Scheduler.Bridge {
 
-			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor infraSched() {
+			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 				return ComponentImpl.this.executor.exec();
 
 			};
@@ -299,14 +299,14 @@ public abstract class ClassicNamed<Msg> {
 	 * Should not be called
 	 */
 	protected abstract ClassicNamed.ClassicNamedAgent<Msg> make_ClassicNamedAgent(
-			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
+			fr.irit.smac.may.lib.classic.named.AbstractClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name);
 
 	/**
 	 * Should not be called
 	 */
 	public ClassicNamed.ClassicNamedAgent<Msg> createImplementationOfClassicNamedAgent(
-			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
+			fr.irit.smac.may.lib.classic.named.AbstractClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name) {
 		ClassicNamed.ClassicNamedAgent<Msg> implem = make_ClassicNamedAgent(
 				beh, name);
@@ -343,7 +343,7 @@ public abstract class ClassicNamed<Msg> {
 	 * This is not meant to be called on the object by hand.
 	 */
 	public ClassicNamed.ClassicNamedAgent.Component<Msg> newClassicNamedAgent(
-			fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour<Msg, java.lang.String> beh,
+			fr.irit.smac.may.lib.classic.named.AbstractClassicNamedBehaviour<Msg, java.lang.String> beh,
 			java.lang.String name) {
 		ClassicNamed.ClassicNamedAgent<Msg> implem = createImplementationOfClassicNamedAgent(
 				beh, name);
@@ -592,7 +592,7 @@ public abstract class ClassicNamed<Msg> {
 				};
 
 				public final java.util.concurrent.Executor executor() {
-					return ComponentImpl.this.s.sched();
+					return ComponentImpl.this.s.exec();
 
 				};
 

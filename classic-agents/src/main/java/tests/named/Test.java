@@ -1,7 +1,7 @@
 package tests.named;
 
+import fr.irit.smac.may.lib.classic.named.AbstractClassicNamedBehaviour;
 import fr.irit.smac.may.lib.classic.named.ClassicNamed;
-import fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour;
 import fr.irit.smac.may.lib.classic.named.ClassicNamedImpl;
 import fr.irit.smac.may.lib.interfaces.Push;
 
@@ -11,7 +11,7 @@ public class Test {
 		ClassicNamed.Component<String> infra = ClassicNamed.newComponent(new ClassicNamedImpl<String>()) ;
 		infra.start();
 		
-		infra.create().create(new ClassicNamedBehaviour<String, String>() {
+		infra.create().create(new AbstractClassicNamedBehaviour<String, String>() {
 			@Override
 			public Push<String> make_cycle() {
 				return new Push<String>() {
@@ -23,7 +23,7 @@ public class Test {
 			}
 		},"a1");
 		
-		infra.create().create(new ClassicNamedBehaviour<String, String>() {
+		infra.create().create(new AbstractClassicNamedBehaviour<String, String>() {
 			@Override
 			public Push<String> make_cycle() {
 				return new Push<String>() {

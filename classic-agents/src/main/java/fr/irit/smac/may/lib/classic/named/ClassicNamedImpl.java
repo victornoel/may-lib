@@ -51,7 +51,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 	protected CreateNamed<Msg, String> make_create() {
 		return new CreateNamed<Msg, String>() {
 			public String create(
-					final ClassicNamedBehaviour<Msg, String> beh, String name) {
+					final AbstractClassicNamedBehaviour<Msg, String> beh, String name) {
 				ClassicNamedAgent.Component<Msg> agent = newClassicNamedAgent(beh, name);
 				agent.start();
 				return name;
@@ -61,7 +61,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 
 	@Override
 	protected fr.irit.smac.may.lib.classic.named.ClassicNamed.ClassicNamedAgent<Msg> make_ClassicNamedAgent(
-			final ClassicNamedBehaviour<Msg, String> beh, final String name) {
+			final AbstractClassicNamedBehaviour<Msg, String> beh, final String name) {
 		return new ClassicNamedAgent<Msg>() {
 			@Override
 			protected ClassicNamedAgentComponent<Msg, String> make_arch() {

@@ -1,9 +1,9 @@
 package fr.irit.smac.may.lib.classic.interfaces;
 
-import fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour;
+import fr.irit.smac.may.lib.classic.named.AbstractClassicNamedBehaviour;
 
 
 public interface CreateNamed<Msg,Ref> {
 
-	public Ref create(ClassicNamedBehaviour<Msg, Ref> beh, Ref r);
+	public Ref create(AbstractClassicNamedBehaviour<Msg, Ref> beh, Ref r);
 }

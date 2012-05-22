@@ -5,7 +5,6 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent;
-import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
 import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
@@ -68,7 +67,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	protected CreateRemoteClassic<Msg, RemoteAgentRef> make_create() {
 		return new CreateRemoteClassic<Msg, RemoteAgentRef>() {
 			public RemoteAgentRef create(
-					final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
+					final AbstractRemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
 				
 				ClassicAgent.Component<Msg> agent = newClassicAgent(beh, "agent"+(i++));
 				agent.start();
@@ -76,7 +75,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 			}
 
 			public RemoteAgentRef create(
-					RemoteClassicBehaviour<Msg, RemoteAgentRef> beh,
+					AbstractRemoteClassicBehaviour<Msg, RemoteAgentRef> beh,
 					Place place) {
 				return fact().factCreate().create(beh, place);
 			}
@@ -90,7 +89,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
 	@Override
 	protected fr.irit.smac.may.lib.classic.remote.RemoteClassic.ClassicAgent<Msg> make_ClassicAgent(
-			final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, String name) {
+			final AbstractRemoteClassicBehaviour<Msg, RemoteAgentRef> beh, String name) {
 		return new ClassicAgent<Msg>() {
 			@Override
 			protected RemoteClassicAgentComponent<Msg, RemoteAgentRef> make_arch() {
