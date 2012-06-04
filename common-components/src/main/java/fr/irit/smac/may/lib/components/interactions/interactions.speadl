@@ -1,6 +1,6 @@
 
 import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.components.interactions.interfaces.*
+import fr.irit.smac.may.lib.components.interactions.interfaces.*
 import java.lang.*
 
 namespace fr.irit.smac.may.lib.components.interactions {
