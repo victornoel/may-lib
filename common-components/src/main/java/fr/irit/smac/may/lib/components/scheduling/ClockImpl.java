@@ -37,11 +37,14 @@ public class ClockImpl extends Clock {
 			}
 			
 			public void step() {
-				running.set(false);
+				//running.set(false);
 				// TODO maybe wait for the previous one to finish before executing the step?
 				sched().execute(new Runnable() {
 					public void run() {
-						tick().doIt();
+						if (!running.getAndSet(true)) {
+							tick().doIt();
+							running.set(false);
+						}
 					}
 				});
 			}
