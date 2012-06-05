@@ -228,6 +228,137 @@ public abstract class DirectReferences<I> {
 	}
 
 	/**
+	 * Should not be called
+	 */
+	protected abstract DirectReferences.Caller<I> make_Caller();
+
+	/**
+	 * Should not be called
+	 */
+	public DirectReferences.Caller<I> createImplementationOfCaller() {
+		DirectReferences.Caller<I> implem = make_Caller();
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent != null;
+		implem.ecosystemComponent = this.selfComponent;
+
+		return implem;
+	}
+
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	public DirectReferences.Caller.Component<I> newCaller() {
+		DirectReferences.Caller<I> implem = createImplementationOfCaller();
+		return implem.newComponent(new DirectReferences.Caller.Bridge<I>() {
+		});
+	}
+
+	public static abstract class Caller<I> {
+
+		private DirectReferences.Caller.ComponentImpl<I> selfComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected DirectReferences.Caller.Component<I> self() {
+			assert this.selfComponent != null;
+			return this.selfComponent;
+		};
+
+		/**
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
+		 *
+		 * This is not meant to be called on from the outside.
+		 */
+		protected abstract fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> make_call();
+
+		private DirectReferences.ComponentImpl<I> ecosystemComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected DirectReferences.Component<I> eco_self() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
+		};
+
+		public static interface Bridge<I> {
+
+		}
+
+		public static interface Component<I> {
+
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> call();
+
+			/**
+			 * This should be called to start the component
+			 */
+			public void start();
+		}
+
+		private final static class ComponentImpl<I>
+				implements
+					DirectReferences.Caller.Component<I> {
+
+			@SuppressWarnings("unused")
+			private final DirectReferences.Caller.Bridge<I> bridge;
+
+			private final DirectReferences.Caller<I> implementation;
+
+			private ComponentImpl(final DirectReferences.Caller<I> implem,
+					final DirectReferences.Caller.Bridge<I> b) {
+				this.bridge = b;
+
+				this.implementation = implem;
+
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
+
+				this.call = implem.make_call();
+
+			}
+
+			private final fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> call;
+
+			public final fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> call() {
+				return this.call;
+			};
+
+			public final void start() {
+
+				this.implementation.start();
+			}
+		}
+
+		/**
+		 * Can be overridden by the implementation
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected void start() {
+		}
+
+		public DirectReferences.Caller.Component<I> newComponent(
+				DirectReferences.Caller.Bridge<I> b) {
+			return new DirectReferences.Caller.ComponentImpl<I>(this, b);
+		}
+
+	}
+
+	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.

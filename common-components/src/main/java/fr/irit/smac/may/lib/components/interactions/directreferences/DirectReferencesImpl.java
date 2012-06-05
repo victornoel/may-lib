@@ -86,4 +86,14 @@ public class DirectReferencesImpl<I> extends DirectReferences<I> {
 			return this.name + (this.ref == null ? "(stopped)" : "");
 		}
 	}
+
+	@Override
+	protected Caller<I> make_Caller() {
+		return new Caller<I>() {
+			@Override
+			protected Call<I, DirRef> make_call() {
+				return eco_self().call();
+			}
+		};
+	}
 }

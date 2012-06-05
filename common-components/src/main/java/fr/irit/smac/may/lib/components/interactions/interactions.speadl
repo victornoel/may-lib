@@ -18,6 +18,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides stop: Do
 		}
 		
+		species Caller {
+			provides call: Call[I,DirRef]
+		}
+		
 		provides call: Call[I,DirRef]
 		
 	}
