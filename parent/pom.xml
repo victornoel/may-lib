@@ -6,22 +6,15 @@
 
 	<parent>
 		<groupId>fr.irit.smac.lib</groupId>
-		<artifactId>parent</artifactId>
+		<artifactId>parent-may</artifactId>
 		<version>0.0.1</version>
 	</parent>
 
-	<groupId>fr.irit.smac.may.lib</groupId>
+	<groupId>fr.irit.smac.lib.may</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<packaging>pom</packaging>
-	<description>Parent pom for all MAY libraries</description>
-
-	<repositories>
-		<repository>
-			<id>fr.irit.smac</id>
-			<url>http://www.irit.fr/~Victor.Noel/maven-repos/</url>
-		</repository>
-	</repositories>
+	<description>Parent pom for the official MAY library</description>
 
 	<scm>
 		<connection>scm:hg:https://anon@wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</connection>
@@ -29,73 +22,4 @@
 		<url>https://wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</url>
 	</scm>
 
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.codehaus.mojo</groupId>
-					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>1.7</version>
-					<executions>
-						<execution>
-							<id>add-source</id>
-							<phase>generate-sources</phase>
-							<goals>
-								<goal>add-source</goal>
-							</goals>
-							<configuration>
-								<sources>
-									<source>src-gen</source>
-								</sources>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
-	<profiles>
-		<!--
-		This is a workaround to add speadl file to the jar
-		Apparently eclipse does not understand that and it prevents
-		it to validate speadl files in the target dir
-		(see https://bugs.eclipse.org/bugs/show_bug.cgi?id=356616)
-		  -->
-		<profile>
-			<id>add-speadl-resources</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<artifactId>maven-resources-plugin</artifactId>
-							<executions>
-								<execution>
-									<id>copy-resources</id>
-									<phase>initialize</phase>
-									<goals>
-										<goal>copy-resources</goal>
-									</goals>
-									<configuration>
-										<outputDirectory>${project.build.outputDirectory}</outputDirectory>
-										<resources>
-											<resource>
-												<directory>src/main/java</directory>
-												<includes>
-													<include>**/*.speadl</include>
-												</includes>
-											</resource>
-										</resources>
-									</configuration>
-								</execution>
-							</executions>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-			</build>
-		</profile>
-	</profiles>
 </project>
