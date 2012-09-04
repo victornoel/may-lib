@@ -40,4 +40,21 @@ public class AsyncReceiverImpl<M,K> extends AsyncReceiver<M,K> {
 		return new Receiver<M, K>() {};
 	}
 
+	@Override
+	protected Sender<M, K> make_Sender() {
+		return new Sender<M, K>() {
+			@Override
+			protected ReliableSend<M, K> make_send() {
+				return new ReliableSend<M, K>() {
+					public void reliableSend(M message, K receiver) throws RefDoesNotExistsException {
+						eco_self().deposit().reliableSend(message, receiver);
+					};
+					public void send(M message, K receiver) {
+						eco_self().deposit().send(message, receiver);
+					};
+				};
+			}
+		};
+	}
+
 }

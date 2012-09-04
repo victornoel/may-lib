@@ -109,6 +109,20 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 	protected CalleePullKey<I, K> make_CalleePullKey() {
 		return new CalleePullKeyImpl();
 	}
+
+	@Override
+	protected MapReferences.Caller<I, K> make_Caller() {
+		return new Caller<I, K>() {
+			@Override
+			protected Call<I, K> make_call() {
+				return new Call<I, K>() {
+					public I call(K ref) throws RefDoesNotExistsException {
+						return eco_self().call().call(ref);
+					};
+				};
+			}
+		};
+	}
 	
 	
 }

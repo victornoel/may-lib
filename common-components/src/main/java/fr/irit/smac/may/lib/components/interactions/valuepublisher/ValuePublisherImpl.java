@@ -68,4 +68,21 @@ public class ValuePublisherImpl<T, K> extends ValuePublisher<T, K> {
 
 		};
 	}
+
+	@Override
+	protected Observer<T, K> make_Observer() {
+		return new Observer<T, K>() {
+			@Override
+			protected ReliableObserve<T, K> make_observe() {
+				return new ReliableObserve<T, K>() {
+					public Option<T> observe(K ref) {
+						return eco_self().observe().observe(ref);
+					};
+					public T reliableObserve(K ref) throws RefDoesNotExistsException {
+						return eco_self().observe().reliableObserve(ref);
+					};
+				};
+			}
+		};
+	}
 }

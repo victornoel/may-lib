@@ -412,6 +412,147 @@ public abstract class ValuePublisher<T, K> {
 	}
 
 	/**
+	 * Should not be called
+	 */
+	protected abstract ValuePublisher.Observer<T, K> make_Observer();
+
+	/**
+	 * Should not be called
+	 */
+	public ValuePublisher.Observer<T, K> createImplementationOfObserver() {
+		ValuePublisher.Observer<T, K> implem = make_Observer();
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent != null;
+		implem.ecosystemComponent = this.selfComponent;
+
+		return implem;
+	}
+
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	public ValuePublisher.Observer.Component<T, K> newObserver() {
+		ValuePublisher.Observer<T, K> implem = createImplementationOfObserver();
+		return implem.newComponent(new ValuePublisher.Observer.Bridge<T, K>() {
+		});
+	}
+
+	public static abstract class Observer<T, K> {
+
+		private ValuePublisher.Observer.ComponentImpl<T, K> selfComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected ValuePublisher.Observer.Component<T, K> self() {
+			assert this.selfComponent != null;
+			return this.selfComponent;
+		};
+
+		/**
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
+		 *
+		 * This is not meant to be called on from the outside.
+		 */
+		protected abstract fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve<T, K> make_observe();
+
+		private ValuePublisher.ComponentImpl<T, K> ecosystemComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected ValuePublisher.Component<T, K> eco_self() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Pull<T>, K> eco_call() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.call();
+		};
+
+		public static interface Bridge<T, K> {
+
+		}
+
+		public static interface Component<T, K> {
+
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve<T, K> observe();
+
+			/**
+			 * This should be called to start the component
+			 */
+			public void start();
+		}
+
+		private final static class ComponentImpl<T, K>
+				implements
+					ValuePublisher.Observer.Component<T, K> {
+
+			@SuppressWarnings("unused")
+			private final ValuePublisher.Observer.Bridge<T, K> bridge;
+
+			private final ValuePublisher.Observer<T, K> implementation;
+
+			private ComponentImpl(final ValuePublisher.Observer<T, K> implem,
+					final ValuePublisher.Observer.Bridge<T, K> b) {
+				this.bridge = b;
+
+				this.implementation = implem;
+
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
+
+				this.observe = implem.make_observe();
+
+			}
+
+			private final fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve<T, K> observe;
+
+			public final fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve<T, K> observe() {
+				return this.observe;
+			};
+
+			public final void start() {
+
+				this.implementation.start();
+			}
+		}
+
+		/**
+		 * Can be overridden by the implementation
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected void start() {
+		}
+
+		public ValuePublisher.Observer.Component<T, K> newComponent(
+				ValuePublisher.Observer.Bridge<T, K> b) {
+			return new ValuePublisher.Observer.ComponentImpl<T, K>(this, b);
+		}
+
+	}
+
+	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.

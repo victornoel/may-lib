@@ -386,6 +386,137 @@ public abstract class MapReferences<I, K> {
 	}
 
 	/**
+	 * Should not be called
+	 */
+	protected abstract MapReferences.Caller<I, K> make_Caller();
+
+	/**
+	 * Should not be called
+	 */
+	public MapReferences.Caller<I, K> createImplementationOfCaller() {
+		MapReferences.Caller<I, K> implem = make_Caller();
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent != null;
+		implem.ecosystemComponent = this.selfComponent;
+
+		return implem;
+	}
+
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	public MapReferences.Caller.Component<I, K> newCaller() {
+		MapReferences.Caller<I, K> implem = createImplementationOfCaller();
+		return implem.newComponent(new MapReferences.Caller.Bridge<I, K>() {
+		});
+	}
+
+	public static abstract class Caller<I, K> {
+
+		private MapReferences.Caller.ComponentImpl<I, K> selfComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected MapReferences.Caller.Component<I, K> self() {
+			assert this.selfComponent != null;
+			return this.selfComponent;
+		};
+
+		/**
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
+		 *
+		 * This is not meant to be called on from the outside.
+		 */
+		protected abstract fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, K> make_call();
+
+		private MapReferences.ComponentImpl<I, K> ecosystemComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected MapReferences.Component<I, K> eco_self() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
+		};
+
+		public static interface Bridge<I, K> {
+
+		}
+
+		public static interface Component<I, K> {
+
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, K> call();
+
+			/**
+			 * This should be called to start the component
+			 */
+			public void start();
+		}
+
+		private final static class ComponentImpl<I, K>
+				implements
+					MapReferences.Caller.Component<I, K> {
+
+			@SuppressWarnings("unused")
+			private final MapReferences.Caller.Bridge<I, K> bridge;
+
+			private final MapReferences.Caller<I, K> implementation;
+
+			private ComponentImpl(final MapReferences.Caller<I, K> implem,
+					final MapReferences.Caller.Bridge<I, K> b) {
+				this.bridge = b;
+
+				this.implementation = implem;
+
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
+
+				this.call = implem.make_call();
+
+			}
+
+			private final fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, K> call;
+
+			public final fr.irit.smac.may.lib.components.interactions.interfaces.Call<I, K> call() {
+				return this.call;
+			};
+
+			public final void start() {
+
+				this.implementation.start();
+			}
+		}
+
+		/**
+		 * Can be overridden by the implementation
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected void start() {
+		}
+
+		public MapReferences.Caller.Component<I, K> newComponent(
+				MapReferences.Caller.Bridge<I, K> b) {
+			return new MapReferences.Caller.ComponentImpl<I, K>(this, b);
+		}
+
+	}
+
+	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.

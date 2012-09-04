@@ -401,6 +401,147 @@ public abstract class AsyncReceiver<M, K> {
 	}
 
 	/**
+	 * Should not be called
+	 */
+	protected abstract AsyncReceiver.Sender<M, K> make_Sender();
+
+	/**
+	 * Should not be called
+	 */
+	public AsyncReceiver.Sender<M, K> createImplementationOfSender() {
+		AsyncReceiver.Sender<M, K> implem = make_Sender();
+		assert implem.ecosystemComponent == null;
+		assert this.selfComponent != null;
+		implem.ecosystemComponent = this.selfComponent;
+
+		return implem;
+	}
+
+	/**
+	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	public AsyncReceiver.Sender.Component<M, K> newSender() {
+		AsyncReceiver.Sender<M, K> implem = createImplementationOfSender();
+		return implem.newComponent(new AsyncReceiver.Sender.Bridge<M, K>() {
+		});
+	}
+
+	public static abstract class Sender<M, K> {
+
+		private AsyncReceiver.Sender.ComponentImpl<M, K> selfComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected AsyncReceiver.Sender.Component<M, K> self() {
+			assert this.selfComponent != null;
+			return this.selfComponent;
+		};
+
+		/**
+		 * This should be overridden by the implementation to define the provided port.
+		 * This will be called once during the construction of the component to initialize the port.
+		 *
+		 * This is not meant to be called on from the outside.
+		 */
+		protected abstract fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend<M, K> make_send();
+
+		private AsyncReceiver.ComponentImpl<M, K> ecosystemComponent = null;
+
+		/**
+		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
+		 *
+		 * This is not meant to be called from the outside by hand.
+		 */
+		protected AsyncReceiver.Component<M, K> eco_self() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent;
+		};
+
+		/**
+		 * This can be called by the implementation to access this required port from the ecosystem.
+		 *
+		 * This is not meant to be called from the outside.
+		 */
+		protected fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Push<M>, K> eco_call() {
+			assert this.ecosystemComponent != null;
+			return this.ecosystemComponent.bridge.call();
+		};
+
+		public static interface Bridge<M, K> {
+
+		}
+
+		public static interface Component<M, K> {
+
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend<M, K> send();
+
+			/**
+			 * This should be called to start the component
+			 */
+			public void start();
+		}
+
+		private final static class ComponentImpl<M, K>
+				implements
+					AsyncReceiver.Sender.Component<M, K> {
+
+			@SuppressWarnings("unused")
+			private final AsyncReceiver.Sender.Bridge<M, K> bridge;
+
+			private final AsyncReceiver.Sender<M, K> implementation;
+
+			private ComponentImpl(final AsyncReceiver.Sender<M, K> implem,
+					final AsyncReceiver.Sender.Bridge<M, K> b) {
+				this.bridge = b;
+
+				this.implementation = implem;
+
+				assert implem.selfComponent == null;
+				implem.selfComponent = this;
+
+				this.send = implem.make_send();
+
+			}
+
+			private final fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend<M, K> send;
+
+			public final fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend<M, K> send() {
+				return this.send;
+			};
+
+			public final void start() {
+
+				this.implementation.start();
+			}
+		}
+
+		/**
+		 * Can be overridden by the implementation
+		 * It will be called after the component has been instantiated, after the components have been instantiated
+		 * and during the containing component start() method is called.
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected void start() {
+		}
+
+		public AsyncReceiver.Sender.Component<M, K> newComponent(
+				AsyncReceiver.Sender.Bridge<M, K> b) {
+			return new AsyncReceiver.Sender.ComponentImpl<M, K>(this, b);
+		}
+
+	}
+
+	/**
 	 * Can be overridden by the implementation
 	 * It will be called after the component has been instantiated, after the components have been instantiated
 	 * and during the containing component start() method is called.

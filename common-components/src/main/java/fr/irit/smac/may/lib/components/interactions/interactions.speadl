@@ -42,6 +42,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides stop: Do
 		}
 		
+		species Caller {
+			provides call: Call[I,K]
+		}
+		
 		provides call: Call[I,K]
 		
 	}
@@ -69,6 +73,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides toCall: Push[M] = q.put
 		}
 		
+		species Sender {
+			provides send: ReliableSend[M, K]
+		}
+		
 		requires call: Call[Push[M],K]
 		provides deposit: ReliableSend[M, K]
 	}
@@ -85,6 +93,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides get: Pull[T]
 			requires getValue: Pull[T]
 			provides toCall: Pull[T] delegateToThis get
+		}
+		
+		species Observer {
+			provides observe: ReliableObserve[T, K]
 		}
 		
 		requires call: Call[Pull[T],K]
