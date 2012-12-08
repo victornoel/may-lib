@@ -11,17 +11,31 @@ public class ClockImpl extends Clock {
 	
 	private volatile int sleep = 0;
 	
+	private void doOneStep() {
+		synchronized (this) {
+			tick().doIt();
+		}
+	}
+	
 	private void myrun() {
 		if (running.get()) {
 			sched().execute(new Runnable() {
 				public void run() {
-					tick().doIt();
-					try {
-						Thread.sleep(sleep);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					final long start = System.currentTimeMillis();
+
+					doOneStep();
+					
+					final long end = System.currentTimeMillis();
+					final long diffWithSleep = sleep - (end - start);
+
+					if (diffWithSleep > 0) {
+						try {
+							Thread.sleep(diffWithSleep);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
 					}
+
 					myrun();
 				}
 			});
@@ -41,7 +55,7 @@ public class ClockImpl extends Clock {
 				// TODO maybe wait for the previous one to finish before executing the step?
 				sched().execute(new Runnable() {
 					public void run() {
-						tick().doIt();
+						doOneStep();
 					}
 				});
 			}
