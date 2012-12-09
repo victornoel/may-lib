@@ -1,10 +1,10 @@
 package fr.irit.smac.may.lib.components.scheduling;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -13,7 +13,9 @@ import fr.irit.smac.may.lib.interfaces.Do;
 
 public class ScheduledImpl extends Scheduled {
 
-	private final Set<AgentSide> agents = Collections.synchronizedSet(new HashSet<AgentSide>());
+	private final Set<AgentSide> agents = new HashSet<AgentSide>();
+	
+	private final ConcurrentLinkedQueue<AgentSide> newAgents = new ConcurrentLinkedQueue<AgentSide>();
 	
 	public class AgentSide extends Scheduled.Agent {
 
@@ -24,12 +26,7 @@ public class ScheduledImpl extends Scheduled {
 		@Override
 		protected void start() {
 			super.start();
-			// add the agent when the collection is not locked (later)
-			sched().execute(new Runnable() {
-				public void run() {
-					agents.add(AgentSide.this);
-				}
-			});
+			newAgents.add(AgentSide.this);
 		}
 		
 		@Override
@@ -77,18 +74,19 @@ public class ScheduledImpl extends Scheduled {
 	protected Do make_tick() {
 		return new Do() {
 			public void doIt() {
-				synchronized (agents) {
-					// start agents
-					Iterator<AgentSide> it = agents.iterator();
-					while(it.hasNext()) {
-						AgentSide a = it.next();
-						if (a.run.get()) a.tick();
-						else it.remove();
-					}
-					// wait for all of them to finish before giving back control
-					for(AgentSide a: agents) {
-						a.waitForEnd();
-					}
+				while (!newAgents.isEmpty()) {
+					agents.add(newAgents.poll());
+				}
+				// start agents
+				Iterator<AgentSide> it = agents.iterator();
+				while(it.hasNext()) {
+					AgentSide a = it.next();
+					if (a.run.get()) a.tick();
+					else it.remove();
+				}
+				// wait for all of them to finish before giving back control
+				for(AgentSide a: agents) {
+					a.waitForEnd();
 				}
 			}
 		};
