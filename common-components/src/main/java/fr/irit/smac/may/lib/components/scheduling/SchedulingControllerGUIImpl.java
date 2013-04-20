@@ -110,7 +110,7 @@ public class SchedulingControllerGUIImpl extends	SchedulingControllerGUI {
 				stepButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						if (stepButton.isEnabled())
-							control().step();
+							control().step(false);
 					}
 				});
 

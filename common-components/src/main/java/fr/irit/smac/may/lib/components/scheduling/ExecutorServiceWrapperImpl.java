@@ -1,6 +1,8 @@
 package fr.irit.smac.may.lib.components.scheduling;
 
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor;
 import fr.irit.smac.may.lib.interfaces.Do;
@@ -21,25 +23,29 @@ public class ExecutorServiceWrapperImpl extends ExecutorService {
 			}
 
 			public void executeAfter(final Runnable command, final long time) {
-				// time of the first execution
-				final long current = System.currentTimeMillis();
-				execute(new Runnable() {
-					public void run() {
-						if (System.currentTimeMillis()>(current+time)) {
-							// if it is time, run it
-							command.run();
-						} else {
-							// else, try later
-							execute(this);
+				if (service instanceof ScheduledExecutorService) {
+					((ScheduledExecutorService) service).schedule(command, time, TimeUnit.MILLISECONDS);
+				} else {
+					// time of the first execution
+					final long current = System.currentTimeMillis();
+					execute(new Runnable() {
+						public void run() {
+							if (System.currentTimeMillis()>(current+time)) {
+								// if it is time, run it
+								command.run();
+							} else {
+								// else, try later
+								execute(this);
+							}
 						}
-					}
-				});
+					});
+				}
 			}
 		};
 	}
 	
 	public static void main(String[] args) {
-		Component component = ExecutorService.createComponent(new ExecutorServiceWrapperImpl(Executors.newSingleThreadExecutor()));
+		Component component = ExecutorService.createComponent(new ExecutorServiceWrapperImpl(Executors.newScheduledThreadPool(10)));
 		component.start();
 		
 		// this should not block even with one thread

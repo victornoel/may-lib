@@ -10,7 +10,7 @@ public abstract class Scheduled {
 	 *
 	 * This is not meant to be called on the object by hand.
 	 */
-	protected final java.util.concurrent.Executor sched() {
+	protected final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched() {
 		assert this.structure != null;
 		return this.structure.bridge.sched();
 	};
@@ -23,8 +23,16 @@ public abstract class Scheduled {
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Do tick();
 
+	/**
+	 * This should be overridden by the implementation to define the provided port
+	 * This will be called once during the construction of the component to initialize the port
+	 *
+	 * This is not meant to be called on the object by hand.
+	 */
+	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl async();
+
 	public static interface Bridge {
-		public java.util.concurrent.Executor sched();
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched();
 
 	}
 
@@ -43,6 +51,7 @@ public abstract class Scheduled {
 			implem.structure = this;
 
 			this.tick = implem.tick();
+			this.async = implem.async();
 
 		}
 
@@ -54,6 +63,15 @@ public abstract class Scheduled {
 		 */
 		public final fr.irit.smac.may.lib.interfaces.Do tick() {
 			return this.tick;
+		};
+		private final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl async;
+
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl async() {
+			return this.async;
 		};
 
 		public final void start() {

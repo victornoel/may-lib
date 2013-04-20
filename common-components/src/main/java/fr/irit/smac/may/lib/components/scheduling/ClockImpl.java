@@ -11,10 +11,10 @@ public class ClockImpl extends Clock {
 	
 	private volatile int sleep = 0;
 	
-	private void doOneStep() {
-		synchronized (this) {
-			tick().doIt();
-		}
+	// the synchronized here make this step to
+	// be executed only when the previous one has finished
+	private synchronized void doOneStep() {
+		tick().doIt();
 	}
 	
 	private void myrun() {
@@ -51,18 +51,25 @@ public class ClockImpl extends Clock {
 			}
 			
 			public void step() {
+				step(false);
+			}
+			
+			public void step(boolean synchronous) {
 				running.set(false);
-				// TODO maybe wait for the previous one to finish before executing the step?
-				sched().execute(new Runnable() {
-					public void run() {
-						doOneStep();
-					}
-				});
+				if (synchronous) {
+					doOneStep();
+				} else {
+					sched().execute(new Runnable() {
+						public void run() {
+							doOneStep();
+						}
+					});
+				}
 			}
 			
 			public void run(int ms) {
 				sleep = ms;
-				if (!running.getAndSet(true)) {
+				if (running.compareAndSet(false, true)) {
 					myrun();
 				}
 			}
