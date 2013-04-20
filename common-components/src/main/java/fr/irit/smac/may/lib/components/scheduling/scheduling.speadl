@@ -17,8 +17,9 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		 * returns upon completion of all agents
 		 */
 		provides tick: Do
-		requires sched: Executor
+		requires sched: AdvancedExecutor
 		
+		provides async: SchedulingControl
 	}
 	
 	/**
@@ -47,20 +48,6 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		}
 		
 		requires executor: AdvancedExecutor
-	}
-	
-	namespace ase {
-		/**
-		 * One step equals to execute at once the number of max thread to be created
-		 * It is not meant to schedule a set of agents all at once (for that see Clock),
-		 * but to execute a set of tasks bit by bit
-		 * 
-		 * Prefer to use the Clock with an ExecutorService
-		 */
-		component AlternateStateExecutorService {
-			provides exec: Executor
-			provides control: SchedulingControl
-		}
 	}
 
 	component ExecutorService {
