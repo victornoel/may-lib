@@ -21,7 +21,7 @@ public abstract class Scheduled {
 	 *
 	 * This is not meant to be called from the outside.
 	 */
-	protected java.util.concurrent.Executor sched() {
+	protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched() {
 		assert this.selfComponent != null;
 		return this.selfComponent.bridge.sched();
 	};
@@ -34,8 +34,16 @@ public abstract class Scheduled {
 	 */
 	protected abstract fr.irit.smac.may.lib.interfaces.Do make_tick();
 
+	/**
+	 * This should be overridden by the implementation to define the provided port.
+	 * This will be called once during the construction of the component to initialize the port.
+	 *
+	 * This is not meant to be called on from the outside.
+	 */
+	protected abstract fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl make_async();
+
 	public static interface Bridge {
-		public java.util.concurrent.Executor sched();
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched();
 
 	}
 
@@ -46,6 +54,11 @@ public abstract class Scheduled {
 		 * start() must have been called before
 		 */
 		public fr.irit.smac.may.lib.interfaces.Do tick();
+		/**
+		 * This can be called to access the provided port
+		 * start() must have been called before
+		 */
+		public fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl async();
 
 		/**
 		 * This should be called to start the component
@@ -68,6 +81,7 @@ public abstract class Scheduled {
 			implem.selfComponent = this;
 
 			this.tick = implem.make_tick();
+			this.async = implem.make_async();
 
 		}
 
@@ -75,6 +89,11 @@ public abstract class Scheduled {
 
 		public final fr.irit.smac.may.lib.interfaces.Do tick() {
 			return this.tick;
+		};
+		private final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl async;
+
+		public final fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl async() {
+			return this.async;
 		};
 
 		public final void start() {
@@ -149,7 +168,7 @@ public abstract class Scheduled {
 		 *
 		 * This is not meant to be called from the outside.
 		 */
-		protected java.util.concurrent.Executor eco_sched() {
+		protected fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor eco_sched() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent.bridge.sched();
 		};
