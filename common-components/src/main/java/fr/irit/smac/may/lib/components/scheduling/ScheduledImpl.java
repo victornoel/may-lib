@@ -84,7 +84,7 @@ public class ScheduledImpl extends Scheduled {
 	// this is true when it is running in cycle loops
 	private final AtomicBoolean running = new AtomicBoolean(false);
 	
-	private void step(boolean synchronous) {
+	private synchronized void step(boolean synchronous) {
 		if (!running.get()) {
 			sleep = 0;
 			CountDownLatch countdown = null;
