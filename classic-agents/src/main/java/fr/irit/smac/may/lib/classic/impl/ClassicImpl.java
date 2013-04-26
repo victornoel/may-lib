@@ -34,11 +34,6 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected Forward<Send<Msg, DirRef>> make_sender() {
-		return new ForwardImpl<Send<Msg, DirRef>>();
-	}
-
-	@Override
 	protected AsyncReceiver<Msg, DirRef> make_receive() {
 		return new AsyncReceiverImpl<Msg, DirRef>();
 	}

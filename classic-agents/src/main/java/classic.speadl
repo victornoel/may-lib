@@ -44,9 +44,6 @@ namespace fr.irit.smac.may.lib.classic {
 			part observeds: ValuePublisher[Integer,String] {
 				bind call to refs.call
 			}
-			part observers: Forward[Observe[Integer,String]] {
-				bind i to observeds.observe
-			}
 			
 			part executor: ExecutorService
 			part schedule: Scheduled {
@@ -84,9 +81,9 @@ namespace fr.irit.smac.may.lib.classic {
 				}
 				
 				part beh: ObserverBehaviour[String] {
-					bind observe to observer.a
+					bind observe to observer.observe
 				}
-				use observer: observers.Agent
+				use observer: observeds.Observer
 				
 			}
 			
@@ -95,24 +92,23 @@ namespace fr.irit.smac.may.lib.classic {
 
 	namespace named {
 		
+		import fr.irit.smac.may.lib.components.interactions.*
+		
 		ecosystem ClassicNamed[Msg] {
+			
 			provides send: Send[Msg, String] = receive.deposit
 			provides create: CreateNamed[Msg, String]
 			
 			part scheduler: Scheduler {
 				bind executor to executor.exec
 			}
-
-			part sender: Forward[Send[Msg, String]] {
-				bind i to receive.deposit
-			}
 			
 			part fact: Forward[CreateNamed[Msg, String]] {
 				bind i toThis create
 			}
 			
-			part refs: fr.irit.smac.may.lib.components.interactions.MapReferences[Push[Msg],String]
-			part receive: fr.irit.smac.may.lib.components.interactions.AsyncReceiver[Msg,String] {
+			part refs: MapReferences[Push[Msg],String]
+			part receive: AsyncReceiver[Msg,String] {
 				bind call to refs.call
 			}
 			
@@ -121,7 +117,7 @@ namespace fr.irit.smac.may.lib.classic {
 			species ClassicNamedAgent(beh: named.AbstractClassicNamedBehaviour[Msg,String], name: String) {
 			//species ClassicNamedAgent(name: String) {
 				part arch: ClassicNamedAgentComponent[Msg, String] {
-					bind send to ss.a
+					bind send to ss.send
 					bind executor to s.exec
 					bind die to s.stop
 					bind create to f.a
@@ -139,7 +135,7 @@ namespace fr.irit.smac.may.lib.classic {
 					bind toCall to receive.toCall
 				}
 
-				use ss: sender.Agent
+				use ss: receive.Sender
 			}
 		}
 		
@@ -177,6 +173,7 @@ namespace fr.irit.smac.may.lib.classic {
 	}
 
 	namespace local {
+		import fr.irit.smac.may.lib.components.interactions.*
 		import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
 		
 		component ClassicBehaviour[Msg, Ref] {
@@ -196,13 +193,9 @@ namespace fr.irit.smac.may.lib.classic {
 			part scheduler: Scheduler {
 				bind executor to executor.exec
 			}
-
-			part sender: Forward[Send[Msg, DirRef]] {
-				bind i to receive.deposit
-			}
 			
-			part refs: fr.irit.smac.may.lib.components.interactions.DirectReferences[Push[Msg]]
-			part receive: fr.irit.smac.may.lib.components.interactions.AsyncReceiver[Msg,DirRef] {
+			part refs: DirectReferences[Push[Msg]]
+			part receive: AsyncReceiver[Msg,DirRef] {
 				bind call to refs.call
 			}
 
@@ -217,7 +210,7 @@ namespace fr.irit.smac.may.lib.classic {
 				provides me: Pull[DirRef] = ref.me
 				
 				part arch: ClassicAgentComponent[Msg, DirRef] {
-					bind send to ss.a
+					bind send to ss.send
 					bind me to ref.me
 					bind executor to s.exec
 					bind die to s.stop
@@ -235,7 +228,7 @@ namespace fr.irit.smac.may.lib.classic {
 					bind toCall to receive.toCall
 				}
 
-				use ss: sender.Agent
+				use ss: receive.Sender
 			}
 		}
 

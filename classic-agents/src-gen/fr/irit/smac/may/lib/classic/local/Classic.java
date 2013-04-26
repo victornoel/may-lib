@@ -51,23 +51,6 @@ public abstract class Classic<Msg> {
 	 * This should be overridden by the implementation to define how to create this sub-component.
 	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
-	protected abstract Forward<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> make_sender();
-
-	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports.
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> sender() {
-		assert this.selfComponent != null;
-		return this.selfComponent.sender;
-	}
-
-	/**
-	 * This should be overridden by the implementation to define how to create this sub-component.
-	 * This will be called once during the construction of the component to initialize this sub-component.
-	 */
 	protected abstract DirectReferences<fr.irit.smac.may.lib.interfaces.Push<Msg>> make_refs();
 
 	/**
@@ -184,10 +167,6 @@ public abstract class Classic<Msg> {
 			this.implem_scheduler = implem.make_scheduler();
 			this.scheduler = this.implem_scheduler
 					.newComponent(new BridgeImpl_scheduler());
-			assert this.implem_sender == null;
-			this.implem_sender = implem.make_sender();
-			this.sender = this.implem_sender
-					.newComponent(new BridgeImpl_sender());
 			assert this.implem_refs == null;
 			this.implem_refs = implem.make_refs();
 			this.refs = this.implem_refs.newComponent(new BridgeImpl_refs());
@@ -212,20 +191,6 @@ public abstract class Classic<Msg> {
 
 			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 				return ComponentImpl.this.executor.exec();
-
-			};
-
-		}
-		private final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> sender;
-
-		private Forward<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> implem_sender = null;
-
-		private final class BridgeImpl_sender
-				implements
-					Forward.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> {
-
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> i() {
-				return ComponentImpl.this.receive.deposit();
 
 			};
 
@@ -296,7 +261,6 @@ public abstract class Classic<Msg> {
 
 		public final void start() {
 			this.scheduler.start();
-			this.sender.start();
 			this.refs.start();
 			this.receive.start();
 			this.fact.start();
@@ -339,10 +303,10 @@ public abstract class Classic<Msg> {
 		assert implem.use_ref == null;
 		implem.use_ref = this.selfComponent.implem_refs
 				.createImplementationOfCallee(name);
-		assert this.selfComponent.implem_sender != null;
+		assert this.selfComponent.implem_receive != null;
 		assert implem.use_ss == null;
-		implem.use_ss = this.selfComponent.implem_sender
-				.createImplementationOfAgent();
+		implem.use_ss = this.selfComponent.implem_receive
+				.createImplementationOfSender();
 
 		return implem;
 	}
@@ -444,7 +408,7 @@ public abstract class Classic<Msg> {
 			return this.selfComponent.ref;
 		}
 
-		private Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> use_ss = null;
+		private AsyncReceiver.Sender<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> use_ss = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -452,7 +416,7 @@ public abstract class Classic<Msg> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> ss() {
+		protected final AsyncReceiver.Sender.Component<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> ss() {
 			assert this.selfComponent != null;
 			return this.selfComponent.ss;
 		}
@@ -478,17 +442,6 @@ public abstract class Classic<Msg> {
 		protected final Scheduler.Component eco_scheduler() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent.scheduler;
-		}
-
-		/**
-		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
-		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> eco_sender() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent.sender;
 		}
 
 		/**
@@ -589,7 +542,7 @@ public abstract class Classic<Msg> {
 						.newComponent(new BridgeImplrefsCallee());
 				assert this.implementation.use_ss != null;
 				this.ss = this.implementation.use_ss
-						.newComponent(new BridgeImplsenderAgent());
+						.newComponent(new BridgeImplreceiveSender());
 			}
 
 			private final ClassicAgentComponent.Component<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> arch;
@@ -601,7 +554,7 @@ public abstract class Classic<Msg> {
 						ClassicAgentComponent.Bridge<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> {
 
 				public final fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> send() {
-					return ComponentImpl.this.ss.a();
+					return ComponentImpl.this.ss.send();
 
 				};
 
@@ -664,11 +617,11 @@ public abstract class Classic<Msg> {
 				};
 
 			}
-			private final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> ss;
+			private final AsyncReceiver.Sender.Component<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> ss;
 
-			private final class BridgeImplsenderAgent
+			private final class BridgeImplreceiveSender
 					implements
-						Forward.Agent.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef>> {
+						AsyncReceiver.Sender.Bridge<Msg, fr.irit.smac.may.lib.components.interactions.directreferences.DirRef> {
 
 			}
 

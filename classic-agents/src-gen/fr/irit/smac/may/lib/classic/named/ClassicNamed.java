@@ -51,23 +51,6 @@ public abstract class ClassicNamed<Msg> {
 	 * This should be overridden by the implementation to define how to create this sub-component.
 	 * This will be called once during the construction of the component to initialize this sub-component.
 	 */
-	protected abstract Forward<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> make_sender();
-
-	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports.
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender() {
-		assert this.selfComponent != null;
-		return this.selfComponent.sender;
-	}
-
-	/**
-	 * This should be overridden by the implementation to define how to create this sub-component.
-	 * This will be called once during the construction of the component to initialize this sub-component.
-	 */
 	protected abstract Forward<fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, java.lang.String>> make_fact();
 
 	/**
@@ -179,10 +162,6 @@ public abstract class ClassicNamed<Msg> {
 			this.implem_scheduler = implem.make_scheduler();
 			this.scheduler = this.implem_scheduler
 					.newComponent(new BridgeImpl_scheduler());
-			assert this.implem_sender == null;
-			this.implem_sender = implem.make_sender();
-			this.sender = this.implem_sender
-					.newComponent(new BridgeImpl_sender());
 			assert this.implem_fact == null;
 			this.implem_fact = implem.make_fact();
 			this.fact = this.implem_fact.newComponent(new BridgeImpl_fact());
@@ -207,20 +186,6 @@ public abstract class ClassicNamed<Msg> {
 
 			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor executor() {
 				return ComponentImpl.this.executor.exec();
-
-			};
-
-		}
-		private final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> sender;
-
-		private Forward<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> implem_sender = null;
-
-		private final class BridgeImpl_sender
-				implements
-					Forward.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
-
-			public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> i() {
-				return ComponentImpl.this.receive.deposit();
 
 			};
 
@@ -285,7 +250,6 @@ public abstract class ClassicNamed<Msg> {
 
 		public final void start() {
 			this.scheduler.start();
-			this.sender.start();
 			this.fact.start();
 			this.refs.start();
 			this.receive.start();
@@ -329,10 +293,10 @@ public abstract class ClassicNamed<Msg> {
 		assert implem.use_ref == null;
 		implem.use_ref = this.selfComponent.implem_refs
 				.createImplementationOfCallee(name);
-		assert this.selfComponent.implem_sender != null;
+		assert this.selfComponent.implem_receive != null;
 		assert implem.use_ss == null;
-		implem.use_ss = this.selfComponent.implem_sender
-				.createImplementationOfAgent();
+		implem.use_ss = this.selfComponent.implem_receive
+				.createImplementationOfSender();
 
 		return implem;
 	}
@@ -435,7 +399,7 @@ public abstract class ClassicNamed<Msg> {
 			return this.selfComponent.ref;
 		}
 
-		private Forward.Agent<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> use_ss = null;
+		private AsyncReceiver.Sender<Msg, java.lang.String> use_ss = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -443,7 +407,7 @@ public abstract class ClassicNamed<Msg> {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> ss() {
+		protected final AsyncReceiver.Sender.Component<Msg, java.lang.String> ss() {
 			assert this.selfComponent != null;
 			return this.selfComponent.ss;
 		}
@@ -469,17 +433,6 @@ public abstract class ClassicNamed<Msg> {
 		protected final Scheduler.Component eco_scheduler() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent.scheduler;
-		}
-
-		/**
-		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
-		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected final Forward.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> eco_sender() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent.sender;
 		}
 
 		/**
@@ -575,7 +528,7 @@ public abstract class ClassicNamed<Msg> {
 						.newComponent(new BridgeImplrefsCallee());
 				assert this.implementation.use_ss != null;
 				this.ss = this.implementation.use_ss
-						.newComponent(new BridgeImplsenderAgent());
+						.newComponent(new BridgeImplreceiveSender());
 			}
 
 			private final ClassicNamedAgentComponent.Component<Msg, java.lang.String> arch;
@@ -587,7 +540,7 @@ public abstract class ClassicNamed<Msg> {
 						ClassicNamedAgentComponent.Bridge<Msg, java.lang.String> {
 
 				public final fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String> send() {
-					return ComponentImpl.this.ss.a();
+					return ComponentImpl.this.ss.send();
 
 				};
 
@@ -650,11 +603,11 @@ public abstract class ClassicNamed<Msg> {
 				};
 
 			}
-			private final Forward.Agent.Component<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> ss;
+			private final AsyncReceiver.Sender.Component<Msg, java.lang.String> ss;
 
-			private final class BridgeImplsenderAgent
+			private final class BridgeImplreceiveSender
 					implements
-						Forward.Agent.Bridge<fr.irit.smac.may.lib.interfaces.Send<Msg, java.lang.String>> {
+						AsyncReceiver.Sender.Bridge<Msg, java.lang.String> {
 
 			}
 

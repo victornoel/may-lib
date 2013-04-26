@@ -5,7 +5,6 @@ import fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour;
 import fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour;
 import fr.irit.smac.may.lib.components.interactions.MapReferences;
 import fr.irit.smac.may.lib.components.interactions.ValuePublisher;
-import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.scheduling.Clock;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
 import fr.irit.smac.may.lib.components.scheduling.Scheduled;
@@ -65,23 +64,6 @@ public abstract class NamedPublishMAS {
 	protected final ValuePublisher.Component<java.lang.Integer, java.lang.String> observeds() {
 		assert this.selfComponent != null;
 		return this.selfComponent.observeds;
-	}
-
-	/**
-	 * This should be overridden by the implementation to define how to create this sub-component.
-	 * This will be called once during the construction of the component to initialize this sub-component.
-	 */
-	protected abstract Forward<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> make_observers();
-
-	/**
-	 * This can be called by the implementation to access the sub-component instance and its provided ports.
-	 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected final Forward.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> observers() {
-		assert this.selfComponent != null;
-		return this.selfComponent.observers;
 	}
 
 	/**
@@ -197,10 +179,6 @@ public abstract class NamedPublishMAS {
 			this.implem_observeds = implem.make_observeds();
 			this.observeds = this.implem_observeds
 					.newComponent(new BridgeImpl_observeds());
-			assert this.implem_observers == null;
-			this.implem_observers = implem.make_observers();
-			this.observers = this.implem_observers
-					.newComponent(new BridgeImpl_observers());
 			assert this.implem_executor == null;
 			this.implem_executor = implem.make_executor();
 			this.executor = this.implem_executor
@@ -236,20 +214,6 @@ public abstract class NamedPublishMAS {
 
 			public final fr.irit.smac.may.lib.components.interactions.interfaces.Call<fr.irit.smac.may.lib.interfaces.Pull<java.lang.Integer>, java.lang.String> call() {
 				return ComponentImpl.this.refs.call();
-
-			};
-
-		}
-		private final Forward.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> observers;
-
-		private Forward<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> implem_observers = null;
-
-		private final class BridgeImpl_observers
-				implements
-					Forward.Bridge<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> {
-
-			public final fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String> i() {
-				return ComponentImpl.this.observeds.observe();
 
 			};
 
@@ -316,7 +280,6 @@ public abstract class NamedPublishMAS {
 		public final void start() {
 			this.refs.start();
 			this.observeds.start();
-			this.observers.start();
 			this.executor.start();
 			this.schedule.start();
 			this.clock.start();
@@ -475,17 +438,6 @@ public abstract class NamedPublishMAS {
 		protected final ValuePublisher.Component<java.lang.Integer, java.lang.String> eco_observeds() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent.observeds;
-		}
-
-		/**
-		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
-		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected final Forward.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> eco_observers() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent.observers;
 		}
 
 		/**
@@ -668,10 +620,10 @@ public abstract class NamedPublishMAS {
 		assert implem.use_sched == null;
 		implem.use_sched = this.selfComponent.implem_schedule
 				.createImplementationOfAgent();
-		assert this.selfComponent.implem_observers != null;
+		assert this.selfComponent.implem_observeds != null;
 		assert implem.use_observer == null;
-		implem.use_observer = this.selfComponent.implem_observers
-				.createImplementationOfAgent();
+		implem.use_observer = this.selfComponent.implem_observeds
+				.createImplementationOfObserver();
 
 		return implem;
 	}
@@ -732,7 +684,7 @@ public abstract class NamedPublishMAS {
 			return this.selfComponent.beh;
 		}
 
-		private Forward.Agent<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> use_observer = null;
+		private ValuePublisher.Observer<java.lang.Integer, java.lang.String> use_observer = null;
 
 		/**
 		 * This can be called by the implementation to access the sub-component instance and its provided ports.
@@ -740,7 +692,7 @@ public abstract class NamedPublishMAS {
 		 *
 		 * This is not meant to be called on the object by hand.
 		 */
-		protected final Forward.Agent.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> observer() {
+		protected final ValuePublisher.Observer.Component<java.lang.Integer, java.lang.String> observer() {
 			assert this.selfComponent != null;
 			return this.selfComponent.observer;
 		}
@@ -777,17 +729,6 @@ public abstract class NamedPublishMAS {
 		protected final ValuePublisher.Component<java.lang.Integer, java.lang.String> eco_observeds() {
 			assert this.ecosystemComponent != null;
 			return this.ecosystemComponent.observeds;
-		}
-
-		/**
-		 * This can be called by the implementation to access the sub-component instance of the ecosystemComponent and its provided ports.
-		 * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected final Forward.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> eco_observers() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent.observers;
 		}
 
 		/**
@@ -872,7 +813,7 @@ public abstract class NamedPublishMAS {
 				this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
 				assert this.implementation.use_observer != null;
 				this.observer = this.implementation.use_observer
-						.newComponent(new BridgeImplobserversAgent());
+						.newComponent(new BridgeImplobservedsObserver());
 			}
 
 			private final Scheduled.Agent.Component sched;
@@ -896,16 +837,16 @@ public abstract class NamedPublishMAS {
 						ObserverBehaviour.Bridge<java.lang.String> {
 
 				public final fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String> observe() {
-					return ComponentImpl.this.observer.a();
+					return ComponentImpl.this.observer.observe();
 
 				};
 
 			}
-			private final Forward.Agent.Component<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> observer;
+			private final ValuePublisher.Observer.Component<java.lang.Integer, java.lang.String> observer;
 
-			private final class BridgeImplobserversAgent
+			private final class BridgeImplobservedsObserver
 					implements
-						Forward.Agent.Bridge<fr.irit.smac.may.lib.components.interactions.interfaces.Observe<java.lang.Integer, java.lang.String>> {
+						ValuePublisher.Observer.Bridge<java.lang.Integer, java.lang.String> {
 
 			}
 

@@ -14,7 +14,6 @@ import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 import fr.irit.smac.may.lib.interfaces.Push;
-import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 	
@@ -27,12 +26,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 	protected ExecutorService make_executor() {
 		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(5));
 	}
-
-	@Override
-	protected Forward<Send<Msg, String>> make_sender() {
-		return new ForwardImpl<Send<Msg, String>>();
-	}
-
+	
 	@Override
 	protected AsyncReceiver<Msg, String> make_receive() {
 		return new AsyncReceiverImpl<Msg, String>();

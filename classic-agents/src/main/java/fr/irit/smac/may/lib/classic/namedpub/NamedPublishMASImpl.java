@@ -7,11 +7,8 @@ import fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour;
 import fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour;
 import fr.irit.smac.may.lib.components.interactions.MapReferences;
 import fr.irit.smac.may.lib.components.interactions.ValuePublisher;
-import fr.irit.smac.may.lib.components.interactions.interfaces.Observe;
 import fr.irit.smac.may.lib.components.interactions.mapreferences.MapReferencesImpl;
 import fr.irit.smac.may.lib.components.interactions.valuepublisher.ValuePublisherImpl;
-import fr.irit.smac.may.lib.components.meta.Forward;
-import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.scheduling.Clock;
 import fr.irit.smac.may.lib.components.scheduling.ClockImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
@@ -52,11 +49,6 @@ public class NamedPublishMASImpl extends NamedPublishMAS {
 	@Override
 	protected ValuePublisher<Integer, String> make_observeds() {
 		return new ValuePublisherImpl<Integer, String>();
-	}
-
-	@Override
-	protected Forward<Observe<Integer, String>> make_observers() {
-		return new ForwardImpl<Observe<Integer,String>>();
 	}
 
 	@Override
