@@ -269,7 +269,7 @@ public abstract class NamedPublishMAS {
 
 		private final class BridgeImpl_schedule implements Scheduled.Bridge {
 
-			public final java.util.concurrent.Executor sched() {
+			public final fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor sched() {
 				return ComponentImpl.this.executor.exec();
 
 			};
