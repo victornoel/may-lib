@@ -22,4 +22,11 @@
 		<url>https://wwwsecu.irit.fr/hg/SMAC/victor-noel-phd/may/lib/</url>
 	</scm>
 
+	<repositories>
+		<repository>
+			<id>fr.irit.smac</id>
+			<url>http://www.irit.fr/~Victor.Noel/maven-repos/</url>
+		</repository>
+	</repositories>
+
 </project>
