@@ -8,6 +8,7 @@
 		<groupId>fr.irit.smac.lib</groupId>
 		<artifactId>parent-may</artifactId>
 		<version>0.0.1</version>
+		<relativePath></relativePath>
 	</parent>
 
 	<groupId>fr.irit.smac.lib.may</groupId>
