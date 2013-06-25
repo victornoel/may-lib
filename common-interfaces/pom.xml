@@ -5,6 +5,7 @@
 		<artifactId>parent</artifactId>
 		<groupId>fr.irit.smac.may.lib</groupId>
 		<version>0.0.2</version>
+		<relativePath>../parent/</relativePath>
 	</parent>
 	<version>2.1.0</version>
 	<artifactId>common-interfaces</artifactId>
