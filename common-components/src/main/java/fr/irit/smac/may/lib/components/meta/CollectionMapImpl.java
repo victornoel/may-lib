@@ -3,6 +3,7 @@ package fr.irit.smac.may.lib.components.meta;
 import java.util.HashMap;
 import java.util.Map;
 
+import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.MapGet;
 
 public class CollectionMapImpl<K, I> extends CollectionMap<K, I> {
@@ -28,6 +29,15 @@ public class CollectionMapImpl<K, I> extends CollectionMap<K, I> {
 		protected void start() {
 			super.start();
 			interfaces.put(this.key().pull(), this);
+		}
+		
+		@Override
+		protected Do stop() {
+			return new Do() {
+				public void doIt() {
+					interfaces.remove(key().pull());
+				}
+			};
 		}
 	}
 }

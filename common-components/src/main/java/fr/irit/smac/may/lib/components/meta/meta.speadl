@@ -13,7 +13,7 @@ namespace fr.irit.smac.may.lib.components.meta {
 		provides port: I
 	}
 	
-	/**
+	/** 
 	 * This transverse enables to realise collection ports
 	 * with integer keys to retrieve the wanted port
 	 */
@@ -21,6 +21,7 @@ namespace fr.irit.smac.may.lib.components.meta {
 		agent {
 			requires p: I
 			provides idx: Pull[Integer]
+			provides stop: Do
 		}
 		infra {
 			provides get: MapGet[Integer,I]
@@ -35,6 +36,7 @@ namespace fr.irit.smac.may.lib.components.meta {
 		agent {
 			requires p: I
 			requires key: Pull[K]
+			provides stop: Do
 		}
 		infra {
 			provides get: MapGet[K,I]

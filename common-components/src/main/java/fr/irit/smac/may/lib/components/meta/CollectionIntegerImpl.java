@@ -3,6 +3,7 @@ package fr.irit.smac.may.lib.components.meta;
 import java.util.ArrayList;
 import java.util.List;
 
+import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Pull;
 
@@ -37,6 +38,15 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 			return new Pull<Integer>() {
 				public Integer pull() {
 					return k;
+				}
+			};
+		}
+		
+		@Override
+		protected Do stop() {
+			return new Do() {
+				public void doIt() {
+					interfaces.set(k, null);
 				}
 			};
 		}

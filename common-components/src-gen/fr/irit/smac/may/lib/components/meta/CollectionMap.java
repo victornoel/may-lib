@@ -76,6 +76,14 @@ public abstract class CollectionMap<K, I> {
 			return this.structure.bridge.key();
 		};
 
+		/**
+		 * This should be overridden by the implementation to define the provided port
+		 * This will be called once during the construction of the component to initialize the port
+		 *
+		 * This is not meant to be called on the object by hand.
+		 */
+		protected abstract fr.irit.smac.may.lib.interfaces.Do stop();
+
 		public static interface Bridge<K, I> {
 			public I p();
 			public fr.irit.smac.may.lib.interfaces.Pull<K> key();
@@ -96,7 +104,19 @@ public abstract class CollectionMap<K, I> {
 				assert implem.structure == null;
 				implem.structure = this;
 
+				this.stop = implem.stop();
+
 			}
+
+			private final fr.irit.smac.may.lib.interfaces.Do stop;
+
+			/**
+			 * This can be called to access the provided port
+			 * start() must have been called before
+			 */
+			public final fr.irit.smac.may.lib.interfaces.Do stop() {
+				return this.stop;
+			};
 
 			public final void start() {
 
