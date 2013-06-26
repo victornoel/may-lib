@@ -73,7 +73,7 @@ public class ScheduledImpl extends Scheduled {
 			return new Do() {
 				public void doIt() {
 					killed.set(true);
-					agents.remove(this);
+					agents.remove(AgentSide.this);
 				}
 			};
 		}
