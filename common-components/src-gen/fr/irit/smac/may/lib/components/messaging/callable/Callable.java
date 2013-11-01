@@ -1,382 +1,521 @@
 package fr.irit.smac.may.lib.components.messaging.callable;
 
-import fr.irit.smac.may.lib.components.messaging.callable.Callable;
+import fr.irit.smac.may.lib.components.messaging.callable.CallRef;
+import fr.irit.smac.may.lib.interfaces.Do;
+import fr.irit.smac.may.lib.interfaces.MapGet;
+import fr.irit.smac.may.lib.interfaces.Pull;
 
+@SuppressWarnings("all")
 public abstract class Callable<I> {
-
-	private Callable.ComponentImpl<I> selfComponent = null;
-
-	/**
-	 * This can be called by the implementation to access the component itself and its provided ports.
-	 *
-	 * This is not meant to be called from the outside by hand.
-	 */
-	protected Callable.Component<I> self() {
-		assert this.selfComponent != null;
-		return this.selfComponent;
-	};
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> make_call();
-
-	public static interface Bridge<I> {
-
-	}
-
-	public static interface Component<I> {
-
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
-
-		/**
-		 * This should be called to start the component
-		 */
-		public void start();
-	}
-
-	private final static class ComponentImpl<I>
-			implements
-				Callable.Component<I> {
-
-		@SuppressWarnings("unused")
-		private final Callable.Bridge<I> bridge;
-
-		private final Callable<I> implementation;
-
-		private ComponentImpl(final Callable<I> implem,
-				final Callable.Bridge<I> b) {
-			this.bridge = b;
-
-			this.implementation = implem;
-
-			assert implem.selfComponent == null;
-			implem.selfComponent = this;
-
-			this.call = implem.make_call();
-
-		}
-
-		private final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call;
-
-		public final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call() {
-			return this.call;
-		};
-
-		public final void start() {
-
-			this.implementation.start();
-		}
-	}
-
-	/**
-	 * Should not be called
-	 */
-	protected abstract Callable.Callee<I> make_Callee();
-
-	/**
-	 * Should not be called
-	 */
-	public Callable.Callee<I> createImplementationOfCallee() {
-		Callable.Callee<I> implem = make_Callee();
-		assert implem.ecosystemComponent == null;
-		assert this.selfComponent != null;
-		implem.ecosystemComponent = this.selfComponent;
-
-		return implem;
-	}
-
-	public static abstract class Callee<I> {
-
-		private Callable.Callee.ComponentImpl<I> selfComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Callable.Callee.Component<I> self() {
-			assert this.selfComponent != null;
-			return this.selfComponent;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port.
-		 *
-		 * This is not meant to be called from the outside.
-		 */
-		protected I toCall() {
-			assert this.selfComponent != null;
-			return this.selfComponent.bridge.toCall();
-		};
-
-		/**
-		 * This should be overridden by the implementation to define the provided port.
-		 * This will be called once during the construction of the component to initialize the port.
-		 *
-		 * This is not meant to be called on from the outside.
-		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> make_me();
-
-		/**
-		 * This should be overridden by the implementation to define the provided port.
-		 * This will be called once during the construction of the component to initialize the port.
-		 *
-		 * This is not meant to be called on from the outside.
-		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
-
-		private Callable.ComponentImpl<I> ecosystemComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Callable.Component<I> eco_self() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent;
-		};
-
-		public static interface Bridge<I> {
-			public I toCall();
-
-		}
-
-		public static interface Component<I> {
-
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me();
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public fr.irit.smac.may.lib.interfaces.Do stop();
-
-			/**
-			 * This should be called to start the component
-			 */
-			public void start();
-		}
-
-		private final static class ComponentImpl<I>
-				implements
-					Callable.Callee.Component<I> {
-
-			private final Callable.Callee.Bridge<I> bridge;
-
-			private final Callable.Callee<I> implementation;
-
-			private ComponentImpl(final Callable.Callee<I> implem,
-					final Callable.Callee.Bridge<I> b) {
-				this.bridge = b;
-
-				this.implementation = implem;
-
-				assert implem.selfComponent == null;
-				implem.selfComponent = this;
-
-				this.me = implem.make_me();
-				this.stop = implem.make_stop();
-
-			}
-
-			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me;
-
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.messaging.callable.CallRef> me() {
-				return this.me;
-			};
-			private final fr.irit.smac.may.lib.interfaces.Do stop;
-
-			public final fr.irit.smac.may.lib.interfaces.Do stop() {
-				return this.stop;
-			};
-
-			public final void start() {
-
-				this.implementation.start();
-			}
-		}
-
-		/**
-		 * Can be overridden by the implementation
-		 * It will be called after the component has been instantiated, after the components have been instantiated
-		 * and during the containing component start() method is called.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected void start() {
-		}
-
-		public Callable.Callee.Component<I> newComponent(
-				Callable.Callee.Bridge<I> b) {
-			return new Callable.Callee.ComponentImpl<I>(this, b);
-		}
-
-	}
-
-	/**
-	 * Should not be called
-	 */
-	protected abstract Callable.Caller<I> make_Caller();
-
-	/**
-	 * Should not be called
-	 */
-	public Callable.Caller<I> createImplementationOfCaller() {
-		Callable.Caller<I> implem = make_Caller();
-		assert implem.ecosystemComponent == null;
-		assert this.selfComponent != null;
-		implem.ecosystemComponent = this.selfComponent;
-
-		return implem;
-	}
-
-	/**
-	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	public Callable.Caller.Component<I> newCaller() {
-		Callable.Caller<I> implem = createImplementationOfCaller();
-		return implem.newComponent(new Callable.Caller.Bridge<I>() {
-		});
-	}
-
-	public static abstract class Caller<I> {
-
-		private Callable.Caller.ComponentImpl<I> selfComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Callable.Caller.Component<I> self() {
-			assert this.selfComponent != null;
-			return this.selfComponent;
-		};
-
-		/**
-		 * This should be overridden by the implementation to define the provided port.
-		 * This will be called once during the construction of the component to initialize the port.
-		 *
-		 * This is not meant to be called on from the outside.
-		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> make_call();
-
-		private Callable.ComponentImpl<I> ecosystemComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Callable.Component<I> eco_self() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent;
-		};
-
-		public static interface Bridge<I> {
-
-		}
-
-		public static interface Component<I> {
-
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call();
-
-			/**
-			 * This should be called to start the component
-			 */
-			public void start();
-		}
-
-		private final static class ComponentImpl<I>
-				implements
-					Callable.Caller.Component<I> {
-
-			@SuppressWarnings("unused")
-			private final Callable.Caller.Bridge<I> bridge;
-
-			private final Callable.Caller<I> implementation;
-
-			private ComponentImpl(final Callable.Caller<I> implem,
-					final Callable.Caller.Bridge<I> b) {
-				this.bridge = b;
-
-				this.implementation = implem;
-
-				assert implem.selfComponent == null;
-				implem.selfComponent = this;
-
-				this.call = implem.make_call();
-
-			}
-
-			private final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call;
-
-			public final fr.irit.smac.may.lib.interfaces.MapGet<fr.irit.smac.may.lib.components.messaging.callable.CallRef, I> call() {
-				return this.call;
-			};
-
-			public final void start() {
-
-				this.implementation.start();
-			}
-		}
-
-		/**
-		 * Can be overridden by the implementation
-		 * It will be called after the component has been instantiated, after the components have been instantiated
-		 * and during the containing component start() method is called.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected void start() {
-		}
-
-		public Callable.Caller.Component<I> newComponent(
-				Callable.Caller.Bridge<I> b) {
-			return new Callable.Caller.ComponentImpl<I>(this, b);
-		}
-
-	}
-
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the component has been instantiated, after the components have been instantiated
-	 * and during the containing component start() method is called.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected void start() {
-	}
-
-	public Callable.Component<I> newComponent(Callable.Bridge<I> b) {
-		return new Callable.ComponentImpl<I>(this, b);
-	}
-
-	public Callable.Component<I> newComponent() {
-		return this.newComponent(new Callable.Bridge<I>() {
-		});
-	}
-	public static final <I> Callable.Component<I> newComponent(
-			Callable<I> _compo) {
-		return _compo.newComponent();
-	}
-
+  @SuppressWarnings("all")
+  public interface Requires<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public MapGet<CallRef,I> call();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Parts<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.messaging.callable.Callable.Provides<I> {
+    /**
+     * This should be called to start the component.
+     * This must be called before any provided port can be called.
+     * 
+     */
+    public void start();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.messaging.callable.Callable.Parts<I>, fr.irit.smac.may.lib.components.messaging.callable.Callable.Component<I> {
+    private final fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I> bridge;
+    
+    private final Callable<I> implementation;
+    
+    public ComponentImpl(final Callable<I> implem, final fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I> b) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null;
+      implem.selfComponent = this;
+      
+      this.call = implem.make_call();
+      
+    }
+    
+    private final MapGet<CallRef,I> call;
+    
+    public final MapGet<CallRef,I> call() {
+      return this.call;
+    }
+    
+    public void start() {
+      this.implementation.start();
+      
+    }
+  }
+  
+  
+  @SuppressWarnings("all")
+  public abstract static class Callee<I> {
+    @SuppressWarnings("all")
+    public interface Requires<I> {
+      /**
+       * This can be called by the implementation to access this required port.
+       * 
+       */
+      public I toCall();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<CallRef> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Parts<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Provides<I> {
+      /**
+       * This should be called to start the component.
+       * This must be called before any provided port can be called.
+       * 
+       */
+      public void start();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Parts<I>, fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Component<I> {
+      private final fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Requires<I> bridge;
+      
+      private final fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee<I> implementation;
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee<I> implem, final fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Requires<I> b) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null;
+        implem.selfComponent = this;
+        
+        this.me = implem.make_me();
+        this.stop = implem.make_stop();
+        
+      }
+      
+      private final Pull<CallRef> me;
+      
+      public final Pull<CallRef> me() {
+        return this.me;
+      }
+      
+      private final Do stop;
+      
+      public final Do stop() {
+        return this.stop;
+      }
+      
+      public void start() {
+        this.implementation.start();
+        
+      }
+    }
+    
+    
+    private fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.ComponentImpl<I> selfComponent;
+    
+    /**
+     * Can be overridden by the implementation.
+     * It will be called after the component has been instantiated, after the components have been instantiated
+     * and during the containing component start() method is called.
+     * 
+     */
+    protected void start() {
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Provides<I> provides() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * This should be overridden by the implementation to define the provided port.
+     * This will be called once during the construction of the component to initialize the port.
+     * 
+     */
+    protected abstract Pull<CallRef> make_me();
+    
+    /**
+     * This should be overridden by the implementation to define the provided port.
+     * This will be called once during the construction of the component to initialize the port.
+     * 
+     */
+    protected abstract Do make_stop();
+    
+    /**
+     * This can be called by the implementation to access the required ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Requires<I> requires() {
+      assert this.selfComponent != null;
+      return this.selfComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the parts and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Parts<I> parts() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * Not meant to be used to manually instantiate components (except for testing).
+     * 
+     */
+    public fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Component<I> newComponent(final fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.Requires<I> b) {
+      return new fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee.ComponentImpl<I>(this, b);
+    }
+    
+    private fr.irit.smac.may.lib.components.messaging.callable.Callable.ComponentImpl<I> ecosystemComponent;
+    
+    /**
+     * This can be called by the species implementation to access the provided ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Provides<I> eco_provides() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the required ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I> eco_requires() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Parts<I> eco_parts() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+  }
+  
+  
+  @SuppressWarnings("all")
+  public abstract static class Caller<I> {
+    @SuppressWarnings("all")
+    public interface Requires<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public MapGet<CallRef,I> call();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Parts<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Provides<I> {
+      /**
+       * This should be called to start the component.
+       * This must be called before any provided port can be called.
+       * 
+       */
+      public void start();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Parts<I>, fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Component<I> {
+      private final fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Requires<I> bridge;
+      
+      private final fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller<I> implementation;
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller<I> implem, final fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Requires<I> b) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null;
+        implem.selfComponent = this;
+        
+        this.call = implem.make_call();
+        
+      }
+      
+      private final MapGet<CallRef,I> call;
+      
+      public final MapGet<CallRef,I> call() {
+        return this.call;
+      }
+      
+      public void start() {
+        this.implementation.start();
+        
+      }
+    }
+    
+    
+    private fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.ComponentImpl<I> selfComponent;
+    
+    /**
+     * Can be overridden by the implementation.
+     * It will be called after the component has been instantiated, after the components have been instantiated
+     * and during the containing component start() method is called.
+     * 
+     */
+    protected void start() {
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Provides<I> provides() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * This should be overridden by the implementation to define the provided port.
+     * This will be called once during the construction of the component to initialize the port.
+     * 
+     */
+    protected abstract MapGet<CallRef,I> make_call();
+    
+    /**
+     * This can be called by the implementation to access the required ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Requires<I> requires() {
+      assert this.selfComponent != null;
+      return this.selfComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the parts and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Parts<I> parts() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * Not meant to be used to manually instantiate components (except for testing).
+     * 
+     */
+    public fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Component<I> newComponent(final fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Requires<I> b) {
+      return new fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.ComponentImpl<I>(this, b);
+    }
+    
+    private fr.irit.smac.may.lib.components.messaging.callable.Callable.ComponentImpl<I> ecosystemComponent;
+    
+    /**
+     * This can be called by the species implementation to access the provided ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Provides<I> eco_provides() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the required ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I> eco_requires() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Parts<I> eco_parts() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+  }
+  
+  
+  private fr.irit.smac.may.lib.components.messaging.callable.Callable.ComponentImpl<I> selfComponent;
+  
+  /**
+   * Can be overridden by the implementation.
+   * It will be called after the component has been instantiated, after the components have been instantiated
+   * and during the containing component start() method is called.
+   * 
+   */
+  protected void start() {
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Provides<I> provides() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract MapGet<CallRef,I> make_call();
+  
+  /**
+   * This can be called by the implementation to access the required ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I> requires() {
+    assert this.selfComponent != null;
+    return this.selfComponent.bridge;
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the parts and their provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Parts<I> parts() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * Not meant to be used to manually instantiate components (except for testing).
+   * 
+   */
+  public fr.irit.smac.may.lib.components.messaging.callable.Callable.Component<I> newComponent(final fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I> b) {
+    return new fr.irit.smac.may.lib.components.messaging.callable.Callable.ComponentImpl<I>(this, b);
+  }
+  
+  /**
+   * This should be overridden by the implementation to instantiate the implementation of the species.
+   * 
+   */
+  protected abstract fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee<I> make_Callee();
+  
+  /**
+   * Do not call, used by generated code.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee<I> _createImplementationOfCallee() {
+    fr.irit.smac.may.lib.components.messaging.callable.Callable.Callee<I> implem = make_Callee();
+    assert implem.ecosystemComponent == null;
+    assert this.selfComponent != null;
+    implem.ecosystemComponent = this.selfComponent;
+    return implem;
+  }
+  
+  /**
+   * This should be overridden by the implementation to instantiate the implementation of the species.
+   * 
+   */
+  protected abstract fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller<I> make_Caller();
+  
+  /**
+   * Do not call, used by generated code.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller<I> _createImplementationOfCaller() {
+    fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller<I> implem = make_Caller();
+    assert implem.ecosystemComponent == null;
+    assert this.selfComponent != null;
+    implem.ecosystemComponent = this.selfComponent;
+    return implem;
+  }
+  
+  /**
+   * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Component<I> newCaller() {
+    fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller<I> implem = _createImplementationOfCaller();
+    return implem.newComponent(new fr.irit.smac.may.lib.components.messaging.callable.Callable.Caller.Requires<I>() {});
+  }
+  
+  /**
+   * Use to instantiate a component from this implementation.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.messaging.callable.Callable.Component<I> newComponent() {
+    return this.newComponent(new fr.irit.smac.may.lib.components.messaging.callable.Callable.Requires<I>() {});
+  }
+  
+  /**
+   * Use to instantiate a component with this implementation.
+   * 
+   */
+  public static <I> fr.irit.smac.may.lib.components.messaging.callable.Callable.Component<I> newComponent(final Callable<I> _compo) {
+    return _compo.newComponent();
+  }
 }

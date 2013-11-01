@@ -1,21 +1,18 @@
-
+import fr.irit.smac.may.lib.interfaces.Push
 
 namespace fr.irit.smac.may.lib.components.either {
 	
-	import fr.irit.smac.may.lib.components.either.datatypes.Either
-	import fr.irit.smac.may.lib.interfaces.*
-
 	component Either[L,R] {
 		provides left: Push[L]
 		provides right: Push[R]
 		
-		requires out: Push[Either[L,R]]
+		requires out: Push[fr.irit.smac.may.lib.components.either.datatypes.Either[L,R]]
 	}
 	
 	component UnEither[L,R] {
 		requires left: Push[L]
 		requires right: Push[R]
 		
-		provides in: Push[Either[L,R]]
+		provides in: Push[fr.irit.smac.may.lib.components.either.datatypes.Either[L,R]]
 	}
 }

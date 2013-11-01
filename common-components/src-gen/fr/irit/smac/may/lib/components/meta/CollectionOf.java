@@ -1,232 +1,319 @@
 package fr.irit.smac.may.lib.components.meta;
 
-import fr.irit.smac.may.lib.components.meta.CollectionOf;
+import fr.irit.smac.may.lib.interfaces.Do;
+import fr.irit.smac.may.lib.interfaces.Pull;
+import java.util.Collection;
 
+@SuppressWarnings("all")
 public abstract class CollectionOf<I> {
-
-	private CollectionOf.ComponentImpl<I> selfComponent = null;
-
-	/**
-	 * This can be called by the implementation to access the component itself and its provided ports.
-	 *
-	 * This is not meant to be called from the outside by hand.
-	 */
-	protected CollectionOf.Component<I> self() {
-		assert this.selfComponent != null;
-		return this.selfComponent;
-	};
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<I>> make_get();
-
-	public static interface Bridge<I> {
-
-	}
-
-	public static interface Component<I> {
-
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<I>> get();
-
-		/**
-		 * This should be called to start the component
-		 */
-		public void start();
-	}
-
-	private final static class ComponentImpl<I>
-			implements
-				CollectionOf.Component<I> {
-
-		@SuppressWarnings("unused")
-		private final CollectionOf.Bridge<I> bridge;
-
-		private final CollectionOf<I> implementation;
-
-		private ComponentImpl(final CollectionOf<I> implem,
-				final CollectionOf.Bridge<I> b) {
-			this.bridge = b;
-
-			this.implementation = implem;
-
-			assert implem.selfComponent == null;
-			implem.selfComponent = this;
-
-			this.get = implem.make_get();
-
-		}
-
-		private final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<I>> get;
-
-		public final fr.irit.smac.may.lib.interfaces.Pull<java.util.Collection<I>> get() {
-			return this.get;
-		};
-
-		public final void start() {
-
-			this.implementation.start();
-		}
-	}
-
-	/**
-	 * Should not be called
-	 */
-	protected abstract CollectionOf.Agent<I> make_Agent();
-
-	/**
-	 * Should not be called
-	 */
-	public CollectionOf.Agent<I> createImplementationOfAgent() {
-		CollectionOf.Agent<I> implem = make_Agent();
-		assert implem.ecosystemComponent == null;
-		assert this.selfComponent != null;
-		implem.ecosystemComponent = this.selfComponent;
-
-		return implem;
-	}
-
-	public static abstract class Agent<I> {
-
-		private CollectionOf.Agent.ComponentImpl<I> selfComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected CollectionOf.Agent.Component<I> self() {
-			assert this.selfComponent != null;
-			return this.selfComponent;
-		};
-
-		/**
-		 * This can be called by the implementation to access this required port.
-		 *
-		 * This is not meant to be called from the outside.
-		 */
-		protected I p() {
-			assert this.selfComponent != null;
-			return this.selfComponent.bridge.p();
-		};
-
-		/**
-		 * This should be overridden by the implementation to define the provided port.
-		 * This will be called once during the construction of the component to initialize the port.
-		 *
-		 * This is not meant to be called on from the outside.
-		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Do make_stop();
-
-		private CollectionOf.ComponentImpl<I> ecosystemComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected CollectionOf.Component<I> eco_self() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent;
-		};
-
-		public static interface Bridge<I> {
-			public I p();
-
-		}
-
-		public static interface Component<I> {
-
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public fr.irit.smac.may.lib.interfaces.Do stop();
-
-			/**
-			 * This should be called to start the component
-			 */
-			public void start();
-		}
-
-		private final static class ComponentImpl<I>
-				implements
-					CollectionOf.Agent.Component<I> {
-
-			private final CollectionOf.Agent.Bridge<I> bridge;
-
-			private final CollectionOf.Agent<I> implementation;
-
-			private ComponentImpl(final CollectionOf.Agent<I> implem,
-					final CollectionOf.Agent.Bridge<I> b) {
-				this.bridge = b;
-
-				this.implementation = implem;
-
-				assert implem.selfComponent == null;
-				implem.selfComponent = this;
-
-				this.stop = implem.make_stop();
-
-			}
-
-			private final fr.irit.smac.may.lib.interfaces.Do stop;
-
-			public final fr.irit.smac.may.lib.interfaces.Do stop() {
-				return this.stop;
-			};
-
-			public final void start() {
-
-				this.implementation.start();
-			}
-		}
-
-		/**
-		 * Can be overridden by the implementation
-		 * It will be called after the component has been instantiated, after the components have been instantiated
-		 * and during the containing component start() method is called.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected void start() {
-		}
-
-		public CollectionOf.Agent.Component<I> newComponent(
-				CollectionOf.Agent.Bridge<I> b) {
-			return new CollectionOf.Agent.ComponentImpl<I>(this, b);
-		}
-
-	}
-
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the component has been instantiated, after the components have been instantiated
-	 * and during the containing component start() method is called.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected void start() {
-	}
-
-	public CollectionOf.Component<I> newComponent(CollectionOf.Bridge<I> b) {
-		return new CollectionOf.ComponentImpl<I>(this, b);
-	}
-
-	public CollectionOf.Component<I> newComponent() {
-		return this.newComponent(new CollectionOf.Bridge<I>() {
-		});
-	}
-	public static final <I> CollectionOf.Component<I> newComponent(
-			CollectionOf<I> _compo) {
-		return _compo.newComponent();
-	}
-
+  @SuppressWarnings("all")
+  public interface Requires<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Collection<I>> get();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Parts<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.CollectionOf.Provides<I> {
+    /**
+     * This should be called to start the component.
+     * This must be called before any provided port can be called.
+     * 
+     */
+    public void start();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.CollectionOf.Parts<I>, fr.irit.smac.may.lib.components.meta.CollectionOf.Component<I> {
+    private final fr.irit.smac.may.lib.components.meta.CollectionOf.Requires<I> bridge;
+    
+    private final CollectionOf<I> implementation;
+    
+    public ComponentImpl(final CollectionOf<I> implem, final fr.irit.smac.may.lib.components.meta.CollectionOf.Requires<I> b) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null;
+      implem.selfComponent = this;
+      
+      this.get = implem.make_get();
+      
+    }
+    
+    private final Pull<Collection<I>> get;
+    
+    public final Pull<Collection<I>> get() {
+      return this.get;
+    }
+    
+    public void start() {
+      this.implementation.start();
+      
+    }
+  }
+  
+  
+  @SuppressWarnings("all")
+  public abstract static class Agent<I> {
+    @SuppressWarnings("all")
+    public interface Requires<I> {
+      /**
+       * This can be called by the implementation to access this required port.
+       * 
+       */
+      public I p();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Parts<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Provides<I> {
+      /**
+       * This should be called to start the component.
+       * This must be called before any provided port can be called.
+       * 
+       */
+      public void start();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Parts<I>, fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Component<I> {
+      private final fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Requires<I> bridge;
+      
+      private final fr.irit.smac.may.lib.components.meta.CollectionOf.Agent<I> implementation;
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.meta.CollectionOf.Agent<I> implem, final fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Requires<I> b) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null;
+        implem.selfComponent = this;
+        
+        this.stop = implem.make_stop();
+        
+      }
+      
+      private final Do stop;
+      
+      public final Do stop() {
+        return this.stop;
+      }
+      
+      public void start() {
+        this.implementation.start();
+        
+      }
+    }
+    
+    
+    private fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.ComponentImpl<I> selfComponent;
+    
+    /**
+     * Can be overridden by the implementation.
+     * It will be called after the component has been instantiated, after the components have been instantiated
+     * and during the containing component start() method is called.
+     * 
+     */
+    protected void start() {
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Provides<I> provides() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * This should be overridden by the implementation to define the provided port.
+     * This will be called once during the construction of the component to initialize the port.
+     * 
+     */
+    protected abstract Do make_stop();
+    
+    /**
+     * This can be called by the implementation to access the required ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Requires<I> requires() {
+      assert this.selfComponent != null;
+      return this.selfComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the parts and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Parts<I> parts() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * Not meant to be used to manually instantiate components (except for testing).
+     * 
+     */
+    public fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.Requires<I> b) {
+      return new fr.irit.smac.may.lib.components.meta.CollectionOf.Agent.ComponentImpl<I>(this, b);
+    }
+    
+    private fr.irit.smac.may.lib.components.meta.CollectionOf.ComponentImpl<I> ecosystemComponent;
+    
+    /**
+     * This can be called by the species implementation to access the provided ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.meta.CollectionOf.Provides<I> eco_provides() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the required ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.meta.CollectionOf.Requires<I> eco_requires() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.meta.CollectionOf.Parts<I> eco_parts() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+  }
+  
+  
+  private fr.irit.smac.may.lib.components.meta.CollectionOf.ComponentImpl<I> selfComponent;
+  
+  /**
+   * Can be overridden by the implementation.
+   * It will be called after the component has been instantiated, after the components have been instantiated
+   * and during the containing component start() method is called.
+   * 
+   */
+  protected void start() {
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.meta.CollectionOf.Provides<I> provides() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Pull<Collection<I>> make_get();
+  
+  /**
+   * This can be called by the implementation to access the required ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.meta.CollectionOf.Requires<I> requires() {
+    assert this.selfComponent != null;
+    return this.selfComponent.bridge;
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the parts and their provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.meta.CollectionOf.Parts<I> parts() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * Not meant to be used to manually instantiate components (except for testing).
+   * 
+   */
+  public fr.irit.smac.may.lib.components.meta.CollectionOf.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.CollectionOf.Requires<I> b) {
+    return new fr.irit.smac.may.lib.components.meta.CollectionOf.ComponentImpl<I>(this, b);
+  }
+  
+  /**
+   * This should be overridden by the implementation to instantiate the implementation of the species.
+   * 
+   */
+  protected abstract fr.irit.smac.may.lib.components.meta.CollectionOf.Agent<I> make_Agent();
+  
+  /**
+   * Do not call, used by generated code.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.meta.CollectionOf.Agent<I> _createImplementationOfAgent() {
+    fr.irit.smac.may.lib.components.meta.CollectionOf.Agent<I> implem = make_Agent();
+    assert implem.ecosystemComponent == null;
+    assert this.selfComponent != null;
+    implem.ecosystemComponent = this.selfComponent;
+    return implem;
+  }
+  
+  /**
+   * Use to instantiate a component from this implementation.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.meta.CollectionOf.Component<I> newComponent() {
+    return this.newComponent(new fr.irit.smac.may.lib.components.meta.CollectionOf.Requires<I>() {});
+  }
+  
+  /**
+   * Use to instantiate a component with this implementation.
+   * 
+   */
+  public static <I> fr.irit.smac.may.lib.components.meta.CollectionOf.Component<I> newComponent(final CollectionOf<I> _compo) {
+    return _compo.newComponent();
+  }
 }

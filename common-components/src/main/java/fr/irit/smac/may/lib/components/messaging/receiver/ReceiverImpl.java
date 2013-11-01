@@ -10,7 +10,7 @@ public class ReceiverImpl<Msg> extends Receiver<Msg> {
 		return new ReliableSend<Msg, AgentRef>() {
 			public void send(Msg msg, AgentRef receiver) {
 				try {
-					self().deposit().reliableSend(msg, receiver);
+					provides().deposit().reliableSend(msg, receiver);
 				} catch (AgentDoesNotExistException e) {
 					// do nothing, on purpose!
 				}

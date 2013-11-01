@@ -18,7 +18,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 	protected MapGet<Integer,I> make_get() {
 		return new MapGet<Integer,I>() {
 			public I get(Integer i) {
-				return interfaces.get(i).getIf();
+				return interfaces.get(i).requires().p();
 			}
 		};
 	}
@@ -37,7 +37,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 		return new Push<F<I, Unit>>() {
 			public void push(F<I, Unit> thing) {
 				for(AgentSide a: interfaces) {
-					if (a != null) thing.f(a.p());
+					if (a != null) thing.f(a.requires().p());
 				}
 			}
 		};
@@ -50,10 +50,6 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 		public AgentSide() {
 			interfaces.add(this);
 			this.k = interfaces.indexOf(this);
-		}
-		
-		private I getIf() {
-			return this.p();
 		}
 		
 		@Override

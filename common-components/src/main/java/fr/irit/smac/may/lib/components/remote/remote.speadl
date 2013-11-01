@@ -1,11 +1,10 @@
-
+import fr.irit.smac.may.lib.components.remote.place.Place
+import fr.irit.smac.may.lib.interfaces.Do
+import fr.irit.smac.may.lib.interfaces.Pull
+import fr.irit.smac.may.lib.interfaces.Send
 
 namespace fr.irit.smac.may.lib.components.remote {
 	
-	import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.components.remote.place.Place
-	import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
-
 	namespace place {
 		ecosystem Placed {
 			species Agent {

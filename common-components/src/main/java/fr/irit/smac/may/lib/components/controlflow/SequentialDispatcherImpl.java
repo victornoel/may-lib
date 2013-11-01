@@ -15,7 +15,7 @@ public class SequentialDispatcherImpl<Truc> extends SequentialDispatcher<Truc> {
 		return new Push<Truc>() {
 			public void push(Truc t) {
 				
-				queue().put().push(t);
+				parts().queue().put().push(t);
 				
 				if (working.compareAndSet(false, true)) {
 					emptyQueue();
@@ -25,11 +25,11 @@ public class SequentialDispatcherImpl<Truc> extends SequentialDispatcher<Truc> {
 	}
 
 	private void emptyQueue() {
-		final Truc truc = queue().get().pull();
+		final Truc truc = parts().queue().get().pull();
 		if (truc != null) {
-			executor().execute(new Runnable() {
+			requires().executor().execute(new Runnable() {
 				public void run() {
-					handler().push(truc);
+					requires().handler().push(truc);
 					emptyQueue();
 				}
 			});

@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>classic-agents</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+	<version>3.2.0-SNAPSHOT</version>
 
 	<build>
 		<plugins>
@@ -27,7 +27,7 @@
 		<dependency>
 			<groupId>fr.irit.smac.lib.may</groupId>
 			<artifactId>common-components</artifactId>
-			<version>3.1.0-SNAPSHOT</version>
+			<version>3.2.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

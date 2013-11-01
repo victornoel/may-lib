@@ -55,7 +55,7 @@ public class DirectReferencesImpl<I> extends DirectReferences<I> {
 		}
 
 		public I p_toCall() {
-			return toCall();
+			return requires().toCall();
 		}
 	}
 
@@ -92,7 +92,7 @@ public class DirectReferencesImpl<I> extends DirectReferences<I> {
 		return new Caller<I>() {
 			@Override
 			protected Call<I, DirRef> make_call() {
-				return eco_self().call();
+				return eco_provides().call();
 			}
 		};
 	}

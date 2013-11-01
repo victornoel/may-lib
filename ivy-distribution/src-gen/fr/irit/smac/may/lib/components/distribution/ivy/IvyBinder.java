@@ -1,120 +1,143 @@
 package fr.irit.smac.may.lib.components.distribution.ivy;
 
-import fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder;
+import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind;
+import fr.irit.smac.may.lib.interfaces.Push;
+import java.util.List;
 
+@SuppressWarnings("all")
 public abstract class IvyBinder {
-
-	private IvyBinder.ComponentImpl selfComponent = null;
-
-	/**
-	 * This can be called by the implementation to access the component itself and its provided ports.
-	 *
-	 * This is not meant to be called from the outside by hand.
-	 */
-	protected IvyBinder.Component self() {
-		assert this.selfComponent != null;
-		return this.selfComponent;
-	};
-
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.bindMsg();
-	};
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.unBindMsg();
-	};
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.receive();
-	};
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<java.lang.String> make_reBindMsg();
-
-	public static interface Bridge {
-		public fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind bindMsg();
-		public fr.irit.smac.may.lib.interfaces.Push<java.lang.Integer> unBindMsg();
-		public fr.irit.smac.may.lib.interfaces.Push<java.util.List<java.lang.String>> receive();
-
-	}
-
-	public static interface Component {
-
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg();
-
-		/**
-		 * This should be called to start the component
-		 */
-		public void start();
-	}
-
-	private final static class ComponentImpl implements IvyBinder.Component {
-
-		private final IvyBinder.Bridge bridge;
-
-		private final IvyBinder implementation;
-
-		private ComponentImpl(final IvyBinder implem, final IvyBinder.Bridge b) {
-			this.bridge = b;
-
-			this.implementation = implem;
-
-			assert implem.selfComponent == null;
-			implem.selfComponent = this;
-
-			this.reBindMsg = implem.make_reBindMsg();
-
-		}
-
-		private final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg;
-
-		public final fr.irit.smac.may.lib.interfaces.Push<java.lang.String> reBindMsg() {
-			return this.reBindMsg;
-		};
-
-		public final void start() {
-
-			this.implementation.start();
-		}
-	}
-
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the component has been instantiated, after the components have been instantiated
-	 * and during the containing component start() method is called.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected void start() {
-	}
-
-	public IvyBinder.Component newComponent(IvyBinder.Bridge b) {
-		return new IvyBinder.ComponentImpl(this, b);
-	}
-
+  @SuppressWarnings("all")
+  public interface Requires {
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Bind bindMsg();
+    
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Push<Integer> unBindMsg();
+    
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Push<List<String>> receive();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<String> reBindMsg();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Parts {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Provides {
+    /**
+     * This should be called to start the component.
+     * This must be called before any provided port can be called.
+     * 
+     */
+    public void start();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Parts, fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component {
+    private final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires bridge;
+    
+    private final IvyBinder implementation;
+    
+    public ComponentImpl(final IvyBinder implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires b) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null;
+      implem.selfComponent = this;
+      
+      this.reBindMsg = implem.make_reBindMsg();
+      
+    }
+    
+    private final Push<String> reBindMsg;
+    
+    public final Push<String> reBindMsg() {
+      return this.reBindMsg;
+    }
+    
+    public void start() {
+      this.implementation.start();
+      
+    }
+  }
+  
+  
+  private fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.ComponentImpl selfComponent;
+  
+  /**
+   * Can be overridden by the implementation.
+   * It will be called after the component has been instantiated, after the components have been instantiated
+   * and during the containing component start() method is called.
+   * 
+   */
+  protected void start() {
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Provides provides() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Push<String> make_reBindMsg();
+  
+  /**
+   * This can be called by the implementation to access the required ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires requires() {
+    assert this.selfComponent != null;
+    return this.selfComponent.bridge;
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the parts and their provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Parts parts() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * Not meant to be used to manually instantiate components (except for testing).
+   * 
+   */
+  public fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component newComponent(final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires b) {
+    return new fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.ComponentImpl(this, b);
+  }
 }

@@ -26,7 +26,7 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 		RemoteMedium<Msg,Ref> rmedium = new RemoteMedium<Msg,Ref>() {
 			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh)
 					throws RemoteException {
-				return RemoteFactoryImpl.this.infraCreate().create(beh);
+				return RemoteFactoryImpl.this.requires().infraCreate().create(beh);
 			}
 		};
 		
@@ -35,7 +35,7 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 			//System.setSecurityManager(new RMISecurityManager());
 
 			// reuse port instead of opening another one!
-			int port = this.thisPlace().pull().getPort();
+			int port = this.requires().thisPlace().pull().getPort();
 			UnicastRemoteObject.exportObject(rmedium, port);
 			(LocateRegistry.createRegistry(port)).bind("ActorMedium", rmedium);
 		} catch (RemoteException e) {
@@ -50,10 +50,10 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 		protected CreateRemoteClassic<Msg, Ref> make_create() {
 			return new CreateRemoteClassic<Msg, Ref>() {
 				public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh, Place place) {
-					return eco_self().factCreate().create(beh,place);
+					return eco_provides().factCreate().create(beh,place);
 				}
 				public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh) {
-					return eco_self().factCreate().create(beh);
+					return eco_provides().factCreate().create(beh);
 				}
 			};
 		}
@@ -63,11 +63,11 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 	protected CreateRemoteClassic<Msg, Ref> make_factCreate() {
 		return new CreateRemoteClassic<Msg, Ref>() {
 			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh) {
-				return infraCreate().create(beh);
+				return requires().infraCreate().create(beh);
 			}
 			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh, Place place) {
-				if (place.equals(RemoteFactoryImpl.this.thisPlace().pull()))
-					return RemoteFactoryImpl.this.infraCreate().create(beh);
+				if (place.equals(RemoteFactoryImpl.this.requires().thisPlace().pull()))
+					return RemoteFactoryImpl.this.requires().infraCreate().create(beh);
 
 				RemoteMedium<Msg, Ref> m;
 

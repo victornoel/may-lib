@@ -1,228 +1,322 @@
 package fr.irit.smac.may.lib.components.remote.place;
 
-import fr.irit.smac.may.lib.components.remote.place.Placed;
+import fr.irit.smac.may.lib.components.remote.place.Place;
+import fr.irit.smac.may.lib.interfaces.Pull;
 
+@SuppressWarnings("all")
 public abstract class Placed {
-
-	private Placed.ComponentImpl selfComponent = null;
-
-	/**
-	 * This can be called by the implementation to access the component itself and its provided ports.
-	 *
-	 * This is not meant to be called from the outside by hand.
-	 */
-	protected Placed.Component self() {
-		assert this.selfComponent != null;
-		return this.selfComponent;
-	};
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> make_thisPlace();
-
-	public static interface Bridge {
-
-	}
-
-	public static interface Component {
-
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace();
-
-		/**
-		 * This should be called to start the component
-		 */
-		public void start();
-	}
-
-	private final static class ComponentImpl implements Placed.Component {
-
-		@SuppressWarnings("unused")
-		private final Placed.Bridge bridge;
-
-		private final Placed implementation;
-
-		private ComponentImpl(final Placed implem, final Placed.Bridge b) {
-			this.bridge = b;
-
-			this.implementation = implem;
-
-			assert implem.selfComponent == null;
-			implem.selfComponent = this;
-
-			this.thisPlace = implem.make_thisPlace();
-
-		}
-
-		private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace;
-
-		public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> thisPlace() {
-			return this.thisPlace;
-		};
-
-		public final void start() {
-
-			this.implementation.start();
-		}
-	}
-
-	/**
-	 * Should not be called
-	 */
-	protected abstract Placed.Agent make_Agent();
-
-	/**
-	 * Should not be called
-	 */
-	public Placed.Agent createImplementationOfAgent() {
-		Placed.Agent implem = make_Agent();
-		assert implem.ecosystemComponent == null;
-		assert this.selfComponent != null;
-		implem.ecosystemComponent = this.selfComponent;
-
-		return implem;
-	}
-
-	/**
-	 * This can be called to create an instance of the species from inside the implementation of the ecosystem.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	public Placed.Agent.Component newAgent() {
-		Placed.Agent implem = createImplementationOfAgent();
-		return implem.newComponent(new Placed.Agent.Bridge() {
-		});
-	}
-
-	public static abstract class Agent {
-
-		private Placed.Agent.ComponentImpl selfComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Placed.Agent.Component self() {
-			assert this.selfComponent != null;
-			return this.selfComponent;
-		};
-
-		/**
-		 * This should be overridden by the implementation to define the provided port.
-		 * This will be called once during the construction of the component to initialize the port.
-		 *
-		 * This is not meant to be called on from the outside.
-		 */
-		protected abstract fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> make_myPlace();
-
-		private Placed.ComponentImpl ecosystemComponent = null;
-
-		/**
-		 * This can be called by the implementation to access the component of the ecosystem itself and its provided ports.
-		 *
-		 * This is not meant to be called from the outside by hand.
-		 */
-		protected Placed.Component eco_self() {
-			assert this.ecosystemComponent != null;
-			return this.ecosystemComponent;
-		};
-
-		public static interface Bridge {
-
-		}
-
-		public static interface Component {
-
-			/**
-			 * This can be called to access the provided port
-			 * start() must have been called before
-			 */
-			public fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace();
-
-			/**
-			 * This should be called to start the component
-			 */
-			public void start();
-		}
-
-		private final static class ComponentImpl
-				implements
-					Placed.Agent.Component {
-
-			@SuppressWarnings("unused")
-			private final Placed.Agent.Bridge bridge;
-
-			private final Placed.Agent implementation;
-
-			private ComponentImpl(final Placed.Agent implem,
-					final Placed.Agent.Bridge b) {
-				this.bridge = b;
-
-				this.implementation = implem;
-
-				assert implem.selfComponent == null;
-				implem.selfComponent = this;
-
-				this.myPlace = implem.make_myPlace();
-
-			}
-
-			private final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace;
-
-			public final fr.irit.smac.may.lib.interfaces.Pull<fr.irit.smac.may.lib.components.remote.place.Place> myPlace() {
-				return this.myPlace;
-			};
-
-			public final void start() {
-
-				this.implementation.start();
-			}
-		}
-
-		/**
-		 * Can be overridden by the implementation
-		 * It will be called after the component has been instantiated, after the components have been instantiated
-		 * and during the containing component start() method is called.
-		 *
-		 * This is not meant to be called on the object by hand.
-		 */
-		protected void start() {
-		}
-
-		public Placed.Agent.Component newComponent(Placed.Agent.Bridge b) {
-			return new Placed.Agent.ComponentImpl(this, b);
-		}
-
-	}
-
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the component has been instantiated, after the components have been instantiated
-	 * and during the containing component start() method is called.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected void start() {
-	}
-
-	public Placed.Component newComponent(Placed.Bridge b) {
-		return new Placed.ComponentImpl(this, b);
-	}
-
-	public Placed.Component newComponent() {
-		return this.newComponent(new Placed.Bridge() {
-		});
-	}
-	public static final Placed.Component newComponent(Placed _compo) {
-		return _compo.newComponent();
-	}
-
+  @SuppressWarnings("all")
+  public interface Requires {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Place> thisPlace();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Parts {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.remote.place.Placed.Provides {
+    /**
+     * This should be called to start the component.
+     * This must be called before any provided port can be called.
+     * 
+     */
+    public void start();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.remote.place.Placed.Parts, fr.irit.smac.may.lib.components.remote.place.Placed.Component {
+    private final fr.irit.smac.may.lib.components.remote.place.Placed.Requires bridge;
+    
+    private final Placed implementation;
+    
+    public ComponentImpl(final Placed implem, final fr.irit.smac.may.lib.components.remote.place.Placed.Requires b) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null;
+      implem.selfComponent = this;
+      
+      this.thisPlace = implem.make_thisPlace();
+      
+    }
+    
+    private final Pull<Place> thisPlace;
+    
+    public final Pull<Place> thisPlace() {
+      return this.thisPlace;
+    }
+    
+    public void start() {
+      this.implementation.start();
+      
+    }
+  }
+  
+  
+  @SuppressWarnings("all")
+  public abstract static class Agent {
+    @SuppressWarnings("all")
+    public interface Requires {
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Provides {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<Place> myPlace();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Parts {
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Component extends fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Provides {
+      /**
+       * This should be called to start the component.
+       * This must be called before any provided port can be called.
+       * 
+       */
+      public void start();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public static class ComponentImpl implements fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Parts, fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Component {
+      private final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires bridge;
+      
+      private final fr.irit.smac.may.lib.components.remote.place.Placed.Agent implementation;
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.remote.place.Placed.Agent implem, final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires b) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null;
+        implem.selfComponent = this;
+        
+        this.myPlace = implem.make_myPlace();
+        
+      }
+      
+      private final Pull<Place> myPlace;
+      
+      public final Pull<Place> myPlace() {
+        return this.myPlace;
+      }
+      
+      public void start() {
+        this.implementation.start();
+        
+      }
+    }
+    
+    
+    private fr.irit.smac.may.lib.components.remote.place.Placed.Agent.ComponentImpl selfComponent;
+    
+    /**
+     * Can be overridden by the implementation.
+     * It will be called after the component has been instantiated, after the components have been instantiated
+     * and during the containing component start() method is called.
+     * 
+     */
+    protected void start() {
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Provides provides() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * This should be overridden by the implementation to define the provided port.
+     * This will be called once during the construction of the component to initialize the port.
+     * 
+     */
+    protected abstract Pull<Place> make_myPlace();
+    
+    /**
+     * This can be called by the implementation to access the required ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires requires() {
+      assert this.selfComponent != null;
+      return this.selfComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the implementation to access the parts and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Parts parts() {
+      assert this.selfComponent != null;
+      return this.selfComponent;
+      
+    }
+    
+    /**
+     * Not meant to be used to manually instantiate components (except for testing).
+     * 
+     */
+    public fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Component newComponent(final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires b) {
+      return new fr.irit.smac.may.lib.components.remote.place.Placed.Agent.ComponentImpl(this, b);
+    }
+    
+    private fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl ecosystemComponent;
+    
+    /**
+     * This can be called by the species implementation to access the provided ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.remote.place.Placed.Provides eco_provides() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the required ports of its ecosystem.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.remote.place.Placed.Requires eco_requires() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent.bridge;
+      
+    }
+    
+    /**
+     * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
+     * 
+     */
+    protected fr.irit.smac.may.lib.components.remote.place.Placed.Parts eco_parts() {
+      assert this.ecosystemComponent != null;
+      return this.ecosystemComponent;
+      
+    }
+  }
+  
+  
+  private fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl selfComponent;
+  
+  /**
+   * Can be overridden by the implementation.
+   * It will be called after the component has been instantiated, after the components have been instantiated
+   * and during the containing component start() method is called.
+   * 
+   */
+  protected void start() {
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.remote.place.Placed.Provides provides() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Pull<Place> make_thisPlace();
+  
+  /**
+   * This can be called by the implementation to access the required ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.remote.place.Placed.Requires requires() {
+    assert this.selfComponent != null;
+    return this.selfComponent.bridge;
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the parts and their provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.remote.place.Placed.Parts parts() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * Not meant to be used to manually instantiate components (except for testing).
+   * 
+   */
+  public fr.irit.smac.may.lib.components.remote.place.Placed.Component newComponent(final fr.irit.smac.may.lib.components.remote.place.Placed.Requires b) {
+    return new fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl(this, b);
+  }
+  
+  /**
+   * This should be overridden by the implementation to instantiate the implementation of the species.
+   * 
+   */
+  protected abstract fr.irit.smac.may.lib.components.remote.place.Placed.Agent make_Agent();
+  
+  /**
+   * Do not call, used by generated code.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.remote.place.Placed.Agent _createImplementationOfAgent() {
+    fr.irit.smac.may.lib.components.remote.place.Placed.Agent implem = make_Agent();
+    assert implem.ecosystemComponent == null;
+    assert this.selfComponent != null;
+    implem.ecosystemComponent = this.selfComponent;
+    return implem;
+  }
+  
+  /**
+   * This can be called to create an instance of the species from inside the implementation of the ecosystem.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Component newAgent() {
+    fr.irit.smac.may.lib.components.remote.place.Placed.Agent implem = _createImplementationOfAgent();
+    return implem.newComponent(new fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires() {});
+  }
+  
+  /**
+   * Use to instantiate a component from this implementation.
+   * 
+   */
+  public fr.irit.smac.may.lib.components.remote.place.Placed.Component newComponent() {
+    return this.newComponent(new fr.irit.smac.may.lib.components.remote.place.Placed.Requires() {});
+  }
+  
+  /**
+   * Use to instantiate a component with this implementation.
+   * 
+   */
+  public static fr.irit.smac.may.lib.components.remote.place.Placed.Component newComponent(final Placed _compo) {
+    return _compo.newComponent();
+  }
 }

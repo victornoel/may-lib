@@ -1,152 +1,178 @@
 package fr.irit.smac.may.lib.components.messaging.distributed;
 
-import fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication;
+import fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo;
+import fr.irit.smac.may.lib.interfaces.Pull;
+import fr.irit.smac.may.lib.interfaces.Push;
+import fr.irit.smac.may.lib.interfaces.Send;
 
+@SuppressWarnings("all")
 public abstract class DistributedCommunication<T> {
-
-	private DistributedCommunication.ComponentImpl<T> selfComponent = null;
-
-	/**
-	 * This can be called by the implementation to access the component itself and its provided ports.
-	 *
-	 * This is not meant to be called from the outside by hand.
-	 */
-	protected DistributedCommunication.Component<T> self() {
-		assert this.selfComponent != null;
-		return this.selfComponent;
-	};
-
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Push<T> out() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.out();
-	};
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> broadcast() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.broadcast();
-	};
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> make_nodeName();
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> make_in();
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> make_handle();
-
-	public static interface Bridge<T> {
-		public fr.irit.smac.may.lib.interfaces.Push<T> out();
-		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> broadcast();
-
-	}
-
-	public static interface Component<T> {
-
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> nodeName();
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> in();
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> handle();
-
-		/**
-		 * This should be called to start the component
-		 */
-		public void start();
-	}
-
-	private final static class ComponentImpl<T>
-			implements
-				DistributedCommunication.Component<T> {
-
-		private final DistributedCommunication.Bridge<T> bridge;
-
-		private final DistributedCommunication<T> implementation;
-
-		private ComponentImpl(final DistributedCommunication<T> implem,
-				final DistributedCommunication.Bridge<T> b) {
-			this.bridge = b;
-
-			this.implementation = implem;
-
-			assert implem.selfComponent == null;
-			implem.selfComponent = this;
-
-			this.nodeName = implem.make_nodeName();
-			this.in = implem.make_in();
-			this.handle = implem.make_handle();
-
-		}
-
-		private final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> nodeName;
-
-		public final fr.irit.smac.may.lib.interfaces.Pull<java.lang.String> nodeName() {
-			return this.nodeName;
-		};
-		private final fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> in;
-
-		public final fr.irit.smac.may.lib.interfaces.Send<T, java.lang.String> in() {
-			return this.in;
-		};
-		private final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> handle;
-
-		public final fr.irit.smac.may.lib.interfaces.Push<fr.irit.smac.may.lib.components.messaging.distributed.DistributedInfo<T>> handle() {
-			return this.handle;
-		};
-
-		public final void start() {
-
-			this.implementation.start();
-		}
-	}
-
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the component has been instantiated, after the components have been instantiated
-	 * and during the containing component start() method is called.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected void start() {
-	}
-
-	public DistributedCommunication.Component<T> newComponent(
-			DistributedCommunication.Bridge<T> b) {
-		return new DistributedCommunication.ComponentImpl<T>(this, b);
-	}
-
+  @SuppressWarnings("all")
+  public interface Requires<T> {
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Push<T> out();
+    
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Push<DistributedInfo<T>> broadcast();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<String> nodeName();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Send<T,String> in();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<DistributedInfo<T>> handle();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Parts<T> {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component<T> extends fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Provides<T> {
+    /**
+     * This should be called to start the component.
+     * This must be called before any provided port can be called.
+     * 
+     */
+    public void start();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Parts<T>, fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Component<T> {
+    private final fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Requires<T> bridge;
+    
+    private final DistributedCommunication<T> implementation;
+    
+    public ComponentImpl(final DistributedCommunication<T> implem, final fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Requires<T> b) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null;
+      implem.selfComponent = this;
+      
+      this.nodeName = implem.make_nodeName();
+      this.in = implem.make_in();
+      this.handle = implem.make_handle();
+      
+    }
+    
+    private final Pull<String> nodeName;
+    
+    public final Pull<String> nodeName() {
+      return this.nodeName;
+    }
+    
+    private final Send<T,String> in;
+    
+    public final Send<T,String> in() {
+      return this.in;
+    }
+    
+    private final Push<DistributedInfo<T>> handle;
+    
+    public final Push<DistributedInfo<T>> handle() {
+      return this.handle;
+    }
+    
+    public void start() {
+      this.implementation.start();
+      
+    }
+  }
+  
+  
+  private fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.ComponentImpl<T> selfComponent;
+  
+  /**
+   * Can be overridden by the implementation.
+   * It will be called after the component has been instantiated, after the components have been instantiated
+   * and during the containing component start() method is called.
+   * 
+   */
+  protected void start() {
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Provides<T> provides() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Pull<String> make_nodeName();
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Send<T,String> make_in();
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Push<DistributedInfo<T>> make_handle();
+  
+  /**
+   * This can be called by the implementation to access the required ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Requires<T> requires() {
+    assert this.selfComponent != null;
+    return this.selfComponent.bridge;
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the parts and their provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Parts<T> parts() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * Not meant to be used to manually instantiate components (except for testing).
+   * 
+   */
+  public fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Component<T> newComponent(final fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.Requires<T> b) {
+    return new fr.irit.smac.may.lib.components.messaging.distributed.DistributedCommunication.ComponentImpl<T>(this, b);
+  }
 }

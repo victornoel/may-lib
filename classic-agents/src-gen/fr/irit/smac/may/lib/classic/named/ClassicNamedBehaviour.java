@@ -1,134 +1,151 @@
 package fr.irit.smac.may.lib.classic.named;
 
-import fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour;
+import fr.irit.smac.may.lib.classic.interfaces.CreateNamed;
+import fr.irit.smac.may.lib.interfaces.Do;
+import fr.irit.smac.may.lib.interfaces.Pull;
+import fr.irit.smac.may.lib.interfaces.Push;
+import fr.irit.smac.may.lib.interfaces.Send;
 
+@SuppressWarnings("all")
 public abstract class ClassicNamedBehaviour<Msg, Ref> {
-
-	private ClassicNamedBehaviour.ComponentImpl<Msg, Ref> selfComponent = null;
-
-	/**
-	 * This can be called by the implementation to access the component itself and its provided ports.
-	 *
-	 * This is not meant to be called from the outside by hand.
-	 */
-	protected ClassicNamedBehaviour.Component<Msg, Ref> self() {
-		assert this.selfComponent != null;
-		return this.selfComponent;
-	};
-
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.send();
-	};
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Pull<Ref> me() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.me();
-	};
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.interfaces.Do die() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.die();
-	};
-	/**
-	 * This can be called by the implementation to access this required port.
-	 *
-	 * This is not meant to be called from the outside.
-	 */
-	protected fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create() {
-		assert this.selfComponent != null;
-		return this.selfComponent.bridge.create();
-	};
-
-	/**
-	 * This should be overridden by the implementation to define the provided port.
-	 * This will be called once during the construction of the component to initialize the port.
-	 *
-	 * This is not meant to be called on from the outside.
-	 */
-	protected abstract fr.irit.smac.may.lib.interfaces.Push<Msg> make_cycle();
-
-	public static interface Bridge<Msg, Ref> {
-		public fr.irit.smac.may.lib.interfaces.Send<Msg, Ref> send();
-		public fr.irit.smac.may.lib.interfaces.Pull<Ref> me();
-		public fr.irit.smac.may.lib.interfaces.Do die();
-		public fr.irit.smac.may.lib.classic.interfaces.CreateNamed<Msg, Ref> create();
-
-	}
-
-	public static interface Component<Msg, Ref> {
-
-		/**
-		 * This can be called to access the provided port
-		 * start() must have been called before
-		 */
-		public fr.irit.smac.may.lib.interfaces.Push<Msg> cycle();
-
-		/**
-		 * This should be called to start the component
-		 */
-		public void start();
-	}
-
-	private final static class ComponentImpl<Msg, Ref>
-			implements
-				ClassicNamedBehaviour.Component<Msg, Ref> {
-
-		private final ClassicNamedBehaviour.Bridge<Msg, Ref> bridge;
-
-		private final ClassicNamedBehaviour<Msg, Ref> implementation;
-
-		private ComponentImpl(final ClassicNamedBehaviour<Msg, Ref> implem,
-				final ClassicNamedBehaviour.Bridge<Msg, Ref> b) {
-			this.bridge = b;
-
-			this.implementation = implem;
-
-			assert implem.selfComponent == null;
-			implem.selfComponent = this;
-
-			this.cycle = implem.make_cycle();
-
-		}
-
-		private final fr.irit.smac.may.lib.interfaces.Push<Msg> cycle;
-
-		public final fr.irit.smac.may.lib.interfaces.Push<Msg> cycle() {
-			return this.cycle;
-		};
-
-		public final void start() {
-
-			this.implementation.start();
-		}
-	}
-
-	/**
-	 * Can be overridden by the implementation
-	 * It will be called after the component has been instantiated, after the components have been instantiated
-	 * and during the containing component start() method is called.
-	 *
-	 * This is not meant to be called on the object by hand.
-	 */
-	protected void start() {
-	}
-
-	public ClassicNamedBehaviour.Component<Msg, Ref> newComponent(
-			ClassicNamedBehaviour.Bridge<Msg, Ref> b) {
-		return new ClassicNamedBehaviour.ComponentImpl<Msg, Ref>(this, b);
-	}
-
+  @SuppressWarnings("all")
+  public interface Requires<Msg, Ref> {
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Send<Msg,Ref> send();
+    
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Pull<Ref> me();
+    
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public Do die();
+    
+    /**
+     * This can be called by the implementation to access this required port.
+     * 
+     */
+    public CreateNamed<Msg,Ref> create();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Msg> cycle();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Parts<Msg, Ref> {
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Provides<Msg,Ref> {
+    /**
+     * This should be called to start the component.
+     * This must be called before any provided port can be called.
+     * 
+     */
+    public void start();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Parts<Msg,Ref>, fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Component<Msg,Ref> {
+    private final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> bridge;
+    
+    private final ClassicNamedBehaviour<Msg,Ref> implementation;
+    
+    public ComponentImpl(final ClassicNamedBehaviour<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> b) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null;
+      implem.selfComponent = this;
+      
+      this.cycle = implem.make_cycle();
+      
+    }
+    
+    private final Push<Msg> cycle;
+    
+    public final Push<Msg> cycle() {
+      return this.cycle;
+    }
+    
+    public void start() {
+      this.implementation.start();
+      
+    }
+  }
+  
+  
+  private fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.ComponentImpl<Msg,Ref> selfComponent;
+  
+  /**
+   * Can be overridden by the implementation.
+   * It will be called after the component has been instantiated, after the components have been instantiated
+   * and during the containing component start() method is called.
+   * 
+   */
+  protected void start() {
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Provides<Msg,Ref> provides() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * This should be overridden by the implementation to define the provided port.
+   * This will be called once during the construction of the component to initialize the port.
+   * 
+   */
+  protected abstract Push<Msg> make_cycle();
+  
+  /**
+   * This can be called by the implementation to access the required ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> requires() {
+    assert this.selfComponent != null;
+    return this.selfComponent.bridge;
+    
+  }
+  
+  /**
+   * This can be called by the implementation to access the parts and their provided ports.
+   * 
+   */
+  protected fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Parts<Msg,Ref> parts() {
+    assert this.selfComponent != null;
+    return this.selfComponent;
+    
+  }
+  
+  /**
+   * Not meant to be used to manually instantiate components (except for testing).
+   * 
+   */
+  public fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Component<Msg,Ref> newComponent(final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> b) {
+    return new fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.ComponentImpl<Msg,Ref>(this, b);
+  }
 }

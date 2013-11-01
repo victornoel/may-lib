@@ -8,17 +8,15 @@ import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
 public class Behavior2<Ref> extends AbstractClassicBehaviour<PatternMatchingMessage,Ref> {
 
-	private static final long serialVersionUID = -7663551892033127305L;
-
 	private final PatternMatchingBehavior matcher = new PatternMatchingBehavior(this);
 	
 	public void caseWorld() {
-		System.out.println(me().pull() + " received : world");
+		System.out.println(requires().me().pull() + " received : world");
 
 		// Ref wr = create().create(new BehaviorWithRef(), new
 		// Place("localhost:1098"));
-		Ref wr = create().create(new BehaviorWithRef<Ref>());
-		send().send(new WithRef<Ref>(me().pull()), wr);
+		Ref wr = requires().create().create(new BehaviorWithRef<Ref>());
+		requires().send().send(new WithRef<Ref>(requires().me().pull()), wr);
 
 		// wait for message to get into my mailbox
 		try {
@@ -32,13 +30,13 @@ public class Behavior2<Ref> extends AbstractClassicBehaviour<PatternMatchingMess
 	}
 
 	public void caseOther(String e) {
-		System.out.println(me().pull() + " : received other : " + e);
+		System.out.println(requires().me().pull() + " : received other : " + e);
 	}
 
 	public void caseZero() {
-		System.out.println(me().pull() + " : received : zero");
+		System.out.println(requires().me().pull() + " : received : zero");
 		
-		System.out.println(me().pull() + " : going to...");
+		System.out.println(requires().me().pull() + " : going to...");
 		
 		/*
 		try {
@@ -49,9 +47,9 @@ public class Behavior2<Ref> extends AbstractClassicBehaviour<PatternMatchingMess
 		}
 		*/
 		
-		System.out.println(me().pull() + " : ...die");
+		System.out.println(requires().me().pull() + " : ...die");
 		
-		die().doIt();
+		requires().die().doIt();
 	}
 	
 	@Override

@@ -13,14 +13,14 @@ public class IvyBinderImpl extends IvyBinder {
 		return new Push<String>() {
 			public void push(String thing) {
 				if (bindId != -1) {
-					unBindMsg().push(bindId);
+					requires().unBindMsg().push(bindId);
 				}
 				Push<List<String>> callback = new Push<List<String>>() {
 					public void push(List<String> thing) {
-						IvyBinderImpl.this.receive().push(thing);
+						requires().receive().push(thing);
 					}
 				};
-				bindId = bindMsg().bind(thing, callback);
+				bindId = requires().bindMsg().bind(thing, callback);
 			}
 		};
 	}

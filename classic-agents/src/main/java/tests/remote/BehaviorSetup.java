@@ -22,12 +22,12 @@ public class BehaviorSetup<Ref> extends AbstractRemoteClassicBehaviour<PatternMa
 	}
 	
 	public void caseStart(Place p1, Place p2) {
-		Ref pierre = create().create(new Behavior2<Ref>(), p1);
-		Ref bob = create().create(new Behavior1<Ref>(pierre), p2);
-		send().send(new Hello(), bob);
+		Ref pierre = requires().create().create(new Behavior2<Ref>(), p1);
+		Ref bob = requires().create().create(new Behavior1<Ref>(pierre), p2);
+		requires().send().send(new Hello(), bob);
 		
-		System.out.println(me().pull() + " : die");
-		die().doIt();
+		System.out.println(requires().me().pull() + " : die");
+		requires().die().doIt();
 	}
 	
 	@Override

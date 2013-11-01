@@ -19,7 +19,7 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 	@Override
 	protected void start() {
 		super.start();
-		ivyBindMsg().push("^fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl\\[" + namespace + "\\]: (.*)$");
+		requires().ivyBindMsg().push("^fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl\\[" + namespace + "\\]: (.*)$");
 	}
 	
 	@Override
@@ -27,8 +27,8 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 		return new Push<List<String>>() {
 			public void push(List<String> thing) {
 				// there should be only one String
-				T m = deserializer().transform(thing.get(0));
-				handle().push(m);
+				T m = requires().deserializer().transform(thing.get(0));
+				requires().handle().push(m);
 				// TODO handle errors in logs
 			}
 		};
@@ -38,8 +38,8 @@ public class IvyBroadcasterImpl<T> extends IvyBroadcaster<T> {
 	protected Push<T> make_send() {
 		return new Push<T>() {
 			public void push(T thing) {
-				String m = serializer().transform(thing);
-				ivySend().push("fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl[" + namespace + "]: " + m);
+				String m = requires().serializer().transform(thing);
+				requires().ivySend().push("fr.irit.smac.may.lib.components.distribution.IvyBroadcasterImpl[" + namespace + "]: " + m);
 			};
 		};
 	}

@@ -49,7 +49,7 @@ public class SchedulerImpl extends Scheduler {
 						final FutureTask<?> f = new FutureTask<Object>(mr, null);
 						mr.f = f;
 						s.add(f);
-						eco_executor().executeAfter(f,time);
+						eco_requires().executor().executeAfter(f,time);
 					}
 				}
 			};

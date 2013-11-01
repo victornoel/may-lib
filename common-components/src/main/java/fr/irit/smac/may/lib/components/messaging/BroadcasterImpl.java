@@ -45,7 +45,7 @@ public class BroadcasterImpl<T,Ref> extends Broadcaster<T, Ref> {
 	private void doBroadcast(T t) {
 		synchronized (s) {
 			for (Ref r : s) {
-				deposit().send(t, r);
+				requires().deposit().send(t, r);
 			}
 		}
 	}

@@ -9,8 +9,6 @@ import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
 public class BehaviorSetup<Ref> extends AbstractClassicBehaviour<PatternMatchingMessage,Ref> {
 
-	private static final long serialVersionUID = 5268234632750262057L;
-
 	private final PatternMatchingBehavior matcher = new PatternMatchingBehavior(this);
 	
 	@Override
@@ -23,14 +21,14 @@ public class BehaviorSetup<Ref> extends AbstractClassicBehaviour<PatternMatching
 		// Ref pierre = create().create(new Behavior2(), p1);
 		// Ref bob = create().create(new Behavior1(pierre), p2);
 		System.out.println("setup, start");
-		Ref pierre = create().create(new Behavior2<Ref>());
-		Ref bob = create().create(new Behavior1<Ref>(pierre));
+		Ref pierre = requires().create().create(new Behavior2<Ref>());
+		Ref bob = requires().create().create(new Behavior1<Ref>(pierre));
 		System.out.println("setup, created");
-		send().send(new Hello(), bob);
+		requires().send().send(new Hello(), bob);
 		System.out.println("setup, sent");
 		
-		System.out.println(me().pull() + " : die");
-		die().doIt();
+		System.out.println(requires().me().pull() + " : die");
+		requires().die().doIt();
 	}
 	
 	@Override

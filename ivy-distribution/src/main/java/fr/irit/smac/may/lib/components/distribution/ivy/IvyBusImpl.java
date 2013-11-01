@@ -86,7 +86,7 @@ public class IvyBusImpl extends IvyBus {
 				IvyMessageListener listener = new IvyMessageListener() {
 					public void receive(IvyClient client, final String[] args) {
 						logger.debug("receiving message \"{}\"", Arrays.toString(args));
-						exec().execute(new Runnable() {
+						requires().exec().execute(new Runnable() {
 							public void run() {
 								logger.debug("calling callback for message \"{}\"", Arrays.toString(args));
 								callback.push(Arrays.asList(args));

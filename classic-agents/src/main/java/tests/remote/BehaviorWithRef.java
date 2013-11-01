@@ -15,7 +15,7 @@ public class BehaviorWithRef<Ref> extends AbstractRemoteClassicBehaviour<Pattern
 	private final PatternMatchingBehavior matcher = new PatternMatchingBehavior(this);
 	
 	public void caseWithRef(Ref r) {
-		System.out.println(me().pull() + " : got ref of " + r);
+		System.out.println(requires().me().pull() + " : got ref of " + r);
 
 		/*
 		try {
@@ -26,10 +26,10 @@ public class BehaviorWithRef<Ref> extends AbstractRemoteClassicBehaviour<Pattern
 		}
 		*/
 
-		send().send(new Other("ahahah"), r);
+		requires().send().send(new Other("ahahah"), r);
 
-		System.out.println(me().pull() + " : die");
-		die().doIt();
+		System.out.println(requires().me().pull() + " : die");
+		requires().die().doIt();
 	}
 	
 	@Override

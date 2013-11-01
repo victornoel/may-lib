@@ -51,7 +51,7 @@ public class BufferImpl<I> extends Buffer<I> {
 				q.add(new Runnable() {
 					public void run() {
 						try {
-							method.invoke(realPort(), args);
+							method.invoke(requires().realPort(), args);
 						} catch (IllegalAccessException e) {
 							throw new RuntimeException("should not happen",e);
 						} catch (IllegalArgumentException e) {
@@ -75,7 +75,7 @@ public class BufferImpl<I> extends Buffer<I> {
 	}
 	
 	public static void main(String[] args) {
-		Component<Push<String>> test = new BufferImpl<Push<String>>(Push.class).newComponent(new Buffer.Bridge<Push<String>>() {
+		Component<Push<String>> test = new BufferImpl<Push<String>>(Push.class).newComponent(new Buffer.Requires<Push<String>>() {
 			public Push<String> realPort() {
 				return new Push<String>() {
 					public void push(String thing) {

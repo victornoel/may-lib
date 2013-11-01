@@ -9,7 +9,7 @@
 	</parent>
 
 	<artifactId>webservices</artifactId>
-	<version>3.1.0-SNAPSHOT</version>
+	<version>3.2.0-SNAPSHOT</version>
 	<description>Provides Web Services abstraction</description>
 
 	<build>

@@ -1,12 +1,14 @@
-
-import fr.irit.smac.may.lib.interfaces.*
-import fr.irit.smac.may.lib.components.interactions.interfaces.*
-import java.lang.*
+import fr.irit.smac.may.lib.components.collections.Queue
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
+import fr.irit.smac.may.lib.components.interactions.interfaces.Call
+import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve
+import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend
+import fr.irit.smac.may.lib.interfaces.Do
+import fr.irit.smac.may.lib.interfaces.Pull
+import fr.irit.smac.may.lib.interfaces.Push
+import java.util.Collection
 
 namespace fr.irit.smac.may.lib.components.interactions {
-	
-
-	import fr.irit.smac.may.lib.components.interactions.directreferences.*
 	
 	ecosystem DirectReferences[I] {
 
@@ -50,16 +52,13 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 	}
 	
-	import java.util.Collection
-	import fr.irit.smac.may.lib.components.collections.Queue
-	
 	ecosystem AsyncReceiver[M,K] {
 		
 		// does not take care of buffering messages
 		// put cannot be blocking!
 		species Receiver {
 			requires put: Push[M]
-			provides toCall: Push[M] delegateToThis put
+			provides toCall: Push[M] = put
 		}
 		
 		// takes care of buffering messages
@@ -86,13 +85,13 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		species PublisherPush {
 			provides set: Push[T]
 			provides get: Pull[T]
-			provides toCall: Pull[T] delegateToThis get
+			provides toCall: Pull[T] = get
 		}
 		
 		species PublisherPull {
 			provides get: Pull[T]
 			requires getValue: Pull[T]
-			provides toCall: Pull[T] delegateToThis get
+			provides toCall: Pull[T] = get
 		}
 		
 		species Observer {

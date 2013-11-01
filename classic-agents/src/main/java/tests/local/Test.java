@@ -31,7 +31,7 @@ public class Test {
 					public void push(String msg) {
 						System.out.println(msg);
 						System.out.println("test2");
-						send().send("HAHAhA", create);
+						requires().send().send("HAHAhA", create);
 					}
 				};
 			}

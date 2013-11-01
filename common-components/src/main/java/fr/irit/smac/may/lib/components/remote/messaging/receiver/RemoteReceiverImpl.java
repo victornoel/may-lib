@@ -44,7 +44,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 		}
 		
 		public void receive(Msg msg) throws RemoteException {
-			localDeposit().send(msg, ref);
+			requires().localDeposit().send(msg, ref);
 		}
 	}
 
@@ -57,17 +57,17 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 			super.start();
 			// beware that anonymous instance of classes are kept linked to
 			// "this" and so may not be gc'ed when we would want
-			RemoteAgent remoteMe = new RemoteAgent(localMe().pull());
+			RemoteAgent remoteMe = new RemoteAgent(requires().localMe().pull());
 
 			try {
 				// reuse port instead of opening another one.
-				UnicastRemoteObject.exportObject(remoteMe, myPlace().pull().getPort());
+				UnicastRemoteObject.exportObject(remoteMe, eco_requires().myPlace().pull().getPort());
 			} catch (RemoteException e) {
 				throw new RuntimeException("export failed", e);
 			}
 
 			// we encapsulate it inside this class to hide the remote object
-			this.me = new RemoteAgentRefImpl(remoteMe, myPlace().pull(), localMe().pull().toString());
+			this.me = new RemoteAgentRefImpl(remoteMe, eco_requires().myPlace().pull(), requires().localMe().pull().toString());
 		}
 
 		@Override

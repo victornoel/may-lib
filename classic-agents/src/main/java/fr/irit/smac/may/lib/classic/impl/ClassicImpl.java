@@ -17,7 +17,6 @@ import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 import fr.irit.smac.may.lib.interfaces.Push;
-import fr.irit.smac.may.lib.interfaces.Send;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
 

@@ -22,15 +22,15 @@ public class Behavior1<Ref> extends AbstractRemoteClassicBehaviour<PatternMatchi
 	}
 
 	public void caseHello() {
-		System.out.println(me().pull() + " : received : hello");
-		send().send(new World(), friend);
-		send().send(new Other("three"), friend);
-		send().send(new Other("two"), friend);
-		send().send(new Other("one"), friend);
-		send().send(new Zero(), friend);
+		System.out.println(requires().me().pull() + " : received : hello");
+		requires().send().send(new World(), friend);
+		requires().send().send(new Other("three"), friend);
+		requires().send().send(new Other("two"), friend);
+		requires().send().send(new Other("one"), friend);
+		requires().send().send(new Zero(), friend);
 
-		System.out.println(me().pull() + " : die");
-		die().doIt();
+		System.out.println(requires().me().pull() + " : die");
+		requires().die().doIt();
 	}
 
 	@Override

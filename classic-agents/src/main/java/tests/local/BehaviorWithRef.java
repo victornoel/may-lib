@@ -8,12 +8,10 @@ import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
 public class BehaviorWithRef<Ref> extends AbstractClassicBehaviour<PatternMatchingMessage,Ref> {
 
-	private static final long serialVersionUID = 2560010704401134710L;
-
 	private final PatternMatchingBehavior matcher = new PatternMatchingBehavior(this);
 	
 	public void caseWithRef(Ref r) {
-		System.out.println(me().pull() + " : got ref of " + r);
+		System.out.println(requires().me().pull() + " : got ref of " + r);
 
 		/*
 		try {
@@ -24,10 +22,10 @@ public class BehaviorWithRef<Ref> extends AbstractClassicBehaviour<PatternMatchi
 		}
 		*/
 
-		send().send(new Other("ahahah"), r);
+		requires().send().send(new Other("ahahah"), r);
 
-		System.out.println(me().pull() + " : die");
-		die().doIt();
+		System.out.println(requires().me().pull() + " : die");
+		requires().die().doIt();
 	}
 	
 	@Override

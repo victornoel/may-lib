@@ -14,12 +14,12 @@ public class ClockImpl extends Clock {
 	// the synchronized here make this step to
 	// be executed only when the previous one has finished
 	private synchronized void doOneStep() {
-		tick().doIt();
+		requires().tick().doIt();
 	}
 	
 	private void myrun() {
 		if (running.get()) {
-			sched().execute(new Runnable() {
+			requires().sched().execute(new Runnable() {
 				public void run() {
 					final long start = System.currentTimeMillis();
 
@@ -59,7 +59,7 @@ public class ClockImpl extends Clock {
 				if (synchronous) {
 					doOneStep();
 				} else {
-					sched().execute(new Runnable() {
+					requires().sched().execute(new Runnable() {
 						public void run() {
 							doOneStep();
 						}

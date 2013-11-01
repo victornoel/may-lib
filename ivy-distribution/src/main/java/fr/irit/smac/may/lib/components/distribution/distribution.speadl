@@ -1,15 +1,14 @@
-
+import fr.irit.smac.may.lib.components.distribution.interfaces.Transform
+import fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder
+import fr.irit.smac.may.lib.components.distribution.ivy.IvyBus
+import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.Bind
+import fr.irit.smac.may.lib.interfaces.Do
+import fr.irit.smac.may.lib.interfaces.Pull
+import fr.irit.smac.may.lib.interfaces.Push
+import java.util.List
+import java.util.concurrent.Executor
 
 namespace fr.irit.smac.may.lib.components.distribution {
-	import fr.irit.smac.may.lib.interfaces.*
-	import java.lang.*
-	import java.util.List
-	import org.javatuples.*
-	import java.util.concurrent.Executor
-	
-	import fr.irit.smac.may.lib.components.distribution.ivy.*
-	import fr.irit.smac.may.lib.components.distribution.ivy.interfaces.*
-	import fr.irit.smac.may.lib.components.distribution.interfaces.*
 
 	component IvyJSONBroadcaster[T] {
 		provides send: Push[T] = bc.send
@@ -18,7 +17,7 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		requires exec: Executor
 		
 		part ivy: IvyBus {
-			bind exec toThis exec
+			bind exec to exec
 		}
 		
 		part json: JSONTransformer[T]
@@ -32,7 +31,7 @@ namespace fr.irit.smac.may.lib.components.distribution {
 		part bc: IvyBroadcaster[T] {
 			bind deserializer to json.deserializer
 			bind serializer to json.serializer
-			bind handle toThis handle
+			bind handle to handle
 			bind ivyBindMsg to binder.reBindMsg
 			bind ivySend to ivy.send
 		}

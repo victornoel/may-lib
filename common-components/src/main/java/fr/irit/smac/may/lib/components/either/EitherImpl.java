@@ -9,7 +9,7 @@ public class EitherImpl<L, R> extends fr.irit.smac.may.lib.components.either.Eit
 	protected Push<L> make_left() {
 		return new Push<L>() {
 			public void push(L thing) {
-				out().push(Either.<L, R>left(thing));
+				requires().out().push(Either.<L, R>left(thing));
 			};
 		};
 	}
@@ -18,7 +18,7 @@ public class EitherImpl<L, R> extends fr.irit.smac.may.lib.components.either.Eit
 	protected Push<R> make_right() {
 		return new Push<R>() {
 			public void push(R thing) {
-				out().push(Either.<L, R>right(thing));
+				requires().out().push(Either.<L, R>right(thing));
 			};
 		};
 	}

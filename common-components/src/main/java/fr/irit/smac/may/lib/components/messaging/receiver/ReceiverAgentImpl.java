@@ -55,7 +55,7 @@ public class ReceiverAgentImpl<Msg> extends Receiver.Agent<Msg> {
 	}
 	
 	void receive(Msg m) {
-		put().push(m);
+		requires().put().push(m);
 	}
 	
 	@Override
@@ -80,10 +80,10 @@ public class ReceiverAgentImpl<Msg> extends Receiver.Agent<Msg> {
 	protected ReliableSend<Msg, AgentRef> make_send() {
 		return new ReliableSend<Msg, AgentRef>() {
 			public void reliableSend(Msg message, AgentRef receiver) throws AgentDoesNotExistException {
-				eco_self().deposit().reliableSend(message, receiver);
+				eco_provides().deposit().reliableSend(message, receiver);
 			};
 			public void send(Msg message, AgentRef receiver) {
-				eco_self().deposit().send(message, receiver);
+				eco_provides().deposit().send(message, receiver);
 			};
 		};
 	}

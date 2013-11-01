@@ -32,7 +32,7 @@ public class WebServiceEndpointImpl<I> extends WebServiceEndpoint<I> {
 		JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
 		svrFactory.setServiceClass(interfaze);
 		svrFactory.setAddress(url);
-		svrFactory.setServiceBean(service());
+		svrFactory.setServiceBean(requires().service());
 		// svrFactory.getInInterceptors().add(new LoggingInInterceptor());
 		// svrFactory.getOutInterceptors().add(new LoggingOutInterceptor());
 		svrFactory.create();

@@ -32,13 +32,13 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 		private K key;
 
 		public I getIf() {
-			return this.toCall();
+			return requires().toCall();
 		}
 		
 		@Override
 		protected void start() {
 			super.start();
-			key = this.key().pull();
+			key = requires().key().pull();
 			if (interfaces.containsKey(key)) throw new RuntimeException("key already in the map");
 			interfaces.put(key, this);
 		}
@@ -67,7 +67,7 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 		private final K key;
 
 		public I getIf() {
-			return this.toCall();
+			return requires().toCall();
 		}
 		
 		public CalleeImpl(K key) {
@@ -117,7 +117,7 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 			protected Call<I, K> make_call() {
 				return new Call<I, K>() {
 					public I call(K ref) throws RefDoesNotExistsException {
-						return eco_self().call().call(ref);
+						return eco_provides().call().call(ref);
 					};
 				};
 			}

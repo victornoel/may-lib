@@ -14,14 +14,14 @@ public class ValuePublisherImpl<T, K> extends ValuePublisher<T, K> {
 		return new ReliableObserve<T, K>() {
 			public Option<T> observe(K ref) {
 				try {
-					return Option.some(self().observe().reliableObserve(ref));
+					return Option.some(provides().observe().reliableObserve(ref));
 				} catch (RefDoesNotExistsException e) {
 					return Option.none();
 				}
 			}
 
 			public T reliableObserve(K ref) throws RefDoesNotExistsException {
-				return call().call(ref).pull();
+				return requires().call().call(ref).pull();
 			}
 		};
 	}
@@ -33,7 +33,7 @@ public class ValuePublisherImpl<T, K> extends ValuePublisher<T, K> {
 			protected Pull<T> make_get() {
 				return new Pull<T>() {
 					public T pull() {
-						return getValue().pull();
+						return requires().getValue().pull();
 					}
 				};
 			}
@@ -76,10 +76,10 @@ public class ValuePublisherImpl<T, K> extends ValuePublisher<T, K> {
 			protected ReliableObserve<T, K> make_observe() {
 				return new ReliableObserve<T, K>() {
 					public Option<T> observe(K ref) {
-						return eco_self().observe().observe(ref);
+						return eco_provides().observe().observe(ref);
 					};
 					public T reliableObserve(K ref) throws RefDoesNotExistsException {
-						return eco_self().observe().reliableObserve(ref);
+						return eco_provides().observe().reliableObserve(ref);
 					};
 				};
 			}

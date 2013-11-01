@@ -77,7 +77,7 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 			public RemoteAgentRef create(
 					AbstractRemoteClassicBehaviour<Msg, RemoteAgentRef> beh,
 					Place place) {
-				return fact().factCreate().create(beh, place);
+				return parts().fact().factCreate().create(beh, place);
 			}
 		};
 	}

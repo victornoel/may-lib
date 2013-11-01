@@ -1,9 +1,9 @@
+import fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor
+import fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl
+import fr.irit.smac.may.lib.interfaces.Do
+import java.util.concurrent.Executor
 
 namespace fr.irit.smac.may.lib.components.scheduling {
-	
-	import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.components.scheduling.interfaces.*
-	import java.util.concurrent.Executor
 	
 	ecosystem Scheduled {
 		species Agent {

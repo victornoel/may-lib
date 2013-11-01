@@ -13,7 +13,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 		return new Pull<DistRef<NodeRef>>() {
 			public DistRef<NodeRef> pull() {
 				int me = i++;
-				return new DistRef<NodeRef>("agent" + me, myNode().pull());
+				return new DistRef<NodeRef>("agent" + me, requires().myNode().pull());
 			}
 		};
 	}
@@ -23,7 +23,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 		return new Send<Msg, DistRef<NodeRef>>() {
 			public void send(Msg message, DistRef<NodeRef> receiver) {
 				DistributedMessage<Msg,NodeRef> m = new DistributedMessage<Msg,NodeRef>(receiver, message);
-				distOut().send(m,receiver.platform);
+				requires().distOut().send(m,receiver.platform);
 			};
 		};
 	}
@@ -32,7 +32,7 @@ public class DistributedMessagingImpl<Msg,NodeRef> extends DistributedMessaging<
 	protected Push<DistributedMessage<Msg, NodeRef>> make_distIn() {
 		return new Push<DistributedMessage<Msg, NodeRef>>() {
 			public void push(DistributedMessage<Msg, NodeRef> thing) {
-				deposit().send(thing.msg, thing.ref);
+				requires().deposit().send(thing.msg, thing.ref);
 			}
 		};
 	}

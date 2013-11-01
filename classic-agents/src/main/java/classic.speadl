@@ -1,30 +1,40 @@
-
-import java.lang.String
-import fr.irit.smac.may.lib.interfaces.*
-import fr.irit.smac.may.lib.classic.interfaces.*
-import fr.irit.smac.may.lib.components.meta.*
-import fr.irit.smac.may.lib.components.scheduling.*
-import fr.irit.smac.may.lib.components.messaging.*
-import fr.irit.smac.may.lib.components.messaging.receiver.*
-import fr.irit.smac.may.lib.components.controlflow.*
-import fr.irit.smac.may.lib.components.remote.place.*
-import fr.irit.smac.may.lib.components.remote.messaging.receiver.*
-import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
-import fr.irit.smac.may.lib.components.remote.place.Place
+import fr.irit.smac.may.lib.classic.impl.AbstractClassicBehaviour
+import fr.irit.smac.may.lib.classic.interfaces.CreateClassic
+import fr.irit.smac.may.lib.classic.interfaces.CreateNamed
+import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic
+import fr.irit.smac.may.lib.classic.namedpub.AbstractObservedBehaviour
+import fr.irit.smac.may.lib.classic.namedpub.AbstractObserverBehaviour
+import fr.irit.smac.may.lib.classic.namedpub.NamedPublishMASFactory
+import fr.irit.smac.may.lib.classic.remote.impl.AbstractRemoteClassicBehaviour
+import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher
+import fr.irit.smac.may.lib.components.interactions.AsyncReceiver
+import fr.irit.smac.may.lib.components.interactions.DirectReferences
+import fr.irit.smac.may.lib.components.interactions.MapReferences
+import fr.irit.smac.may.lib.components.interactions.ValuePublisher
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
+import fr.irit.smac.may.lib.components.interactions.interfaces.Observe
 import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
-
+import fr.irit.smac.may.lib.components.messaging.receiver.Receiver
+import fr.irit.smac.may.lib.components.meta.Forward
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
+import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver
+import fr.irit.smac.may.lib.components.remote.place.Place
+import fr.irit.smac.may.lib.components.remote.place.Placed
+import fr.irit.smac.may.lib.components.scheduling.Clock
+import fr.irit.smac.may.lib.components.scheduling.ExecutorService
+import fr.irit.smac.may.lib.components.scheduling.Scheduled
+import fr.irit.smac.may.lib.components.scheduling.Scheduler
+import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI
+import fr.irit.smac.may.lib.interfaces.Do
+import fr.irit.smac.may.lib.interfaces.Pull
+import fr.irit.smac.may.lib.interfaces.Push
+import fr.irit.smac.may.lib.interfaces.Send
 import java.util.concurrent.Executor
-
-import fr.irit.smac.may.lib.classic.*
-
-import java.lang.*
 
 namespace fr.irit.smac.may.lib.classic {
 
 	namespace namedPublish {
 		
-		import fr.irit.smac.may.lib.components.interactions.*
-		import fr.irit.smac.may.lib.components.interactions.interfaces.Observe
 		
 		component ObservedBehaviour {
 			provides cycle: Do
@@ -38,7 +48,7 @@ namespace fr.irit.smac.may.lib.classic {
 		
 		ecosystem NamedPublishMAS {
 			
-			provides create: namedpub.NamedPublishMASFactory
+			provides create: NamedPublishMASFactory
 			
 			part refs: MapReferences[Pull[Integer],String]
 			part observeds: ValuePublisher[Integer,String] {
@@ -57,14 +67,14 @@ namespace fr.irit.smac.may.lib.classic {
 				bind control to clock.control
 			}
 
-			species Observed(name: String, beha: namedpub.AbstractObservedBehaviour) {
+			species Observed(name: String, beha: AbstractObservedBehaviour) {
 
 				use sched: schedule.Agent {
 					bind cycle to beh.cycle
 				}
 				
 				part beh: ObservedBehaviour {
-					bind changeValue to observed.set
+					bind changeValue to observed.set 
 				}
 			
 				use ref: refs.Callee(name) {
@@ -74,7 +84,7 @@ namespace fr.irit.smac.may.lib.classic {
 				
 			}
 			
-			species Observer(beha: namedpub.AbstractObserverBehaviour[String]) {
+			species Observer(beha: AbstractObserverBehaviour[String]) {
 				
 				use sched: schedule.Agent {
 					bind cycle to beh.cycle
@@ -92,7 +102,6 @@ namespace fr.irit.smac.may.lib.classic {
 
 	namespace named {
 		
-		import fr.irit.smac.may.lib.components.interactions.*
 		
 		ecosystem ClassicNamed[Msg] {
 			
@@ -104,7 +113,7 @@ namespace fr.irit.smac.may.lib.classic {
 			}
 			
 			part fact: Forward[CreateNamed[Msg, String]] {
-				bind i toThis create
+				bind i to create
 			}
 			
 			part refs: MapReferences[Push[Msg],String]
@@ -114,7 +123,7 @@ namespace fr.irit.smac.may.lib.classic {
 			
 			part executor: ExecutorService
 			
-			species ClassicNamedAgent(beh: named.AbstractClassicNamedBehaviour[Msg,String], name: String) {
+			species ClassicNamedAgent(beh: AbstractClassicNamedBehaviour[Msg,String], name: String) {
 			//species ClassicNamedAgent(name: String) {
 				part arch: ClassicNamedAgentComponent[Msg, String] {
 					bind send to ss.send
@@ -158,23 +167,21 @@ namespace fr.irit.smac.may.lib.classic {
 			requires create: CreateNamed[Msg, Ref]
 
 			part dispatcher: SequentialDispatcher[Msg] {
-				bind executor toThis executor
+				bind executor to executor
 				bind handler to beh.cycle
 			}
 			
 			part beh: ClassicNamedBehaviour[Msg, Ref] {
-				bind send toThis send
-				bind me toThis me
-				bind die toThis die
-				bind create toThis create
+				bind send to send
+				bind me to me
+				bind die to die
+				bind create to create
 			}
 
 		}
 	}
 
 	namespace local {
-		import fr.irit.smac.may.lib.components.interactions.*
-		import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
 		
 		component ClassicBehaviour[Msg, Ref] {
 			provides cycle: Push[Msg]
@@ -200,12 +207,12 @@ namespace fr.irit.smac.may.lib.classic {
 			}
 
 			part fact: Forward[CreateClassic[Msg, DirRef]] {
-				bind i toThis create
+				bind i to create
 			}
 
 			part executor: ExecutorService
 
-			species ClassicAgent(beh: impl.AbstractClassicBehaviour[Msg,DirRef], name: String) {
+			species ClassicAgent(beh: AbstractClassicBehaviour[Msg,DirRef], name: String) {
 			//species ClassicAgent(name: String) {
 				provides me: Pull[DirRef] = ref.me
 				
@@ -241,14 +248,14 @@ namespace fr.irit.smac.may.lib.classic {
 			requires create: CreateClassic[Msg, Ref]
 
 			part dispatcher: SequentialDispatcher[Msg] {
-				bind executor toThis executor
+				bind executor to executor
 				bind handler to beh.cycle
 			}
 			part beh: ClassicBehaviour[Msg, Ref] {
-				bind send toThis send
-				bind me toThis me
-				bind die toThis die
-				bind create toThis create
+				bind send to send
+				bind me to me
+				bind die to die
+				bind create to create
 			}
 		}
 	}
@@ -274,14 +281,14 @@ namespace fr.irit.smac.may.lib.classic {
 			requires create: CreateRemoteClassic[Msg, Ref]
 
 			part dispatcher: SequentialDispatcher[Msg] {
-				bind executor toThis executor
+				bind executor to executor
 				bind handler to beh.cycle
 			}
 			part beh: RemoteClassicBehaviour[Msg, Ref] {
-				bind send toThis send
-				bind me toThis me
-				bind die toThis die
-				bind create toThis create
+				bind send to send
+				bind me to me
+				bind die to die
+				bind create to create
 			}
 		}
 
@@ -320,13 +327,13 @@ namespace fr.irit.smac.may.lib.classic {
 			}
 
 			part fact: RemoteFactory[Msg, RemoteAgentRef] {
-				bind infraCreate toThis create
+				bind infraCreate to create
 				bind thisPlace to placed.thisPlace
 			}
 
 			part executor: ExecutorService
 
-			species ClassicAgent(beh: remote.impl.AbstractRemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
+			species ClassicAgent(beh: AbstractRemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
 			//species ClassicAgent(name: String) {
 				provides ref: Pull[RemoteAgentRef] = rr.me
 				part arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {

@@ -27,7 +27,7 @@ public class CollectionOfImpl<I> extends CollectionOf<I> {
 			@Override
 			protected void start() {
 				super.start();
-				interfaces.put(this, p());
+				interfaces.put(this, requires().p());
 			}
 			
 			@Override

@@ -1,10 +1,13 @@
+import fj.F
+import fj.Unit
+import fr.irit.smac.may.lib.interfaces.Do
+import fr.irit.smac.may.lib.interfaces.MapGet
+import fr.irit.smac.may.lib.interfaces.Pull
+import fr.irit.smac.may.lib.interfaces.Push
+import java.util.Collection
 
 namespace fr.irit.smac.may.lib.components.meta {
 	
-	import java.lang.*
-	import java.util.*
-	import fr.irit.smac.may.lib.interfaces.*
-
 	// to explicitely do nothing with a requires, plug it a Void
 	component Void[I] {
 		provides port: I
@@ -22,7 +25,7 @@ namespace fr.irit.smac.may.lib.components.meta {
 		}
 		provides get: MapGet[Integer,I]
 		provides size: Pull[Integer]
-		provides forAll: Push[fj.F[I,fj.Unit]]
+		provides forAll: Push[F[I,Unit]]
 	}
 	
 	ecosystem CollectionOf[I] {

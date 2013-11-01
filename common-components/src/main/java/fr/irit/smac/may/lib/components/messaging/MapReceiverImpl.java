@@ -15,7 +15,7 @@ public class MapReceiverImpl<Msg, RealRef, Ref> extends MapReceiver<Msg, RealRef
 		return new Send<Msg, Ref>() {
 			public void send(Msg message, Ref receiver) {
 				if (MapReceiverImpl.this.map.containsKey(receiver)) {
-					depositValue().send(message, MapReceiverImpl.this.map.get(receiver));
+					requires().depositValue().send(message, MapReceiverImpl.this.map.get(receiver));
 				} else {
 					// TODO not normal…
 				}
@@ -28,14 +28,14 @@ public class MapReceiverImpl<Msg, RealRef, Ref> extends MapReceiver<Msg, RealRef
 		@Override
 		protected void start() {
 			super.start();
-			MapReceiverImpl.this.map.put(key().pull(), value().pull());
+			MapReceiverImpl.this.map.put(requires().key().pull(), requires().value().pull());
 		}
 
 		@Override
 		protected Do make_disconnect() {
 			return new Do() {
 				public void doIt() {
-					MapReceiverImpl.this.map.remove(key().pull());
+					MapReceiverImpl.this.map.remove(requires().key().pull());
 				}
 			};
 		}

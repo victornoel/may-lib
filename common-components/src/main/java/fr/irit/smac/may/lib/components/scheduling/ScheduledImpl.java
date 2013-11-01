@@ -45,11 +45,11 @@ public class ScheduledImpl extends Scheduled {
 		}
 		
 		private void iterativeRun(final CountDownLatch countdown) {
-			sched().executeAfter(new Runnable() {
+			eco_requires().sched().executeAfter(new Runnable() {
 				public void run() {
 					if (!killed.get()) {
 						try {
-							cycle().doIt();
+							requires().cycle().doIt();
 						} catch (Throwable t) {
 							System.err.println("Error when executing cycle in ScheduledImpl:");
 							t.printStackTrace();

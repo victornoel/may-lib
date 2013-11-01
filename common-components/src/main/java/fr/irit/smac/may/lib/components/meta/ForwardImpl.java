@@ -6,7 +6,7 @@ public class ForwardImpl<I> extends Forward<I> {
 		
 		@Override
 		protected I make_a() {
-			return i();
+			return eco_requires().i();
 		}
 		
 	}

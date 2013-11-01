@@ -25,8 +25,8 @@ public class RemoteClassicAgentComponentImpl<Msg> extends RemoteClassicAgentComp
 	protected Do make_die() {
 		return new Do() {
 			public void doIt() {
-				stopExec().doIt();
-				stopReceive().doIt();
+				requires().stopExec().doIt();
+				requires().stopReceive().doIt();
 			}
 		};
 	}

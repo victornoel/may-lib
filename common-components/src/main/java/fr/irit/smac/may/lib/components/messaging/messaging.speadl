@@ -1,11 +1,14 @@
-
+import fr.irit.smac.may.lib.components.messaging.interfaces.ReliableSend
+import fr.irit.smac.may.lib.interfaces.Broadcast
+import fr.irit.smac.may.lib.interfaces.Do
+import fr.irit.smac.may.lib.interfaces.MapGet
+import fr.irit.smac.may.lib.interfaces.Pull
+import fr.irit.smac.may.lib.interfaces.Push
+import fr.irit.smac.may.lib.interfaces.Send
 
 namespace fr.irit.smac.may.lib.components.messaging {
 
-	import fr.irit.smac.may.lib.interfaces.*
-	import fr.irit.smac.may.lib.components.messaging.interfaces.*
-	import java.lang.*
-	
+
 	ecosystem Broadcaster[T, Ref] {
 		species Agent {
 			provides bc: Broadcast[T]
@@ -17,7 +20,6 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	}
 
 	namespace receiver {
-		import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
 		ecosystem Receiver[MsgType] {
 			species Agent(name:String) {
 				requires put: Push[MsgType]
@@ -30,7 +32,6 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	}
 	
 	namespace callable {
-		import fr.irit.smac.may.lib.components.messaging.callable.CallRef
 		
 		// est-ce que ce n'est juste une version spéciale du collection map sans map ? si!
 		ecosystem Callable[I] {
@@ -64,7 +65,6 @@ namespace fr.irit.smac.may.lib.components.messaging {
 	
 	namespace distributed {
 		
-		import fr.irit.smac.may.lib.components.messaging.distributed.*
 		
 		// a bit useless now it seems…
 		component DistributedMessaging[Msg,NodeRef] {

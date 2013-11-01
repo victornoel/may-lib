@@ -17,14 +17,14 @@ public class Test {
 			protected void behaviour() {
 				int v = new Random().nextInt(10);
 				System.out.println("observed: changing value to "+v);
-				changeValue().push(v);
+				requires().changeValue().push(v);
 			}
 		});
 		
 		mas.create().createObserver(new AbstractObserverBehaviour<String>() {
 			@Override
 			protected void behaviour() {
-				System.out.println("observer: observing value of "+observe().observe("agent1").orSome(-1));
+				System.out.println("observer: observing value of "+requires().observe().observe("agent1").orSome(-1));
 			}
 		});
 	}

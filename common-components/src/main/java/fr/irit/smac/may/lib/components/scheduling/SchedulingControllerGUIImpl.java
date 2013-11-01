@@ -33,7 +33,7 @@ public class SchedulingControllerGUIImpl extends SchedulingControllerGUI {
 		frame.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
-				control().pause();
+				requires().control().pause();
 			}
 		});
 		frame.pack();
@@ -110,7 +110,7 @@ public class SchedulingControllerGUIImpl extends SchedulingControllerGUI {
 				stepButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						if (stepButton.isEnabled())
-							control().step(false);
+							requires().control().step(false);
 					}
 				});
 
@@ -123,15 +123,15 @@ public class SchedulingControllerGUIImpl extends SchedulingControllerGUI {
 					int state = source.getValue();
 					switch (state) {
 					case 1:
-						control().pause();
+						requires().control().pause();
 						stepButton.setEnabled(true);
 						break;
 					case 2:
-						control().run(ms);
+						requires().control().run(ms);
 						stepButton.setEnabled(false);
 						break;
 					case 3:
-						control().run(0);
+						requires().control().run(0);
 						stepButton.setEnabled(false);
 						break;
 					}

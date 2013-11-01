@@ -10,8 +10,6 @@ import fr.irit.smac.may.lib.pmbehaviour.PatternMatchingMessage;
 
 public class Behavior1<Ref> extends AbstractClassicBehaviour<PatternMatchingMessage,Ref> {
 
-	private static final long serialVersionUID = 7879055266000413093L;
-
 	private final Ref friend;
 	private final PatternMatchingBehavior matcher = new PatternMatchingBehavior(this);
 
@@ -20,15 +18,15 @@ public class Behavior1<Ref> extends AbstractClassicBehaviour<PatternMatchingMess
 	}
 
 	public void caseHello() {
-		System.out.println(me().pull() + " : received : hello");
-		send().send(new World(), friend);
-		send().send(new Other("three"), friend);
-		send().send(new Other("two"), friend);
-		send().send(new Other("one"), friend);
-		send().send(new Zero(), friend);
+		System.out.println(requires().me().pull() + " : received : hello");
+		requires().send().send(new World(), friend);
+		requires().send().send(new Other("three"), friend);
+		requires().send().send(new Other("two"), friend);
+		requires().send().send(new Other("one"), friend);
+		requires().send().send(new Zero(), friend);
 
-		System.out.println(me().pull() + " : die");
-		die().doIt();
+		System.out.println(requires().me().pull() + " : die");
+		requires().die().doIt();
 	}
 
 	@Override

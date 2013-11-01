@@ -20,7 +20,7 @@ public class CallableImpl<I> extends Callable<I> {
 		}
 
 		public I call() {
-			if (ref != null) return ref.toCall();
+			if (ref != null) return ref.requires().toCall();
 			else return null;
 		}
 	}
@@ -72,7 +72,7 @@ public class CallableImpl<I> extends Callable<I> {
 
 		@Override
 		protected MapGet<CallRef, I> make_call() {
-			return eco_self().call();
+			return eco_provides().call();
 		}
 		
 	}

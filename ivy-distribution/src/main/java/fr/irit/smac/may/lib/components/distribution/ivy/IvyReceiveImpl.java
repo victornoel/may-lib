@@ -49,7 +49,7 @@ public class IvyReceiveImpl extends IvyReceive {
 						for (int i = 0; i < args.length; i++) {
 							list.add(args[i]);
 						}
-						IvyReceiveImpl.this.receive().push(list);
+						requires().receive().push(list);
 
 					}
 				};

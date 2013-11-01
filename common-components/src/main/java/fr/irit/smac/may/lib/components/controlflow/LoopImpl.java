@@ -23,10 +23,10 @@ public class LoopImpl extends Loop {
 	}
 	
 	private void loop() {
-		executor().executeAfter(new Runnable() {
+		requires().executor().executeAfter(new Runnable() {
 			public void run() {
 				if (run.get()) {
-					handler().doIt();
+					requires().handler().doIt();
 					loop();
 				}
 			}

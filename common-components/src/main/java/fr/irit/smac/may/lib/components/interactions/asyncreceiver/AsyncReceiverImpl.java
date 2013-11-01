@@ -12,12 +12,12 @@ public class AsyncReceiverImpl<M,K> extends AsyncReceiver<M,K> {
 	protected ReliableSend<M, K> make_deposit() {
 		return new ReliableSend<M, K>() {
 			public void reliableSend(M message, K receiver) throws RefDoesNotExistsException {
-				call().call(receiver).push(message);
+				requires().call().call(receiver).push(message);
 			}
 
 			public void send(M message, K receiver) {
 				try {
-					self().deposit().reliableSend(message, receiver);
+					provides().deposit().reliableSend(message, receiver);
 				} catch (RefDoesNotExistsException e) {
 					// do nothing, on purpose!
 				}
@@ -47,10 +47,10 @@ public class AsyncReceiverImpl<M,K> extends AsyncReceiver<M,K> {
 			protected ReliableSend<M, K> make_send() {
 				return new ReliableSend<M, K>() {
 					public void reliableSend(M message, K receiver) throws RefDoesNotExistsException {
-						eco_self().deposit().reliableSend(message, receiver);
+						eco_provides().deposit().reliableSend(message, receiver);
 					};
 					public void send(M message, K receiver) {
-						eco_self().deposit().send(message, receiver);
+						eco_provides().deposit().send(message, receiver);
 					};
 				};
 			}
