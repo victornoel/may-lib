@@ -5,18 +5,15 @@ import fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour;
 import fr.irit.smac.may.lib.classic.namedpub.AbstractObservedBehaviour;
 import fr.irit.smac.may.lib.classic.namedpub.AbstractObserverBehaviour;
 import fr.irit.smac.may.lib.classic.namedpub.NamedPublishMASFactory;
-import fr.irit.smac.may.lib.components.interactions.MapReferences;
-import fr.irit.smac.may.lib.components.interactions.ValuePublisher;
-import fr.irit.smac.may.lib.components.interactions.interfaces.Call;
+import fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher;
 import fr.irit.smac.may.lib.components.interactions.interfaces.Observe;
 import fr.irit.smac.may.lib.components.scheduling.Clock;
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
-import fr.irit.smac.may.lib.components.scheduling.Scheduled;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
+import fr.irit.smac.may.lib.components.scheduling.Scheduler;
 import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI;
 import fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor;
 import fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl;
 import fr.irit.smac.may.lib.interfaces.Do;
-import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
 import java.util.concurrent.Executor;
 
@@ -38,34 +35,32 @@ public abstract class NamedPublishMAS {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public fr.irit.smac.may.lib.components.interactions.MapReferences.Component<Pull<Integer>,String> refs();
+    public fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Component<Integer,String> observeds();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public fr.irit.smac.may.lib.components.interactions.ValuePublisher.Component<Integer,String> observeds();
+    public fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Component executor();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public fr.irit.smac.may.lib.components.scheduling.ExecutorService.Component executor();
-    
-    /**
-     * This can be called by the implementation to access the part and its provided ports.
-     * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-     * 
-     */
-    public fr.irit.smac.may.lib.components.scheduling.Scheduled.Component schedule();
+    public fr.irit.smac.may.lib.components.scheduling.Scheduler.Component schedule();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -84,123 +79,114 @@ public abstract class NamedPublishMAS {
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Parts, fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Component, fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Parts {
     private final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Requires bridge;
     
     private final NamedPublishMAS implementation;
     
-    public ComponentImpl(final NamedPublishMAS implem, final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Requires b) {
+    protected void initParts() {
+      assert this.implem_observeds == null;
+      this.implem_observeds = this.implementation.make_observeds();
+      assert this.observeds == null;
+      this.observeds = this.implem_observeds.newComponent(new BridgeImpl_observeds());
+      assert this.implem_executor == null;
+      this.implem_executor = this.implementation.make_executor();
+      assert this.executor == null;
+      this.executor = this.implem_executor.newComponent(new BridgeImpl_executor());
+      assert this.implem_schedule == null;
+      this.implem_schedule = this.implementation.make_schedule();
+      assert this.schedule == null;
+      this.schedule = this.implem_schedule.newComponent(new BridgeImpl_schedule());
+      assert this.implem_clock == null;
+      this.implem_clock = this.implementation.make_clock();
+      assert this.clock == null;
+      this.clock = this.implem_clock.newComponent(new BridgeImpl_clock());
+      assert this.implem_gui == null;
+      this.implem_gui = this.implementation.make_gui();
+      assert this.gui == null;
+      this.gui = this.implem_gui.newComponent(new BridgeImpl_gui());
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.create == null;
+      this.create = this.implementation.make_create();
+      
+    }
+    
+    public ComponentImpl(final NamedPublishMAS implem, final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.create = implem.make_create();
-      assert this.implem_refs == null;
-      this.implem_refs = implem.make_refs();
-      this.refs = this.implem_refs.newComponent(new BridgeImpl_refs());
-      assert this.implem_observeds == null;
-      this.implem_observeds = implem.make_observeds();
-      this.observeds = this.implem_observeds.newComponent(new BridgeImpl_observeds());
-      assert this.implem_executor == null;
-      this.implem_executor = implem.make_executor();
-      this.executor = this.implem_executor.newComponent(new BridgeImpl_executor());
-      assert this.implem_schedule == null;
-      this.implem_schedule = implem.make_schedule();
-      this.schedule = this.implem_schedule.newComponent(new BridgeImpl_schedule());
-      assert this.implem_clock == null;
-      this.implem_clock = implem.make_clock();
-      this.clock = this.implem_clock.newComponent(new BridgeImpl_clock());
-      assert this.implem_gui == null;
-      this.implem_gui = implem.make_gui();
-      this.gui = this.implem_gui.newComponent(new BridgeImpl_gui());
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final NamedPublishMASFactory create;
+    private NamedPublishMASFactory create;
     
     public final NamedPublishMASFactory create() {
       return this.create;
     }
     
-    private final fr.irit.smac.may.lib.components.interactions.MapReferences.Component<Pull<Integer>,String> refs;
+    private fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Component<Integer,String> observeds;
     
-    private final MapReferences<Pull<Integer>,String> implem_refs;
-    
-    @SuppressWarnings("all")
-    private final class BridgeImpl_refs implements fr.irit.smac.may.lib.components.interactions.MapReferences.Requires<Pull<Integer>,String> {
-    }
-    
-    
-    public final fr.irit.smac.may.lib.components.interactions.MapReferences.Component<Pull<Integer>,String> refs() {
-      return this.refs;
-    }
-    
-    private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Component<Integer,String> observeds;
-    
-    private final ValuePublisher<Integer,String> implem_observeds;
+    private MapRefValuePublisher<Integer,String> implem_observeds;
     
     @SuppressWarnings("all")
-    private final class BridgeImpl_observeds implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.Requires<Integer,String> {
-      public final Call<Pull<Integer>,String> call() {
-        return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl.this.refs.call();
-      }
+    private final class BridgeImpl_observeds implements fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Requires<Integer,String> {
     }
     
     
-    public final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Component<Integer,String> observeds() {
+    public final fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Component<Integer,String> observeds() {
       return this.observeds;
     }
     
-    private final fr.irit.smac.may.lib.components.scheduling.ExecutorService.Component executor;
+    private fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Component executor;
     
-    private final ExecutorService implem_executor;
+    private ExecutorServiceWrapper implem_executor;
     
     @SuppressWarnings("all")
-    private final class BridgeImpl_executor implements fr.irit.smac.may.lib.components.scheduling.ExecutorService.Requires {
+    private final class BridgeImpl_executor implements fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Requires {
     }
     
     
-    public final fr.irit.smac.may.lib.components.scheduling.ExecutorService.Component executor() {
+    public final fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Component executor() {
       return this.executor;
     }
     
-    private final fr.irit.smac.may.lib.components.scheduling.Scheduled.Component schedule;
+    private fr.irit.smac.may.lib.components.scheduling.Scheduler.Component schedule;
     
-    private final Scheduled implem_schedule;
+    private Scheduler implem_schedule;
     
     @SuppressWarnings("all")
-    private final class BridgeImpl_schedule implements fr.irit.smac.may.lib.components.scheduling.Scheduled.Requires {
-      public final AdvancedExecutor sched() {
-        return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl.this.executor.exec();
+    private final class BridgeImpl_schedule implements fr.irit.smac.may.lib.components.scheduling.Scheduler.Requires {
+      public final AdvancedExecutor executor() {
+        return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl.this.executor.executor();
       }
     }
     
     
-    public final fr.irit.smac.may.lib.components.scheduling.Scheduled.Component schedule() {
+    public final fr.irit.smac.may.lib.components.scheduling.Scheduler.Component schedule() {
       return this.schedule;
     }
     
-    private final fr.irit.smac.may.lib.components.scheduling.Clock.Component clock;
+    private fr.irit.smac.may.lib.components.scheduling.Clock.Component clock;
     
-    private final Clock implem_clock;
+    private Clock implem_clock;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_clock implements fr.irit.smac.may.lib.components.scheduling.Clock.Requires {
       public final Executor sched() {
-        return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl.this.executor.exec();
+        return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl.this.executor.executor();
       }
       
       public final Do tick() {
@@ -213,9 +199,9 @@ public abstract class NamedPublishMAS {
       return this.clock;
     }
     
-    private final fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI.Component gui;
+    private fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI.Component gui;
     
-    private final SchedulingControllerGUI implem_gui;
+    private SchedulingControllerGUI implem_gui;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_gui implements fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI.Requires {
@@ -227,17 +213,6 @@ public abstract class NamedPublishMAS {
     
     public final fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI.Component gui() {
       return this.gui;
-    }
-    
-    public void start() {
-      this.refs.start();
-      this.observeds.start();
-      this.executor.start();
-      this.schedule.start();
-      this.clock.start();
-      this.gui.start();
-      this.implementation.start();
-      
     }
   }
   
@@ -255,13 +230,18 @@ public abstract class NamedPublishMAS {
     
     
     @SuppressWarnings("all")
+    public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Provides {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Component sched();
+      public fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Component sched();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -275,70 +255,68 @@ public abstract class NamedPublishMAS {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Component<Pull<Integer>,String> ref();
-      
-      /**
-       * This can be called by the implementation to access the part and its provided ports.
-       * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-       * 
-       */
-      public fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Component<Integer,String> observed();
+      public fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.PublisherPush.Component<Integer,String> observed();
     }
     
     
     @SuppressWarnings("all")
-    public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Provides {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Parts, fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Component {
+    public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Component, fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Parts {
       private final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Requires bridge;
       
       private final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed implem, final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Requires b) {
+      protected void initParts() {
+        assert this.implementation.use_sched != null;
+        assert this.sched == null;
+        this.sched = this.implementation.use_sched.newComponent(new BridgeImpl_schedule_sched());
+        assert this.implem_beh == null;
+        this.implem_beh = this.implementation.make_beh();
+        assert this.beh == null;
+        this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
+        assert this.implementation.use_observed != null;
+        assert this.observed == null;
+        this.observed = this.implementation.use_observed.newComponent(new BridgeImpl_observeds_observed());
+        
+      }
+      
+      protected void initProvidedPorts() {
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed implem, final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Requires b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        assert this.implementation.use_sched != null;
-        this.sched = this.implementation.use_sched.newComponent(new BridgeImpl_schedule_sched());
-        assert this.implem_beh == null;
-        this.implem_beh = implem.make_beh();
-        this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
-        assert this.implementation.use_ref != null;
-        this.ref = this.implementation.use_ref.newComponent(new BridgeImpl_refs_ref());
-        assert this.implementation.use_observed != null;
-        this.observed = this.implementation.use_observed.newComponent(new BridgeImpl_observeds_observed());
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Component sched;
+      private fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Component sched;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_schedule_sched implements fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Requires {
+      private final class BridgeImpl_schedule_sched implements fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Requires {
         public final Do cycle() {
           return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.ComponentImpl.this.beh.cycle();
         }
       }
       
       
-      public final fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Component sched() {
+      public final fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Component sched() {
         return this.sched;
       }
       
-      private final fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Component beh;
+      private fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Component beh;
       
-      private final ObservedBehaviour implem_beh;
+      private ObservedBehaviour implem_beh;
       
       @SuppressWarnings("all")
       private final class BridgeImpl_beh implements fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Requires {
@@ -352,38 +330,15 @@ public abstract class NamedPublishMAS {
         return this.beh;
       }
       
-      private final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Component<Pull<Integer>,String> ref;
+      private fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.PublisherPush.Component<Integer,String> observed;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_refs_ref implements fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Requires<Pull<Integer>,String> {
-        public final Pull<Integer> toCall() {
-          return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.ComponentImpl.this.observed.toCall();
-        }
+      private final class BridgeImpl_observeds_observed implements fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.PublisherPush.Requires<Integer,String> {
       }
       
       
-      public final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Component<Pull<Integer>,String> ref() {
-        return this.ref;
-      }
-      
-      private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Component<Integer,String> observed;
-      
-      @SuppressWarnings("all")
-      private final class BridgeImpl_observeds_observed implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Requires<Integer,String> {
-      }
-      
-      
-      public final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Component<Integer,String> observed() {
+      public final fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.PublisherPush.Component<Integer,String> observed() {
         return this.observed;
-      }
-      
-      public void start() {
-        this.sched.start();
-        this.beh.start();
-        this.ref.start();
-        this.observed.start();
-        this.implementation.start();
-        
       }
     }
     
@@ -392,8 +347,7 @@ public abstract class NamedPublishMAS {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -430,7 +384,7 @@ public abstract class NamedPublishMAS {
       
     }
     
-    private fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent use_sched;
+    private fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled use_sched;
     
     /**
      * This should be overridden by the implementation to define how to create this sub-component.
@@ -439,16 +393,17 @@ public abstract class NamedPublishMAS {
      */
     protected abstract ObservedBehaviour make_beh();
     
-    private fr.irit.smac.may.lib.components.interactions.MapReferences.Callee<Pull<Integer>,String> use_ref;
-    
-    private fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush<Integer,String> use_observed;
+    private fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.PublisherPush<Integer,String> use_observed;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
     public fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Component newComponent(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.Requires b) {
-      return new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.ComponentImpl(this, b);
+      fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.ComponentImpl comp = new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observed.ComponentImpl(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl ecosystemComponent;
@@ -498,13 +453,18 @@ public abstract class NamedPublishMAS {
     
     
     @SuppressWarnings("all")
+    public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Provides {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Component sched();
+      public fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Component sched();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -518,61 +478,68 @@ public abstract class NamedPublishMAS {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Component<Integer,String> observer();
+      public fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Observer.Component<Integer,String> observer();
     }
     
     
     @SuppressWarnings("all")
-    public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Provides {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Parts, fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Component {
+    public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Component, fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Parts {
       private final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Requires bridge;
       
       private final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer implem, final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Requires b) {
+      protected void initParts() {
+        assert this.implementation.use_sched != null;
+        assert this.sched == null;
+        this.sched = this.implementation.use_sched.newComponent(new BridgeImpl_schedule_sched());
+        assert this.implem_beh == null;
+        this.implem_beh = this.implementation.make_beh();
+        assert this.beh == null;
+        this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
+        assert this.implementation.use_observer != null;
+        assert this.observer == null;
+        this.observer = this.implementation.use_observer.newComponent(new BridgeImpl_observeds_observer());
+        
+      }
+      
+      protected void initProvidedPorts() {
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer implem, final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Requires b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        assert this.implementation.use_sched != null;
-        this.sched = this.implementation.use_sched.newComponent(new BridgeImpl_schedule_sched());
-        assert this.implem_beh == null;
-        this.implem_beh = implem.make_beh();
-        this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
-        assert this.implementation.use_observer != null;
-        this.observer = this.implementation.use_observer.newComponent(new BridgeImpl_observeds_observer());
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Component sched;
+      private fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Component sched;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_schedule_sched implements fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Requires {
+      private final class BridgeImpl_schedule_sched implements fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Requires {
         public final Do cycle() {
           return fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.ComponentImpl.this.beh.cycle();
         }
       }
       
       
-      public final fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent.Component sched() {
+      public final fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled.Component sched() {
         return this.sched;
       }
       
-      private final fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour.Component<String> beh;
+      private fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour.Component<String> beh;
       
-      private final ObserverBehaviour<String> implem_beh;
+      private ObserverBehaviour<String> implem_beh;
       
       @SuppressWarnings("all")
       private final class BridgeImpl_beh implements fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour.Requires<String> {
@@ -586,23 +553,15 @@ public abstract class NamedPublishMAS {
         return this.beh;
       }
       
-      private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Component<Integer,String> observer;
+      private fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Observer.Component<Integer,String> observer;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_observeds_observer implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Requires<Integer,String> {
+      private final class BridgeImpl_observeds_observer implements fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Observer.Requires<Integer,String> {
       }
       
       
-      public final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Component<Integer,String> observer() {
+      public final fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Observer.Component<Integer,String> observer() {
         return this.observer;
-      }
-      
-      public void start() {
-        this.sched.start();
-        this.beh.start();
-        this.observer.start();
-        this.implementation.start();
-        
       }
     }
     
@@ -611,8 +570,7 @@ public abstract class NamedPublishMAS {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -649,7 +607,7 @@ public abstract class NamedPublishMAS {
       
     }
     
-    private fr.irit.smac.may.lib.components.scheduling.Scheduled.Agent use_sched;
+    private fr.irit.smac.may.lib.components.scheduling.Scheduler.Scheduled use_sched;
     
     /**
      * This should be overridden by the implementation to define how to create this sub-component.
@@ -658,14 +616,17 @@ public abstract class NamedPublishMAS {
      */
     protected abstract ObserverBehaviour<String> make_beh();
     
-    private fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer<Integer,String> use_observer;
+    private fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher.Observer<Integer,String> use_observer;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
     public fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Component newComponent(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.Requires b) {
-      return new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.ComponentImpl(this, b);
+      fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.ComponentImpl comp = new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Observer.ComponentImpl(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl ecosystemComponent;
@@ -706,8 +667,7 @@ public abstract class NamedPublishMAS {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -756,28 +716,21 @@ public abstract class NamedPublishMAS {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract MapReferences<Pull<Integer>,String> make_refs();
+  protected abstract MapRefValuePublisher<Integer,String> make_observeds();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract ValuePublisher<Integer,String> make_observeds();
+  protected abstract ExecutorServiceWrapper make_executor();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract ExecutorService make_executor();
-  
-  /**
-   * This should be overridden by the implementation to define how to create this sub-component.
-   * This will be called once during the construction of the component to initialize this sub-component.
-   * 
-   */
-  protected abstract Scheduled make_schedule();
+  protected abstract Scheduler make_schedule();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -798,7 +751,10 @@ public abstract class NamedPublishMAS {
    * 
    */
   public fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Component newComponent(final fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Requires b) {
-    return new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl comp = new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -818,13 +774,10 @@ public abstract class NamedPublishMAS {
     implem.ecosystemComponent = this.selfComponent;
     assert this.selfComponent.implem_schedule != null;
     assert implem.use_sched == null;
-    implem.use_sched = this.selfComponent.implem_schedule._createImplementationOfAgent();
-    assert this.selfComponent.implem_refs != null;
-    assert implem.use_ref == null;
-    implem.use_ref = this.selfComponent.implem_refs._createImplementationOfCallee(name);
+    implem.use_sched = this.selfComponent.implem_schedule._createImplementationOfScheduled();
     assert this.selfComponent.implem_observeds != null;
     assert implem.use_observed == null;
-    implem.use_observed = this.selfComponent.implem_observeds._createImplementationOfPublisherPush();
+    implem.use_observed = this.selfComponent.implem_observeds._createImplementationOfPublisherPush(name);
     return implem;
   }
   
@@ -854,7 +807,7 @@ public abstract class NamedPublishMAS {
     implem.ecosystemComponent = this.selfComponent;
     assert this.selfComponent.implem_schedule != null;
     assert implem.use_sched == null;
-    implem.use_sched = this.selfComponent.implem_schedule._createImplementationOfAgent();
+    implem.use_sched = this.selfComponent.implem_schedule._createImplementationOfScheduled();
     assert this.selfComponent.implem_observeds != null;
     assert implem.use_observer == null;
     implem.use_observer = this.selfComponent.implem_observeds._createImplementationOfObserver();
@@ -876,13 +829,5 @@ public abstract class NamedPublishMAS {
    */
   public fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Component newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Requires() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS.Component newComponent(final NamedPublishMAS _compo) {
-    return _compo.newComponent();
   }
 }

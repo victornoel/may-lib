@@ -8,7 +8,7 @@ public abstract class Forward<I> {
      * This can be called by the implementation to access this required port.
      * 
      */
-    public I i();
+    public I forwardedPort();
   }
   
   
@@ -18,46 +18,50 @@ public abstract class Forward<I> {
   
   
   @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Forward.Provides<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Forward.Provides<I> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Forward.Parts<I>, fr.irit.smac.may.lib.components.meta.Forward.Component<I> {
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Forward.Component<I>, fr.irit.smac.may.lib.components.meta.Forward.Parts<I> {
     private final fr.irit.smac.may.lib.components.meta.Forward.Requires<I> bridge;
     
     private final Forward<I> implementation;
     
-    public ComponentImpl(final Forward<I> implem, final fr.irit.smac.may.lib.components.meta.Forward.Requires<I> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      
+    }
+    
+    public ComponentImpl(final Forward<I> implem, final fr.irit.smac.may.lib.components.meta.Forward.Requires<I> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      
-    }
-    
-    public void start() {
-      this.implementation.start();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
   }
   
   
   @SuppressWarnings("all")
-  public abstract static class Agent<I> {
+  public abstract static class Caller<I> {
     @SuppressWarnings("all")
     public interface Requires<I> {
     }
@@ -69,7 +73,12 @@ public abstract class Forward<I> {
        * This can be called to access the provided port.
        * 
        */
-      public I a();
+      public I forwardedPort();
+    }
+    
+    
+    @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Forward.Caller.Provides<I> {
     }
     
     
@@ -79,52 +88,51 @@ public abstract class Forward<I> {
     
     
     @SuppressWarnings("all")
-    public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Forward.Agent.Provides<I> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Forward.Agent.Parts<I>, fr.irit.smac.may.lib.components.meta.Forward.Agent.Component<I> {
-      private final fr.irit.smac.may.lib.components.meta.Forward.Agent.Requires<I> bridge;
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Forward.Caller.Component<I>, fr.irit.smac.may.lib.components.meta.Forward.Caller.Parts<I> {
+      private final fr.irit.smac.may.lib.components.meta.Forward.Caller.Requires<I> bridge;
       
-      private final fr.irit.smac.may.lib.components.meta.Forward.Agent<I> implementation;
+      private final fr.irit.smac.may.lib.components.meta.Forward.Caller<I> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.meta.Forward.Agent<I> implem, final fr.irit.smac.may.lib.components.meta.Forward.Agent.Requires<I> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.forwardedPort == null;
+        this.forwardedPort = this.implementation.make_forwardedPort();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.meta.Forward.Caller<I> implem, final fr.irit.smac.may.lib.components.meta.Forward.Caller.Requires<I> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.a = implem.make_a();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final I a;
+      private I forwardedPort;
       
-      public final I a() {
-        return this.a;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
+      public final I forwardedPort() {
+        return this.forwardedPort;
       }
     }
     
     
-    private fr.irit.smac.may.lib.components.meta.Forward.Agent.ComponentImpl<I> selfComponent;
+    private fr.irit.smac.may.lib.components.meta.Forward.Caller.ComponentImpl<I> selfComponent;
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -135,7 +143,7 @@ public abstract class Forward<I> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.meta.Forward.Agent.Provides<I> provides() {
+    protected fr.irit.smac.may.lib.components.meta.Forward.Caller.Provides<I> provides() {
       assert this.selfComponent != null;
       return this.selfComponent;
       
@@ -146,13 +154,13 @@ public abstract class Forward<I> {
      * This will be called once during the construction of the component to initialize the port.
      * 
      */
-    protected abstract I make_a();
+    protected abstract I make_forwardedPort();
     
     /**
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.meta.Forward.Agent.Requires<I> requires() {
+    protected fr.irit.smac.may.lib.components.meta.Forward.Caller.Requires<I> requires() {
       assert this.selfComponent != null;
       return this.selfComponent.bridge;
       
@@ -162,7 +170,7 @@ public abstract class Forward<I> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.meta.Forward.Agent.Parts<I> parts() {
+    protected fr.irit.smac.may.lib.components.meta.Forward.Caller.Parts<I> parts() {
       assert this.selfComponent != null;
       return this.selfComponent;
       
@@ -172,8 +180,11 @@ public abstract class Forward<I> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public fr.irit.smac.may.lib.components.meta.Forward.Agent.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.Forward.Agent.Requires<I> b) {
-      return new fr.irit.smac.may.lib.components.meta.Forward.Agent.ComponentImpl<I>(this, b);
+    public fr.irit.smac.may.lib.components.meta.Forward.Caller.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.Forward.Caller.Requires<I> b) {
+      fr.irit.smac.may.lib.components.meta.Forward.Caller.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.meta.Forward.Caller.ComponentImpl<I>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.meta.Forward.ComponentImpl<I> ecosystemComponent;
@@ -214,8 +225,7 @@ public abstract class Forward<I> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -257,21 +267,24 @@ public abstract class Forward<I> {
    * 
    */
   public fr.irit.smac.may.lib.components.meta.Forward.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.Forward.Requires<I> b) {
-    return new fr.irit.smac.may.lib.components.meta.Forward.ComponentImpl<I>(this, b);
+    fr.irit.smac.may.lib.components.meta.Forward.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.meta.Forward.ComponentImpl<I>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract fr.irit.smac.may.lib.components.meta.Forward.Agent<I> make_Agent();
+  protected abstract fr.irit.smac.may.lib.components.meta.Forward.Caller<I> make_Caller();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public fr.irit.smac.may.lib.components.meta.Forward.Agent<I> _createImplementationOfAgent() {
-    fr.irit.smac.may.lib.components.meta.Forward.Agent<I> implem = make_Agent();
+  public fr.irit.smac.may.lib.components.meta.Forward.Caller<I> _createImplementationOfCaller() {
+    fr.irit.smac.may.lib.components.meta.Forward.Caller<I> implem = make_Caller();
     assert implem.ecosystemComponent == null;
     assert this.selfComponent != null;
     implem.ecosystemComponent = this.selfComponent;
@@ -282,8 +295,8 @@ public abstract class Forward<I> {
    * This can be called to create an instance of the species from inside the implementation of the ecosystem.
    * 
    */
-  protected fr.irit.smac.may.lib.components.meta.Forward.Agent.Component<I> newAgent() {
-    fr.irit.smac.may.lib.components.meta.Forward.Agent<I> implem = _createImplementationOfAgent();
-    return implem.newComponent(new fr.irit.smac.may.lib.components.meta.Forward.Agent.Requires<I>() {});
+  protected fr.irit.smac.may.lib.components.meta.Forward.Caller.Component<I> newCaller() {
+    fr.irit.smac.may.lib.components.meta.Forward.Caller<I> implem = _createImplementationOfCaller();
+    return implem.newComponent(new fr.irit.smac.may.lib.components.meta.Forward.Caller.Requires<I>() {});
   }
 }

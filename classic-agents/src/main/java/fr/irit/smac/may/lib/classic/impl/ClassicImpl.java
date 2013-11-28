@@ -5,43 +5,28 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
-import fr.irit.smac.may.lib.components.interactions.AsyncReceiver;
-import fr.irit.smac.may.lib.components.interactions.DirectReferences;
-import fr.irit.smac.may.lib.components.interactions.asyncreceiver.AsyncReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
+import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiverImpl;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
-import fr.irit.smac.may.lib.components.interactions.directreferences.DirectReferencesImpl;
 import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.meta.ForwardImpl;
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
-import fr.irit.smac.may.lib.components.scheduling.Scheduler;
-import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
-import fr.irit.smac.may.lib.interfaces.Push;
 
 public class ClassicImpl<Msg> extends Classic<Msg> {
 
 	private volatile int i = 0;
 	
 	@Override
-	protected Scheduler make_scheduler() {
-		return new SchedulerImpl();
-	}
-
-	@Override
-	protected ExecutorService make_executor() {
+	protected ExecutorServiceWrapper make_executor() {
 		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(5));
 	}
 
 	@Override
-	protected AsyncReceiver<Msg, DirRef> make_receive() {
-		return new AsyncReceiverImpl<Msg, DirRef>();
+	protected DirRefAsyncReceiver<Msg> make_receive() {
+		return new DirRefAsyncReceiverImpl<Msg>();
 	}
 	
-	@Override
-	protected DirectReferences<Push<Msg>> make_refs() {
-		return new DirectReferencesImpl<Push<Msg>>();
-	}
-
 	@Override
 	protected Forward<CreateClassic<Msg, DirRef>> make_fact() {
 		return new ForwardImpl<CreateClassic<Msg,DirRef>>();
@@ -53,7 +38,6 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 			public DirRef create(
 					final AbstractClassicBehaviour<Msg, DirRef> beh) {
 				ClassicAgent.Component<Msg> agent = newClassicAgent(beh, "agent"+(i++));
-				agent.start();
 				return agent.me().pull();
 			}
 		};

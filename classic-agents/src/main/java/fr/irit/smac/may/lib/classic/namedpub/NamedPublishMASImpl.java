@@ -5,30 +5,27 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS;
 import fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour;
 import fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour;
-import fr.irit.smac.may.lib.components.interactions.MapReferences;
-import fr.irit.smac.may.lib.components.interactions.ValuePublisher;
-import fr.irit.smac.may.lib.components.interactions.mapreferences.MapReferencesImpl;
-import fr.irit.smac.may.lib.components.interactions.valuepublisher.ValuePublisherImpl;
+import fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher;
+import fr.irit.smac.may.lib.components.interactions.MapRefValuePublisherImpl;
 import fr.irit.smac.may.lib.components.scheduling.Clock;
 import fr.irit.smac.may.lib.components.scheduling.ClockImpl;
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
-import fr.irit.smac.may.lib.components.scheduling.Scheduled;
-import fr.irit.smac.may.lib.components.scheduling.ScheduledImpl;
+import fr.irit.smac.may.lib.components.scheduling.Scheduler;
+import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI;
 import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUIImpl;
-import fr.irit.smac.may.lib.interfaces.Pull;
 
 public class NamedPublishMASImpl extends NamedPublishMAS {
 
 	@Override
-	protected ExecutorService make_executor() {
+	protected ExecutorServiceWrapper make_executor() {
 		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(10));
 	}
 
 	@Override
-	protected Scheduled make_schedule() {
-		return new ScheduledImpl();
+	protected Scheduler make_schedule() {
+		return new SchedulerImpl();
 	}
 
 	@Override
@@ -42,13 +39,8 @@ public class NamedPublishMASImpl extends NamedPublishMAS {
 	}
 
 	@Override
-	protected MapReferences<Pull<Integer>, String> make_refs() {
-		return new MapReferencesImpl<Pull<Integer>, String>();
-	}
-
-	@Override
-	protected ValuePublisher<Integer, String> make_observeds() {
-		return new ValuePublisherImpl<Integer, String>();
+	protected MapRefValuePublisher<Integer, String> make_observeds() {
+		return new MapRefValuePublisherImpl<Integer, String>();
 	}
 
 	@Override
@@ -76,14 +68,11 @@ public class NamedPublishMASImpl extends NamedPublishMAS {
 		return new NamedPublishMASFactory() {
 
 			public void createObserver(AbstractObserverBehaviour<String> beh) {
-				Observer.Component agent = newObserver(beh);
-				agent.start();
+				newObserver(beh);
 			}
 
 			public void createObserved(String name,	AbstractObservedBehaviour beh) {
-				Observed.Component agent = newObserved(name,beh);
-				agent.start();
-				
+				newObserved(name,beh);
 			}
 		};
 	}

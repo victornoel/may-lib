@@ -21,47 +21,52 @@ public abstract class Placed {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.remote.place.Placed.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.components.remote.place.Placed.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.components.remote.place.Placed.Parts, fr.irit.smac.may.lib.components.remote.place.Placed.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.remote.place.Placed.Component, fr.irit.smac.may.lib.components.remote.place.Placed.Parts {
     private final fr.irit.smac.may.lib.components.remote.place.Placed.Requires bridge;
     
     private final Placed implementation;
     
-    public ComponentImpl(final Placed implem, final fr.irit.smac.may.lib.components.remote.place.Placed.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.thisPlace == null;
+      this.thisPlace = this.implementation.make_thisPlace();
+      
+    }
+    
+    public ComponentImpl(final Placed implem, final fr.irit.smac.may.lib.components.remote.place.Placed.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.thisPlace = implem.make_thisPlace();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Pull<Place> thisPlace;
+    private Pull<Place> thisPlace;
     
     public final Pull<Place> thisPlace() {
       return this.thisPlace;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -84,47 +89,52 @@ public abstract class Placed {
     
     
     @SuppressWarnings("all")
+    public interface Component extends fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Provides {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component extends fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Provides {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl implements fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Parts, fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Component {
+    public static class ComponentImpl implements fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Component, fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Parts {
       private final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires bridge;
       
       private final fr.irit.smac.may.lib.components.remote.place.Placed.Agent implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.remote.place.Placed.Agent implem, final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.myPlace == null;
+        this.myPlace = this.implementation.make_myPlace();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.remote.place.Placed.Agent implem, final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.myPlace = implem.make_myPlace();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<Place> myPlace;
+      private Pull<Place> myPlace;
       
       public final Pull<Place> myPlace() {
         return this.myPlace;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -133,8 +143,7 @@ public abstract class Placed {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -183,7 +192,10 @@ public abstract class Placed {
      * 
      */
     public fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Component newComponent(final fr.irit.smac.may.lib.components.remote.place.Placed.Agent.Requires b) {
-      return new fr.irit.smac.may.lib.components.remote.place.Placed.Agent.ComponentImpl(this, b);
+      fr.irit.smac.may.lib.components.remote.place.Placed.Agent.ComponentImpl comp = new fr.irit.smac.may.lib.components.remote.place.Placed.Agent.ComponentImpl(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl ecosystemComponent;
@@ -224,8 +236,7 @@ public abstract class Placed {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -274,7 +285,10 @@ public abstract class Placed {
    * 
    */
   public fr.irit.smac.may.lib.components.remote.place.Placed.Component newComponent(final fr.irit.smac.may.lib.components.remote.place.Placed.Requires b) {
-    return new fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl comp = new fr.irit.smac.may.lib.components.remote.place.Placed.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -310,13 +324,5 @@ public abstract class Placed {
    */
   public fr.irit.smac.may.lib.components.remote.place.Placed.Component newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.remote.place.Placed.Requires() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static fr.irit.smac.may.lib.components.remote.place.Placed.Component newComponent(final Placed _compo) {
-    return _compo.newComponent();
   }
 }

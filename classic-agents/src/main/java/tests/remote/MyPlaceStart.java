@@ -11,11 +11,11 @@ public class MyPlaceStart {
 
 	public static void main(String[] args) {
 
-		RemoteClassic.Component<PatternMatchingMessage> infra = RemoteClassic.newComponent(new RemoteClassicImpl<PatternMatchingMessage>(1099));
+		RemoteClassic.Component<PatternMatchingMessage> infra = new RemoteClassicImpl<PatternMatchingMessage>(1099).newComponent();
 		
 		RemoteAgentRef starter = infra.create().create(new BehaviorSetup<RemoteAgentRef>());
 
-		infra.send().send(new Start(infra.thisPlace().pull(), new Place("volte",1098)), starter);
+		infra.send().send(new Start(infra.thisPlace().pull(), new Place("localhost",1098)), starter);
 		
 		System.gc();
 		

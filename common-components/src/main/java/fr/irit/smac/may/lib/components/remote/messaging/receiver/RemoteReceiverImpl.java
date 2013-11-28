@@ -1,5 +1,6 @@
 package fr.irit.smac.may.lib.components.remote.messaging.receiver;
 
+import java.io.Serializable;
 import java.rmi.NoSuchObjectException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -13,7 +14,7 @@ import fr.irit.smac.may.lib.interfaces.Send;
 public class RemoteReceiverImpl<Msg, LocalRef> extends
 		RemoteReceiver<Msg, LocalRef> {
 	
-	public class RemoteAgentRefImpl implements RemoteAgentRef {
+	public class RemoteAgentRefImpl implements RemoteAgentRef, Serializable {
 
 		private static final long serialVersionUID = 3786174379034488447L;
 		

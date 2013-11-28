@@ -1,11 +1,8 @@
 package fr.irit.smac.may.lib.components.meta;
 
-import fj.F;
-import fj.Unit;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Pull;
-import fr.irit.smac.may.lib.interfaces.Push;
 
 @SuppressWarnings("all")
 public abstract class CollectionInteger<I> {
@@ -27,12 +24,11 @@ public abstract class CollectionInteger<I> {
      * 
      */
     public Pull<Integer> size();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<F<I,Unit>> forAll();
+  }
+  
+  
+  @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.CollectionInteger.Provides<I> {
   }
   
   
@@ -42,69 +38,63 @@ public abstract class CollectionInteger<I> {
   
   
   @SuppressWarnings("all")
-  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.CollectionInteger.Provides<I> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.CollectionInteger.Parts<I>, fr.irit.smac.may.lib.components.meta.CollectionInteger.Component<I> {
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.CollectionInteger.Component<I>, fr.irit.smac.may.lib.components.meta.CollectionInteger.Parts<I> {
     private final fr.irit.smac.may.lib.components.meta.CollectionInteger.Requires<I> bridge;
     
     private final CollectionInteger<I> implementation;
     
-    public ComponentImpl(final CollectionInteger<I> implem, final fr.irit.smac.may.lib.components.meta.CollectionInteger.Requires<I> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.get == null;
+      this.get = this.implementation.make_get();
+      assert this.size == null;
+      this.size = this.implementation.make_size();
+      
+    }
+    
+    public ComponentImpl(final CollectionInteger<I> implem, final fr.irit.smac.may.lib.components.meta.CollectionInteger.Requires<I> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.get = implem.make_get();
-      this.size = implem.make_size();
-      this.forAll = implem.make_forAll();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final MapGet<Integer,I> get;
+    private MapGet<Integer,I> get;
     
     public final MapGet<Integer,I> get() {
       return this.get;
     }
     
-    private final Pull<Integer> size;
+    private Pull<Integer> size;
     
     public final Pull<Integer> size() {
       return this.size;
-    }
-    
-    private final Push<F<I,Unit>> forAll;
-    
-    public final Push<F<I,Unit>> forAll() {
-      return this.forAll;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
   
   @SuppressWarnings("all")
-  public abstract static class Agent<I> {
+  public abstract static class Element<I> {
     @SuppressWarnings("all")
     public interface Requires<I> {
       /**
        * This can be called by the implementation to access this required port.
        * 
        */
-      public I p();
+      public I forwardedPort();
     }
     
     
@@ -125,64 +115,69 @@ public abstract class CollectionInteger<I> {
     
     
     @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Provides<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<I> extends fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Provides<I> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Parts<I>, fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Component<I> {
-      private final fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Requires<I> bridge;
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Component<I>, fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Parts<I> {
+      private final fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Requires<I> bridge;
       
-      private final fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> implementation;
+      private final fr.irit.smac.may.lib.components.meta.CollectionInteger.Element<I> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> implem, final fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Requires<I> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.idx == null;
+        this.idx = this.implementation.make_idx();
+        assert this.stop == null;
+        this.stop = this.implementation.make_stop();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.meta.CollectionInteger.Element<I> implem, final fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Requires<I> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.idx = implem.make_idx();
-        this.stop = implem.make_stop();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<Integer> idx;
+      private Pull<Integer> idx;
       
       public final Pull<Integer> idx() {
         return this.idx;
       }
       
-      private final Do stop;
+      private Do stop;
       
       public final Do stop() {
         return this.stop;
       }
-      
-      public void start() {
-        this.implementation.start();
-        
-      }
     }
     
     
-    private fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.ComponentImpl<I> selfComponent;
+    private fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.ComponentImpl<I> selfComponent;
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -193,7 +188,7 @@ public abstract class CollectionInteger<I> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Provides<I> provides() {
+    protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Provides<I> provides() {
       assert this.selfComponent != null;
       return this.selfComponent;
       
@@ -217,7 +212,7 @@ public abstract class CollectionInteger<I> {
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Requires<I> requires() {
+    protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Requires<I> requires() {
       assert this.selfComponent != null;
       return this.selfComponent.bridge;
       
@@ -227,7 +222,7 @@ public abstract class CollectionInteger<I> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Parts<I> parts() {
+    protected fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Parts<I> parts() {
       assert this.selfComponent != null;
       return this.selfComponent;
       
@@ -237,8 +232,11 @@ public abstract class CollectionInteger<I> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.Requires<I> b) {
-      return new fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent.ComponentImpl<I>(this, b);
+    public fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.Requires<I> b) {
+      fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.meta.CollectionInteger.Element.ComponentImpl<I>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.meta.CollectionInteger.ComponentImpl<I> ecosystemComponent;
@@ -279,8 +277,7 @@ public abstract class CollectionInteger<I> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -312,13 +309,6 @@ public abstract class CollectionInteger<I> {
   protected abstract Pull<Integer> make_size();
   
   /**
-   * This should be overridden by the implementation to define the provided port.
-   * This will be called once during the construction of the component to initialize the port.
-   * 
-   */
-  protected abstract Push<F<I,Unit>> make_forAll();
-  
-  /**
    * This can be called by the implementation to access the required ports.
    * 
    */
@@ -343,21 +333,24 @@ public abstract class CollectionInteger<I> {
    * 
    */
   public fr.irit.smac.may.lib.components.meta.CollectionInteger.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.CollectionInteger.Requires<I> b) {
-    return new fr.irit.smac.may.lib.components.meta.CollectionInteger.ComponentImpl<I>(this, b);
+    fr.irit.smac.may.lib.components.meta.CollectionInteger.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.meta.CollectionInteger.ComponentImpl<I>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> make_Agent();
+  protected abstract fr.irit.smac.may.lib.components.meta.CollectionInteger.Element<I> make_Element();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> _createImplementationOfAgent() {
-    fr.irit.smac.may.lib.components.meta.CollectionInteger.Agent<I> implem = make_Agent();
+  public fr.irit.smac.may.lib.components.meta.CollectionInteger.Element<I> _createImplementationOfElement() {
+    fr.irit.smac.may.lib.components.meta.CollectionInteger.Element<I> implem = make_Element();
     assert implem.ecosystemComponent == null;
     assert this.selfComponent != null;
     implem.ecosystemComponent = this.selfComponent;
@@ -370,13 +363,5 @@ public abstract class CollectionInteger<I> {
    */
   public fr.irit.smac.may.lib.components.meta.CollectionInteger.Component<I> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.meta.CollectionInteger.Requires<I>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <I> fr.irit.smac.may.lib.components.meta.CollectionInteger.Component<I> newComponent(final CollectionInteger<I> _compo) {
-    return _compo.newComponent();
   }
 }

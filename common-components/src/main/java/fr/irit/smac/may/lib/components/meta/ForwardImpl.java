@@ -2,17 +2,17 @@ package fr.irit.smac.may.lib.components.meta;
 
 public class ForwardImpl<I> extends Forward<I> {
 
-	public class AgentSide extends Agent<I> {
+	private class AgentSide extends Caller<I> {
 		
 		@Override
-		protected I make_a() {
-			return eco_requires().i();
+		protected I make_forwardedPort() {
+			return eco_requires().forwardedPort();
 		}
 		
 	}
 	
 	@Override
-	protected Agent<I> make_Agent() {
+	protected Caller<I> make_Caller() {
 		return new AgentSide();
 	}
 }

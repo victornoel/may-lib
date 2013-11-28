@@ -1,4 +1,3 @@
-import fr.irit.smac.may.lib.components.collections.Queue
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
 import fr.irit.smac.may.lib.components.interactions.interfaces.Call
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve
@@ -6,10 +5,227 @@ import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend
 import fr.irit.smac.may.lib.interfaces.Do
 import fr.irit.smac.may.lib.interfaces.Pull
 import fr.irit.smac.may.lib.interfaces.Push
-import java.util.Collection
 
 namespace fr.irit.smac.may.lib.components.interactions {
 	
+	/**
+	 * Combine async receiver with direct reference
+	 * for ease of use
+	 */
+	ecosystem DirRefAsyncReceiver[M] {
+		
+		part dr: DirectReferences[Push[M]]
+		part ar: AsyncReceiver[M,DirRef] {
+			bind call to dr.call
+		}
+		
+		species Receiver(name: String) {
+			
+			requires put: Push[M]
+			
+			provides me: Pull[DirRef] = dr.me
+			provides stop: Do = dr.stop
+			
+			use dr: dr.Callee(name) {
+				bind toCall to ar.toCall
+			}
+			
+			use ar: ar.Receiver {
+				bind put to put
+			}
+		}
+		
+		species Sender {
+			
+			provides send: ReliableSend[M, DirRef] = ar.send
+			
+			use ar: ar.Sender
+		}
+		
+		provides deposit: ReliableSend[M, DirRef] = ar.deposit
+	}
+	
+	/**
+	 * Combine async receiver with map reference
+	 * for ease of use
+	 */
+	ecosystem MapRefAsyncReceiver[M,K] {
+		
+		part mr: MapReferences[Push[M], K]
+		part ar: AsyncReceiver[M,K] {
+			bind call to mr.call
+		}
+		
+		species Receiver(key: K) {
+			
+			requires put: Push[M]
+			
+			provides me: Pull[K] = mr.me
+			provides stop: Do = mr.stop
+			
+			use mr: mr.Callee(key) {
+				bind toCall to ar.toCall
+			}
+			
+			use ar: ar.Receiver {
+				bind put to put
+			}
+		}
+		
+		species ReceiverKeyPort {
+			
+			requires put: Push[M]
+			requires key: Pull[K]
+			
+			provides me: Pull[K] = mr.me
+			provides stop: Do = mr.stop
+			
+			use mr: mr.CalleeKeyPort {
+				bind key to key
+				bind toCall to ar.toCall
+			}
+			
+			use ar: ar.Receiver {
+				bind put to put
+			}
+		}
+		
+		species Sender {
+			
+			provides send: ReliableSend[M, K] = ar.send
+			
+			use ar: ar.Sender
+		}
+		
+		provides deposit: ReliableSend[M, K] = ar.deposit
+	}
+	
+	/**
+	 * Combine value publisher with direct reference
+	 * for ease of use.
+	 * 
+	 * T is the type of value published
+	 */
+	ecosystem DirRefValuePublisher[T] {
+		
+		part dr: DirectReferences[Pull[T]]
+		part vp: ValuePublisher[T,DirRef] {
+			bind call to dr.call
+		}
+		
+		species PublisherPush(name: String) {
+			
+			provides set: Push[T] = vp.set
+			provides get: Pull[T] = vp.get
+			
+			use dr: dr.Callee(name) {
+				bind toCall to vp.toCall
+			}
+			
+			use vp: vp.PublisherPush
+		}
+		
+		species PublisherPull(name: String) {
+			provides get: Pull[T] = vp.get
+			requires getValue: Pull[T]
+			
+			use dr: dr.Callee(name) {
+				bind toCall to vp.toCall
+			}
+			use vp: vp.PublisherPull {
+				bind getValue to getValue
+			}
+		}
+		
+		species Observer {
+			provides observe: ReliableObserve[T, DirRef] = vp.observe
+			use vp: vp.Observer
+		}
+		
+		provides observe: ReliableObserve[T, DirRef] = vp.observe
+	}
+	
+	/**
+	 * Combine value publisher with map reference
+	 * for ease of use.
+	 * 
+	 * T is the type of value published
+	 * K is the type of the key
+	 */
+	ecosystem MapRefValuePublisher[T, K] {
+		
+		part mr: MapReferences[Pull[T], K]
+		part vp: ValuePublisher[T,K] {
+			bind call to mr.call
+		}
+		
+		species PublisherPush(key: K) {
+			
+			provides set: Push[T] = vp.set
+			provides get: Pull[T] = vp.get
+			
+			use mr: mr.Callee(key) {
+				bind toCall to vp.toCall
+			}
+			
+			use vp: vp.PublisherPush
+		}
+		
+		species PublisherPull(key: K) {
+			provides get: Pull[T] = vp.get
+			
+			requires getValue: Pull[T]
+			
+			use mr: mr.Callee(key) {
+				bind toCall to vp.toCall
+			}
+			use vp: vp.PublisherPull {
+				bind getValue to getValue
+			}
+		}
+		
+		species PublisherPushKeyPort {
+			
+			provides set: Push[T] = vp.set
+			provides get: Pull[T] = vp.get
+			
+			requires key: Pull[K]
+			
+			use mr: mr.CalleeKeyPort {
+				bind toCall to vp.toCall
+				bind key to key
+			}
+			
+			use vp: vp.PublisherPush
+		}
+		
+		species PublisherPullKeyPort {
+			provides get: Pull[T] = vp.get
+			
+			requires getValue: Pull[T]
+			requires key: Pull[K]
+			
+			use mr: mr.CalleeKeyPort {
+				bind toCall to vp.toCall
+				bind key to key
+			}
+			use vp: vp.PublisherPull {
+				bind getValue to getValue
+			}
+		}
+		
+		species Observer {
+			provides observe: ReliableObserve[T, K] = vp.observe
+			use vp: vp.Observer
+		}
+		
+		provides observe: ReliableObserve[T, K] = vp.observe
+	}
+	
+	/**
+	 * I is the called port type
+	 * DirRef are used for references
+	 */
 	ecosystem DirectReferences[I] {
 
 		// name is only used for pretty
@@ -20,6 +236,9 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides stop: Do
 		}
 		
+		/**
+		 * Equivalent to a Forward to the eco port
+		 */
 		species Caller {
 			provides call: Call[I,DirRef]
 		}
@@ -28,6 +247,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 	}
 	
+	/**
+	 * I is the called port type
+	 * K is the reference type
+	 */
 	ecosystem MapReferences[I,K] {
 		
 		species Callee(key: K) {
@@ -36,7 +259,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides stop: Do
 		}
 		
-		species CalleePullKey {
+		species CalleeKeyPort {
 			requires toCall: I
 			requires key: Pull[K]
 			
@@ -44,6 +267,9 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			provides stop: Do
 		}
 		
+		/**
+		 * Equivalent to a Forward to the eco port
+		 */
 		species Caller {
 			provides call: Call[I,K]
 		}
@@ -52,6 +278,12 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 	}
 	
+	/**
+	 * M is the message type
+	 * K is the reference type
+	 * 
+	 * If buffering of messages is needed, compose with a Queue
+	 */
 	ecosystem AsyncReceiver[M,K] {
 		
 		// does not take care of buffering messages
@@ -59,17 +291,6 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		species Receiver {
 			requires put: Push[M]
 			provides toCall: Push[M] = put
-		}
-		
-		// takes care of buffering messages
-		species ReceiverBuf {
-			
-			provides getNext: Pull[M] = q.get
-			provides getAll: Pull[Collection[M]] = q.getAll
-			
-			part q: Queue[M]
-			
-			provides toCall: Push[M] = q.put
 		}
 		
 		species Sender {
@@ -80,6 +301,10 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		provides deposit: ReliableSend[M, K]
 	}
 	
+	/**
+	 * T is the type of value published
+	 * K is the key
+	 */
 	ecosystem ValuePublisher[T,K] {
 		
 		species PublisherPush {

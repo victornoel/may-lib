@@ -42,7 +42,7 @@ public class ConcurrentQueueImpl<Truc> extends Queue<Truc> {
 	}
 	
 	public static void main(String[] args) {
-		Queue.Component<String> t = Queue.newComponent(new ConcurrentQueueImpl<String>());
+		Queue.Component<String> t = new ConcurrentQueueImpl<String>().newComponent();
 		t.put().push("a");
 		System.out.println(t.get().pull());
 	}

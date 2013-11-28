@@ -35,47 +35,52 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
   
   
   @SuppressWarnings("all")
+  public interface Component<Msg, LocalRef> extends fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Provides<Msg,LocalRef> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<Msg, LocalRef> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<Msg, LocalRef> extends fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Provides<Msg,LocalRef> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, LocalRef> implements fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Parts<Msg,LocalRef>, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Component<Msg,LocalRef> {
+  public static class ComponentImpl<Msg, LocalRef> implements fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Component<Msg,LocalRef>, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Parts<Msg,LocalRef> {
     private final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Requires<Msg,LocalRef> bridge;
     
     private final RemoteReceiver<Msg,LocalRef> implementation;
     
-    public ComponentImpl(final RemoteReceiver<Msg,LocalRef> implem, final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Requires<Msg,LocalRef> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.deposit == null;
+      this.deposit = this.implementation.make_deposit();
+      
+    }
+    
+    public ComponentImpl(final RemoteReceiver<Msg,LocalRef> implem, final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Requires<Msg,LocalRef> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.deposit = implem.make_deposit();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Send<Msg,RemoteAgentRef> deposit;
+    private Send<Msg,RemoteAgentRef> deposit;
     
     public final Send<Msg,RemoteAgentRef> deposit() {
       return this.deposit;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -109,54 +114,60 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     
     
     @SuppressWarnings("all")
+    public interface Component<Msg, LocalRef> extends fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Provides<Msg,LocalRef> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<Msg, LocalRef> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<Msg, LocalRef> extends fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Provides<Msg,LocalRef> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<Msg, LocalRef> implements fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Parts<Msg,LocalRef>, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Component<Msg,LocalRef> {
+    public static class ComponentImpl<Msg, LocalRef> implements fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Component<Msg,LocalRef>, fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Parts<Msg,LocalRef> {
       private final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Requires<Msg,LocalRef> bridge;
       
       private final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent<Msg,LocalRef> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent<Msg,LocalRef> implem, final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Requires<Msg,LocalRef> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.me == null;
+        this.me = this.implementation.make_me();
+        assert this.disconnect == null;
+        this.disconnect = this.implementation.make_disconnect();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent<Msg,LocalRef> implem, final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Requires<Msg,LocalRef> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.me = implem.make_me();
-        this.disconnect = implem.make_disconnect();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<RemoteAgentRef> me;
+      private Pull<RemoteAgentRef> me;
       
       public final Pull<RemoteAgentRef> me() {
         return this.me;
       }
       
-      private final Do disconnect;
+      private Do disconnect;
       
       public final Do disconnect() {
         return this.disconnect;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -165,8 +176,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -222,7 +232,10 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * 
      */
     public fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Component<Msg,LocalRef> newComponent(final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.Requires<Msg,LocalRef> b) {
-      return new fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.ComponentImpl<Msg,LocalRef>(this, b);
+      fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.ComponentImpl<Msg,LocalRef> comp = new fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Agent.ComponentImpl<Msg,LocalRef>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.ComponentImpl<Msg,LocalRef> ecosystemComponent;
@@ -263,8 +276,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -313,7 +325,10 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    * 
    */
   public fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Component<Msg,LocalRef> newComponent(final fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.Requires<Msg,LocalRef> b) {
-    return new fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.ComponentImpl<Msg,LocalRef>(this, b);
+    fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.ComponentImpl<Msg,LocalRef> comp = new fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver.ComponentImpl<Msg,LocalRef>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**

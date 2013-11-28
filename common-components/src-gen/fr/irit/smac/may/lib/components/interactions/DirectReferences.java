@@ -23,47 +23,52 @@ public abstract class DirectReferences<I> {
   
   
   @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.interactions.DirectReferences.Provides<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<I> extends fr.irit.smac.may.lib.components.interactions.DirectReferences.Provides<I> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Parts<I>, fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<I> {
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<I>, fr.irit.smac.may.lib.components.interactions.DirectReferences.Parts<I> {
     private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Requires<I> bridge;
     
     private final DirectReferences<I> implementation;
     
-    public ComponentImpl(final DirectReferences<I> implem, final fr.irit.smac.may.lib.components.interactions.DirectReferences.Requires<I> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.call == null;
+      this.call = this.implementation.make_call();
+      
+    }
+    
+    public ComponentImpl(final DirectReferences<I> implem, final fr.irit.smac.may.lib.components.interactions.DirectReferences.Requires<I> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.call = implem.make_call();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Call<I,DirRef> call;
+    private Call<I,DirRef> call;
     
     public final Call<I,DirRef> call() {
       return this.call;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -97,54 +102,60 @@ public abstract class DirectReferences<I> {
     
     
     @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Provides<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<I> extends fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Provides<I> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Parts<I>, fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Component<I> {
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Component<I>, fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Parts<I> {
       private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Requires<I> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee<I> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee<I> implem, final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Requires<I> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.me == null;
+        this.me = this.implementation.make_me();
+        assert this.stop == null;
+        this.stop = this.implementation.make_stop();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee<I> implem, final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Requires<I> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.me = implem.make_me();
-        this.stop = implem.make_stop();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<DirRef> me;
+      private Pull<DirRef> me;
       
       public final Pull<DirRef> me() {
         return this.me;
       }
       
-      private final Do stop;
+      private Do stop;
       
       public final Do stop() {
         return this.stop;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -153,8 +164,7 @@ public abstract class DirectReferences<I> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -210,7 +220,10 @@ public abstract class DirectReferences<I> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Component<I> newComponent(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Requires<I> b) {
-      return new fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.ComponentImpl<I>(this, b);
+      fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.ComponentImpl<I>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.DirectReferences.ComponentImpl<I> ecosystemComponent;
@@ -265,47 +278,52 @@ public abstract class DirectReferences<I> {
     
     
     @SuppressWarnings("all")
+    public interface Component<I> extends fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Provides<I> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<I> extends fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Provides<I> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Parts<I>, fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Component<I> {
+    public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Component<I>, fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Parts<I> {
       private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Requires<I> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller<I> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller<I> implem, final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Requires<I> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.call == null;
+        this.call = this.implementation.make_call();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller<I> implem, final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Requires<I> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.call = implem.make_call();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Call<I,DirRef> call;
+      private Call<I,DirRef> call;
       
       public final Call<I,DirRef> call() {
         return this.call;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -314,8 +332,7 @@ public abstract class DirectReferences<I> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -364,7 +381,10 @@ public abstract class DirectReferences<I> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Component<I> newComponent(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.Requires<I> b) {
-      return new fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.ComponentImpl<I>(this, b);
+      fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.interactions.DirectReferences.Caller.ComponentImpl<I>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.DirectReferences.ComponentImpl<I> ecosystemComponent;
@@ -405,8 +425,7 @@ public abstract class DirectReferences<I> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -455,7 +474,10 @@ public abstract class DirectReferences<I> {
    * 
    */
   public fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<I> newComponent(final fr.irit.smac.may.lib.components.interactions.DirectReferences.Requires<I> b) {
-    return new fr.irit.smac.may.lib.components.interactions.DirectReferences.ComponentImpl<I>(this, b);
+    fr.irit.smac.may.lib.components.interactions.DirectReferences.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.interactions.DirectReferences.ComponentImpl<I>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -509,13 +531,5 @@ public abstract class DirectReferences<I> {
    */
   public fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<I> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.interactions.DirectReferences.Requires<I>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <I> fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<I> newComponent(final DirectReferences<I> _compo) {
-    return _compo.newComponent();
   }
 }

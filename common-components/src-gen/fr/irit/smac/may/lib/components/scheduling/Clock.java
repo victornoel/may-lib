@@ -33,47 +33,52 @@ public abstract class Clock {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.scheduling.Clock.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.components.scheduling.Clock.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.components.scheduling.Clock.Parts, fr.irit.smac.may.lib.components.scheduling.Clock.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.scheduling.Clock.Component, fr.irit.smac.may.lib.components.scheduling.Clock.Parts {
     private final fr.irit.smac.may.lib.components.scheduling.Clock.Requires bridge;
     
     private final Clock implementation;
     
-    public ComponentImpl(final Clock implem, final fr.irit.smac.may.lib.components.scheduling.Clock.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.control == null;
+      this.control = this.implementation.make_control();
+      
+    }
+    
+    public ComponentImpl(final Clock implem, final fr.irit.smac.may.lib.components.scheduling.Clock.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.control = implem.make_control();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final SchedulingControl control;
+    private SchedulingControl control;
     
     public final SchedulingControl control() {
       return this.control;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -82,8 +87,7 @@ public abstract class Clock {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -132,6 +136,9 @@ public abstract class Clock {
    * 
    */
   public fr.irit.smac.may.lib.components.scheduling.Clock.Component newComponent(final fr.irit.smac.may.lib.components.scheduling.Clock.Requires b) {
-    return new fr.irit.smac.may.lib.components.scheduling.Clock.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.components.scheduling.Clock.ComponentImpl comp = new fr.irit.smac.may.lib.components.scheduling.Clock.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

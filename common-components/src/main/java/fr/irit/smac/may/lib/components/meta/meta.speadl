@@ -1,9 +1,6 @@
-import fj.F
-import fj.Unit
 import fr.irit.smac.may.lib.interfaces.Do
 import fr.irit.smac.may.lib.interfaces.MapGet
 import fr.irit.smac.may.lib.interfaces.Pull
-import fr.irit.smac.may.lib.interfaces.Push
 import java.util.Collection
 
 namespace fr.irit.smac.may.lib.components.meta {
@@ -18,20 +15,19 @@ namespace fr.irit.smac.may.lib.components.meta {
 	 * with integer keys to retrieve the wanted port
 	 */
 	ecosystem CollectionInteger[I] {
-		species Agent {
-			requires p: I
+		species Element {
+			requires forwardedPort: I
 			provides idx: Pull[Integer]
 			provides stop: Do
 		}
 		provides get: MapGet[Integer,I]
 		provides size: Pull[Integer]
-		provides forAll: Push[F[I,Unit]]
 	}
 	
 	ecosystem CollectionOf[I] {
 		
-		species Agent {
-			requires p: I
+		species Element {
+			requires forwardedPort: I
 			provides stop: Do
 		}
 		
@@ -42,11 +38,11 @@ namespace fr.irit.smac.may.lib.components.meta {
 	 * Simply forward a port from the agents to the infrastructure
 	 */
 	ecosystem Forward[I] {
-		species Agent {
-			provides a: I
+		species Caller {
+			provides forwardedPort: I
 		}
 
-		requires i: I
+		requires forwardedPort: I
 	}
 	
 	ecosystem Buffer[I] {

@@ -22,47 +22,52 @@ public abstract class MapReferences<I, K> {
   
   
   @SuppressWarnings("all")
+  public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.Provides<I,K> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<I, K> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.Provides<I,K> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.Parts<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.Component<I,K> {
+  public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.Component<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.Parts<I,K> {
     private final fr.irit.smac.may.lib.components.interactions.MapReferences.Requires<I,K> bridge;
     
     private final MapReferences<I,K> implementation;
     
-    public ComponentImpl(final MapReferences<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.Requires<I,K> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.call == null;
+      this.call = this.implementation.make_call();
+      
+    }
+    
+    public ComponentImpl(final MapReferences<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.Requires<I,K> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.call = implem.make_call();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Call<I,K> call;
+    private Call<I,K> call;
     
     public final Call<I,K> call() {
       return this.call;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -96,54 +101,60 @@ public abstract class MapReferences<I, K> {
     
     
     @SuppressWarnings("all")
+    public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Provides<I,K> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<I, K> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Provides<I,K> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Parts<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Component<I,K> {
+    public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Component<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Parts<I,K> {
       private final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Requires<I,K> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee<I,K> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Requires<I,K> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.me == null;
+        this.me = this.implementation.make_me();
+        assert this.stop == null;
+        this.stop = this.implementation.make_stop();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Requires<I,K> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.me = implem.make_me();
-        this.stop = implem.make_stop();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<K> me;
+      private Pull<K> me;
       
       public final Pull<K> me() {
         return this.me;
       }
       
-      private final Do stop;
+      private Do stop;
       
       public final Do stop() {
         return this.stop;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -152,8 +163,7 @@ public abstract class MapReferences<I, K> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -209,7 +219,10 @@ public abstract class MapReferences<I, K> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Component<I,K> newComponent(final fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.Requires<I,K> b) {
-      return new fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.ComponentImpl<I,K>(this, b);
+      fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.ComponentImpl<I,K> comp = new fr.irit.smac.may.lib.components.interactions.MapReferences.Callee.ComponentImpl<I,K>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.MapReferences.ComponentImpl<I,K> ecosystemComponent;
@@ -247,7 +260,7 @@ public abstract class MapReferences<I, K> {
   
   
   @SuppressWarnings("all")
-  public abstract static class CalleePullKey<I, K> {
+  public abstract static class CalleeKeyPort<I, K> {
     @SuppressWarnings("all")
     public interface Requires<I, K> {
       /**
@@ -281,64 +294,69 @@ public abstract class MapReferences<I, K> {
     
     
     @SuppressWarnings("all")
+    public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Provides<I,K> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<I, K> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Provides<I,K> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Parts<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Component<I,K> {
-      private final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Requires<I,K> bridge;
+    public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Component<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Parts<I,K> {
+      private final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Requires<I,K> bridge;
       
-      private final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey<I,K> implementation;
+      private final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort<I,K> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Requires<I,K> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.me == null;
+        this.me = this.implementation.make_me();
+        assert this.stop == null;
+        this.stop = this.implementation.make_stop();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Requires<I,K> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.me = implem.make_me();
-        this.stop = implem.make_stop();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<K> me;
+      private Pull<K> me;
       
       public final Pull<K> me() {
         return this.me;
       }
       
-      private final Do stop;
+      private Do stop;
       
       public final Do stop() {
         return this.stop;
       }
-      
-      public void start() {
-        this.implementation.start();
-        
-      }
     }
     
     
-    private fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.ComponentImpl<I,K> selfComponent;
+    private fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.ComponentImpl<I,K> selfComponent;
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -349,7 +367,7 @@ public abstract class MapReferences<I, K> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Provides<I,K> provides() {
+    protected fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Provides<I,K> provides() {
       assert this.selfComponent != null;
       return this.selfComponent;
       
@@ -373,7 +391,7 @@ public abstract class MapReferences<I, K> {
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Requires<I,K> requires() {
+    protected fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Requires<I,K> requires() {
       assert this.selfComponent != null;
       return this.selfComponent.bridge;
       
@@ -383,7 +401,7 @@ public abstract class MapReferences<I, K> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Parts<I,K> parts() {
+    protected fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Parts<I,K> parts() {
       assert this.selfComponent != null;
       return this.selfComponent;
       
@@ -393,8 +411,11 @@ public abstract class MapReferences<I, K> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Component<I,K> newComponent(final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.Requires<I,K> b) {
-      return new fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey.ComponentImpl<I,K>(this, b);
+    public fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Component<I,K> newComponent(final fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.Requires<I,K> b) {
+      fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.ComponentImpl<I,K> comp = new fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort.ComponentImpl<I,K>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.MapReferences.ComponentImpl<I,K> ecosystemComponent;
@@ -449,47 +470,52 @@ public abstract class MapReferences<I, K> {
     
     
     @SuppressWarnings("all")
+    public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Provides<I,K> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<I, K> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<I, K> extends fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Provides<I,K> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Parts<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Component<I,K> {
+    public static class ComponentImpl<I, K> implements fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Component<I,K>, fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Parts<I,K> {
       private final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Requires<I,K> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller<I,K> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Requires<I,K> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.call == null;
+        this.call = this.implementation.make_call();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller<I,K> implem, final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Requires<I,K> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.call = implem.make_call();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Call<I,K> call;
+      private Call<I,K> call;
       
       public final Call<I,K> call() {
         return this.call;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -498,8 +524,7 @@ public abstract class MapReferences<I, K> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -548,7 +573,10 @@ public abstract class MapReferences<I, K> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Component<I,K> newComponent(final fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.Requires<I,K> b) {
-      return new fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.ComponentImpl<I,K>(this, b);
+      fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.ComponentImpl<I,K> comp = new fr.irit.smac.may.lib.components.interactions.MapReferences.Caller.ComponentImpl<I,K>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.MapReferences.ComponentImpl<I,K> ecosystemComponent;
@@ -589,8 +617,7 @@ public abstract class MapReferences<I, K> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -639,7 +666,10 @@ public abstract class MapReferences<I, K> {
    * 
    */
   public fr.irit.smac.may.lib.components.interactions.MapReferences.Component<I,K> newComponent(final fr.irit.smac.may.lib.components.interactions.MapReferences.Requires<I,K> b) {
-    return new fr.irit.smac.may.lib.components.interactions.MapReferences.ComponentImpl<I,K>(this, b);
+    fr.irit.smac.may.lib.components.interactions.MapReferences.ComponentImpl<I,K> comp = new fr.irit.smac.may.lib.components.interactions.MapReferences.ComponentImpl<I,K>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -664,14 +694,14 @@ public abstract class MapReferences<I, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey<I,K> make_CalleePullKey();
+  protected abstract fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort<I,K> make_CalleeKeyPort();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey<I,K> _createImplementationOfCalleePullKey() {
-    fr.irit.smac.may.lib.components.interactions.MapReferences.CalleePullKey<I,K> implem = make_CalleePullKey();
+  public fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort<I,K> _createImplementationOfCalleeKeyPort() {
+    fr.irit.smac.may.lib.components.interactions.MapReferences.CalleeKeyPort<I,K> implem = make_CalleeKeyPort();
     assert implem.ecosystemComponent == null;
     assert this.selfComponent != null;
     implem.ecosystemComponent = this.selfComponent;
@@ -711,13 +741,5 @@ public abstract class MapReferences<I, K> {
    */
   public fr.irit.smac.may.lib.components.interactions.MapReferences.Component<I,K> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.interactions.MapReferences.Requires<I,K>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <I, K> fr.irit.smac.may.lib.components.interactions.MapReferences.Component<I,K> newComponent(final MapReferences<I,K> _compo) {
-    return _compo.newComponent();
   }
 }

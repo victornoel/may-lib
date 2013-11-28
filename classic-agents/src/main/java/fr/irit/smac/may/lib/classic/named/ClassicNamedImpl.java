@@ -3,38 +3,23 @@ package fr.irit.smac.may.lib.classic.named;
 import java.util.concurrent.Executors;
 
 import fr.irit.smac.may.lib.classic.interfaces.CreateNamed;
-import fr.irit.smac.may.lib.components.interactions.AsyncReceiver;
-import fr.irit.smac.may.lib.components.interactions.MapReferences;
-import fr.irit.smac.may.lib.components.interactions.asyncreceiver.AsyncReceiverImpl;
-import fr.irit.smac.may.lib.components.interactions.mapreferences.MapReferencesImpl;
+import fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver;
+import fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiverImpl;
 import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.meta.ForwardImpl;
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
-import fr.irit.smac.may.lib.components.scheduling.Scheduler;
-import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
-import fr.irit.smac.may.lib.interfaces.Push;
 
 public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 	
 	@Override
-	protected Scheduler make_scheduler() {
-		return new SchedulerImpl();
-	}
-
-	@Override
-	protected ExecutorService make_executor() {
+	protected ExecutorServiceWrapper make_executor() {
 		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(5));
 	}
 	
 	@Override
-	protected AsyncReceiver<Msg, String> make_receive() {
-		return new AsyncReceiverImpl<Msg, String>();
-	}
-	
-	@Override
-	protected MapReferences<Push<Msg>, String> make_refs() {
-		return new MapReferencesImpl<Push<Msg>, String>();
+	protected MapRefAsyncReceiver<Msg, String> make_receive() {
+		return new MapRefAsyncReceiverImpl<Msg, String>();
 	}
 
 	@Override
@@ -46,8 +31,7 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 		return new CreateNamed<Msg, String>() {
 			public String create(
 					final AbstractClassicNamedBehaviour<Msg, String> beh, String name) {
-				ClassicNamedAgent.Component<Msg> agent = newClassicNamedAgent(beh, name);
-				agent.start();
+				newClassicNamedAgent(beh, name);
 				return name;
 			}
 		};

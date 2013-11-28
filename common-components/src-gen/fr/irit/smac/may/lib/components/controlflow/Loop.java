@@ -32,47 +32,52 @@ public abstract class Loop {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.controlflow.Loop.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.components.controlflow.Loop.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.components.controlflow.Loop.Parts, fr.irit.smac.may.lib.components.controlflow.Loop.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.controlflow.Loop.Component, fr.irit.smac.may.lib.components.controlflow.Loop.Parts {
     private final fr.irit.smac.may.lib.components.controlflow.Loop.Requires bridge;
     
     private final Loop implementation;
     
-    public ComponentImpl(final Loop implem, final fr.irit.smac.may.lib.components.controlflow.Loop.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.stop == null;
+      this.stop = this.implementation.make_stop();
+      
+    }
+    
+    public ComponentImpl(final Loop implem, final fr.irit.smac.may.lib.components.controlflow.Loop.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.stop = implem.make_stop();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Do stop;
+    private Do stop;
     
     public final Do stop() {
       return this.stop;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -81,8 +86,7 @@ public abstract class Loop {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -131,6 +135,9 @@ public abstract class Loop {
    * 
    */
   public fr.irit.smac.may.lib.components.controlflow.Loop.Component newComponent(final fr.irit.smac.may.lib.components.controlflow.Loop.Requires b) {
-    return new fr.irit.smac.may.lib.components.controlflow.Loop.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.components.controlflow.Loop.ComponentImpl comp = new fr.irit.smac.may.lib.components.controlflow.Loop.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

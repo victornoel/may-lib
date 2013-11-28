@@ -39,6 +39,11 @@ public abstract class IvyJSONBroadcaster<T> {
   
   
   @SuppressWarnings("all")
+  public interface Component<T> extends fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Provides<T> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -71,41 +76,49 @@ public abstract class IvyJSONBroadcaster<T> {
   
   
   @SuppressWarnings("all")
-  public interface Component<T> extends fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Provides<T> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Parts<T>, fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Component<T> {
+  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Component<T>, fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Parts<T> {
     private final fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Requires<T> bridge;
     
     private final IvyJSONBroadcaster<T> implementation;
     
-    public ComponentImpl(final IvyJSONBroadcaster<T> implem, final fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Requires<T> b) {
+    protected void initParts() {
+      assert this.implem_ivy == null;
+      this.implem_ivy = this.implementation.make_ivy();
+      assert this.ivy == null;
+      this.ivy = this.implem_ivy.newComponent(new BridgeImpl_ivy());
+      assert this.implem_json == null;
+      this.implem_json = this.implementation.make_json();
+      assert this.json == null;
+      this.json = this.implem_json.newComponent(new BridgeImpl_json());
+      assert this.implem_binder == null;
+      this.implem_binder = this.implementation.make_binder();
+      assert this.binder == null;
+      this.binder = this.implem_binder.newComponent(new BridgeImpl_binder());
+      assert this.implem_bc == null;
+      this.implem_bc = this.implementation.make_bc();
+      assert this.bc == null;
+      this.bc = this.implem_bc.newComponent(new BridgeImpl_bc());
+      
+    }
+    
+    protected void initProvidedPorts() {
+      
+    }
+    
+    public ComponentImpl(final IvyJSONBroadcaster<T> implem, final fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Requires<T> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      assert this.implem_ivy == null;
-      this.implem_ivy = implem.make_ivy();
-      this.ivy = this.implem_ivy.newComponent(new BridgeImpl_ivy());
-      assert this.implem_json == null;
-      this.implem_json = implem.make_json();
-      this.json = this.implem_json.newComponent(new BridgeImpl_json());
-      assert this.implem_binder == null;
-      this.implem_binder = implem.make_binder();
-      this.binder = this.implem_binder.newComponent(new BridgeImpl_binder());
-      assert this.implem_bc == null;
-      this.implem_bc = implem.make_bc();
-      this.bc = this.implem_bc.newComponent(new BridgeImpl_bc());
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
@@ -113,9 +126,9 @@ public abstract class IvyJSONBroadcaster<T> {
       return this.bc.send();
     }
     
-    private final fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Component ivy;
+    private fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Component ivy;
     
-    private final IvyBus implem_ivy;
+    private IvyBus implem_ivy;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_ivy implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Requires {
@@ -129,9 +142,9 @@ public abstract class IvyJSONBroadcaster<T> {
       return this.ivy;
     }
     
-    private final fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T> json;
+    private fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T> json;
     
-    private final JSONTransformer<T> implem_json;
+    private JSONTransformer<T> implem_json;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_json implements fr.irit.smac.may.lib.components.distribution.JSONTransformer.Requires<T> {
@@ -142,9 +155,9 @@ public abstract class IvyJSONBroadcaster<T> {
       return this.json;
     }
     
-    private final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component binder;
+    private fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component binder;
     
-    private final IvyBinder implem_binder;
+    private IvyBinder implem_binder;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_binder implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires {
@@ -166,9 +179,9 @@ public abstract class IvyJSONBroadcaster<T> {
       return this.binder;
     }
     
-    private final fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Component<T> bc;
+    private fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Component<T> bc;
     
-    private final IvyBroadcaster<T> implem_bc;
+    private IvyBroadcaster<T> implem_bc;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_bc implements fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Requires<T> {
@@ -197,15 +210,6 @@ public abstract class IvyJSONBroadcaster<T> {
     public final fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Component<T> bc() {
       return this.bc;
     }
-    
-    public void start() {
-      this.ivy.start();
-      this.json.start();
-      this.binder.start();
-      this.bc.start();
-      this.implementation.start();
-      
-    }
   }
   
   
@@ -213,8 +217,7 @@ public abstract class IvyJSONBroadcaster<T> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -284,6 +287,9 @@ public abstract class IvyJSONBroadcaster<T> {
    * 
    */
   public fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Component<T> newComponent(final fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.Requires<T> b) {
-    return new fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.ComponentImpl<T>(this, b);
+    fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.ComponentImpl<T> comp = new fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster.ComponentImpl<T>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

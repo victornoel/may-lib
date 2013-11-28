@@ -9,8 +9,7 @@ import fr.irit.smac.may.lib.classic.namedpub.NamedPublishMASImpl;
 
 public class Test {
 	public static void main(String[] args) {
-		NamedPublishMAS.Component mas = NamedPublishMAS.newComponent(new NamedPublishMASImpl());
-		mas.start();
+		NamedPublishMAS.Component mas = new NamedPublishMASImpl().newComponent();
 		
 		mas.create().createObserved("agent1", new AbstractObservedBehaviour() {
 			@Override

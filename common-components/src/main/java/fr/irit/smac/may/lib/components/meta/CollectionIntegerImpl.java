@@ -3,12 +3,9 @@ package fr.irit.smac.may.lib.components.meta;
 import java.util.ArrayList;
 import java.util.List;
 
-import fj.F;
-import fj.Unit;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.MapGet;
 import fr.irit.smac.may.lib.interfaces.Pull;
-import fr.irit.smac.may.lib.interfaces.Push;
 
 public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 
@@ -18,7 +15,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 	protected MapGet<Integer,I> make_get() {
 		return new MapGet<Integer,I>() {
 			public I get(Integer i) {
-				return interfaces.get(i).requires().p();
+				return interfaces.get(i).requires().forwardedPort();
 			}
 		};
 	}
@@ -32,18 +29,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 		};
 	}
 	
-	@Override
-	protected Push<F<I, Unit>> make_forAll() {
-		return new Push<F<I, Unit>>() {
-			public void push(F<I, Unit> thing) {
-				for(AgentSide a: interfaces) {
-					if (a != null) thing.f(a.requires().p());
-				}
-			}
-		};
-	}
-	
-	public class AgentSide extends Agent<I> {
+	public class AgentSide extends Element<I> {
 		
 		private final int k;
 		
@@ -72,7 +58,7 @@ public class CollectionIntegerImpl<I> extends CollectionInteger<I> {
 	}
 	
 	@Override
-	protected Agent<I> make_Agent() {
+	protected Element<I> make_Element() {
 		return new AgentSide();
 	}
 

@@ -3,14 +3,10 @@ package fr.irit.smac.may.lib.classic.local;
 import fr.irit.smac.may.lib.classic.impl.AbstractClassicBehaviour;
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
-import fr.irit.smac.may.lib.components.interactions.AsyncReceiver;
-import fr.irit.smac.may.lib.components.interactions.DirectReferences;
+import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
-import fr.irit.smac.may.lib.components.interactions.interfaces.Call;
 import fr.irit.smac.may.lib.components.meta.Forward;
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
-import fr.irit.smac.may.lib.components.scheduling.Scheduler;
-import fr.irit.smac.may.lib.components.scheduling.interfaces.AdvancedExecutor;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
@@ -47,27 +43,18 @@ public abstract class Classic<Msg> {
   
   
   @SuppressWarnings("all")
+  public interface Component<Msg> extends fr.irit.smac.may.lib.classic.local.Classic.Provides<Msg> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<Msg> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public fr.irit.smac.may.lib.components.scheduling.Scheduler.Component scheduler();
-    
-    /**
-     * This can be called by the implementation to access the part and its provided ports.
-     * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-     * 
-     */
-    public fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<Push<Msg>> refs();
-    
-    /**
-     * This can be called by the implementation to access the part and its provided ports.
-     * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-     * 
-     */
-    public fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Component<Msg,DirRef> receive();
+    public fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Component<Msg> receive();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -81,50 +68,52 @@ public abstract class Classic<Msg> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public fr.irit.smac.may.lib.components.scheduling.ExecutorService.Component executor();
+    public fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Component executor();
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<Msg> extends fr.irit.smac.may.lib.classic.local.Classic.Provides<Msg> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg> implements fr.irit.smac.may.lib.classic.local.Classic.Parts<Msg>, fr.irit.smac.may.lib.classic.local.Classic.Component<Msg> {
+  public static class ComponentImpl<Msg> implements fr.irit.smac.may.lib.classic.local.Classic.Component<Msg>, fr.irit.smac.may.lib.classic.local.Classic.Parts<Msg> {
     private final fr.irit.smac.may.lib.classic.local.Classic.Requires<Msg> bridge;
     
     private final Classic<Msg> implementation;
     
-    public ComponentImpl(final Classic<Msg> implem, final fr.irit.smac.may.lib.classic.local.Classic.Requires<Msg> b) {
+    protected void initParts() {
+      assert this.implem_receive == null;
+      this.implem_receive = this.implementation.make_receive();
+      assert this.receive == null;
+      this.receive = this.implem_receive.newComponent(new BridgeImpl_receive());
+      assert this.implem_fact == null;
+      this.implem_fact = this.implementation.make_fact();
+      assert this.fact == null;
+      this.fact = this.implem_fact.newComponent(new BridgeImpl_fact());
+      assert this.implem_executor == null;
+      this.implem_executor = this.implementation.make_executor();
+      assert this.executor == null;
+      this.executor = this.implem_executor.newComponent(new BridgeImpl_executor());
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.create == null;
+      this.create = this.implementation.make_create();
+      
+    }
+    
+    public ComponentImpl(final Classic<Msg> implem, final fr.irit.smac.may.lib.classic.local.Classic.Requires<Msg> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.create = implem.make_create();
-      assert this.implem_scheduler == null;
-      this.implem_scheduler = implem.make_scheduler();
-      this.scheduler = this.implem_scheduler.newComponent(new BridgeImpl_scheduler());
-      assert this.implem_refs == null;
-      this.implem_refs = implem.make_refs();
-      this.refs = this.implem_refs.newComponent(new BridgeImpl_refs());
-      assert this.implem_receive == null;
-      this.implem_receive = implem.make_receive();
-      this.receive = this.implem_receive.newComponent(new BridgeImpl_receive());
-      assert this.implem_fact == null;
-      this.implem_fact = implem.make_fact();
-      this.fact = this.implem_fact.newComponent(new BridgeImpl_fact());
-      assert this.implem_executor == null;
-      this.implem_executor = implem.make_executor();
-      this.executor = this.implem_executor.newComponent(new BridgeImpl_executor());
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
@@ -132,7 +121,7 @@ public abstract class Classic<Msg> {
       return this.receive.deposit();
     }
     
-    private final CreateClassic<Msg,DirRef> create;
+    private CreateClassic<Msg,DirRef> create;
     
     public final CreateClassic<Msg,DirRef> create() {
       return this.create;
@@ -142,58 +131,26 @@ public abstract class Classic<Msg> {
       return this.executor.stop();
     }
     
-    private final fr.irit.smac.may.lib.components.scheduling.Scheduler.Component scheduler;
+    private fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Component<Msg> receive;
     
-    private final Scheduler implem_scheduler;
-    
-    @SuppressWarnings("all")
-    private final class BridgeImpl_scheduler implements fr.irit.smac.may.lib.components.scheduling.Scheduler.Requires {
-      public final AdvancedExecutor executor() {
-        return fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl.this.executor.exec();
-      }
-    }
-    
-    
-    public final fr.irit.smac.may.lib.components.scheduling.Scheduler.Component scheduler() {
-      return this.scheduler;
-    }
-    
-    private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<Push<Msg>> refs;
-    
-    private final DirectReferences<Push<Msg>> implem_refs;
+    private DirRefAsyncReceiver<Msg> implem_receive;
     
     @SuppressWarnings("all")
-    private final class BridgeImpl_refs implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Requires<Push<Msg>> {
+    private final class BridgeImpl_receive implements fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Requires<Msg> {
     }
     
     
-    public final fr.irit.smac.may.lib.components.interactions.DirectReferences.Component<Push<Msg>> refs() {
-      return this.refs;
-    }
-    
-    private final fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Component<Msg,DirRef> receive;
-    
-    private final AsyncReceiver<Msg,DirRef> implem_receive;
-    
-    @SuppressWarnings("all")
-    private final class BridgeImpl_receive implements fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Requires<Msg,DirRef> {
-      public final Call<Push<Msg>,DirRef> call() {
-        return fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl.this.refs.call();
-      }
-    }
-    
-    
-    public final fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Component<Msg,DirRef> receive() {
+    public final fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Component<Msg> receive() {
       return this.receive;
     }
     
-    private final fr.irit.smac.may.lib.components.meta.Forward.Component<CreateClassic<Msg,DirRef>> fact;
+    private fr.irit.smac.may.lib.components.meta.Forward.Component<CreateClassic<Msg,DirRef>> fact;
     
-    private final Forward<CreateClassic<Msg,DirRef>> implem_fact;
+    private Forward<CreateClassic<Msg,DirRef>> implem_fact;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_fact implements fr.irit.smac.may.lib.components.meta.Forward.Requires<CreateClassic<Msg,DirRef>> {
-      public final CreateClassic<Msg,DirRef> i() {
+      public final CreateClassic<Msg,DirRef> forwardedPort() {
         return fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl.this.create();
       }
     }
@@ -203,27 +160,17 @@ public abstract class Classic<Msg> {
       return this.fact;
     }
     
-    private final fr.irit.smac.may.lib.components.scheduling.ExecutorService.Component executor;
+    private fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Component executor;
     
-    private final ExecutorService implem_executor;
+    private ExecutorServiceWrapper implem_executor;
     
     @SuppressWarnings("all")
-    private final class BridgeImpl_executor implements fr.irit.smac.may.lib.components.scheduling.ExecutorService.Requires {
+    private final class BridgeImpl_executor implements fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Requires {
     }
     
     
-    public final fr.irit.smac.may.lib.components.scheduling.ExecutorService.Component executor() {
+    public final fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Component executor() {
       return this.executor;
-    }
-    
-    public void start() {
-      this.scheduler.start();
-      this.refs.start();
-      this.receive.start();
-      this.fact.start();
-      this.executor.start();
-      this.implementation.start();
-      
     }
   }
   
@@ -246,6 +193,11 @@ public abstract class Classic<Msg> {
     
     
     @SuppressWarnings("all")
+    public interface Component<Msg> extends fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Provides<Msg> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<Msg> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -259,85 +211,85 @@ public abstract class Classic<Msg> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.scheduling.Scheduler.Agent.Component s();
+      public fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Executing.Component s();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.meta.Forward.Agent.Component<CreateClassic<Msg,DirRef>> f();
+      public fr.irit.smac.may.lib.components.meta.Forward.Caller.Component<CreateClassic<Msg,DirRef>> f();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Receiver.Component<Msg,DirRef> receive();
+      public fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Receiver.Component<Msg> receive();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Component<Push<Msg>> ref();
-      
-      /**
-       * This can be called by the implementation to access the part and its provided ports.
-       * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-       * 
-       */
-      public fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Sender.Component<Msg,DirRef> ss();
+      public fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Sender.Component<Msg> ss();
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<Msg> extends fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Provides<Msg> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<Msg> implements fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Parts<Msg>, fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Component<Msg> {
+    public static class ComponentImpl<Msg> implements fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Component<Msg>, fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Parts<Msg> {
       private final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Requires<Msg> bridge;
       
       private final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent<Msg> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent<Msg> implem, final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Requires<Msg> b) {
+      protected void initParts() {
+        assert this.implem_arch == null;
+        this.implem_arch = this.implementation.make_arch();
+        assert this.arch == null;
+        this.arch = this.implem_arch.newComponent(new BridgeImpl_arch());
+        assert this.implementation.use_s != null;
+        assert this.s == null;
+        this.s = this.implementation.use_s.newComponent(new BridgeImpl_executor_s());
+        assert this.implementation.use_f != null;
+        assert this.f == null;
+        this.f = this.implementation.use_f.newComponent(new BridgeImpl_fact_f());
+        assert this.implementation.use_receive != null;
+        assert this.receive == null;
+        this.receive = this.implementation.use_receive.newComponent(new BridgeImpl_receive_receive());
+        assert this.implementation.use_ss != null;
+        assert this.ss == null;
+        this.ss = this.implementation.use_ss.newComponent(new BridgeImpl_receive_ss());
+        
+      }
+      
+      protected void initProvidedPorts() {
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent<Msg> implem, final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Requires<Msg> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        assert this.implem_arch == null;
-        this.implem_arch = implem.make_arch();
-        this.arch = this.implem_arch.newComponent(new BridgeImpl_arch());
-        assert this.implementation.use_s != null;
-        this.s = this.implementation.use_s.newComponent(new BridgeImpl_scheduler_s());
-        assert this.implementation.use_f != null;
-        this.f = this.implementation.use_f.newComponent(new BridgeImpl_fact_f());
-        assert this.implementation.use_receive != null;
-        this.receive = this.implementation.use_receive.newComponent(new BridgeImpl_receive_receive());
-        assert this.implementation.use_ref != null;
-        this.ref = this.implementation.use_ref.newComponent(new BridgeImpl_refs_ref());
-        assert this.implementation.use_ss != null;
-        this.ss = this.implementation.use_ss.newComponent(new BridgeImpl_receive_ss());
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
       public final Pull<DirRef> me() {
-        return this.ref.me();
+        return this.receive.me();
       }
       
-      private final fr.irit.smac.may.lib.classic.local.ClassicAgentComponent.Component<Msg,DirRef> arch;
+      private fr.irit.smac.may.lib.classic.local.ClassicAgentComponent.Component<Msg,DirRef> arch;
       
-      private final ClassicAgentComponent<Msg,DirRef> implem_arch;
+      private ClassicAgentComponent<Msg,DirRef> implem_arch;
       
       @SuppressWarnings("all")
       private final class BridgeImpl_arch implements fr.irit.smac.may.lib.classic.local.ClassicAgentComponent.Requires<Msg,DirRef> {
@@ -346,11 +298,11 @@ public abstract class Classic<Msg> {
         }
         
         public final Pull<DirRef> me() {
-          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.ref.me();
+          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.receive.me();
         }
         
         public final Executor executor() {
-          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.s.exec();
+          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.s.executor();
         }
         
         public final Do die() {
@@ -358,7 +310,7 @@ public abstract class Classic<Msg> {
         }
         
         public final CreateClassic<Msg,DirRef> create() {
-          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.f.a();
+          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.f.forwardedPort();
         }
       }
       
@@ -367,76 +319,51 @@ public abstract class Classic<Msg> {
         return this.arch;
       }
       
-      private final fr.irit.smac.may.lib.components.scheduling.Scheduler.Agent.Component s;
+      private fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Executing.Component s;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_scheduler_s implements fr.irit.smac.may.lib.components.scheduling.Scheduler.Agent.Requires {
+      private final class BridgeImpl_executor_s implements fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Executing.Requires {
       }
       
       
-      public final fr.irit.smac.may.lib.components.scheduling.Scheduler.Agent.Component s() {
+      public final fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Executing.Component s() {
         return this.s;
       }
       
-      private final fr.irit.smac.may.lib.components.meta.Forward.Agent.Component<CreateClassic<Msg,DirRef>> f;
+      private fr.irit.smac.may.lib.components.meta.Forward.Caller.Component<CreateClassic<Msg,DirRef>> f;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_fact_f implements fr.irit.smac.may.lib.components.meta.Forward.Agent.Requires<CreateClassic<Msg,DirRef>> {
+      private final class BridgeImpl_fact_f implements fr.irit.smac.may.lib.components.meta.Forward.Caller.Requires<CreateClassic<Msg,DirRef>> {
       }
       
       
-      public final fr.irit.smac.may.lib.components.meta.Forward.Agent.Component<CreateClassic<Msg,DirRef>> f() {
+      public final fr.irit.smac.may.lib.components.meta.Forward.Caller.Component<CreateClassic<Msg,DirRef>> f() {
         return this.f;
       }
       
-      private final fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Receiver.Component<Msg,DirRef> receive;
+      private fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Receiver.Component<Msg> receive;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_receive_receive implements fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Receiver.Requires<Msg,DirRef> {
+      private final class BridgeImpl_receive_receive implements fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Receiver.Requires<Msg> {
         public final Push<Msg> put() {
           return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.arch.put();
         }
       }
       
       
-      public final fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Receiver.Component<Msg,DirRef> receive() {
+      public final fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Receiver.Component<Msg> receive() {
         return this.receive;
       }
       
-      private final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Component<Push<Msg>> ref;
+      private fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Sender.Component<Msg> ss;
       
       @SuppressWarnings("all")
-      private final class BridgeImpl_refs_ref implements fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Requires<Push<Msg>> {
-        public final Push<Msg> toCall() {
-          return fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl.this.receive.toCall();
-        }
+      private final class BridgeImpl_receive_ss implements fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Sender.Requires<Msg> {
       }
       
       
-      public final fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee.Component<Push<Msg>> ref() {
-        return this.ref;
-      }
-      
-      private final fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Sender.Component<Msg,DirRef> ss;
-      
-      @SuppressWarnings("all")
-      private final class BridgeImpl_receive_ss implements fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Sender.Requires<Msg,DirRef> {
-      }
-      
-      
-      public final fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Sender.Component<Msg,DirRef> ss() {
+      public final fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Sender.Component<Msg> ss() {
         return this.ss;
-      }
-      
-      public void start() {
-        this.arch.start();
-        this.s.start();
-        this.f.start();
-        this.receive.start();
-        this.ref.start();
-        this.ss.start();
-        this.implementation.start();
-        
       }
     }
     
@@ -445,8 +372,7 @@ public abstract class Classic<Msg> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -490,22 +416,23 @@ public abstract class Classic<Msg> {
      */
     protected abstract ClassicAgentComponent<Msg,DirRef> make_arch();
     
-    private fr.irit.smac.may.lib.components.scheduling.Scheduler.Agent use_s;
+    private fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper.Executing use_s;
     
-    private fr.irit.smac.may.lib.components.meta.Forward.Agent<CreateClassic<Msg,DirRef>> use_f;
+    private fr.irit.smac.may.lib.components.meta.Forward.Caller<CreateClassic<Msg,DirRef>> use_f;
     
-    private fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Receiver<Msg,DirRef> use_receive;
+    private fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Receiver<Msg> use_receive;
     
-    private fr.irit.smac.may.lib.components.interactions.DirectReferences.Callee<Push<Msg>> use_ref;
-    
-    private fr.irit.smac.may.lib.components.interactions.AsyncReceiver.Sender<Msg,DirRef> use_ss;
+    private fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver.Sender<Msg> use_ss;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
     public fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Component<Msg> newComponent(final fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.Requires<Msg> b) {
-      return new fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl<Msg>(this, b);
+      fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl<Msg> comp = new fr.irit.smac.may.lib.classic.local.Classic.ClassicAgent.ComponentImpl<Msg>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl<Msg> ecosystemComponent;
@@ -546,8 +473,7 @@ public abstract class Classic<Msg> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -596,21 +522,7 @@ public abstract class Classic<Msg> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract Scheduler make_scheduler();
-  
-  /**
-   * This should be overridden by the implementation to define how to create this sub-component.
-   * This will be called once during the construction of the component to initialize this sub-component.
-   * 
-   */
-  protected abstract DirectReferences<Push<Msg>> make_refs();
-  
-  /**
-   * This should be overridden by the implementation to define how to create this sub-component.
-   * This will be called once during the construction of the component to initialize this sub-component.
-   * 
-   */
-  protected abstract AsyncReceiver<Msg,DirRef> make_receive();
+  protected abstract DirRefAsyncReceiver<Msg> make_receive();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -624,14 +536,17 @@ public abstract class Classic<Msg> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract ExecutorService make_executor();
+  protected abstract ExecutorServiceWrapper make_executor();
   
   /**
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
   public fr.irit.smac.may.lib.classic.local.Classic.Component<Msg> newComponent(final fr.irit.smac.may.lib.classic.local.Classic.Requires<Msg> b) {
-    return new fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl<Msg>(this, b);
+    fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl<Msg> comp = new fr.irit.smac.may.lib.classic.local.Classic.ComponentImpl<Msg>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -649,18 +564,15 @@ public abstract class Classic<Msg> {
     assert implem.ecosystemComponent == null;
     assert this.selfComponent != null;
     implem.ecosystemComponent = this.selfComponent;
-    assert this.selfComponent.implem_scheduler != null;
+    assert this.selfComponent.implem_executor != null;
     assert implem.use_s == null;
-    implem.use_s = this.selfComponent.implem_scheduler._createImplementationOfAgent();
+    implem.use_s = this.selfComponent.implem_executor._createImplementationOfExecuting();
     assert this.selfComponent.implem_fact != null;
     assert implem.use_f == null;
-    implem.use_f = this.selfComponent.implem_fact._createImplementationOfAgent();
+    implem.use_f = this.selfComponent.implem_fact._createImplementationOfCaller();
     assert this.selfComponent.implem_receive != null;
     assert implem.use_receive == null;
-    implem.use_receive = this.selfComponent.implem_receive._createImplementationOfReceiver();
-    assert this.selfComponent.implem_refs != null;
-    assert implem.use_ref == null;
-    implem.use_ref = this.selfComponent.implem_refs._createImplementationOfCallee(name);
+    implem.use_receive = this.selfComponent.implem_receive._createImplementationOfReceiver(name);
     assert this.selfComponent.implem_receive != null;
     assert implem.use_ss == null;
     implem.use_ss = this.selfComponent.implem_receive._createImplementationOfSender();
@@ -682,13 +594,5 @@ public abstract class Classic<Msg> {
    */
   public fr.irit.smac.may.lib.classic.local.Classic.Component<Msg> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.classic.local.Classic.Requires<Msg>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <Msg> fr.irit.smac.may.lib.classic.local.Classic.Component<Msg> newComponent(final Classic<Msg> _compo) {
-    return _compo.newComponent();
   }
 }

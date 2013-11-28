@@ -26,47 +26,52 @@ public abstract class ObservedBehaviour {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Parts, fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Component, fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Parts {
     private final fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Requires bridge;
     
     private final ObservedBehaviour implementation;
     
-    public ComponentImpl(final ObservedBehaviour implem, final fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.cycle == null;
+      this.cycle = this.implementation.make_cycle();
+      
+    }
+    
+    public ComponentImpl(final ObservedBehaviour implem, final fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.cycle = implem.make_cycle();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Do cycle;
+    private Do cycle;
     
     public final Do cycle() {
       return this.cycle;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -75,8 +80,7 @@ public abstract class ObservedBehaviour {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -125,6 +129,9 @@ public abstract class ObservedBehaviour {
    * 
    */
   public fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Component newComponent(final fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.Requires b) {
-    return new fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.ComponentImpl comp = new fr.irit.smac.may.lib.classic.namedPublish.ObservedBehaviour.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

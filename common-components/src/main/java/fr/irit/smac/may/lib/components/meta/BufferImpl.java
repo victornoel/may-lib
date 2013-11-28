@@ -85,8 +85,6 @@ public class BufferImpl<I> extends Buffer<I> {
 			}
 		});
 		
-		test.start();
-		
 		System.out.println("before calls");
 		
 		test.port().push("a");

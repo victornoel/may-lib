@@ -39,47 +39,52 @@ public abstract class IvyBinder {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Parts, fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component, fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Parts {
     private final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires bridge;
     
     private final IvyBinder implementation;
     
-    public ComponentImpl(final IvyBinder implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.reBindMsg == null;
+      this.reBindMsg = this.implementation.make_reBindMsg();
+      
+    }
+    
+    public ComponentImpl(final IvyBinder implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.reBindMsg = implem.make_reBindMsg();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Push<String> reBindMsg;
+    private Push<String> reBindMsg;
     
     public final Push<String> reBindMsg() {
       return this.reBindMsg;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -88,8 +93,7 @@ public abstract class IvyBinder {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -138,6 +142,9 @@ public abstract class IvyBinder {
    * 
    */
   public fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Component newComponent(final fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.Requires b) {
-    return new fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.ComponentImpl comp = new fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

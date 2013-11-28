@@ -68,6 +68,11 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
   
   
   @SuppressWarnings("all")
+  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Provides<Msg,Ref> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -86,36 +91,43 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
   
   
   @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Provides<Msg,Ref> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Parts<Msg,Ref>, fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Component<Msg,Ref> {
+  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Component<Msg,Ref>, fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Parts<Msg,Ref> {
     private final fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Requires<Msg,Ref> bridge;
     
     private final RemoteClassicAgentComponent<Msg,Ref> implementation;
     
-    public ComponentImpl(final RemoteClassicAgentComponent<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Requires<Msg,Ref> b) {
+    protected void initParts() {
+      assert this.implem_dispatcher == null;
+      this.implem_dispatcher = this.implementation.make_dispatcher();
+      assert this.dispatcher == null;
+      this.dispatcher = this.implem_dispatcher.newComponent(new BridgeImpl_dispatcher());
+      assert this.implem_beh == null;
+      this.implem_beh = this.implementation.make_beh();
+      assert this.beh == null;
+      this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.die == null;
+      this.die = this.implementation.make_die();
+      
+    }
+    
+    public ComponentImpl(final RemoteClassicAgentComponent<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Requires<Msg,Ref> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.die = implem.make_die();
-      assert this.implem_dispatcher == null;
-      this.implem_dispatcher = implem.make_dispatcher();
-      this.dispatcher = this.implem_dispatcher.newComponent(new BridgeImpl_dispatcher());
-      assert this.implem_beh == null;
-      this.implem_beh = implem.make_beh();
-      this.beh = this.implem_beh.newComponent(new BridgeImpl_beh());
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
@@ -123,15 +135,15 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       return this.dispatcher.dispatch();
     }
     
-    private final Do die;
+    private Do die;
     
     public final Do die() {
       return this.die;
     }
     
-    private final fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher.Component<Msg> dispatcher;
+    private fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher.Component<Msg> dispatcher;
     
-    private final SequentialDispatcher<Msg> implem_dispatcher;
+    private SequentialDispatcher<Msg> implem_dispatcher;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_dispatcher implements fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher.Requires<Msg> {
@@ -149,9 +161,9 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       return this.dispatcher;
     }
     
-    private final fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour.Component<Msg,Ref> beh;
+    private fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour.Component<Msg,Ref> beh;
     
-    private final RemoteClassicBehaviour<Msg,Ref> implem_beh;
+    private RemoteClassicBehaviour<Msg,Ref> implem_beh;
     
     @SuppressWarnings("all")
     private final class BridgeImpl_beh implements fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour.Requires<Msg,Ref> {
@@ -176,13 +188,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
     public final fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour.Component<Msg,Ref> beh() {
       return this.beh;
     }
-    
-    public void start() {
-      this.dispatcher.start();
-      this.beh.start();
-      this.implementation.start();
-      
-    }
   }
   
   
@@ -190,8 +195,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -254,6 +258,9 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
    * 
    */
   public fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Component<Msg,Ref> newComponent(final fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.Requires<Msg,Ref> b) {
-    return new fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.ComponentImpl<Msg,Ref>(this, b);
+    fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.ComponentImpl<Msg,Ref> comp = new fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent.ComponentImpl<Msg,Ref>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

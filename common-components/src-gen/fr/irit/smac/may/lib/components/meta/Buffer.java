@@ -31,54 +31,60 @@ public abstract class Buffer<I> {
   
   
   @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Buffer.Provides<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Buffer.Provides<I> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Buffer.Parts<I>, fr.irit.smac.may.lib.components.meta.Buffer.Component<I> {
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Buffer.Component<I>, fr.irit.smac.may.lib.components.meta.Buffer.Parts<I> {
     private final fr.irit.smac.may.lib.components.meta.Buffer.Requires<I> bridge;
     
     private final Buffer<I> implementation;
     
-    public ComponentImpl(final Buffer<I> implem, final fr.irit.smac.may.lib.components.meta.Buffer.Requires<I> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.port == null;
+      this.port = this.implementation.make_port();
+      assert this.release == null;
+      this.release = this.implementation.make_release();
+      
+    }
+    
+    public ComponentImpl(final Buffer<I> implem, final fr.irit.smac.may.lib.components.meta.Buffer.Requires<I> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.port = implem.make_port();
-      this.release = implem.make_release();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final I port;
+    private I port;
     
     public final I port() {
       return this.port;
     }
     
-    private final Do release;
+    private Do release;
     
     public final Do release() {
       return this.release;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -87,8 +93,7 @@ public abstract class Buffer<I> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -144,6 +149,9 @@ public abstract class Buffer<I> {
    * 
    */
   public fr.irit.smac.may.lib.components.meta.Buffer.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.Buffer.Requires<I> b) {
-    return new fr.irit.smac.may.lib.components.meta.Buffer.ComponentImpl<I>(this, b);
+    fr.irit.smac.may.lib.components.meta.Buffer.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.meta.Buffer.ComponentImpl<I>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

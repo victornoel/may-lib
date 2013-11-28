@@ -5,25 +5,43 @@ import java.util.concurrent.Executor
 
 namespace fr.irit.smac.may.lib.components.scheduling {
 	
-	ecosystem Scheduled {
-		species Agent {
+	/**
+	 * A scheduler providing two means of executing species
+	 * Either synchronised using the tick port
+	 * or asynchronised using the async port.
+	 * 
+	 * Do not use both of them!
+	 */
+	ecosystem Scheduler {
+		
+		species Scheduled {
 			requires cycle: Do
 			provides stop: Do
 		}
 		
 		/**
 		 * when called, all agents are called concurrently
-		 * (using sched) on their cycle port.
-		 * returns upon completion of all agents
+		 * (using executor) on their cycle port.
+		 * returns upon completion of all agents.
 		 */
 		provides tick: Do
-		requires sched: AdvancedExecutor
 		
+		/**
+		 * this one is used to directly run the agents asynchronously
+		 * (using executor) on their cycle port.
+		 * this should be controlled by SchedulingControllerGUI
+		 * for example.
+		 */
 		provides async: SchedulingControl
+		
+		requires executor: AdvancedExecutor
 	}
 	
 	/**
-	 * One step means to execute all agents once
+	 * A clock that give time to the execution
+	 * of a system.
+	 * Should be controlled by SchedulingControllerGUI
+	 * for example
 	 */
 	component Clock {
 		requires sched: Executor
@@ -36,22 +54,28 @@ namespace fr.irit.smac.may.lib.components.scheduling {
 		requires control: SchedulingControl
 	}
 
-
 	/**
-	 * Will schedule as much tasks as needed.
-	 * Stop will stop any task not finished.
+	 * A wrapper for an executor service
+	 * Also provides a species for executing tasks
+	 * 
 	 */
-	ecosystem Scheduler {
-		species Agent {
-			provides exec: AdvancedExecutor
+	ecosystem ExecutorServiceWrapper {
+		
+		provides executor: AdvancedExecutor
+		
+		/**
+		 * Will stop all of the tasks
+		 */
+		provides stop: Do
+		
+		species Executing {
+			
+			provides executor: AdvancedExecutor
+			
+			/**
+			 * Will stop only the tasks of this agent
+			 */
 			provides stop: Do
 		}
-		
-		requires executor: AdvancedExecutor
-	}
-
-	component ExecutorService {
-		provides exec: AdvancedExecutor
-		provides stop: Do
 	}
 }

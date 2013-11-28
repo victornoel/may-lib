@@ -1,7 +1,5 @@
 package fr.irit.smac.may.lib.components.interactions.asyncreceiver;
 
-import fr.irit.smac.may.lib.components.collections.ConcurrentQueueImpl;
-import fr.irit.smac.may.lib.components.collections.Queue;
 import fr.irit.smac.may.lib.components.interactions.AsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.exceptions.RefDoesNotExistsException;
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend;
@@ -22,16 +20,6 @@ public class AsyncReceiverImpl<M,K> extends AsyncReceiver<M,K> {
 					// do nothing, on purpose!
 				}
 			};
-		};
-	}
-	
-	@Override
-	protected ReceiverBuf<M,K> make_ReceiverBuf() {
-		return new ReceiverBuf<M,K>() {
-			@Override
-			protected Queue<M> make_q() {
-				return new ConcurrentQueueImpl<M>();
-			}
 		};
 	}
 

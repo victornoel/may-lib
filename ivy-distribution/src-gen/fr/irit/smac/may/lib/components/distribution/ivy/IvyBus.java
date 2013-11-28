@@ -46,68 +46,76 @@ public abstract class IvyBus {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Parts, fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Component, fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Parts {
     private final fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Requires bridge;
     
     private final IvyBus implementation;
     
-    public ComponentImpl(final IvyBus implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.disconnect == null;
+      this.disconnect = this.implementation.make_disconnect();
+      assert this.bindMsg == null;
+      this.bindMsg = this.implementation.make_bindMsg();
+      assert this.unBindMsg == null;
+      this.unBindMsg = this.implementation.make_unBindMsg();
+      assert this.send == null;
+      this.send = this.implementation.make_send();
+      
+    }
+    
+    public ComponentImpl(final IvyBus implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.disconnect = implem.make_disconnect();
-      this.bindMsg = implem.make_bindMsg();
-      this.unBindMsg = implem.make_unBindMsg();
-      this.send = implem.make_send();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Do disconnect;
+    private Do disconnect;
     
     public final Do disconnect() {
       return this.disconnect;
     }
     
-    private final Bind bindMsg;
+    private Bind bindMsg;
     
     public final Bind bindMsg() {
       return this.bindMsg;
     }
     
-    private final Push<Integer> unBindMsg;
+    private Push<Integer> unBindMsg;
     
     public final Push<Integer> unBindMsg() {
       return this.unBindMsg;
     }
     
-    private final Push<String> send;
+    private Push<String> send;
     
     public final Push<String> send() {
       return this.send;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -116,8 +124,7 @@ public abstract class IvyBus {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -187,6 +194,9 @@ public abstract class IvyBus {
    * 
    */
   public fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Component newComponent(final fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.Requires b) {
-    return new fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.ComponentImpl comp = new fr.irit.smac.may.lib.components.distribution.ivy.IvyBus.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

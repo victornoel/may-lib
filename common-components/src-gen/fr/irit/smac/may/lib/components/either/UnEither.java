@@ -32,47 +32,52 @@ public abstract class UnEither<L, R> {
   
   
   @SuppressWarnings("all")
+  public interface Component<L, R> extends fr.irit.smac.may.lib.components.either.UnEither.Provides<L,R> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<L, R> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<L, R> extends fr.irit.smac.may.lib.components.either.UnEither.Provides<L,R> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<L, R> implements fr.irit.smac.may.lib.components.either.UnEither.Parts<L,R>, fr.irit.smac.may.lib.components.either.UnEither.Component<L,R> {
+  public static class ComponentImpl<L, R> implements fr.irit.smac.may.lib.components.either.UnEither.Component<L,R>, fr.irit.smac.may.lib.components.either.UnEither.Parts<L,R> {
     private final fr.irit.smac.may.lib.components.either.UnEither.Requires<L,R> bridge;
     
     private final UnEither<L,R> implementation;
     
-    public ComponentImpl(final UnEither<L,R> implem, final fr.irit.smac.may.lib.components.either.UnEither.Requires<L,R> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.in == null;
+      this.in = this.implementation.make_in();
+      
+    }
+    
+    public ComponentImpl(final UnEither<L,R> implem, final fr.irit.smac.may.lib.components.either.UnEither.Requires<L,R> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.in = implem.make_in();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Push<Either<L,R>> in;
+    private Push<Either<L,R>> in;
     
     public final Push<Either<L,R>> in() {
       return this.in;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -81,8 +86,7 @@ public abstract class UnEither<L, R> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -131,6 +135,9 @@ public abstract class UnEither<L, R> {
    * 
    */
   public fr.irit.smac.may.lib.components.either.UnEither.Component<L,R> newComponent(final fr.irit.smac.may.lib.components.either.UnEither.Requires<L,R> b) {
-    return new fr.irit.smac.may.lib.components.either.UnEither.ComponentImpl<L,R>(this, b);
+    fr.irit.smac.may.lib.components.either.UnEither.ComponentImpl<L,R> comp = new fr.irit.smac.may.lib.components.either.UnEither.ComponentImpl<L,R>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

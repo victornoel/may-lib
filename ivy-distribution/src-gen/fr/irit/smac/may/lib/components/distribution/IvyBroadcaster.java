@@ -57,54 +57,60 @@ public abstract class IvyBroadcaster<T> {
   
   
   @SuppressWarnings("all")
+  public interface Component<T> extends fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Provides<T> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<T> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<T> extends fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Provides<T> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Parts<T>, fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Component<T> {
+  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Component<T>, fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Parts<T> {
     private final fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Requires<T> bridge;
     
     private final IvyBroadcaster<T> implementation;
     
-    public ComponentImpl(final IvyBroadcaster<T> implem, final fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Requires<T> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.ivyReceive == null;
+      this.ivyReceive = this.implementation.make_ivyReceive();
+      assert this.send == null;
+      this.send = this.implementation.make_send();
+      
+    }
+    
+    public ComponentImpl(final IvyBroadcaster<T> implem, final fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Requires<T> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.ivyReceive = implem.make_ivyReceive();
-      this.send = implem.make_send();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Push<List<String>> ivyReceive;
+    private Push<List<String>> ivyReceive;
     
     public final Push<List<String>> ivyReceive() {
       return this.ivyReceive;
     }
     
-    private final Push<T> send;
+    private Push<T> send;
     
     public final Push<T> send() {
       return this.send;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -113,8 +119,7 @@ public abstract class IvyBroadcaster<T> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -170,6 +175,9 @@ public abstract class IvyBroadcaster<T> {
    * 
    */
   public fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Component<T> newComponent(final fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.Requires<T> b) {
-    return new fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.ComponentImpl<T>(this, b);
+    fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.ComponentImpl<T> comp = new fr.irit.smac.may.lib.components.distribution.IvyBroadcaster.ComponentImpl<T>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

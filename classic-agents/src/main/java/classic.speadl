@@ -7,22 +7,18 @@ import fr.irit.smac.may.lib.classic.namedpub.AbstractObserverBehaviour
 import fr.irit.smac.may.lib.classic.namedpub.NamedPublishMASFactory
 import fr.irit.smac.may.lib.classic.remote.impl.AbstractRemoteClassicBehaviour
 import fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher
-import fr.irit.smac.may.lib.components.interactions.AsyncReceiver
-import fr.irit.smac.may.lib.components.interactions.DirectReferences
-import fr.irit.smac.may.lib.components.interactions.MapReferences
-import fr.irit.smac.may.lib.components.interactions.ValuePublisher
+import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver
+import fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver
+import fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
 import fr.irit.smac.may.lib.components.interactions.interfaces.Observe
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef
-import fr.irit.smac.may.lib.components.messaging.receiver.Receiver
 import fr.irit.smac.may.lib.components.meta.Forward
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver
 import fr.irit.smac.may.lib.components.remote.place.Place
 import fr.irit.smac.may.lib.components.remote.place.Placed
 import fr.irit.smac.may.lib.components.scheduling.Clock
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService
-import fr.irit.smac.may.lib.components.scheduling.Scheduled
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper
 import fr.irit.smac.may.lib.components.scheduling.Scheduler
 import fr.irit.smac.may.lib.components.scheduling.SchedulingControllerGUI
 import fr.irit.smac.may.lib.interfaces.Do
@@ -50,17 +46,14 @@ namespace fr.irit.smac.may.lib.classic {
 			
 			provides create: NamedPublishMASFactory
 			
-			part refs: MapReferences[Pull[Integer],String]
-			part observeds: ValuePublisher[Integer,String] {
-				bind call to refs.call
-			}
+			part observeds: MapRefValuePublisher[Integer,String]
 			
-			part executor: ExecutorService
-			part schedule: Scheduled {
-				bind sched to executor.exec
+			part executor: ExecutorServiceWrapper
+			part schedule: Scheduler {
+				bind executor to executor.executor
 			}
 			part clock: Clock {
-				bind sched to executor.exec
+				bind sched to executor.executor
 				bind tick to schedule.tick
 			}
 			part gui: SchedulingControllerGUI {
@@ -69,24 +62,21 @@ namespace fr.irit.smac.may.lib.classic {
 
 			species Observed(name: String, beha: AbstractObservedBehaviour) {
 
-				use sched: schedule.Agent {
+				use sched: schedule.Scheduled {
 					bind cycle to beh.cycle
 				}
 				
 				part beh: ObservedBehaviour {
 					bind changeValue to observed.set 
 				}
-			
-				use ref: refs.Callee(name) {
-					bind toCall to observed.toCall
-				}
-				use observed: observeds.PublisherPush
+				
+				use observed: observeds.PublisherPush(name)
 				
 			}
 			
 			species Observer(beha: AbstractObserverBehaviour[String]) {
 				
-				use sched: schedule.Agent {
+				use sched: schedule.Scheduled {
 					bind cycle to beh.cycle
 				}
 				
@@ -107,43 +97,33 @@ namespace fr.irit.smac.may.lib.classic {
 			
 			provides send: Send[Msg, String] = receive.deposit
 			provides create: CreateNamed[Msg, String]
-			
-			part scheduler: Scheduler {
-				bind executor to executor.exec
-			}
-			
+						
 			part fact: Forward[CreateNamed[Msg, String]] {
-				bind i to create
+				bind forwardedPort to create
 			}
 			
-			part refs: MapReferences[Push[Msg],String]
-			part receive: AsyncReceiver[Msg,String] {
-				bind call to refs.call
-			}
+			part receive: MapRefAsyncReceiver[Msg,String]
 			
-			part executor: ExecutorService
+			part executor: ExecutorServiceWrapper
 			
 			species ClassicNamedAgent(beh: AbstractClassicNamedBehaviour[Msg,String], name: String) {
 			//species ClassicNamedAgent(name: String) {
 				part arch: ClassicNamedAgentComponent[Msg, String] {
 					bind send to ss.send
-					bind executor to s.exec
+					bind executor to s.executor
 					bind die to s.stop
-					bind create to f.a
-					bind me to ref.me
+					bind create to f.forwardedPort
+					bind me to receive.me
 				}
 
-				use s: scheduler.Agent
+				use s: executor.Executing
 
-				use f: fact.Agent
+				use f: fact.Caller
 
-				use receive: receive.Receiver {
+				use receive: receive.Receiver(name) {
 					bind put to arch.put
 				}
-				use ref: refs.Callee(name) {
-					bind toCall to receive.toCall
-				}
-
+				
 				use ss: receive.Sender
 			}
 		}
@@ -196,43 +176,33 @@ namespace fr.irit.smac.may.lib.classic {
 			provides send: Send[Msg, DirRef] = receive.deposit
 			provides create: CreateClassic[Msg, DirRef]
 			provides stop: Do = executor.stop
-
-			part scheduler: Scheduler {
-				bind executor to executor.exec
-			}
 			
-			part refs: DirectReferences[Push[Msg]]
-			part receive: AsyncReceiver[Msg,DirRef] {
-				bind call to refs.call
-			}
+			part receive: DirRefAsyncReceiver[Msg]
 
 			part fact: Forward[CreateClassic[Msg, DirRef]] {
-				bind i to create
+				bind forwardedPort to create
 			}
 
-			part executor: ExecutorService
+			part executor: ExecutorServiceWrapper
 
 			species ClassicAgent(beh: AbstractClassicBehaviour[Msg,DirRef], name: String) {
 			//species ClassicAgent(name: String) {
-				provides me: Pull[DirRef] = ref.me
+				provides me: Pull[DirRef] = receive.me
 				
 				part arch: ClassicAgentComponent[Msg, DirRef] {
 					bind send to ss.send
-					bind me to ref.me
-					bind executor to s.exec
+					bind me to receive.me
+					bind executor to s.executor
 					bind die to s.stop
-					bind create to f.a
+					bind create to f.forwardedPort
 				}
 
-				use s: scheduler.Agent
+				use s: executor.Executing
 
-				use f: fact.Agent
+				use f: fact.Caller
 				
-				use receive: receive.Receiver {
+				use receive: receive.Receiver(name) {
 					bind put to arch.put
-				}
-				use ref: refs.Callee(name) {
-					bind toCall to receive.toCall
 				}
 
 				use ss: receive.Sender
@@ -308,20 +278,16 @@ namespace fr.irit.smac.may.lib.classic {
 			provides send: Send[Msg, RemoteAgentRef] = remReceive.deposit
 			provides thisPlace: Pull[Place] = placed.thisPlace
 			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
-
-			part scheduler: Scheduler {
-				bind executor to executor.exec
-			}
-
+			
 			part sender: Forward[Send[Msg, RemoteAgentRef]] {
-				bind i to remReceive.deposit
+				bind forwardedPort to remReceive.deposit
 			}
 
-			part receive: Receiver[Msg]
+			part receive: DirRefAsyncReceiver[Msg]
 
 			part placed: Placed
 
-			part remReceive: RemoteReceiver[Msg, AgentRef] {
+			part remReceive: RemoteReceiver[Msg, DirRef] {
 				bind localDeposit to receive.deposit
 				bind myPlace to placed.thisPlace
 			}
@@ -331,26 +297,26 @@ namespace fr.irit.smac.may.lib.classic {
 				bind thisPlace to placed.thisPlace
 			}
 
-			part executor: ExecutorService
+			part executor: ExecutorServiceWrapper
 
 			species ClassicAgent(beh: AbstractRemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
 			//species ClassicAgent(name: String) {
 				provides ref: Pull[RemoteAgentRef] = rr.me
 				part arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
-					bind send to ss.a
+					bind send to ss.forwardedPort
 					bind me to rr.me
 					bind stopExec to s.stop
 					bind stopReceive to rr.disconnect
-					bind executor to s.exec
+					bind executor to s.executor
 					bind create to f.create
 				}
 				use p: placed.Agent
 				use f: fact.Agent
-				use s: scheduler.Agent
-				use r: receive.Agent(name) {
+				use s: executor.Executing
+				use r: receive.Receiver(name) {
 					bind put to arch.put
 				}
-				use ss: sender.Agent
+				use ss: sender.Caller
 				use rr: remReceive.Agent {
 					bind localMe to r.me
 				}

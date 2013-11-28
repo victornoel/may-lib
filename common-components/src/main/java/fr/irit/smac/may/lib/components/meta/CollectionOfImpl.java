@@ -9,7 +9,7 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 
 public class CollectionOfImpl<I> extends CollectionOf<I> {
 
-	private Map<Agent<I>,I> interfaces = new ConcurrentHashMap<Agent<I>, I>();
+	private final Map<Element<I>,I> interfaces = new ConcurrentHashMap<Element<I>, I>();
 	
 	@Override
 	protected Pull<Collection<I>> make_get() {
@@ -21,13 +21,13 @@ public class CollectionOfImpl<I> extends CollectionOf<I> {
 	}
 
 	@Override
-	protected Agent<I> make_Agent() {
-		return new Agent<I>() {
+	protected Element<I> make_Element() {
+		return new Element<I>() {
 			
 			@Override
 			protected void start() {
 				super.start();
-				interfaces.put(this, requires().p());
+				interfaces.put(this, requires().forwardedPort());
 			}
 			
 			@Override

@@ -9,8 +9,7 @@ import fr.irit.smac.may.lib.interfaces.Push;
 public class Test {
 
 	public static void main(String[] args) {
-		RemoteClassic.Component<String> infra = RemoteClassic.newComponent(new RemoteClassicImpl<String>(1099));
-		infra.start();
+		RemoteClassic.Component<String> infra = new RemoteClassicImpl<String>(1099).newComponent();
 		
 		final RemoteAgentRef create = infra.create().create(new AbstractRemoteClassicBehaviour<String, RemoteAgentRef>() {
 			@Override

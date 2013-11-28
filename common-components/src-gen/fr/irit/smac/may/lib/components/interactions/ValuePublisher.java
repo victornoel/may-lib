@@ -28,47 +28,52 @@ public abstract class ValuePublisher<T, K> {
   
   
   @SuppressWarnings("all")
+  public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.Provides<T,K> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<T, K> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.Provides<T,K> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.Parts<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.Component<T,K> {
+  public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.Component<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.Parts<T,K> {
     private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Requires<T,K> bridge;
     
     private final ValuePublisher<T,K> implementation;
     
-    public ComponentImpl(final ValuePublisher<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Requires<T,K> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.observe == null;
+      this.observe = this.implementation.make_observe();
+      
+    }
+    
+    public ComponentImpl(final ValuePublisher<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Requires<T,K> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.observe = implem.make_observe();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final ReliableObserve<T,K> observe;
+    private ReliableObserve<T,K> observe;
     
     public final ReliableObserve<T,K> observe() {
       return this.observe;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -103,46 +108,57 @@ public abstract class ValuePublisher<T, K> {
     
     
     @SuppressWarnings("all")
+    public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Provides<T,K> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<T, K> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Provides<T,K> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Parts<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Component<T,K> {
+    public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Component<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Parts<T,K> {
       private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Requires<T,K> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush<T,K> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Requires<T,K> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.set == null;
+        this.set = this.implementation.make_set();
+        assert this.get == null;
+        this.get = this.implementation.make_get();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Requires<T,K> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.set = implem.make_set();
-        this.get = implem.make_get();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Push<T> set;
+      private Push<T> set;
       
       public final Push<T> set() {
         return this.set;
       }
       
-      private final Pull<T> get;
+      private Pull<T> get;
       
       public final Pull<T> get() {
         return this.get;
@@ -151,11 +167,6 @@ public abstract class ValuePublisher<T, K> {
       public final Pull<T> toCall() {
         return this.get();
       }
-      
-      public void start() {
-        this.implementation.start();
-        
-      }
     }
     
     
@@ -163,8 +174,7 @@ public abstract class ValuePublisher<T, K> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -220,7 +230,10 @@ public abstract class ValuePublisher<T, K> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Component<T,K> newComponent(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.Requires<T,K> b) {
-      return new fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.ComponentImpl<T,K>(this, b);
+      fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.ComponentImpl<T,K> comp = new fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPush.ComponentImpl<T,K>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.ValuePublisher.ComponentImpl<T,K> ecosystemComponent;
@@ -286,39 +299,49 @@ public abstract class ValuePublisher<T, K> {
     
     
     @SuppressWarnings("all")
+    public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Provides<T,K> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<T, K> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Provides<T,K> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Parts<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Component<T,K> {
+    public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Component<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Parts<T,K> {
       private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Requires<T,K> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull<T,K> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Requires<T,K> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.get == null;
+        this.get = this.implementation.make_get();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Requires<T,K> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.get = implem.make_get();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final Pull<T> get;
+      private Pull<T> get;
       
       public final Pull<T> get() {
         return this.get;
@@ -327,11 +350,6 @@ public abstract class ValuePublisher<T, K> {
       public final Pull<T> toCall() {
         return this.get();
       }
-      
-      public void start() {
-        this.implementation.start();
-        
-      }
     }
     
     
@@ -339,8 +357,7 @@ public abstract class ValuePublisher<T, K> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -389,7 +406,10 @@ public abstract class ValuePublisher<T, K> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Component<T,K> newComponent(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.Requires<T,K> b) {
-      return new fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.ComponentImpl<T,K>(this, b);
+      fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.ComponentImpl<T,K> comp = new fr.irit.smac.may.lib.components.interactions.ValuePublisher.PublisherPull.ComponentImpl<T,K>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.ValuePublisher.ComponentImpl<T,K> ecosystemComponent;
@@ -444,47 +464,52 @@ public abstract class ValuePublisher<T, K> {
     
     
     @SuppressWarnings("all")
+    public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Provides<T,K> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<T, K> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<T, K> extends fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Provides<T,K> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Parts<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Component<T,K> {
+    public static class ComponentImpl<T, K> implements fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Component<T,K>, fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Parts<T,K> {
       private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Requires<T,K> bridge;
       
       private final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer<T,K> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Requires<T,K> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.observe == null;
+        this.observe = this.implementation.make_observe();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer<T,K> implem, final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Requires<T,K> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.observe = implem.make_observe();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final ReliableObserve<T,K> observe;
+      private ReliableObserve<T,K> observe;
       
       public final ReliableObserve<T,K> observe() {
         return this.observe;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -493,8 +518,7 @@ public abstract class ValuePublisher<T, K> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -543,7 +567,10 @@ public abstract class ValuePublisher<T, K> {
      * 
      */
     public fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Component<T,K> newComponent(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.Requires<T,K> b) {
-      return new fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.ComponentImpl<T,K>(this, b);
+      fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.ComponentImpl<T,K> comp = new fr.irit.smac.may.lib.components.interactions.ValuePublisher.Observer.ComponentImpl<T,K>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.components.interactions.ValuePublisher.ComponentImpl<T,K> ecosystemComponent;
@@ -584,8 +611,7 @@ public abstract class ValuePublisher<T, K> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -634,7 +660,10 @@ public abstract class ValuePublisher<T, K> {
    * 
    */
   public fr.irit.smac.may.lib.components.interactions.ValuePublisher.Component<T,K> newComponent(final fr.irit.smac.may.lib.components.interactions.ValuePublisher.Requires<T,K> b) {
-    return new fr.irit.smac.may.lib.components.interactions.ValuePublisher.ComponentImpl<T,K>(this, b);
+    fr.irit.smac.may.lib.components.interactions.ValuePublisher.ComponentImpl<T,K> comp = new fr.irit.smac.may.lib.components.interactions.ValuePublisher.ComponentImpl<T,K>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**

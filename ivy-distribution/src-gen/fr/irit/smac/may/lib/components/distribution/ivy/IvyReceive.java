@@ -48,68 +48,76 @@ public abstract class IvyReceive {
   
   
   @SuppressWarnings("all")
+  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Provides {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component extends fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Provides {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Parts, fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Component {
+  public static class ComponentImpl implements fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Component, fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Parts {
     private final fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Requires bridge;
     
     private final IvyReceive implementation;
     
-    public ComponentImpl(final IvyReceive implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Requires b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.bindMsg == null;
+      this.bindMsg = this.implementation.make_bindMsg();
+      assert this.connectionStatus == null;
+      this.connectionStatus = this.implementation.make_connectionStatus();
+      assert this.connect == null;
+      this.connect = this.implementation.make_connect();
+      assert this.disconnect == null;
+      this.disconnect = this.implementation.make_disconnect();
+      
+    }
+    
+    public ComponentImpl(final IvyReceive implem, final fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Requires b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.bindMsg = implem.make_bindMsg();
-      this.connectionStatus = implem.make_connectionStatus();
-      this.connect = implem.make_connect();
-      this.disconnect = implem.make_disconnect();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Push<String> bindMsg;
+    private Push<String> bindMsg;
     
     public final Push<String> bindMsg() {
       return this.bindMsg;
     }
     
-    private final Pull<IvyConnectionStatus> connectionStatus;
+    private Pull<IvyConnectionStatus> connectionStatus;
     
     public final Pull<IvyConnectionStatus> connectionStatus() {
       return this.connectionStatus;
     }
     
-    private final Push<IvyConnectionConfig> connect;
+    private Push<IvyConnectionConfig> connect;
     
     public final Push<IvyConnectionConfig> connect() {
       return this.connect;
     }
     
-    private final Do disconnect;
+    private Do disconnect;
     
     public final Do disconnect() {
       return this.disconnect;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -118,8 +126,7 @@ public abstract class IvyReceive {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -189,6 +196,9 @@ public abstract class IvyReceive {
    * 
    */
   public fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Component newComponent(final fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.Requires b) {
-    return new fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.ComponentImpl(this, b);
+    fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.ComponentImpl comp = new fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive.ComponentImpl(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

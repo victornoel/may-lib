@@ -6,9 +6,9 @@ import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
-import fr.irit.smac.may.lib.components.messaging.receiver.AgentRef;
-import fr.irit.smac.may.lib.components.messaging.receiver.Receiver;
-import fr.irit.smac.may.lib.components.messaging.receiver.ReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
+import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiverImpl;
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
 import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
@@ -17,10 +17,8 @@ import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiverI
 import fr.irit.smac.may.lib.components.remote.place.Place;
 import fr.irit.smac.may.lib.components.remote.place.Placed;
 import fr.irit.smac.may.lib.components.remote.place.PlacedImpl;
-import fr.irit.smac.may.lib.components.scheduling.ExecutorService;
+import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
-import fr.irit.smac.may.lib.components.scheduling.Scheduler;
-import fr.irit.smac.may.lib.components.scheduling.SchedulerImpl;
 import fr.irit.smac.may.lib.interfaces.Send;
 
 public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
@@ -34,27 +32,22 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	protected Scheduler make_scheduler() {
-		return new SchedulerImpl();
-	}
-
-	@Override
 	protected Forward<Send<Msg, RemoteAgentRef>> make_sender() {
 		return new ForwardImpl<Send<Msg,RemoteAgentRef>>();
 	}
 
 	@Override
-	public Receiver<Msg> make_receive() {
-		return new ReceiverImpl<Msg>();
+	protected DirRefAsyncReceiver<Msg> make_receive() {
+		return new DirRefAsyncReceiverImpl<Msg>();
 	}
 
 	@Override
-	public RemoteReceiver<Msg, AgentRef> make_remReceive() {
-		return new RemoteReceiverImpl<Msg, AgentRef>();
+	public RemoteReceiver<Msg, DirRef> make_remReceive() {
+		return new RemoteReceiverImpl<Msg, DirRef>();
 	}
 
 	@Override
-	public ExecutorService make_executor() {
+	public ExecutorServiceWrapper make_executor() {
 		return new ExecutorServiceWrapperImpl(Executors.newFixedThreadPool(5));
 	}
 
@@ -70,7 +63,6 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 					final AbstractRemoteClassicBehaviour<Msg, RemoteAgentRef> beh) {
 				
 				ClassicAgent.Component<Msg> agent = newClassicAgent(beh, "agent"+(i++));
-				agent.start();
 				return agent.ref().pull();
 			}
 

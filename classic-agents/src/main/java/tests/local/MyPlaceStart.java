@@ -11,7 +11,7 @@ public class MyPlaceStart {
 
 	public static void main(String[] args) {
 
-		Classic.Component<PatternMatchingMessage> infra = Classic.newComponent(new ClassicImpl<PatternMatchingMessage>());
+		Classic.Component<PatternMatchingMessage> infra = new ClassicImpl<PatternMatchingMessage>().newComponent();
 		
 		DirRef starter = infra.create().create(new BehaviorSetup<DirRef>());
 

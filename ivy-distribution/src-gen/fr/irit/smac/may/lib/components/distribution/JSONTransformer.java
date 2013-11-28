@@ -26,54 +26,60 @@ public abstract class JSONTransformer<T> {
   
   
   @SuppressWarnings("all")
+  public interface Component<T> extends fr.irit.smac.may.lib.components.distribution.JSONTransformer.Provides<T> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<T> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<T> extends fr.irit.smac.may.lib.components.distribution.JSONTransformer.Provides<T> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.distribution.JSONTransformer.Parts<T>, fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T> {
+  public static class ComponentImpl<T> implements fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T>, fr.irit.smac.may.lib.components.distribution.JSONTransformer.Parts<T> {
     private final fr.irit.smac.may.lib.components.distribution.JSONTransformer.Requires<T> bridge;
     
     private final JSONTransformer<T> implementation;
     
-    public ComponentImpl(final JSONTransformer<T> implem, final fr.irit.smac.may.lib.components.distribution.JSONTransformer.Requires<T> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.serializer == null;
+      this.serializer = this.implementation.make_serializer();
+      assert this.deserializer == null;
+      this.deserializer = this.implementation.make_deserializer();
+      
+    }
+    
+    public ComponentImpl(final JSONTransformer<T> implem, final fr.irit.smac.may.lib.components.distribution.JSONTransformer.Requires<T> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.serializer = implem.make_serializer();
-      this.deserializer = implem.make_deserializer();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Transform<T,String> serializer;
+    private Transform<T,String> serializer;
     
     public final Transform<T,String> serializer() {
       return this.serializer;
     }
     
-    private final Transform<String,T> deserializer;
+    private Transform<String,T> deserializer;
     
     public final Transform<String,T> deserializer() {
       return this.deserializer;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -82,8 +88,7 @@ public abstract class JSONTransformer<T> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -139,7 +144,10 @@ public abstract class JSONTransformer<T> {
    * 
    */
   public fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T> newComponent(final fr.irit.smac.may.lib.components.distribution.JSONTransformer.Requires<T> b) {
-    return new fr.irit.smac.may.lib.components.distribution.JSONTransformer.ComponentImpl<T>(this, b);
+    fr.irit.smac.may.lib.components.distribution.JSONTransformer.ComponentImpl<T> comp = new fr.irit.smac.may.lib.components.distribution.JSONTransformer.ComponentImpl<T>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -148,13 +156,5 @@ public abstract class JSONTransformer<T> {
    */
   public fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.distribution.JSONTransformer.Requires<T>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <T> fr.irit.smac.may.lib.components.distribution.JSONTransformer.Component<T> newComponent(final JSONTransformer<T> _compo) {
-    return _compo.newComponent();
   }
 }

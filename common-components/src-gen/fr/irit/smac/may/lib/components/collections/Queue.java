@@ -34,61 +34,68 @@ public abstract class Queue<Truc> {
   
   
   @SuppressWarnings("all")
+  public interface Component<Truc> extends fr.irit.smac.may.lib.components.collections.Queue.Provides<Truc> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<Truc> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<Truc> extends fr.irit.smac.may.lib.components.collections.Queue.Provides<Truc> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Truc> implements fr.irit.smac.may.lib.components.collections.Queue.Parts<Truc>, fr.irit.smac.may.lib.components.collections.Queue.Component<Truc> {
+  public static class ComponentImpl<Truc> implements fr.irit.smac.may.lib.components.collections.Queue.Component<Truc>, fr.irit.smac.may.lib.components.collections.Queue.Parts<Truc> {
     private final fr.irit.smac.may.lib.components.collections.Queue.Requires<Truc> bridge;
     
     private final Queue<Truc> implementation;
     
-    public ComponentImpl(final Queue<Truc> implem, final fr.irit.smac.may.lib.components.collections.Queue.Requires<Truc> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.put == null;
+      this.put = this.implementation.make_put();
+      assert this.get == null;
+      this.get = this.implementation.make_get();
+      assert this.getAll == null;
+      this.getAll = this.implementation.make_getAll();
+      
+    }
+    
+    public ComponentImpl(final Queue<Truc> implem, final fr.irit.smac.may.lib.components.collections.Queue.Requires<Truc> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.put = implem.make_put();
-      this.get = implem.make_get();
-      this.getAll = implem.make_getAll();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Push<Truc> put;
+    private Push<Truc> put;
     
     public final Push<Truc> put() {
       return this.put;
     }
     
-    private final Pull<Truc> get;
+    private Pull<Truc> get;
     
     public final Pull<Truc> get() {
       return this.get;
     }
     
-    private final Pull<Collection<Truc>> getAll;
+    private Pull<Collection<Truc>> getAll;
     
     public final Pull<Collection<Truc>> getAll() {
       return this.getAll;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -97,8 +104,7 @@ public abstract class Queue<Truc> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -161,7 +167,10 @@ public abstract class Queue<Truc> {
    * 
    */
   public fr.irit.smac.may.lib.components.collections.Queue.Component<Truc> newComponent(final fr.irit.smac.may.lib.components.collections.Queue.Requires<Truc> b) {
-    return new fr.irit.smac.may.lib.components.collections.Queue.ComponentImpl<Truc>(this, b);
+    fr.irit.smac.may.lib.components.collections.Queue.ComponentImpl<Truc> comp = new fr.irit.smac.may.lib.components.collections.Queue.ComponentImpl<Truc>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -170,13 +179,5 @@ public abstract class Queue<Truc> {
    */
   public fr.irit.smac.may.lib.components.collections.Queue.Component<Truc> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.collections.Queue.Requires<Truc>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <Truc> fr.irit.smac.may.lib.components.collections.Queue.Component<Truc> newComponent(final Queue<Truc> _compo) {
-    return _compo.newComponent();
   }
 }

@@ -18,47 +18,52 @@ public abstract class Void<I> {
   
   
   @SuppressWarnings("all")
+  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Void.Provides<I> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<I> extends fr.irit.smac.may.lib.components.meta.Void.Provides<I> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Void.Parts<I>, fr.irit.smac.may.lib.components.meta.Void.Component<I> {
+  public static class ComponentImpl<I> implements fr.irit.smac.may.lib.components.meta.Void.Component<I>, fr.irit.smac.may.lib.components.meta.Void.Parts<I> {
     private final fr.irit.smac.may.lib.components.meta.Void.Requires<I> bridge;
     
     private final Void<I> implementation;
     
-    public ComponentImpl(final Void<I> implem, final fr.irit.smac.may.lib.components.meta.Void.Requires<I> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.port == null;
+      this.port = this.implementation.make_port();
+      
+    }
+    
+    public ComponentImpl(final Void<I> implem, final fr.irit.smac.may.lib.components.meta.Void.Requires<I> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.port = implem.make_port();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final I port;
+    private I port;
     
     public final I port() {
       return this.port;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -67,8 +72,7 @@ public abstract class Void<I> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -117,7 +121,10 @@ public abstract class Void<I> {
    * 
    */
   public fr.irit.smac.may.lib.components.meta.Void.Component<I> newComponent(final fr.irit.smac.may.lib.components.meta.Void.Requires<I> b) {
-    return new fr.irit.smac.may.lib.components.meta.Void.ComponentImpl<I>(this, b);
+    fr.irit.smac.may.lib.components.meta.Void.ComponentImpl<I> comp = new fr.irit.smac.may.lib.components.meta.Void.ComponentImpl<I>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**
@@ -126,13 +133,5 @@ public abstract class Void<I> {
    */
   public fr.irit.smac.may.lib.components.meta.Void.Component<I> newComponent() {
     return this.newComponent(new fr.irit.smac.may.lib.components.meta.Void.Requires<I>() {});
-  }
-  
-  /**
-   * Use to instantiate a component with this implementation.
-   * 
-   */
-  public static <I> fr.irit.smac.may.lib.components.meta.Void.Component<I> newComponent(final Void<I> _compo) {
-    return _compo.newComponent();
   }
 }

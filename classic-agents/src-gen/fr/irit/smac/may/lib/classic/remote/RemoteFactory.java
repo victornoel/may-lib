@@ -33,47 +33,52 @@ public abstract class RemoteFactory<Msg, Ref> {
   
   
   @SuppressWarnings("all")
+  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.remote.RemoteFactory.Provides<Msg,Ref> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.remote.RemoteFactory.Provides<Msg,Ref> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.remote.RemoteFactory.Parts<Msg,Ref>, fr.irit.smac.may.lib.classic.remote.RemoteFactory.Component<Msg,Ref> {
+  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.remote.RemoteFactory.Component<Msg,Ref>, fr.irit.smac.may.lib.classic.remote.RemoteFactory.Parts<Msg,Ref> {
     private final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Requires<Msg,Ref> bridge;
     
     private final RemoteFactory<Msg,Ref> implementation;
     
-    public ComponentImpl(final RemoteFactory<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Requires<Msg,Ref> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.factCreate == null;
+      this.factCreate = this.implementation.make_factCreate();
+      
+    }
+    
+    public ComponentImpl(final RemoteFactory<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Requires<Msg,Ref> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.factCreate = implem.make_factCreate();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final CreateRemoteClassic<Msg,Ref> factCreate;
+    private CreateRemoteClassic<Msg,Ref> factCreate;
     
     public final CreateRemoteClassic<Msg,Ref> factCreate() {
       return this.factCreate;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -96,47 +101,52 @@ public abstract class RemoteFactory<Msg, Ref> {
     
     
     @SuppressWarnings("all")
+    public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Provides<Msg,Ref> {
+    }
+    
+    
+    @SuppressWarnings("all")
     public interface Parts<Msg, Ref> {
     }
     
     
     @SuppressWarnings("all")
-    public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Provides<Msg,Ref> {
-      /**
-       * This should be called to start the component.
-       * This must be called before any provided port can be called.
-       * 
-       */
-      public void start();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Parts<Msg,Ref>, fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Component<Msg,Ref> {
+    public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Component<Msg,Ref>, fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Parts<Msg,Ref> {
       private final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Requires<Msg,Ref> bridge;
       
       private final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent<Msg,Ref> implementation;
       
-      public ComponentImpl(final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Requires<Msg,Ref> b) {
+      protected void initParts() {
+        
+      }
+      
+      protected void initProvidedPorts() {
+        assert this.create == null;
+        this.create = this.implementation.make_create();
+        
+      }
+      
+      public ComponentImpl(final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Requires<Msg,Ref> b, final boolean initMakes) {
         this.bridge = b;
         this.implementation = implem;
         
         assert implem.selfComponent == null;
         implem.selfComponent = this;
         
-        this.create = implem.make_create();
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (initMakes) {
+        	initParts();
+        	initProvidedPorts();
+        }
         
       }
       
-      private final CreateRemoteClassic<Msg,Ref> create;
+      private CreateRemoteClassic<Msg,Ref> create;
       
       public final CreateRemoteClassic<Msg,Ref> create() {
         return this.create;
-      }
-      
-      public void start() {
-        this.implementation.start();
-        
       }
     }
     
@@ -145,8 +155,7 @@ public abstract class RemoteFactory<Msg, Ref> {
     
     /**
      * Can be overridden by the implementation.
-     * It will be called after the component has been instantiated, after the components have been instantiated
-     * and during the containing component start() method is called.
+     * It will be called automatically after the component has been instantiated.
      * 
      */
     protected void start() {
@@ -195,7 +204,10 @@ public abstract class RemoteFactory<Msg, Ref> {
      * 
      */
     public fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Component<Msg,Ref> newComponent(final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.Requires<Msg,Ref> b) {
-      return new fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.ComponentImpl<Msg,Ref>(this, b);
+      fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.ComponentImpl<Msg,Ref> comp = new fr.irit.smac.may.lib.classic.remote.RemoteFactory.Agent.ComponentImpl<Msg,Ref>(this, b, true);
+      comp.implementation.start();
+      return comp;
+      
     }
     
     private fr.irit.smac.may.lib.classic.remote.RemoteFactory.ComponentImpl<Msg,Ref> ecosystemComponent;
@@ -236,8 +248,7 @@ public abstract class RemoteFactory<Msg, Ref> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -286,7 +297,10 @@ public abstract class RemoteFactory<Msg, Ref> {
    * 
    */
   public fr.irit.smac.may.lib.classic.remote.RemoteFactory.Component<Msg,Ref> newComponent(final fr.irit.smac.may.lib.classic.remote.RemoteFactory.Requires<Msg,Ref> b) {
-    return new fr.irit.smac.may.lib.classic.remote.RemoteFactory.ComponentImpl<Msg,Ref>(this, b);
+    fr.irit.smac.may.lib.classic.remote.RemoteFactory.ComponentImpl<Msg,Ref> comp = new fr.irit.smac.may.lib.classic.remote.RemoteFactory.ComponentImpl<Msg,Ref>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
   
   /**

@@ -47,47 +47,52 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
   
   
   @SuppressWarnings("all")
+  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Provides<Msg,Ref> {
+  }
+  
+  
+  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
   }
   
   
   @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Provides<Msg,Ref> {
-    /**
-     * This should be called to start the component.
-     * This must be called before any provided port can be called.
-     * 
-     */
-    public void start();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Parts<Msg,Ref>, fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Component<Msg,Ref> {
+  public static class ComponentImpl<Msg, Ref> implements fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Component<Msg,Ref>, fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Parts<Msg,Ref> {
     private final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> bridge;
     
     private final ClassicNamedBehaviour<Msg,Ref> implementation;
     
-    public ComponentImpl(final ClassicNamedBehaviour<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> b) {
+    protected void initParts() {
+      
+    }
+    
+    protected void initProvidedPorts() {
+      assert this.cycle == null;
+      this.cycle = this.implementation.make_cycle();
+      
+    }
+    
+    public ComponentImpl(final ClassicNamedBehaviour<Msg,Ref> implem, final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> b, final boolean initMakes) {
       this.bridge = b;
       this.implementation = implem;
       
       assert implem.selfComponent == null;
       implem.selfComponent = this;
       
-      this.cycle = implem.make_cycle();
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (initMakes) {
+      	initParts();
+      	initProvidedPorts();
+      }
       
     }
     
-    private final Push<Msg> cycle;
+    private Push<Msg> cycle;
     
     public final Push<Msg> cycle() {
       return this.cycle;
-    }
-    
-    public void start() {
-      this.implementation.start();
-      
     }
   }
   
@@ -96,8 +101,7 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
   
   /**
    * Can be overridden by the implementation.
-   * It will be called after the component has been instantiated, after the components have been instantiated
-   * and during the containing component start() method is called.
+   * It will be called automatically after the component has been instantiated.
    * 
    */
   protected void start() {
@@ -146,6 +150,9 @@ public abstract class ClassicNamedBehaviour<Msg, Ref> {
    * 
    */
   public fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Component<Msg,Ref> newComponent(final fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.Requires<Msg,Ref> b) {
-    return new fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.ComponentImpl<Msg,Ref>(this, b);
+    fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.ComponentImpl<Msg,Ref> comp = new fr.irit.smac.may.lib.classic.named.ClassicNamedBehaviour.ComponentImpl<Msg,Ref>(this, b, true);
+    comp.implementation.start();
+    return comp;
+    
   }
 }

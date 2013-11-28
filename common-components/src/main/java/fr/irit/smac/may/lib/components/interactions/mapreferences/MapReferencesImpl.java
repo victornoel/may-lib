@@ -27,7 +27,7 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 		public I getIf();
 	}
 	
-	public class CalleePullKeyImpl extends CalleePullKey<I, K> implements Agent<I> {
+	public class CalleePullKeyImpl extends CalleeKeyPort<I, K> implements Agent<I> {
 
 		private K key;
 
@@ -106,7 +106,7 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 	}
 
 	@Override
-	protected CalleePullKey<I, K> make_CalleePullKey() {
+	protected CalleeKeyPort<I, K> make_CalleeKeyPort() {
 		return new CalleePullKeyImpl();
 	}
 
