@@ -44,7 +44,7 @@ public class NamedPublishMASImpl extends NamedPublishMAS {
 	}
 
 	@Override
-	protected Observed make_Observed(String name, final AbstractObservedBehaviour beh) {
+	protected Observed make_Observed(String name, final ObservedBehaviour beh) {
 		return new Observed() {
 			@Override
 			protected ObservedBehaviour make_beh() {
@@ -54,7 +54,7 @@ public class NamedPublishMASImpl extends NamedPublishMAS {
 	}
 
 	@Override
-	protected Observer make_Observer(final AbstractObserverBehaviour<String> beh) {
+	protected Observer make_Observer(final ObserverBehaviour<String> beh) {
 		return new Observer() {
 			@Override
 			protected ObserverBehaviour<String> make_beh() {

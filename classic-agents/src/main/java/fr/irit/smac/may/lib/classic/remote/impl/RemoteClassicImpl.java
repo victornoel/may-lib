@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateRemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassic;
 import fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent;
+import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiverImpl;
@@ -80,8 +81,8 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 	}
 
 	@Override
-	protected fr.irit.smac.may.lib.classic.remote.RemoteClassic.ClassicAgent<Msg> make_ClassicAgent(
-			final AbstractRemoteClassicBehaviour<Msg, RemoteAgentRef> beh, String name) {
+	protected ClassicAgent<Msg> make_ClassicAgent(
+			final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, String name) {
 		return new ClassicAgent<Msg>() {
 			@Override
 			protected RemoteClassicAgentComponent<Msg, RemoteAgentRef> make_arch() {

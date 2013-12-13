@@ -6,14 +6,13 @@
 
 	<parent>
 		<groupId>fr.irit.smac.lib</groupId>
-		<artifactId>parent-may</artifactId>
-		<version>0.0.1</version>
-		<relativePath></relativePath>
+		<artifactId>parent</artifactId>
+		<version>0.0.3</version>
 	</parent>
 
 	<groupId>fr.irit.smac.lib.may</groupId>
 	<artifactId>parent</artifactId>
-	<version>0.0.3</version>
+	<version>3.2.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<description>Parent pom for the official MAY library</description>
 

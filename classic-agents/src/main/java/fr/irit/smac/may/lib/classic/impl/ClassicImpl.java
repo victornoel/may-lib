@@ -5,6 +5,7 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateClassic;
 import fr.irit.smac.may.lib.classic.local.Classic;
 import fr.irit.smac.may.lib.classic.local.ClassicAgentComponent;
+import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiverImpl;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
@@ -44,7 +45,7 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 	}
 
 	@Override
-	protected ClassicAgent<Msg> make_ClassicAgent(final AbstractClassicBehaviour<Msg, DirRef> beh, String name) {
+	protected ClassicAgent<Msg> make_ClassicAgent(final ClassicBehaviour<Msg, DirRef> beh, String name) {
 		return new ClassicAgent<Msg>() {
 			@Override
 			protected ClassicAgentComponent<Msg, DirRef> make_arch() {

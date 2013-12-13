@@ -75,7 +75,7 @@ public class BufferImpl<I> extends Buffer<I> {
 	}
 	
 	public static void main(String[] args) {
-		Component<Push<String>> test = new BufferImpl<Push<String>>(Push.class).newComponent(new Buffer.Requires<Push<String>>() {
+		Component<Push<String>> test = new BufferImpl<Push<String>>(Push.class)._newComponent(new Buffer.Requires<Push<String>>() {
 			public Push<String> realPort() {
 				return new Push<String>() {
 					public void push(String thing) {
@@ -83,7 +83,7 @@ public class BufferImpl<I> extends Buffer<I> {
 					}
 				};
 			}
-		});
+		}, true);
 		
 		System.out.println("before calls");
 		

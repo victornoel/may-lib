@@ -6,11 +6,12 @@
 
 	<groupId>fr.irit.smac.lib.may</groupId>
 	<artifactId>aggregator</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.1</version>
 	<packaging>pom</packaging>
 
 	<modules>
 		<module>parent</module>
+		<module>parent-speadl</module>
 		<module>classic-agents</module>
 		<module>common-interfaces</module>
 		<module>common-components</module>
