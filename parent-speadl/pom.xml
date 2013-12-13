@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.irit.smac.lib.may</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.2.1-SNAPSHOT</version>
+		<version>3.2.1</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
@@ -99,7 +99,7 @@
 					<dependency>
 						<groupId>fr.irit.smac.may</groupId>
 						<artifactId>fr.irit.smac.may.speadl</artifactId>
-						<version>3.2.1-SNAPSHOT</version>
+						<version>${project.version}</version>
 					</dependency>
 				</dependencies>
 			</plugin>
