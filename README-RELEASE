@@ -1,0 +1,25 @@
+Release procedure:
+
+ * Prepare for release:
+  * Clean everything
+    -> mvn clean
+  * change the version to a fixed one (for example, if we were to 2.1.0-SNAPSHOT, go to 2.1.0)
+    -> cd parent && mvn versions:set -DnewVersion=2.1.0 && cd ..
+  * commit and tag the release
+    -> hg commit -m "prepare for 2.1.0 release"
+    -> hg tag v2.1.0
+
+ * Do the release
+  * Compile, install in the local repository and deploy 
+    -> mvn install deploy
+    
+ * Increment for development
+  * Clean everything
+    -> mvn clean
+  * change the version (note: it will change the osgi version AND the pom versions)
+    -> cd parent && mvn versions:set -DnewVersion=2.2.0-SNAPSHOT && cd ..
+  * commit
+    -> hg commit -m "increment to 2.2.0 development version"
+
+ * Develop!
+
