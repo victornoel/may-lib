@@ -11,7 +11,7 @@ Release procedure:
 
  * Do the release
   * Compile, install in the local repository and deploy 
-    -> mvn install deploy
+    -> mvn deploy
     
  * Increment for development
   * Clean everything
