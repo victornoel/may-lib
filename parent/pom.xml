@@ -12,7 +12,7 @@
 
 	<groupId>fr.irit.smac.lib.may</groupId>
 	<artifactId>parent</artifactId>
-	<version>3.2.2-SNAPSHOT</version>
+	<version>3.2.4</version>
 	<packaging>pom</packaging>
 	<description>Parent pom for the official MAY library</description>
 

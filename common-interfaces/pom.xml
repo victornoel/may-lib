@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>parent</artifactId>
 		<groupId>fr.irit.smac.lib.may</groupId>
-		<version>3.2.2-SNAPSHOT</version>
+		<version>3.2.4</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 

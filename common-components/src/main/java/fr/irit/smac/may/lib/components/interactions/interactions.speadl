@@ -1,7 +1,11 @@
+import fr.irit.smac.may.lib.components.interactions.asyncreceiver.AsyncReceiverImpl
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
+import fr.irit.smac.may.lib.components.interactions.directreferences.DirectReferencesImpl
 import fr.irit.smac.may.lib.components.interactions.interfaces.Call
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend
+import fr.irit.smac.may.lib.components.interactions.mapreferences.MapReferencesImpl
+import fr.irit.smac.may.lib.components.interactions.valuepublisher.ValuePublisherImpl
 import fr.irit.smac.may.lib.interfaces.Do
 import fr.irit.smac.may.lib.interfaces.Pull
 import fr.irit.smac.may.lib.interfaces.Push
@@ -42,7 +46,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			use ar: ar.Sender
 		}
 		
-		provides deposit: ReliableSend[M, DirRef] = ar.deposit
+		provides send: ReliableSend[M, DirRef] = ar.send
 	}
 	
 	/**
@@ -97,7 +101,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			use ar: ar.Sender
 		}
 		
-		provides deposit: ReliableSend[M, K] = ar.deposit
+		provides send: ReliableSend[M, K] = ar.send
 	}
 	
 	/**
@@ -109,9 +113,9 @@ namespace fr.irit.smac.may.lib.components.interactions {
 	ecosystem DirRefValuePublisher[T] {
 		
 		part dr: DirectReferences[Pull[T]]
-		part vp: ValuePublisher[T,DirRef] {
+		part vp: ValuePublisher[T,DirRef] { 
 			bind call to dr.call
-		}
+		}	
 		
 		species PublisherPush(name: String) {
 			
@@ -298,7 +302,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		}
 		
 		requires call: Call[Push[M],K]
-		provides deposit: ReliableSend[M, K]
+		provides send: ReliableSend[M, K]
 	}
 	
 	/**
@@ -325,6 +329,33 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 		requires call: Call[Pull[T],K]
 		provides observe: ReliableObserve[T, K]
+	}
+
+	/**
+	 * A very simple broadcast mechanism
+	 * 
+	 * M is the message type
+	 * R is the reference type
+	 * 
+	 * To be composed with a Reference and a Message mechanism
+	 * (which must be already composed together...)
+	 * or one that does both (such as DirRefAsyncReceiver)
+	 */
+	ecosystem Broadcast[M,R] {
+		
+		species BroadcastTarget {
+			// provided by the reference mechanism
+			requires me: Pull[R]
+			provides stop: Do
+		}
+		
+		species Broadcaster {
+			provides broadcast: Push[M]
+		}
+		
+		provides broadcast: Push[M]
+		// provided by the message mechanism
+		requires send: ReliableSend[M, R]
 	}
 
 }

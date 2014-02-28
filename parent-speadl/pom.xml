@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.irit.smac.lib.may</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.2.2-SNAPSHOT</version>
+		<version>3.2.4</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
@@ -15,97 +15,101 @@
 	<packaging>pom</packaging>
 	<description>Parent pom for the official MAY library that generates code with SpeADL</description>
 
+	<properties>
+		<xtext-version>2.5.3</xtext-version>
+	</properties>
+
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<version>1.8</version>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>speadl-gen</source>
-							</sources>
-						</configuration>
-					</execution>
-					<execution>
-						<!-- Needed so that speadl files are included in the jar -->
-						<id>add-resource</id>
-						<goals>
-							<goal>add-resource</goal>
-						</goals>
-						<configuration>
-							<resources>
-								<resource>
-									<directory>${project.build.sourceDirectory}</directory>
-									<includes>
-										<include>**/*.speadl</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<filesets>
-								<fileset>
-									<directory>speadl-gen</directory>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.xtext</groupId>
-				<artifactId>xtext-maven-plugin</artifactId>
-				<version>2.5.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<languages>
-						<language>
-							<setup>fr.irit.smac.may.speadl.SpeADLStandaloneSetup</setup>
-							<outputConfigurations>
-								<outputConfiguration>
-									<outputDirectory>speadl-gen</outputDirectory>
-								</outputConfiguration>
-							</outputConfigurations>
-						</language>
-					</languages>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>fr.irit.smac.may</groupId>
-						<artifactId>fr.irit.smac.may.speadl</artifactId>
-						<version>${project.version}</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-		</plugins>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>build-helper-maven-plugin</artifactId>
+					<version>1.8</version>
+					<executions>
+						<execution>
+							<id>add-source</id>
+							<goals>
+								<goal>add-source</goal>
+							</goals>
+							<configuration>
+								<sources>
+									<source>${project.basedir}/src/main/speadl-gen</source>
+								</sources>
+							</configuration>
+						</execution>
+						<execution>
+							<!-- Needed so that speadl files are included in the jar -->
+							<id>add-resource</id>
+							<goals>
+								<goal>add-resource</goal>
+							</goals>
+							<configuration>
+								<resources>
+									<resource>
+										<directory>${project.build.sourceDirectory}</directory>
+										<includes>
+											<include>**/*.speadl</include>
+										</includes>
+									</resource>
+								</resources>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-clean-plugin</artifactId>
+					<version>2.5</version>
+					<executions>
+						<execution>
+							<!-- hack in order for the file not to be removed on clean but only 
+								prior to code generation from xtend-maven-plugin -->
+							<phase>initialize</phase>
+							<goals>
+								<goal>clean</goal>
+							</goals>
+							<configuration>
+								<filesets>
+									<fileset>
+										<directory>${project.basedir}/src/main/speadl-gen</directory>
+									</fileset>
+								</filesets>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.xtext</groupId>
+					<artifactId>xtext-maven-plugin</artifactId>
+					<version>${xtext-version}</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>generate</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<languages>
+							<language>
+								<setup>fr.irit.smac.may.speadl.SpeADLStandaloneSetup</setup>
+								<outputConfigurations>
+									<outputConfiguration>
+										<outputDirectory>${project.basedir}/src/main/speadl-gen</outputDirectory>
+									</outputConfiguration>
+								</outputConfigurations>
+							</language>
+						</languages>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>fr.irit.smac.may</groupId>
+							<artifactId>fr.irit.smac.may.speadl</artifactId>
+							<version>${project.version}</version>
+						</dependency>
+					</dependencies>
+				</plugin>
 				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -117,13 +121,32 @@
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-clean-plugin
+										</artifactId>
+										<versionRange>
+											[2.5,)
+										</versionRange>
+										<goals>
+											<goal>clean</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
 											org.eclipse.xtext
 										</groupId>
 										<artifactId>
 											xtext-maven-plugin
 										</artifactId>
 										<versionRange>
-											[2.5.0,)
+											[${xtext-version},)
 										</versionRange>
 										<goals>
 											<goal>generate</goal>

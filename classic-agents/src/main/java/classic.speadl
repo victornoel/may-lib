@@ -31,7 +31,7 @@ namespace fr.irit.smac.may.lib.classic {
 		component ObservedBehaviour {
 			provides cycle: Do
 			requires changeValue: Push[Integer]
-		}
+		} 
 		
 		component ObserverBehaviour[Ref] {
 			provides cycle: Do
@@ -91,7 +91,7 @@ namespace fr.irit.smac.may.lib.classic {
 		
 		ecosystem ClassicNamed[Msg] {
 			
-			provides send: Send[Msg, String] = receive.deposit
+			provides send: Send[Msg, String] = receive.send
 			provides create: CreateNamed[Msg, String]
 						
 			part fact: Forward[CreateNamed[Msg, String]] {
@@ -168,7 +168,7 @@ namespace fr.irit.smac.may.lib.classic {
 		
 		ecosystem Classic[Msg] {
 
-			provides send: Send[Msg, DirRef] = receive.deposit
+			provides send: Send[Msg, DirRef] = receive.send
 			provides create: CreateClassic[Msg, DirRef]
 			provides stop: Do = executor.stop
 			
@@ -269,12 +269,12 @@ namespace fr.irit.smac.may.lib.classic {
 
 		ecosystem RemoteClassic[Msg] {
 
-			provides send: Send[Msg, RemoteAgentRef] = remReceive.deposit
+			provides send: Send[Msg, RemoteAgentRef] = remReceive.send
 			provides thisPlace: Pull[Place] = placed.thisPlace
 			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
 			
 			part sender: Forward[Send[Msg, RemoteAgentRef]] {
-				bind forwardedPort to remReceive.deposit
+				bind forwardedPort to remReceive.send
 			}
 
 			part receive: DirRefAsyncReceiver[Msg]
@@ -282,7 +282,7 @@ namespace fr.irit.smac.may.lib.classic {
 			part placed: Placed
 
 			part remReceive: RemoteReceiver[Msg, DirRef] {
-				bind localDeposit to receive.deposit
+				bind localSend to receive.send
 				bind myPlace to placed.thisPlace
 			}
 

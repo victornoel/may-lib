@@ -45,7 +45,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 		}
 		
 		public void receive(Msg msg) throws RemoteException {
-			requires().localDeposit().send(msg, ref);
+			requires().localSend().send(msg, ref);
 		}
 	}
 
@@ -95,7 +95,7 @@ public class RemoteReceiverImpl<Msg, LocalRef> extends
 	}
 
 	@Override
-	public Send<Msg, RemoteAgentRef> make_deposit() {
+	public Send<Msg, RemoteAgentRef> make_send() {
 		return new Send<Msg, RemoteAgentRef>() {
 			public void send(Msg msg, RemoteAgentRef receiver) {
 				try {

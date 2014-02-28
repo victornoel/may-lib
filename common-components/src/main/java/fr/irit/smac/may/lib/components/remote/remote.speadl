@@ -22,9 +22,9 @@ namespace fr.irit.smac.may.lib.components.remote {
 				provides disconnect: Do
 			}
 
-			requires localDeposit: Send[Msg, LocalRef]
+			requires localSend: Send[Msg, LocalRef]
 			requires myPlace: Pull[Place]
-			provides deposit: Send[Msg, RemoteAgentRef]
+			provides send: Send[Msg, RemoteAgentRef]
 
 		}
 	}

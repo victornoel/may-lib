@@ -4,12 +4,12 @@
 	<parent>
 		<artifactId>parent-speadl</artifactId>
 		<groupId>fr.irit.smac.lib.may</groupId>
-		<version>3.2.2-SNAPSHOT</version>
+		<version>3.2.4</version>
 		<relativePath>../parent-speadl/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>common-components</artifactId>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>fr.irit.smac.lib.may</groupId>
@@ -22,4 +22,21 @@
 			<version>3.1</version>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-clean-plugin</artifactId>
+			</plugin>
+			<plugin>
+				<groupId>org.eclipse.xtext</groupId>
+				<artifactId>xtext-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
 </project>
