@@ -89,13 +89,13 @@ public abstract class IvyBroadcaster<T> {
     
     private Push<List<String>> ivyReceive;
     
-    public final Push<List<String>> ivyReceive() {
+    public Push<List<String>> ivyReceive() {
       return this.ivyReceive;
     }
     
     private Push<T> send;
     
-    public final Push<T> send() {
+    public Push<T> send() {
       return this.send;
     }
   }

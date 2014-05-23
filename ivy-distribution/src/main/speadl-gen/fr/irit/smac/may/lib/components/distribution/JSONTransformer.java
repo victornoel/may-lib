@@ -58,13 +58,13 @@ public abstract class JSONTransformer<T> {
     
     private Transform<T, String> serializer;
     
-    public final Transform<T, String> serializer() {
+    public Transform<T, String> serializer() {
       return this.serializer;
     }
     
     private Transform<String, T> deserializer;
     
-    public final Transform<String, T> deserializer() {
+    public Transform<String, T> deserializer() {
       return this.deserializer;
     }
   }

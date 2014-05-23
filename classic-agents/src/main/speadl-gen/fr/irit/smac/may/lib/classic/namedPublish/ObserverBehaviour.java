@@ -59,7 +59,7 @@ public abstract class ObserverBehaviour<Ref> {
     
     private Do cycle;
     
-    public final Do cycle() {
+    public Do cycle() {
       return this.cycle;
     }
   }

@@ -72,7 +72,7 @@ public abstract class IvyBinder {
     
     private Push<String> reBindMsg;
     
-    public final Push<String> reBindMsg() {
+    public Push<String> reBindMsg() {
       return this.reBindMsg;
     }
   }

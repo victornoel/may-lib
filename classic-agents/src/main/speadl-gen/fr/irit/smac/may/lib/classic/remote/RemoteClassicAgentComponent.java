@@ -124,13 +124,13 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       
     }
     
-    public final Push<Msg> put() {
+    public Push<Msg> put() {
       return this.dispatcher.dispatch();
     }
     
     private Do die;
     
-    public final Do die() {
+    public Do die() {
       return this.die;
     }
     

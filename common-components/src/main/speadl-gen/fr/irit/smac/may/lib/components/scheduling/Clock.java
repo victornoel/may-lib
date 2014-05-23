@@ -66,7 +66,7 @@ public abstract class Clock {
     
     private SchedulingControl control;
     
-    public final SchedulingControl control() {
+    public SchedulingControl control() {
       return this.control;
     }
   }

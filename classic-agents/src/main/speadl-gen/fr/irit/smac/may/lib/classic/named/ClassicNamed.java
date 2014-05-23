@@ -108,13 +108,13 @@ public abstract class ClassicNamed<Msg> {
       
     }
     
-    public final Send<Msg, String> send() {
+    public Send<Msg, String> send() {
       return this.receive.send();
     }
     
     private CreateNamed<Msg, String> create;
     
-    public final CreateNamed<Msg, String> create() {
+    public CreateNamed<Msg, String> create() {
       return this.create;
     }
     

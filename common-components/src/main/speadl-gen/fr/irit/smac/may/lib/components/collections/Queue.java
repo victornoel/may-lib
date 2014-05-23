@@ -65,19 +65,19 @@ public abstract class Queue<Truc> {
     
     private Push<Truc> put;
     
-    public final Push<Truc> put() {
+    public Push<Truc> put() {
       return this.put;
     }
     
     private Pull<Truc> get;
     
-    public final Pull<Truc> get() {
+    public Pull<Truc> get() {
       return this.get;
     }
     
     private Pull<Collection<Truc>> getAll;
     
-    public final Pull<Collection<Truc>> getAll() {
+    public Pull<Collection<Truc>> getAll() {
       return this.getAll;
     }
   }

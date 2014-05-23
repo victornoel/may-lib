@@ -84,7 +84,7 @@ public abstract class DirRefAsyncReceiver<M> {
       
     }
     
-    public final ReliableSend<M, DirRef> send() {
+    public ReliableSend<M, DirRef> send() {
       return this.ar.send();
     }
     
@@ -196,11 +196,11 @@ public abstract class DirRefAsyncReceiver<M> {
         
       }
       
-      public final Pull<DirRef> me() {
+      public Pull<DirRef> me() {
         return this.dr.me();
       }
       
-      public final Do stop() {
+      public Do stop() {
         return this.dr.stop();
       }
       
@@ -420,7 +420,7 @@ public abstract class DirRefAsyncReceiver<M> {
         
       }
       
-      public final ReliableSend<M, DirRef> send() {
+      public ReliableSend<M, DirRef> send() {
         return this.ar.send();
       }
       

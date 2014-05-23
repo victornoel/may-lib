@@ -83,7 +83,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
       
     }
     
-    public final ReliableSend<M, K> send() {
+    public ReliableSend<M, K> send() {
       return this.ar.send();
     }
     
@@ -195,11 +195,11 @@ public abstract class MapRefAsyncReceiver<M, K> {
         
       }
       
-      public final Pull<K> me() {
+      public Pull<K> me() {
         return this.mr.me();
       }
       
-      public final Do stop() {
+      public Do stop() {
         return this.mr.stop();
       }
       
@@ -442,11 +442,11 @@ public abstract class MapRefAsyncReceiver<M, K> {
         
       }
       
-      public final Pull<K> me() {
+      public Pull<K> me() {
         return this.mr.me();
       }
       
-      public final Do stop() {
+      public Do stop() {
         return this.mr.stop();
       }
       
@@ -670,7 +670,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
         
       }
       
-      public final ReliableSend<M, K> send() {
+      public ReliableSend<M, K> send() {
         return this.ar.send();
       }
       

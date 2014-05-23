@@ -68,7 +68,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     
     private Send<Msg, RemoteAgentRef> send;
     
-    public final Send<Msg, RemoteAgentRef> send() {
+    public Send<Msg, RemoteAgentRef> send() {
       return this.send;
     }
   }
@@ -144,13 +144,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       
       private Pull<RemoteAgentRef> me;
       
-      public final Pull<RemoteAgentRef> me() {
+      public Pull<RemoteAgentRef> me() {
         return this.me;
       }
       
       private Do disconnect;
       
-      public final Do disconnect() {
+      public Do disconnect() {
         return this.disconnect;
       }
     }

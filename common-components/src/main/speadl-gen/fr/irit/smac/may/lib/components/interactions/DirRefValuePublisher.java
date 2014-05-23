@@ -5,6 +5,7 @@ import fr.irit.smac.may.lib.components.interactions.ValuePublisher;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
 import fr.irit.smac.may.lib.components.interactions.interfaces.Call;
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve;
+import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
 
@@ -83,7 +84,7 @@ public abstract class DirRefValuePublisher<T> {
       
     }
     
-    public final ReliableObserve<T, DirRef> observe() {
+    public ReliableObserve<T, DirRef> observe() {
       return this.vp.observe();
     }
     
@@ -190,12 +191,16 @@ public abstract class DirRefValuePublisher<T> {
         
       }
       
-      public final Push<T> set() {
+      public Push<T> set() {
         return this.vp.set();
       }
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.vp.get();
+      }
+      
+      public Do stop() {
+        return this.dr.stop();
       }
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
@@ -232,6 +237,12 @@ public abstract class DirRefValuePublisher<T> {
        * 
        */
       public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Component<T> extends DirRefValuePublisher.PublisherPush.Provides<T> {
@@ -428,8 +439,12 @@ public abstract class DirRefValuePublisher<T> {
         
       }
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.vp.get();
+      }
+      
+      public Do stop() {
+        return this.dr.stop();
       }
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
@@ -463,6 +478,12 @@ public abstract class DirRefValuePublisher<T> {
        * 
        */
       public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Component<T> extends DirRefValuePublisher.PublisherPull.Provides<T> {
@@ -642,7 +663,7 @@ public abstract class DirRefValuePublisher<T> {
         
       }
       
-      public final ReliableObserve<T, DirRef> observe() {
+      public ReliableObserve<T, DirRef> observe() {
         return this.vp.observe();
       }
       

@@ -76,25 +76,25 @@ public abstract class IvyBus {
     
     private Do disconnect;
     
-    public final Do disconnect() {
+    public Do disconnect() {
       return this.disconnect;
     }
     
     private Bind bindMsg;
     
-    public final Bind bindMsg() {
+    public Bind bindMsg() {
       return this.bindMsg;
     }
     
     private Push<Integer> unBindMsg;
     
-    public final Push<Integer> unBindMsg() {
+    public Push<Integer> unBindMsg() {
       return this.unBindMsg;
     }
     
     private Push<String> send;
     
-    public final Push<String> send() {
+    public Push<String> send() {
       return this.send;
     }
   }

@@ -17,7 +17,7 @@
 
 	<properties>
 		<xtext-version>2.6.0</xtext-version>
-		<may-version>3.2.5-SNAPSHOT</may-version>
+		<may-version>3.3.0-SNAPSHOT</may-version>
 	</properties>
 
 	<build>
@@ -65,7 +65,7 @@
 					<executions>
 						<execution>
 							<!-- hack in order for the file not to be removed on clean but only 
-								prior to code generation from xtend-maven-plugin -->
+								prior to code generation from xtext-maven-plugin -->
 							<phase>initialize</phase>
 							<goals>
 								<goal>clean</goal>

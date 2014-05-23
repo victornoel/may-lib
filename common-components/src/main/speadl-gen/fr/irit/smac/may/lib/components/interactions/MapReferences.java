@@ -55,7 +55,7 @@ public abstract class MapReferences<I, K> {
     
     private Call<I, K> call;
     
-    public final Call<I, K> call() {
+    public Call<I, K> call() {
       return this.call;
     }
   }
@@ -131,13 +131,13 @@ public abstract class MapReferences<I, K> {
       
       private Pull<K> me;
       
-      public final Pull<K> me() {
+      public Pull<K> me() {
         return this.me;
       }
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }
@@ -355,13 +355,13 @@ public abstract class MapReferences<I, K> {
       
       private Pull<K> me;
       
-      public final Pull<K> me() {
+      public Pull<K> me() {
         return this.me;
       }
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }
@@ -563,7 +563,7 @@ public abstract class MapReferences<I, K> {
       
       private Call<I, K> call;
       
-      public final Call<I, K> call() {
+      public Call<I, K> call() {
         return this.call;
       }
     }

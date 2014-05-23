@@ -65,7 +65,7 @@ public abstract class UnEither<L, R> {
     
     private Push<Either<L, R>> in;
     
-    public final Push<Either<L, R>> in() {
+    public Push<Either<L, R>> in() {
       return this.in;
     }
   }

@@ -128,7 +128,7 @@ public abstract class IvyJSONBroadcaster<T> {
       
     }
     
-    public final Push<T> send() {
+    public Push<T> send() {
       return this.bc.send();
     }
     

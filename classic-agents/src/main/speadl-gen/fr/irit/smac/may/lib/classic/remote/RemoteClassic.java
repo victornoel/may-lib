@@ -162,17 +162,17 @@ public abstract class RemoteClassic<Msg> {
       
     }
     
-    public final Send<Msg, RemoteAgentRef> send() {
+    public Send<Msg, RemoteAgentRef> send() {
       return this.remReceive.send();
     }
     
-    public final Pull<Place> thisPlace() {
+    public Pull<Place> thisPlace() {
       return this.placed.thisPlace();
     }
     
     private CreateRemoteClassic<Msg, RemoteAgentRef> create;
     
-    public final CreateRemoteClassic<Msg, RemoteAgentRef> create() {
+    public CreateRemoteClassic<Msg, RemoteAgentRef> create() {
       return this.create;
     }
     
@@ -413,7 +413,7 @@ public abstract class RemoteClassic<Msg> {
         
       }
       
-      public final Pull<RemoteAgentRef> ref() {
+      public Pull<RemoteAgentRef> ref() {
         return this.rr.me();
       }
       

@@ -63,13 +63,13 @@ public abstract class Either<L, R> {
     
     private Push<L> left;
     
-    public final Push<L> left() {
+    public Push<L> left() {
       return this.left;
     }
     
     private Push<R> right;
     
-    public final Push<R> right() {
+    public Push<R> right() {
       return this.right;
     }
   }

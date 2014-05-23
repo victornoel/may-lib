@@ -60,13 +60,13 @@ public abstract class CollectionInteger<I> {
     
     private MapGet<Integer, I> get;
     
-    public final MapGet<Integer, I> get() {
+    public MapGet<Integer, I> get() {
       return this.get;
     }
     
     private Pull<Integer> size;
     
-    public final Pull<Integer> size() {
+    public Pull<Integer> size() {
       return this.size;
     }
   }
@@ -148,13 +148,13 @@ public abstract class CollectionInteger<I> {
       
       private Pull<Integer> idx;
       
-      public final Pull<Integer> idx() {
+      public Pull<Integer> idx() {
         return this.idx;
       }
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }

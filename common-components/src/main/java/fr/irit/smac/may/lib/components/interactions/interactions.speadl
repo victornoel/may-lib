@@ -1,11 +1,7 @@
-import fr.irit.smac.may.lib.components.interactions.asyncreceiver.AsyncReceiverImpl
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
-import fr.irit.smac.may.lib.components.interactions.directreferences.DirectReferencesImpl
 import fr.irit.smac.may.lib.components.interactions.interfaces.Call
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableSend
-import fr.irit.smac.may.lib.components.interactions.mapreferences.MapReferencesImpl
-import fr.irit.smac.may.lib.components.interactions.valuepublisher.ValuePublisherImpl
 import fr.irit.smac.may.lib.interfaces.Do
 import fr.irit.smac.may.lib.interfaces.Pull
 import fr.irit.smac.may.lib.interfaces.Push
@@ -121,6 +117,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			
 			provides set: Push[T] = vp.set
 			provides get: Pull[T] = vp.get
+			provides stop: Do = dr.stop
 			
 			use dr: dr.Callee(name) {
 				bind toCall to vp.toCall
@@ -132,6 +129,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		species PublisherPull(name: String) {
 			provides get: Pull[T] = vp.get
 			requires getValue: Pull[T]
+			provides stop: Do = dr.stop
 			
 			use dr: dr.Callee(name) {
 				bind toCall to vp.toCall
@@ -167,6 +165,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			
 			provides set: Push[T] = vp.set
 			provides get: Pull[T] = vp.get
+			provides stop: Do = mr.stop
 			
 			use mr: mr.Callee(key) {
 				bind toCall to vp.toCall
@@ -177,6 +176,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 		species PublisherPull(key: K) {
 			provides get: Pull[T] = vp.get
+			provides stop: Do = mr.stop
 			
 			requires getValue: Pull[T]
 			
@@ -192,6 +192,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 			
 			provides set: Push[T] = vp.set
 			provides get: Pull[T] = vp.get
+			provides stop: Do = mr.stop
 			
 			requires key: Pull[K]
 			
@@ -205,6 +206,7 @@ namespace fr.irit.smac.may.lib.components.interactions {
 		
 		species PublisherPullKeyPort {
 			provides get: Pull[T] = vp.get
+			provides stop: Do = mr.stop
 			
 			requires getValue: Pull[T]
 			requires key: Pull[K]

@@ -59,13 +59,13 @@ public abstract class ExecutorServiceWrapper {
     
     private AdvancedExecutor executor;
     
-    public final AdvancedExecutor executor() {
+    public AdvancedExecutor executor() {
       return this.executor;
     }
     
     private Do stop;
     
-    public final Do stop() {
+    public Do stop() {
       return this.stop;
     }
   }
@@ -142,13 +142,13 @@ public abstract class ExecutorServiceWrapper {
       
       private AdvancedExecutor executor;
       
-      public final AdvancedExecutor executor() {
+      public AdvancedExecutor executor() {
         return this.executor;
       }
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }

@@ -65,7 +65,7 @@ public abstract class Loop {
     
     private Do stop;
     
-    public final Do stop() {
+    public Do stop() {
       return this.stop;
     }
   }

@@ -65,13 +65,13 @@ public abstract class Scheduler {
     
     private Do tick;
     
-    public final Do tick() {
+    public Do tick() {
       return this.tick;
     }
     
     private SchedulingControl async;
     
-    public final SchedulingControl async() {
+    public SchedulingControl async() {
       return this.async;
     }
   }
@@ -148,7 +148,7 @@ public abstract class Scheduler {
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }

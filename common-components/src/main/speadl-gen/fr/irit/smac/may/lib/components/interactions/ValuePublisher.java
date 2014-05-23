@@ -61,7 +61,7 @@ public abstract class ValuePublisher<T, K> {
     
     private ReliableObserve<T, K> observe;
     
-    public final ReliableObserve<T, K> observe() {
+    public ReliableObserve<T, K> observe() {
       return this.observe;
     }
   }
@@ -132,17 +132,17 @@ public abstract class ValuePublisher<T, K> {
       
       private Push<T> set;
       
-      public final Push<T> set() {
+      public Push<T> set() {
         return this.set;
       }
       
       private Pull<T> get;
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.get;
       }
       
-      public final Pull<T> toCall() {
+      public Pull<T> toCall() {
         return this.get();
       }
     }
@@ -355,11 +355,11 @@ public abstract class ValuePublisher<T, K> {
       
       private Pull<T> get;
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.get;
       }
       
-      public final Pull<T> toCall() {
+      public Pull<T> toCall() {
         return this.get();
       }
     }
@@ -554,7 +554,7 @@ public abstract class ValuePublisher<T, K> {
       
       private ReliableObserve<T, K> observe;
       
-      public final ReliableObserve<T, K> observe() {
+      public ReliableObserve<T, K> observe() {
         return this.observe;
       }
     }

@@ -106,7 +106,7 @@ public abstract class Forward<I> {
       
       private I forwardedPort;
       
-      public final I forwardedPort() {
+      public I forwardedPort() {
         return this.forwardedPort;
       }
     }

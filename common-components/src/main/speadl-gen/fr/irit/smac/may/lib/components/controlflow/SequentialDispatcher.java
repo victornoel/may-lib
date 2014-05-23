@@ -81,7 +81,7 @@ public abstract class SequentialDispatcher<T> {
     
     private Push<T> dispatch;
     
-    public final Push<T> dispatch() {
+    public Push<T> dispatch() {
       return this.dispatch;
     }
     

@@ -66,7 +66,7 @@ public abstract class RemoteFactory<Msg, Ref> {
     
     private CreateRemoteClassic<Msg, Ref> factCreate;
     
-    public final CreateRemoteClassic<Msg, Ref> factCreate() {
+    public CreateRemoteClassic<Msg, Ref> factCreate() {
       return this.factCreate;
     }
   }
@@ -132,7 +132,7 @@ public abstract class RemoteFactory<Msg, Ref> {
       
       private CreateRemoteClassic<Msg, Ref> create;
       
-      public final CreateRemoteClassic<Msg, Ref> create() {
+      public CreateRemoteClassic<Msg, Ref> create() {
         return this.create;
       }
     }

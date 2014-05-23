@@ -145,7 +145,7 @@ public abstract class NamedPublishMAS {
     
     private NamedPublishMASFactory create;
     
-    public final NamedPublishMASFactory create() {
+    public NamedPublishMASFactory create() {
       return this.create;
     }
     

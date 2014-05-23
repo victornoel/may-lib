@@ -54,7 +54,7 @@ public abstract class Placed {
     
     private Pull<Place> thisPlace;
     
-    public final Pull<Place> thisPlace() {
+    public Pull<Place> thisPlace() {
       return this.thisPlace;
     }
   }
@@ -120,7 +120,7 @@ public abstract class Placed {
       
       private Pull<Place> myPlace;
       
-      public final Pull<Place> myPlace() {
+      public Pull<Place> myPlace() {
         return this.myPlace;
       }
     }

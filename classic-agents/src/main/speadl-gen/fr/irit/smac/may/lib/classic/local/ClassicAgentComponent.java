@@ -113,7 +113,7 @@ public abstract class ClassicAgentComponent<Msg, Ref> {
       
     }
     
-    public final Push<Msg> put() {
+    public Push<Msg> put() {
       return this.dispatcher.dispatch();
     }
     

@@ -60,7 +60,7 @@ public abstract class AsyncReceiver<M, K> {
     
     private ReliableSend<M, K> send;
     
-    public final ReliableSend<M, K> send() {
+    public ReliableSend<M, K> send() {
       return this.send;
     }
   }
@@ -124,7 +124,7 @@ public abstract class AsyncReceiver<M, K> {
         
       }
       
-      public final Push<M> toCall() {
+      public Push<M> toCall() {
         return this.bridge.put();
       }
     }
@@ -306,7 +306,7 @@ public abstract class AsyncReceiver<M, K> {
       
       private ReliableSend<M, K> send;
       
-      public final ReliableSend<M, K> send() {
+      public ReliableSend<M, K> send() {
         return this.send;
       }
     }

@@ -61,7 +61,7 @@ public abstract class Broadcast<M, R> {
     
     private Push<M> broadcast;
     
-    public final Push<M> broadcast() {
+    public Push<M> broadcast() {
       return this.broadcast;
     }
   }
@@ -132,7 +132,7 @@ public abstract class Broadcast<M, R> {
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }
@@ -321,7 +321,7 @@ public abstract class Broadcast<M, R> {
       
       private Push<M> broadcast;
       
-      public final Push<M> broadcast() {
+      public Push<M> broadcast() {
         return this.broadcast;
       }
     }

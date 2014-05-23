@@ -109,17 +109,17 @@ public abstract class Classic<Msg> {
       
     }
     
-    public final Send<Msg, DirRef> send() {
+    public Send<Msg, DirRef> send() {
       return this.receive.send();
     }
     
     private CreateClassic<Msg, DirRef> create;
     
-    public final CreateClassic<Msg, DirRef> create() {
+    public CreateClassic<Msg, DirRef> create() {
       return this.create;
     }
     
-    public final Do stop() {
+    public Do stop() {
       return this.executor.stop();
     }
     
@@ -289,7 +289,7 @@ public abstract class Classic<Msg> {
         
       }
       
-      public final Pull<DirRef> me() {
+      public Pull<DirRef> me() {
         return this.receive.me();
       }
       

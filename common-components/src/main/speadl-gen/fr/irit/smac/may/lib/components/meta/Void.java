@@ -51,7 +51,7 @@ public abstract class Void<I> {
     
     private I port;
     
-    public final I port() {
+    public I port() {
       return this.port;
     }
   }

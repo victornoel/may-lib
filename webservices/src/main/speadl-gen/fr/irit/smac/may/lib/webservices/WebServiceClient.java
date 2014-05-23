@@ -53,7 +53,7 @@ public abstract class WebServiceClient<I> {
     
     private RemoteCall<I, String> service;
     
-    public final RemoteCall<I, String> service() {
+    public RemoteCall<I, String> service() {
       return this.service;
     }
   }

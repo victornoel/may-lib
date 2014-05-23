@@ -63,13 +63,13 @@ public abstract class Buffer<I> {
     
     private I port;
     
-    public final I port() {
+    public I port() {
       return this.port;
     }
     
     private Do release;
     
-    public final Do release() {
+    public Do release() {
       return this.release;
     }
   }

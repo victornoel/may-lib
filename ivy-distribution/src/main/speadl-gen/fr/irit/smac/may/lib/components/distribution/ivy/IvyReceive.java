@@ -78,25 +78,25 @@ public abstract class IvyReceive {
     
     private Push<String> bindMsg;
     
-    public final Push<String> bindMsg() {
+    public Push<String> bindMsg() {
       return this.bindMsg;
     }
     
     private Pull<IvyConnectionStatus> connectionStatus;
     
-    public final Pull<IvyConnectionStatus> connectionStatus() {
+    public Pull<IvyConnectionStatus> connectionStatus() {
       return this.connectionStatus;
     }
     
     private Push<IvyConnectionConfig> connect;
     
-    public final Push<IvyConnectionConfig> connect() {
+    public Push<IvyConnectionConfig> connect() {
       return this.connect;
     }
     
     private Do disconnect;
     
-    public final Do disconnect() {
+    public Do disconnect() {
       return this.disconnect;
     }
   }

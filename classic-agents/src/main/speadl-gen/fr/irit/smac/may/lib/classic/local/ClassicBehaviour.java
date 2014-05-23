@@ -80,7 +80,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
     
     private Push<Msg> cycle;
     
-    public final Push<Msg> cycle() {
+    public Push<Msg> cycle() {
       return this.cycle;
     }
   }

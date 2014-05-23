@@ -4,6 +4,7 @@ import fr.irit.smac.may.lib.components.interactions.MapReferences;
 import fr.irit.smac.may.lib.components.interactions.ValuePublisher;
 import fr.irit.smac.may.lib.components.interactions.interfaces.Call;
 import fr.irit.smac.may.lib.components.interactions.interfaces.ReliableObserve;
+import fr.irit.smac.may.lib.interfaces.Do;
 import fr.irit.smac.may.lib.interfaces.Pull;
 import fr.irit.smac.may.lib.interfaces.Push;
 
@@ -82,7 +83,7 @@ public abstract class MapRefValuePublisher<T, K> {
       
     }
     
-    public final ReliableObserve<T, K> observe() {
+    public ReliableObserve<T, K> observe() {
       return this.vp.observe();
     }
     
@@ -189,12 +190,16 @@ public abstract class MapRefValuePublisher<T, K> {
         
       }
       
-      public final Push<T> set() {
+      public Push<T> set() {
         return this.vp.set();
       }
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.vp.get();
+      }
+      
+      public Do stop() {
+        return this.mr.stop();
       }
       
       private MapReferences.Callee.Component<Pull<T>, K> mr;
@@ -231,6 +236,12 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Component<T, K> extends MapRefValuePublisher.PublisherPush.Provides<T, K> {
@@ -427,8 +438,12 @@ public abstract class MapRefValuePublisher<T, K> {
         
       }
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.vp.get();
+      }
+      
+      public Do stop() {
+        return this.mr.stop();
       }
       
       private MapReferences.Callee.Component<Pull<T>, K> mr;
@@ -462,6 +477,12 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Component<T, K> extends MapRefValuePublisher.PublisherPull.Provides<T, K> {
@@ -658,12 +679,16 @@ public abstract class MapRefValuePublisher<T, K> {
         
       }
       
-      public final Push<T> set() {
+      public Push<T> set() {
         return this.vp.set();
       }
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.vp.get();
+      }
+      
+      public Do stop() {
+        return this.mr.stop();
       }
       
       private MapReferences.CalleeKeyPort.Component<Pull<T>, K> mr;
@@ -704,6 +729,12 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Component<T, K> extends MapRefValuePublisher.PublisherPushKeyPort.Provides<T, K> {
@@ -906,8 +937,12 @@ public abstract class MapRefValuePublisher<T, K> {
         
       }
       
-      public final Pull<T> get() {
+      public Pull<T> get() {
         return this.vp.get();
+      }
+      
+      public Do stop() {
+        return this.mr.stop();
       }
       
       private MapReferences.CalleeKeyPort.Component<Pull<T>, K> mr;
@@ -945,6 +980,12 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Component<T, K> extends MapRefValuePublisher.PublisherPullKeyPort.Provides<T, K> {
@@ -1124,7 +1165,7 @@ public abstract class MapRefValuePublisher<T, K> {
         
       }
       
-      public final ReliableObserve<T, K> observe() {
+      public ReliableObserve<T, K> observe() {
         return this.vp.observe();
       }
       

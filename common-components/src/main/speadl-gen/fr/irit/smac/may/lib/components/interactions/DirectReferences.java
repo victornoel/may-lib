@@ -56,7 +56,7 @@ public abstract class DirectReferences<I> {
     
     private Call<I, DirRef> call;
     
-    public final Call<I, DirRef> call() {
+    public Call<I, DirRef> call() {
       return this.call;
     }
   }
@@ -132,13 +132,13 @@ public abstract class DirectReferences<I> {
       
       private Pull<DirRef> me;
       
-      public final Pull<DirRef> me() {
+      public Pull<DirRef> me() {
         return this.me;
       }
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }
@@ -340,7 +340,7 @@ public abstract class DirectReferences<I> {
       
       private Call<I, DirRef> call;
       
-      public final Call<I, DirRef> call() {
+      public Call<I, DirRef> call() {
         return this.call;
       }
     }

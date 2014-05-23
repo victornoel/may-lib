@@ -55,7 +55,7 @@ public abstract class CollectionOf<I> {
     
     private Pull<Collection<I>> get;
     
-    public final Pull<Collection<I>> get() {
+    public Pull<Collection<I>> get() {
       return this.get;
     }
   }
@@ -126,7 +126,7 @@ public abstract class CollectionOf<I> {
       
       private Do stop;
       
-      public final Do stop() {
+      public Do stop() {
         return this.stop;
       }
     }
