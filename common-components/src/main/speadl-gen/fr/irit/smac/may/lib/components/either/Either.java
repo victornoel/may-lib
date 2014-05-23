@@ -4,47 +4,21 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 @SuppressWarnings("all")
 public abstract class Either<L, R> {
-  @SuppressWarnings("all")
   public interface Requires<L, R> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L,R>> out();
+    public Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<L, R> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<L> left();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<R> right();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<L, R> extends Either.Provides<L,R> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<L, R> {
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<L, R> implements Either.Component<L,R>, Either.Parts<L,R> {
-    private final Either.Requires<L,R> bridge;
+  public static class ComponentImpl<L, R> implements Either.Component<L, R>, Either.Parts<L, R> {
+    private final Either.Requires<L, R> bridge;
     
-    private final Either<L,R> implementation;
+    private final Either<L, R> implementation;
     
     public void start() {
       this.implementation.start();
@@ -70,7 +44,7 @@ public abstract class Either<L, R> {
       
     }
     
-    public ComponentImpl(final Either<L,R> implem, final Either.Requires<L,R> b, final boolean doInits) {
+    public ComponentImpl(final Either<L, R> implem, final Either.Requires<L, R> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -100,6 +74,22 @@ public abstract class Either<L, R> {
     }
   }
   
+  public interface Provides<L, R> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<L> left();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<R> right();
+  }
+  
+  public interface Component<L, R> extends Either.Provides<L, R> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -114,7 +104,7 @@ public abstract class Either<L, R> {
    */
   private boolean started = false;;
   
-  private Either.ComponentImpl<L,R> selfComponent;
+  private Either.ComponentImpl<L, R> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -132,7 +122,7 @@ public abstract class Either<L, R> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected Either.Provides<L,R> provides() {
+  protected Either.Provides<L, R> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -159,7 +149,7 @@ public abstract class Either<L, R> {
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected Either.Requires<L,R> requires() {
+  protected Either.Requires<L, R> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -172,7 +162,7 @@ public abstract class Either<L, R> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected Either.Parts<L,R> parts() {
+  protected Either.Parts<L, R> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -185,12 +175,12 @@ public abstract class Either<L, R> {
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized Either.Component<L,R> _newComponent(final Either.Requires<L,R> b, final boolean start) {
+  public synchronized Either.Component<L, R> _newComponent(final Either.Requires<L, R> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of Either has already been used to create a component, use another one.");
     }
     this.init = true;
-    Either.ComponentImpl<L,R> comp = new Either.ComponentImpl<L,R>(this, b, true);
+    Either.ComponentImpl<L, R> comp = new Either.ComponentImpl<L, R>(this, b, true);
     if (start) {
     	comp.start();
     }

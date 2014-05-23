@@ -11,27 +11,9 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 @SuppressWarnings("all")
 public abstract class DirRefAsyncReceiver<M> {
-  @SuppressWarnings("all")
   public interface Requires<M> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<M> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableSend<M,DirRef> send();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<M> extends DirRefAsyncReceiver.Provides<M> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<M> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -45,11 +27,9 @@ public abstract class DirRefAsyncReceiver<M> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public AsyncReceiver.Component<M,DirRef> ar();
+    public AsyncReceiver.Component<M, DirRef> ar();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<M> implements DirRefAsyncReceiver.Component<M>, DirRefAsyncReceiver.Parts<M> {
     private final DirRefAsyncReceiver.Requires<M> bridge;
     
@@ -59,7 +39,7 @@ public abstract class DirRefAsyncReceiver<M> {
       assert this.dr != null: "This is a bug.";
       ((DirectReferences.ComponentImpl<Push<M>>) this.dr).start();
       assert this.ar != null: "This is a bug.";
-      ((AsyncReceiver.ComponentImpl<M,DirRef>) this.ar).start();
+      ((AsyncReceiver.ComponentImpl<M, DirRef>) this.ar).start();
       this.implementation.start();
       this.implementation.started = true;
       
@@ -104,7 +84,7 @@ public abstract class DirRefAsyncReceiver<M> {
       
     }
     
-    public final ReliableSend<M,DirRef> send() {
+    public final ReliableSend<M, DirRef> send() {
       return this.ar.send();
     }
     
@@ -112,36 +92,40 @@ public abstract class DirRefAsyncReceiver<M> {
     
     private DirectReferences<Push<M>> implem_dr;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_dr implements DirectReferences.Requires<Push<M>> {
     }
-    
     
     public final DirectReferences.Component<Push<M>> dr() {
       return this.dr;
     }
     
-    private AsyncReceiver.Component<M,DirRef> ar;
+    private AsyncReceiver.Component<M, DirRef> ar;
     
-    private AsyncReceiver<M,DirRef> implem_ar;
+    private AsyncReceiver<M, DirRef> implem_ar;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_ar implements AsyncReceiver.Requires<M,DirRef> {
-      public final Call<Push<M>,DirRef> call() {
+    private final class BridgeImpl_ar implements AsyncReceiver.Requires<M, DirRef> {
+      public final Call<Push<M>, DirRef> call() {
         return DirRefAsyncReceiver.ComponentImpl.this.dr.call();
       }
     }
     
-    
-    public final AsyncReceiver.Component<M,DirRef> ar() {
+    public final AsyncReceiver.Component<M, DirRef> ar() {
       return this.ar;
     }
   }
   
+  public interface Provides<M> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableSend<M, DirRef> send();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<M> extends DirRefAsyncReceiver.Provides<M> {
+  }
+  
   public abstract static class Receiver<M> {
-    @SuppressWarnings("all")
     public interface Requires<M> {
       /**
        * This can be called by the implementation to access this required port.
@@ -150,29 +134,6 @@ public abstract class DirRefAsyncReceiver<M> {
       public Push<M> put();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<M> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<DirRef> me();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<M> extends DirRefAsyncReceiver.Receiver.Provides<M> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<M> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -186,11 +147,9 @@ public abstract class DirRefAsyncReceiver<M> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public AsyncReceiver.Receiver.Component<M,DirRef> ar();
+      public AsyncReceiver.Receiver.Component<M, DirRef> ar();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<M> implements DirRefAsyncReceiver.Receiver.Component<M>, DirRefAsyncReceiver.Receiver.Parts<M> {
       private final DirRefAsyncReceiver.Receiver.Requires<M> bridge;
       
@@ -200,7 +159,7 @@ public abstract class DirRefAsyncReceiver<M> {
         assert this.dr != null: "This is a bug.";
         ((DirectReferences.Callee.ComponentImpl<Push<M>>) this.dr).start();
         assert this.ar != null: "This is a bug.";
-        ((AsyncReceiver.Receiver.ComponentImpl<M,DirRef>) this.ar).start();
+        ((AsyncReceiver.Receiver.ComponentImpl<M, DirRef>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -247,33 +206,45 @@ public abstract class DirRefAsyncReceiver<M> {
       
       private DirectReferences.Callee.Component<Push<M>> dr;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Push<M>> {
         public final Push<M> toCall() {
           return DirRefAsyncReceiver.Receiver.ComponentImpl.this.ar.toCall();
         }
       }
       
-      
       public final DirectReferences.Callee.Component<Push<M>> dr() {
         return this.dr;
       }
       
-      private AsyncReceiver.Receiver.Component<M,DirRef> ar;
+      private AsyncReceiver.Receiver.Component<M, DirRef> ar;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_ar_ar implements AsyncReceiver.Receiver.Requires<M,DirRef> {
+      private final class BridgeImpl_ar_ar implements AsyncReceiver.Receiver.Requires<M, DirRef> {
         public final Push<M> put() {
           return DirRefAsyncReceiver.Receiver.ComponentImpl.this.bridge.put();
         }
       }
       
-      
-      public final AsyncReceiver.Receiver.Component<M,DirRef> ar() {
+      public final AsyncReceiver.Receiver.Component<M, DirRef> ar() {
         return this.ar;
       }
     }
     
+    public interface Provides<M> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<DirRef> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component<M> extends DirRefAsyncReceiver.Receiver.Provides<M> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -343,7 +314,7 @@ public abstract class DirRefAsyncReceiver<M> {
     
     private DirectReferences.Callee<Push<M>> use_dr;
     
-    private AsyncReceiver.Receiver<M,DirRef> use_ar;
+    private AsyncReceiver.Receiver<M, DirRef> use_ar;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -395,41 +366,19 @@ public abstract class DirRefAsyncReceiver<M> {
     }
   }
   
-  
-  @SuppressWarnings("all")
   public abstract static class Sender<M> {
-    @SuppressWarnings("all")
     public interface Requires<M> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<M> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableSend<M,DirRef> send();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<M> extends DirRefAsyncReceiver.Sender.Provides<M> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<M> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public AsyncReceiver.Sender.Component<M,DirRef> ar();
+      public AsyncReceiver.Sender.Component<M, DirRef> ar();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<M> implements DirRefAsyncReceiver.Sender.Component<M>, DirRefAsyncReceiver.Sender.Parts<M> {
       private final DirRefAsyncReceiver.Sender.Requires<M> bridge;
       
@@ -437,7 +386,7 @@ public abstract class DirRefAsyncReceiver<M> {
       
       public void start() {
         assert this.ar != null: "This is a bug.";
-        ((AsyncReceiver.Sender.ComponentImpl<M,DirRef>) this.ar).start();
+        ((AsyncReceiver.Sender.ComponentImpl<M, DirRef>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -471,22 +420,30 @@ public abstract class DirRefAsyncReceiver<M> {
         
       }
       
-      public final ReliableSend<M,DirRef> send() {
+      public final ReliableSend<M, DirRef> send() {
         return this.ar.send();
       }
       
-      private AsyncReceiver.Sender.Component<M,DirRef> ar;
+      private AsyncReceiver.Sender.Component<M, DirRef> ar;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_ar_ar implements AsyncReceiver.Sender.Requires<M,DirRef> {
+      private final class BridgeImpl_ar_ar implements AsyncReceiver.Sender.Requires<M, DirRef> {
       }
       
-      
-      public final AsyncReceiver.Sender.Component<M,DirRef> ar() {
+      public final AsyncReceiver.Sender.Component<M, DirRef> ar() {
         return this.ar;
       }
     }
     
+    public interface Provides<M> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableSend<M, DirRef> send();
+    }
+    
+    public interface Component<M> extends DirRefAsyncReceiver.Sender.Provides<M> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -554,7 +511,7 @@ public abstract class DirRefAsyncReceiver<M> {
       
     }
     
-    private AsyncReceiver.Sender<M,DirRef> use_ar;
+    private AsyncReceiver.Sender<M, DirRef> use_ar;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -605,7 +562,6 @@ public abstract class DirRefAsyncReceiver<M> {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -685,7 +641,7 @@ public abstract class DirRefAsyncReceiver<M> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract AsyncReceiver<M,DirRef> make_ar();
+  protected abstract AsyncReceiver<M, DirRef> make_ar();
   
   /**
    * Not meant to be used to manually instantiate components (except for testing).

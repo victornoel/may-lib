@@ -17,34 +17,16 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class NamedPublishMAS {
-  @SuppressWarnings("all")
   public interface Requires {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public NamedPublishMASFactory create();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends NamedPublishMAS.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public MapRefValuePublisher.Component<Integer,String> observeds();
+    public MapRefValuePublisher.Component<Integer, String> observeds();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -75,8 +57,6 @@ public abstract class NamedPublishMAS {
     public SchedulingControllerGUI.Component gui();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements NamedPublishMAS.Component, NamedPublishMAS.Parts {
     private final NamedPublishMAS.Requires bridge;
     
@@ -84,7 +64,7 @@ public abstract class NamedPublishMAS {
     
     public void start() {
       assert this.observeds != null: "This is a bug.";
-      ((MapRefValuePublisher.ComponentImpl<Integer,String>) this.observeds).start();
+      ((MapRefValuePublisher.ComponentImpl<Integer, String>) this.observeds).start();
       assert this.executor != null: "This is a bug.";
       ((ExecutorServiceWrapper.ComponentImpl) this.executor).start();
       assert this.schedule != null: "This is a bug.";
@@ -169,16 +149,14 @@ public abstract class NamedPublishMAS {
       return this.create;
     }
     
-    private MapRefValuePublisher.Component<Integer,String> observeds;
+    private MapRefValuePublisher.Component<Integer, String> observeds;
     
-    private MapRefValuePublisher<Integer,String> implem_observeds;
+    private MapRefValuePublisher<Integer, String> implem_observeds;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_observeds implements MapRefValuePublisher.Requires<Integer,String> {
+    private final class BridgeImpl_observeds implements MapRefValuePublisher.Requires<Integer, String> {
     }
     
-    
-    public final MapRefValuePublisher.Component<Integer,String> observeds() {
+    public final MapRefValuePublisher.Component<Integer, String> observeds() {
       return this.observeds;
     }
     
@@ -186,10 +164,8 @@ public abstract class NamedPublishMAS {
     
     private ExecutorServiceWrapper implem_executor;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_executor implements ExecutorServiceWrapper.Requires {
     }
-    
     
     public final ExecutorServiceWrapper.Component executor() {
       return this.executor;
@@ -199,13 +175,11 @@ public abstract class NamedPublishMAS {
     
     private Scheduler implem_schedule;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_schedule implements Scheduler.Requires {
       public final AdvancedExecutor executor() {
         return NamedPublishMAS.ComponentImpl.this.executor.executor();
       }
     }
-    
     
     public final Scheduler.Component schedule() {
       return this.schedule;
@@ -215,7 +189,6 @@ public abstract class NamedPublishMAS {
     
     private Clock implem_clock;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_clock implements Clock.Requires {
       public final Executor sched() {
         return NamedPublishMAS.ComponentImpl.this.executor.executor();
@@ -226,7 +199,6 @@ public abstract class NamedPublishMAS {
       }
     }
     
-    
     public final Clock.Component clock() {
       return this.clock;
     }
@@ -235,38 +207,32 @@ public abstract class NamedPublishMAS {
     
     private SchedulingControllerGUI implem_gui;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_gui implements SchedulingControllerGUI.Requires {
       public final SchedulingControl control() {
         return NamedPublishMAS.ComponentImpl.this.clock.control();
       }
     }
     
-    
     public final SchedulingControllerGUI.Component gui() {
       return this.gui;
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public NamedPublishMASFactory create();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component extends NamedPublishMAS.Provides {
+  }
+  
   public abstract static class Observed {
-    @SuppressWarnings("all")
     public interface Requires {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component extends NamedPublishMAS.Observed.Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts {
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -287,11 +253,9 @@ public abstract class NamedPublishMAS {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public MapRefValuePublisher.PublisherPush.Component<Integer,String> observed();
+      public MapRefValuePublisher.PublisherPush.Component<Integer, String> observed();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl implements NamedPublishMAS.Observed.Component, NamedPublishMAS.Observed.Parts {
       private final NamedPublishMAS.Observed.Requires bridge;
       
@@ -303,7 +267,7 @@ public abstract class NamedPublishMAS {
         assert this.beh != null: "This is a bug.";
         ((ObservedBehaviour.ComponentImpl) this.beh).start();
         assert this.observed != null: "This is a bug.";
-        ((MapRefValuePublisher.PublisherPush.ComponentImpl<Integer,String>) this.observed).start();
+        ((MapRefValuePublisher.PublisherPush.ComponentImpl<Integer, String>) this.observed).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -349,13 +313,11 @@ public abstract class NamedPublishMAS {
       
       private Scheduler.Scheduled.Component sched;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_schedule_sched implements Scheduler.Scheduled.Requires {
         public final Do cycle() {
           return NamedPublishMAS.Observed.ComponentImpl.this.beh.cycle();
         }
       }
-      
       
       public final Scheduler.Scheduled.Component sched() {
         return this.sched;
@@ -365,30 +327,31 @@ public abstract class NamedPublishMAS {
       
       private ObservedBehaviour implem_beh;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_beh implements ObservedBehaviour.Requires {
         public final Push<Integer> changeValue() {
           return NamedPublishMAS.Observed.ComponentImpl.this.observed.set();
         }
       }
       
-      
       public final ObservedBehaviour.Component beh() {
         return this.beh;
       }
       
-      private MapRefValuePublisher.PublisherPush.Component<Integer,String> observed;
+      private MapRefValuePublisher.PublisherPush.Component<Integer, String> observed;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_observeds_observed implements MapRefValuePublisher.PublisherPush.Requires<Integer,String> {
+      private final class BridgeImpl_observeds_observed implements MapRefValuePublisher.PublisherPush.Requires<Integer, String> {
       }
       
-      
-      public final MapRefValuePublisher.PublisherPush.Component<Integer,String> observed() {
+      public final MapRefValuePublisher.PublisherPush.Component<Integer, String> observed() {
         return this.observed;
       }
     }
     
+    public interface Provides {
+    }
+    
+    public interface Component extends NamedPublishMAS.Observed.Provides {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -465,7 +428,7 @@ public abstract class NamedPublishMAS {
      */
     protected abstract ObservedBehaviour make_beh();
     
-    private MapRefValuePublisher.PublisherPush<Integer,String> use_observed;
+    private MapRefValuePublisher.PublisherPush<Integer, String> use_observed;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -517,25 +480,10 @@ public abstract class NamedPublishMAS {
     }
   }
   
-  
-  @SuppressWarnings("all")
   public abstract static class Observer {
-    @SuppressWarnings("all")
     public interface Requires {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component extends NamedPublishMAS.Observer.Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts {
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -556,11 +504,9 @@ public abstract class NamedPublishMAS {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public MapRefValuePublisher.Observer.Component<Integer,String> observer();
+      public MapRefValuePublisher.Observer.Component<Integer, String> observer();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl implements NamedPublishMAS.Observer.Component, NamedPublishMAS.Observer.Parts {
       private final NamedPublishMAS.Observer.Requires bridge;
       
@@ -572,7 +518,7 @@ public abstract class NamedPublishMAS {
         assert this.beh != null: "This is a bug.";
         ((ObserverBehaviour.ComponentImpl<String>) this.beh).start();
         assert this.observer != null: "This is a bug.";
-        ((MapRefValuePublisher.Observer.ComponentImpl<Integer,String>) this.observer).start();
+        ((MapRefValuePublisher.Observer.ComponentImpl<Integer, String>) this.observer).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -618,13 +564,11 @@ public abstract class NamedPublishMAS {
       
       private Scheduler.Scheduled.Component sched;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_schedule_sched implements Scheduler.Scheduled.Requires {
         public final Do cycle() {
           return NamedPublishMAS.Observer.ComponentImpl.this.beh.cycle();
         }
       }
-      
       
       public final Scheduler.Scheduled.Component sched() {
         return this.sched;
@@ -634,30 +578,31 @@ public abstract class NamedPublishMAS {
       
       private ObserverBehaviour<String> implem_beh;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_beh implements ObserverBehaviour.Requires<String> {
-        public final Observe<Integer,String> observe() {
+        public final Observe<Integer, String> observe() {
           return NamedPublishMAS.Observer.ComponentImpl.this.observer.observe();
         }
       }
-      
       
       public final ObserverBehaviour.Component<String> beh() {
         return this.beh;
       }
       
-      private MapRefValuePublisher.Observer.Component<Integer,String> observer;
+      private MapRefValuePublisher.Observer.Component<Integer, String> observer;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_observeds_observer implements MapRefValuePublisher.Observer.Requires<Integer,String> {
+      private final class BridgeImpl_observeds_observer implements MapRefValuePublisher.Observer.Requires<Integer, String> {
       }
       
-      
-      public final MapRefValuePublisher.Observer.Component<Integer,String> observer() {
+      public final MapRefValuePublisher.Observer.Component<Integer, String> observer() {
         return this.observer;
       }
     }
     
+    public interface Provides {
+    }
+    
+    public interface Component extends NamedPublishMAS.Observer.Provides {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -734,7 +679,7 @@ public abstract class NamedPublishMAS {
      */
     protected abstract ObserverBehaviour<String> make_beh();
     
-    private MapRefValuePublisher.Observer<Integer,String> use_observer;
+    private MapRefValuePublisher.Observer<Integer, String> use_observer;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -785,7 +730,6 @@ public abstract class NamedPublishMAS {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -865,7 +809,7 @@ public abstract class NamedPublishMAS {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract MapRefValuePublisher<Integer,String> make_observeds();
+  protected abstract MapRefValuePublisher<Integer, String> make_observeds();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.

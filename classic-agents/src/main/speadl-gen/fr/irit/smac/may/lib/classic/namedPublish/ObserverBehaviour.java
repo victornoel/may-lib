@@ -5,37 +5,17 @@ import fr.irit.smac.may.lib.interfaces.Do;
 
 @SuppressWarnings("all")
 public abstract class ObserverBehaviour<Ref> {
-  @SuppressWarnings("all")
   public interface Requires<Ref> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Observe<Integer,Ref> observe();
+    public Observe<Integer, Ref> observe();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do cycle();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Ref> extends ObserverBehaviour.Provides<Ref> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Ref> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<Ref> implements ObserverBehaviour.Component<Ref>, ObserverBehaviour.Parts<Ref> {
     private final ObserverBehaviour.Requires<Ref> bridge;
     
@@ -84,6 +64,16 @@ public abstract class ObserverBehaviour<Ref> {
     }
   }
   
+  public interface Provides<Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do cycle();
+  }
+  
+  public interface Component<Ref> extends ObserverBehaviour.Provides<Ref> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

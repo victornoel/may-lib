@@ -4,7 +4,6 @@ import fr.irit.smac.may.lib.interfaces.Do;
 
 @SuppressWarnings("all")
 public abstract class Buffer<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
     /**
      * This can be called by the implementation to access this required port.
@@ -13,34 +12,9 @@ public abstract class Buffer<I> {
     public I realPort();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public I port();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do release();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends Buffer.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements Buffer.Component<I>, Buffer.Parts<I> {
     private final Buffer.Requires<I> bridge;
     
@@ -100,6 +74,22 @@ public abstract class Buffer<I> {
     }
   }
   
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public I port();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do release();
+  }
+  
+  public interface Component<I> extends Buffer.Provides<I> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

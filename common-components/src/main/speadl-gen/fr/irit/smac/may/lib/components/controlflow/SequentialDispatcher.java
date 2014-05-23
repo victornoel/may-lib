@@ -6,7 +6,6 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class SequentialDispatcher<T> {
-  @SuppressWarnings("all")
   public interface Requires<T> {
     /**
      * This can be called by the implementation to access this required port.
@@ -21,23 +20,6 @@ public abstract class SequentialDispatcher<T> {
     public Push<T> handler();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<T> dispatch();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<T> extends SequentialDispatcher.Provides<T> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -47,8 +29,6 @@ public abstract class SequentialDispatcher<T> {
     public Queue.Component<T> queue();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<T> implements SequentialDispatcher.Component<T>, SequentialDispatcher.Parts<T> {
     private final SequentialDispatcher.Requires<T> bridge;
     
@@ -109,16 +89,24 @@ public abstract class SequentialDispatcher<T> {
     
     private Queue<T> implem_queue;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_queue implements Queue.Requires<T> {
     }
-    
     
     public final Queue.Component<T> queue() {
       return this.queue;
     }
   }
   
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<T> dispatch();
+  }
+  
+  public interface Component<T> extends SequentialDispatcher.Provides<T> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

@@ -5,32 +5,12 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 
 @SuppressWarnings("all")
 public abstract class Placed {
-  @SuppressWarnings("all")
   public interface Requires {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Place> thisPlace();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends Placed.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements Placed.Component, Placed.Parts {
     private final Placed.Requires bridge;
     
@@ -79,35 +59,24 @@ public abstract class Placed {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Place> thisPlace();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component extends Placed.Provides {
+  }
+  
   public abstract static class Agent {
-    @SuppressWarnings("all")
     public interface Requires {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<Place> myPlace();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component extends Placed.Agent.Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl implements Placed.Agent.Component, Placed.Agent.Parts {
       private final Placed.Agent.Requires bridge;
       
@@ -156,6 +125,16 @@ public abstract class Placed {
       }
     }
     
+    public interface Provides {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<Place> myPlace();
+    }
+    
+    public interface Component extends Placed.Agent.Provides {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -279,7 +258,6 @@ public abstract class Placed {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,

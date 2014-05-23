@@ -4,38 +4,12 @@ import fr.irit.smac.may.lib.components.distribution.interfaces.Transform;
 
 @SuppressWarnings("all")
 public abstract class JSONTransformer<T> {
-  @SuppressWarnings("all")
   public interface Requires<T> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Transform<T,String> serializer();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Transform<String,T> deserializer();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<T> extends JSONTransformer.Provides<T> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<T> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<T> implements JSONTransformer.Component<T>, JSONTransformer.Parts<T> {
     private final JSONTransformer.Requires<T> bridge;
     
@@ -82,19 +56,35 @@ public abstract class JSONTransformer<T> {
       
     }
     
-    private Transform<T,String> serializer;
+    private Transform<T, String> serializer;
     
-    public final Transform<T,String> serializer() {
+    public final Transform<T, String> serializer() {
       return this.serializer;
     }
     
-    private Transform<String,T> deserializer;
+    private Transform<String, T> deserializer;
     
-    public final Transform<String,T> deserializer() {
+    public final Transform<String, T> deserializer() {
       return this.deserializer;
     }
   }
   
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Transform<T, String> serializer();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Transform<String, T> deserializer();
+  }
+  
+  public interface Component<T> extends JSONTransformer.Provides<T> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -141,14 +131,14 @@ public abstract class JSONTransformer<T> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract Transform<T,String> make_serializer();
+  protected abstract Transform<T, String> make_serializer();
   
   /**
    * This should be overridden by the implementation to define the provided port.
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract Transform<String,T> make_deserializer();
+  protected abstract Transform<String, T> make_deserializer();
   
   /**
    * This can be called by the implementation to access the required ports.

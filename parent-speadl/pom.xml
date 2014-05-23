@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.irit.smac.lib.may</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.2.5-SNAPSHOT</version>
+		<version>3.3.0-SNAPSHOT</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
@@ -16,7 +16,8 @@
 	<description>Parent pom for the official MAY library that generates code with SpeADL</description>
 
 	<properties>
-		<xtext-version>2.5.3</xtext-version>
+		<xtext-version>2.6.0</xtext-version>
+		<may-version>3.2.5-SNAPSHOT</may-version>
 	</properties>
 
 	<build>
@@ -70,6 +71,7 @@
 								<goal>clean</goal>
 							</goals>
 							<configuration>
+								<excludeDefaultDirectories>true</excludeDefaultDirectories>
 								<filesets>
 									<fileset>
 										<directory>${project.basedir}/src/main/speadl-gen</directory>
@@ -106,7 +108,7 @@
 						<dependency>
 							<groupId>fr.irit.smac.may</groupId>
 							<artifactId>fr.irit.smac.may.speadl</artifactId>
-							<version>${project.version}</version>
+							<version>${may-version}</version>
 						</dependency>
 					</dependencies>
 				</plugin>

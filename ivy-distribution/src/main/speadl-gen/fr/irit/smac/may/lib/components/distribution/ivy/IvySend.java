@@ -8,50 +8,12 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 @SuppressWarnings("all")
 public abstract class IvySend {
-  @SuppressWarnings("all")
   public interface Requires {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<String> send();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<IvyConnectionStatus> connectionStatus();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<IvyConnectionConfig> connect();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do disconnect();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends IvySend.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements IvySend.Component, IvySend.Parts {
     private final IvySend.Requires bridge;
     
@@ -133,6 +95,34 @@ public abstract class IvySend {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<String> send();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<IvyConnectionStatus> connectionStatus();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<IvyConnectionConfig> connect();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do disconnect();
+  }
+  
+  public interface Component extends IvySend.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

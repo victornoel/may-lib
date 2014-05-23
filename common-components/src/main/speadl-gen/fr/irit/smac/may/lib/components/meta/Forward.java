@@ -2,7 +2,6 @@ package fr.irit.smac.may.lib.components.meta;
 
 @SuppressWarnings("all")
 public abstract class Forward<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
     /**
      * This can be called by the implementation to access this required port.
@@ -11,23 +10,9 @@ public abstract class Forward<I> {
     public I forwardedPort();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends Forward.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements Forward.Component<I>, Forward.Parts<I> {
     private final Forward.Requires<I> bridge;
     
@@ -65,35 +50,19 @@ public abstract class Forward<I> {
     }
   }
   
+  public interface Provides<I> {
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<I> extends Forward.Provides<I> {
+  }
+  
   public abstract static class Caller<I> {
-    @SuppressWarnings("all")
     public interface Requires<I> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public I forwardedPort();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<I> extends Forward.Caller.Provides<I> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<I> implements Forward.Caller.Component<I>, Forward.Caller.Parts<I> {
       private final Forward.Caller.Requires<I> bridge;
       
@@ -142,6 +111,16 @@ public abstract class Forward<I> {
       }
     }
     
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public I forwardedPort();
+    }
+    
+    public interface Component<I> extends Forward.Caller.Provides<I> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -265,7 +244,6 @@ public abstract class Forward<I> {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,

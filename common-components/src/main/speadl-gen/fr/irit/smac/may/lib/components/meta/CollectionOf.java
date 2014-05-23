@@ -6,32 +6,12 @@ import java.util.Collection;
 
 @SuppressWarnings("all")
 public abstract class CollectionOf<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Collection<I>> get();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends CollectionOf.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements CollectionOf.Component<I>, CollectionOf.Parts<I> {
     private final CollectionOf.Requires<I> bridge;
     
@@ -80,10 +60,18 @@ public abstract class CollectionOf<I> {
     }
   }
   
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Collection<I>> get();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<I> extends CollectionOf.Provides<I> {
+  }
+  
   public abstract static class Element<I> {
-    @SuppressWarnings("all")
     public interface Requires<I> {
       /**
        * This can be called by the implementation to access this required port.
@@ -92,28 +80,9 @@ public abstract class CollectionOf<I> {
       public I forwardedPort();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<I> extends CollectionOf.Element.Provides<I> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<I> implements CollectionOf.Element.Component<I>, CollectionOf.Element.Parts<I> {
       private final CollectionOf.Element.Requires<I> bridge;
       
@@ -162,6 +131,16 @@ public abstract class CollectionOf<I> {
       }
     }
     
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component<I> extends CollectionOf.Element.Provides<I> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -285,7 +264,6 @@ public abstract class CollectionOf<I> {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,

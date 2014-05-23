@@ -5,7 +5,6 @@ import fr.irit.smac.may.lib.interfaces.Do;
 
 @SuppressWarnings("all")
 public abstract class Loop {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -20,28 +19,9 @@ public abstract class Loop {
     public Do handler();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do stop();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends Loop.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements Loop.Component, Loop.Parts {
     private final Loop.Requires bridge;
     
@@ -90,6 +70,16 @@ public abstract class Loop {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do stop();
+  }
+  
+  public interface Component extends Loop.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

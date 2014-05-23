@@ -6,13 +6,12 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 
 @SuppressWarnings("all")
 public abstract class RemoteFactory<Msg, Ref> {
-  @SuppressWarnings("all")
   public interface Requires<Msg, Ref> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public CreateRemoteClassic<Msg,Ref> infraCreate();
+    public CreateRemoteClassic<Msg, Ref> infraCreate();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -21,32 +20,13 @@ public abstract class RemoteFactory<Msg, Ref> {
     public Pull<Place> thisPlace();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg, Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public CreateRemoteClassic<Msg,Ref> factCreate();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends RemoteFactory.Provides<Msg,Ref> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements RemoteFactory.Component<Msg,Ref>, RemoteFactory.Parts<Msg,Ref> {
-    private final RemoteFactory.Requires<Msg,Ref> bridge;
+  public static class ComponentImpl<Msg, Ref> implements RemoteFactory.Component<Msg, Ref>, RemoteFactory.Parts<Msg, Ref> {
+    private final RemoteFactory.Requires<Msg, Ref> bridge;
     
-    private final RemoteFactory<Msg,Ref> implementation;
+    private final RemoteFactory<Msg, Ref> implementation;
     
     public void start() {
       this.implementation.start();
@@ -67,7 +47,7 @@ public abstract class RemoteFactory<Msg, Ref> {
       
     }
     
-    public ComponentImpl(final RemoteFactory<Msg,Ref> implem, final RemoteFactory.Requires<Msg,Ref> b, final boolean doInits) {
+    public ComponentImpl(final RemoteFactory<Msg, Ref> implem, final RemoteFactory.Requires<Msg, Ref> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -84,46 +64,35 @@ public abstract class RemoteFactory<Msg, Ref> {
       
     }
     
-    private CreateRemoteClassic<Msg,Ref> factCreate;
+    private CreateRemoteClassic<Msg, Ref> factCreate;
     
-    public final CreateRemoteClassic<Msg,Ref> factCreate() {
+    public final CreateRemoteClassic<Msg, Ref> factCreate() {
       return this.factCreate;
     }
   }
   
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public CreateRemoteClassic<Msg, Ref> factCreate();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<Msg, Ref> extends RemoteFactory.Provides<Msg, Ref> {
+  }
+  
   public abstract static class Agent<Msg, Ref> {
-    @SuppressWarnings("all")
     public interface Requires<Msg, Ref> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<Msg, Ref> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public CreateRemoteClassic<Msg,Ref> create();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<Msg, Ref> extends RemoteFactory.Agent.Provides<Msg,Ref> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<Msg, Ref> {
     }
     
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<Msg, Ref> implements RemoteFactory.Agent.Component<Msg,Ref>, RemoteFactory.Agent.Parts<Msg,Ref> {
-      private final RemoteFactory.Agent.Requires<Msg,Ref> bridge;
+    public static class ComponentImpl<Msg, Ref> implements RemoteFactory.Agent.Component<Msg, Ref>, RemoteFactory.Agent.Parts<Msg, Ref> {
+      private final RemoteFactory.Agent.Requires<Msg, Ref> bridge;
       
-      private final RemoteFactory.Agent<Msg,Ref> implementation;
+      private final RemoteFactory.Agent<Msg, Ref> implementation;
       
       public void start() {
         this.implementation.start();
@@ -144,7 +113,7 @@ public abstract class RemoteFactory<Msg, Ref> {
         
       }
       
-      public ComponentImpl(final RemoteFactory.Agent<Msg,Ref> implem, final RemoteFactory.Agent.Requires<Msg,Ref> b, final boolean doInits) {
+      public ComponentImpl(final RemoteFactory.Agent<Msg, Ref> implem, final RemoteFactory.Agent.Requires<Msg, Ref> b, final boolean doInits) {
         this.bridge = b;
         this.implementation = implem;
         
@@ -161,13 +130,23 @@ public abstract class RemoteFactory<Msg, Ref> {
         
       }
       
-      private CreateRemoteClassic<Msg,Ref> create;
+      private CreateRemoteClassic<Msg, Ref> create;
       
-      public final CreateRemoteClassic<Msg,Ref> create() {
+      public final CreateRemoteClassic<Msg, Ref> create() {
         return this.create;
       }
     }
     
+    public interface Provides<Msg, Ref> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public CreateRemoteClassic<Msg, Ref> create();
+    }
+    
+    public interface Component<Msg, Ref> extends RemoteFactory.Agent.Provides<Msg, Ref> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -182,7 +161,7 @@ public abstract class RemoteFactory<Msg, Ref> {
      */
     private boolean started = false;;
     
-    private RemoteFactory.Agent.ComponentImpl<Msg,Ref> selfComponent;
+    private RemoteFactory.Agent.ComponentImpl<Msg, Ref> selfComponent;
     
     /**
      * Can be overridden by the implementation.
@@ -200,7 +179,7 @@ public abstract class RemoteFactory<Msg, Ref> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected RemoteFactory.Agent.Provides<Msg,Ref> provides() {
+    protected RemoteFactory.Agent.Provides<Msg, Ref> provides() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -214,13 +193,13 @@ public abstract class RemoteFactory<Msg, Ref> {
      * This will be called once during the construction of the component to initialize the port.
      * 
      */
-    protected abstract CreateRemoteClassic<Msg,Ref> make_create();
+    protected abstract CreateRemoteClassic<Msg, Ref> make_create();
     
     /**
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected RemoteFactory.Agent.Requires<Msg,Ref> requires() {
+    protected RemoteFactory.Agent.Requires<Msg, Ref> requires() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -233,7 +212,7 @@ public abstract class RemoteFactory<Msg, Ref> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected RemoteFactory.Agent.Parts<Msg,Ref> parts() {
+    protected RemoteFactory.Agent.Parts<Msg, Ref> parts() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -246,12 +225,12 @@ public abstract class RemoteFactory<Msg, Ref> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public synchronized RemoteFactory.Agent.Component<Msg,Ref> _newComponent(final RemoteFactory.Agent.Requires<Msg,Ref> b, final boolean start) {
+    public synchronized RemoteFactory.Agent.Component<Msg, Ref> _newComponent(final RemoteFactory.Agent.Requires<Msg, Ref> b, final boolean start) {
       if (this.init) {
       	throw new RuntimeException("This instance of Agent has already been used to create a component, use another one.");
       }
       this.init = true;
-      RemoteFactory.Agent.ComponentImpl<Msg,Ref> comp = new RemoteFactory.Agent.ComponentImpl<Msg,Ref>(this, b, true);
+      RemoteFactory.Agent.ComponentImpl<Msg, Ref> comp = new RemoteFactory.Agent.ComponentImpl<Msg, Ref>(this, b, true);
       if (start) {
       	comp.start();
       }
@@ -259,13 +238,13 @@ public abstract class RemoteFactory<Msg, Ref> {
       
     }
     
-    private RemoteFactory.ComponentImpl<Msg,Ref> ecosystemComponent;
+    private RemoteFactory.ComponentImpl<Msg, Ref> ecosystemComponent;
     
     /**
      * This can be called by the species implementation to access the provided ports of its ecosystem.
      * 
      */
-    protected RemoteFactory.Provides<Msg,Ref> eco_provides() {
+    protected RemoteFactory.Provides<Msg, Ref> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
@@ -275,7 +254,7 @@ public abstract class RemoteFactory<Msg, Ref> {
      * This can be called by the species implementation to access the required ports of its ecosystem.
      * 
      */
-    protected RemoteFactory.Requires<Msg,Ref> eco_requires() {
+    protected RemoteFactory.Requires<Msg, Ref> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
       
@@ -285,13 +264,12 @@ public abstract class RemoteFactory<Msg, Ref> {
      * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
      * 
      */
-    protected RemoteFactory.Parts<Msg,Ref> eco_parts() {
+    protected RemoteFactory.Parts<Msg, Ref> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -306,7 +284,7 @@ public abstract class RemoteFactory<Msg, Ref> {
    */
   private boolean started = false;;
   
-  private RemoteFactory.ComponentImpl<Msg,Ref> selfComponent;
+  private RemoteFactory.ComponentImpl<Msg, Ref> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -324,7 +302,7 @@ public abstract class RemoteFactory<Msg, Ref> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected RemoteFactory.Provides<Msg,Ref> provides() {
+  protected RemoteFactory.Provides<Msg, Ref> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -338,13 +316,13 @@ public abstract class RemoteFactory<Msg, Ref> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract CreateRemoteClassic<Msg,Ref> make_factCreate();
+  protected abstract CreateRemoteClassic<Msg, Ref> make_factCreate();
   
   /**
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected RemoteFactory.Requires<Msg,Ref> requires() {
+  protected RemoteFactory.Requires<Msg, Ref> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -357,7 +335,7 @@ public abstract class RemoteFactory<Msg, Ref> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected RemoteFactory.Parts<Msg,Ref> parts() {
+  protected RemoteFactory.Parts<Msg, Ref> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -370,12 +348,12 @@ public abstract class RemoteFactory<Msg, Ref> {
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized RemoteFactory.Component<Msg,Ref> _newComponent(final RemoteFactory.Requires<Msg,Ref> b, final boolean start) {
+  public synchronized RemoteFactory.Component<Msg, Ref> _newComponent(final RemoteFactory.Requires<Msg, Ref> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of RemoteFactory has already been used to create a component, use another one.");
     }
     this.init = true;
-    RemoteFactory.ComponentImpl<Msg,Ref> comp = new RemoteFactory.ComponentImpl<Msg,Ref>(this, b, true);
+    RemoteFactory.ComponentImpl<Msg, Ref> comp = new RemoteFactory.ComponentImpl<Msg, Ref>(this, b, true);
     if (start) {
     	comp.start();
     }
@@ -387,14 +365,14 @@ public abstract class RemoteFactory<Msg, Ref> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract RemoteFactory.Agent<Msg,Ref> make_Agent();
+  protected abstract RemoteFactory.Agent<Msg, Ref> make_Agent();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public RemoteFactory.Agent<Msg,Ref> _createImplementationOfAgent() {
-    RemoteFactory.Agent<Msg,Ref> implem = make_Agent();
+  public RemoteFactory.Agent<Msg, Ref> _createImplementationOfAgent() {
+    RemoteFactory.Agent<Msg, Ref> implem = make_Agent();
     if (implem == null) {
     	throw new RuntimeException("make_Agent() in fr.irit.smac.may.lib.classic.remote.RemoteFactory should not return null.");
     }
@@ -408,8 +386,8 @@ public abstract class RemoteFactory<Msg, Ref> {
    * This can be called to create an instance of the species from inside the implementation of the ecosystem.
    * 
    */
-  protected RemoteFactory.Agent.Component<Msg,Ref> newAgent() {
-    RemoteFactory.Agent<Msg,Ref> implem = _createImplementationOfAgent();
-    return implem._newComponent(new RemoteFactory.Agent.Requires<Msg,Ref>() {},true);
+  protected RemoteFactory.Agent.Component<Msg, Ref> newAgent() {
+    RemoteFactory.Agent<Msg, Ref> implem = _createImplementationOfAgent();
+    return implem._newComponent(new RemoteFactory.Agent.Requires<Msg, Ref>() {},true);
   }
 }

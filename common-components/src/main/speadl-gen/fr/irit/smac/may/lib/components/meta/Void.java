@@ -2,32 +2,12 @@ package fr.irit.smac.may.lib.components.meta;
 
 @SuppressWarnings("all")
 public abstract class Void<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public I port();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends Void.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements Void.Component<I>, Void.Parts<I> {
     private final Void.Requires<I> bridge;
     
@@ -76,6 +56,16 @@ public abstract class Void<I> {
     }
   }
   
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public I port();
+  }
+  
+  public interface Component<I> extends Void.Provides<I> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

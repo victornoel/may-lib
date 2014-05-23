@@ -7,7 +7,6 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class IvyBus {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -16,46 +15,9 @@ public abstract class IvyBus {
     public Executor exec();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do disconnect();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Bind bindMsg();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Integer> unBindMsg();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<String> send();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends IvyBus.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements IvyBus.Component, IvyBus.Parts {
     private final IvyBus.Requires bridge;
     
@@ -137,6 +99,34 @@ public abstract class IvyBus {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do disconnect();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Bind bindMsg();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Integer> unBindMsg();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<String> send();
+  }
+  
+  public interface Component extends IvyBus.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

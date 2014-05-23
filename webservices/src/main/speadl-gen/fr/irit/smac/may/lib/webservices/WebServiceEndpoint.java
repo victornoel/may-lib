@@ -2,7 +2,6 @@ package fr.irit.smac.may.lib.webservices;
 
 @SuppressWarnings("all")
 public abstract class WebServiceEndpoint<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
     /**
      * This can be called by the implementation to access this required port.
@@ -11,23 +10,9 @@ public abstract class WebServiceEndpoint<I> {
     public I service();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends WebServiceEndpoint.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements WebServiceEndpoint.Component<I>, WebServiceEndpoint.Parts<I> {
     private final WebServiceEndpoint.Requires<I> bridge;
     
@@ -65,6 +50,11 @@ public abstract class WebServiceEndpoint<I> {
     }
   }
   
+  public interface Provides<I> {
+  }
+  
+  public interface Component<I> extends WebServiceEndpoint.Provides<I> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

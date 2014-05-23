@@ -5,38 +5,12 @@ import fr.irit.smac.may.lib.interfaces.Do;
 
 @SuppressWarnings("all")
 public abstract class ExecutorServiceWrapper {
-  @SuppressWarnings("all")
   public interface Requires {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public AdvancedExecutor executor();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do stop();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends ExecutorServiceWrapper.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements ExecutorServiceWrapper.Component, ExecutorServiceWrapper.Parts {
     private final ExecutorServiceWrapper.Requires bridge;
     
@@ -96,41 +70,30 @@ public abstract class ExecutorServiceWrapper {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public AdvancedExecutor executor();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do stop();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component extends ExecutorServiceWrapper.Provides {
+  }
+  
   public abstract static class Executing {
-    @SuppressWarnings("all")
     public interface Requires {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public AdvancedExecutor executor();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component extends ExecutorServiceWrapper.Executing.Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl implements ExecutorServiceWrapper.Executing.Component, ExecutorServiceWrapper.Executing.Parts {
       private final ExecutorServiceWrapper.Executing.Requires bridge;
       
@@ -190,6 +153,22 @@ public abstract class ExecutorServiceWrapper {
       }
     }
     
+    public interface Provides {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public AdvancedExecutor executor();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component extends ExecutorServiceWrapper.Executing.Provides {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -320,7 +299,6 @@ public abstract class ExecutorServiceWrapper {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,

@@ -7,32 +7,12 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 
 @SuppressWarnings("all")
 public abstract class DirectReferences<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Call<I,DirRef> call();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends DirectReferences.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements DirectReferences.Component<I>, DirectReferences.Parts<I> {
     private final DirectReferences.Requires<I> bridge;
     
@@ -74,17 +54,25 @@ public abstract class DirectReferences<I> {
       
     }
     
-    private Call<I,DirRef> call;
+    private Call<I, DirRef> call;
     
-    public final Call<I,DirRef> call() {
+    public final Call<I, DirRef> call() {
       return this.call;
     }
   }
   
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Call<I, DirRef> call();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<I> extends DirectReferences.Provides<I> {
+  }
+  
   public abstract static class Callee<I> {
-    @SuppressWarnings("all")
     public interface Requires<I> {
       /**
        * This can be called by the implementation to access this required port.
@@ -93,34 +81,9 @@ public abstract class DirectReferences<I> {
       public I toCall();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<DirRef> me();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<I> extends DirectReferences.Callee.Provides<I> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<I> implements DirectReferences.Callee.Component<I>, DirectReferences.Callee.Parts<I> {
       private final DirectReferences.Callee.Requires<I> bridge;
       
@@ -180,6 +143,22 @@ public abstract class DirectReferences<I> {
       }
     }
     
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<DirRef> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component<I> extends DirectReferences.Callee.Provides<I> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -311,35 +290,13 @@ public abstract class DirectReferences<I> {
     }
   }
   
-  
-  @SuppressWarnings("all")
   public abstract static class Caller<I> {
-    @SuppressWarnings("all")
     public interface Requires<I> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Call<I,DirRef> call();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<I> extends DirectReferences.Caller.Provides<I> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<I> implements DirectReferences.Caller.Component<I>, DirectReferences.Caller.Parts<I> {
       private final DirectReferences.Caller.Requires<I> bridge;
       
@@ -381,13 +338,23 @@ public abstract class DirectReferences<I> {
         
       }
       
-      private Call<I,DirRef> call;
+      private Call<I, DirRef> call;
       
-      public final Call<I,DirRef> call() {
+      public final Call<I, DirRef> call() {
         return this.call;
       }
     }
     
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Call<I, DirRef> call();
+    }
+    
+    public interface Component<I> extends DirectReferences.Caller.Provides<I> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -434,7 +401,7 @@ public abstract class DirectReferences<I> {
      * This will be called once during the construction of the component to initialize the port.
      * 
      */
-    protected abstract Call<I,DirRef> make_call();
+    protected abstract Call<I, DirRef> make_call();
     
     /**
      * This can be called by the implementation to access the required ports.
@@ -512,7 +479,6 @@ public abstract class DirectReferences<I> {
     }
   }
   
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -558,7 +524,7 @@ public abstract class DirectReferences<I> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract Call<I,DirRef> make_call();
+  protected abstract Call<I, DirRef> make_call();
   
   /**
    * This can be called by the implementation to access the required ports.

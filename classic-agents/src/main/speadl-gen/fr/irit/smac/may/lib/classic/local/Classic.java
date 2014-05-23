@@ -15,39 +15,9 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class Classic<Msg> {
-  @SuppressWarnings("all")
   public interface Requires<Msg> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Send<Msg,DirRef> send();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public CreateClassic<Msg,DirRef> create();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do stop();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg> extends Classic.Provides<Msg> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -61,7 +31,7 @@ public abstract class Classic<Msg> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public Forward.Component<CreateClassic<Msg,DirRef>> fact();
+    public Forward.Component<CreateClassic<Msg, DirRef>> fact();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -71,8 +41,6 @@ public abstract class Classic<Msg> {
     public ExecutorServiceWrapper.Component executor();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<Msg> implements Classic.Component<Msg>, Classic.Parts<Msg> {
     private final Classic.Requires<Msg> bridge;
     
@@ -82,7 +50,7 @@ public abstract class Classic<Msg> {
       assert this.receive != null: "This is a bug.";
       ((DirRefAsyncReceiver.ComponentImpl<Msg>) this.receive).start();
       assert this.fact != null: "This is a bug.";
-      ((Forward.ComponentImpl<CreateClassic<Msg,DirRef>>) this.fact).start();
+      ((Forward.ComponentImpl<CreateClassic<Msg, DirRef>>) this.fact).start();
       assert this.executor != null: "This is a bug.";
       ((ExecutorServiceWrapper.ComponentImpl) this.executor).start();
       this.implementation.start();
@@ -141,13 +109,13 @@ public abstract class Classic<Msg> {
       
     }
     
-    public final Send<Msg,DirRef> send() {
+    public final Send<Msg, DirRef> send() {
       return this.receive.send();
     }
     
-    private CreateClassic<Msg,DirRef> create;
+    private CreateClassic<Msg, DirRef> create;
     
-    public final CreateClassic<Msg,DirRef> create() {
+    public final CreateClassic<Msg, DirRef> create() {
       return this.create;
     }
     
@@ -159,28 +127,24 @@ public abstract class Classic<Msg> {
     
     private DirRefAsyncReceiver<Msg> implem_receive;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_receive implements DirRefAsyncReceiver.Requires<Msg> {
     }
-    
     
     public final DirRefAsyncReceiver.Component<Msg> receive() {
       return this.receive;
     }
     
-    private Forward.Component<CreateClassic<Msg,DirRef>> fact;
+    private Forward.Component<CreateClassic<Msg, DirRef>> fact;
     
-    private Forward<CreateClassic<Msg,DirRef>> implem_fact;
+    private Forward<CreateClassic<Msg, DirRef>> implem_fact;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_fact implements Forward.Requires<CreateClassic<Msg,DirRef>> {
-      public final CreateClassic<Msg,DirRef> forwardedPort() {
+    private final class BridgeImpl_fact implements Forward.Requires<CreateClassic<Msg, DirRef>> {
+      public final CreateClassic<Msg, DirRef> forwardedPort() {
         return Classic.ComponentImpl.this.create();
       }
     }
     
-    
-    public final Forward.Component<CreateClassic<Msg,DirRef>> fact() {
+    public final Forward.Component<CreateClassic<Msg, DirRef>> fact() {
       return this.fact;
     }
     
@@ -188,47 +152,48 @@ public abstract class Classic<Msg> {
     
     private ExecutorServiceWrapper implem_executor;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_executor implements ExecutorServiceWrapper.Requires {
     }
-    
     
     public final ExecutorServiceWrapper.Component executor() {
       return this.executor;
     }
   }
   
+  public interface Provides<Msg> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Send<Msg, DirRef> send();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public CreateClassic<Msg, DirRef> create();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do stop();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<Msg> extends Classic.Provides<Msg> {
+  }
+  
   public abstract static class ClassicAgent<Msg> {
-    @SuppressWarnings("all")
     public interface Requires<Msg> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<Msg> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<DirRef> me();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<Msg> extends Classic.ClassicAgent.Provides<Msg> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<Msg> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public ClassicAgentComponent.Component<Msg,DirRef> arch();
+      public ClassicAgentComponent.Component<Msg, DirRef> arch();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -242,7 +207,7 @@ public abstract class Classic<Msg> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public Forward.Caller.Component<CreateClassic<Msg,DirRef>> f();
+      public Forward.Caller.Component<CreateClassic<Msg, DirRef>> f();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -259,8 +224,6 @@ public abstract class Classic<Msg> {
       public DirRefAsyncReceiver.Sender.Component<Msg> ss();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<Msg> implements Classic.ClassicAgent.Component<Msg>, Classic.ClassicAgent.Parts<Msg> {
       private final Classic.ClassicAgent.Requires<Msg> bridge;
       
@@ -268,11 +231,11 @@ public abstract class Classic<Msg> {
       
       public void start() {
         assert this.arch != null: "This is a bug.";
-        ((ClassicAgentComponent.ComponentImpl<Msg,DirRef>) this.arch).start();
+        ((ClassicAgentComponent.ComponentImpl<Msg, DirRef>) this.arch).start();
         assert this.s != null: "This is a bug.";
         ((ExecutorServiceWrapper.Executing.ComponentImpl) this.s).start();
         assert this.f != null: "This is a bug.";
-        ((Forward.Caller.ComponentImpl<CreateClassic<Msg,DirRef>>) this.f).start();
+        ((Forward.Caller.ComponentImpl<CreateClassic<Msg, DirRef>>) this.f).start();
         assert this.receive != null: "This is a bug.";
         ((DirRefAsyncReceiver.Receiver.ComponentImpl<Msg>) this.receive).start();
         assert this.ss != null: "This is a bug.";
@@ -330,13 +293,12 @@ public abstract class Classic<Msg> {
         return this.receive.me();
       }
       
-      private ClassicAgentComponent.Component<Msg,DirRef> arch;
+      private ClassicAgentComponent.Component<Msg, DirRef> arch;
       
-      private ClassicAgentComponent<Msg,DirRef> implem_arch;
+      private ClassicAgentComponent<Msg, DirRef> implem_arch;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_arch implements ClassicAgentComponent.Requires<Msg,DirRef> {
-        public final Send<Msg,DirRef> send() {
+      private final class BridgeImpl_arch implements ClassicAgentComponent.Requires<Msg, DirRef> {
+        public final Send<Msg, DirRef> send() {
           return Classic.ClassicAgent.ComponentImpl.this.ss.send();
         }
         
@@ -352,47 +314,40 @@ public abstract class Classic<Msg> {
           return Classic.ClassicAgent.ComponentImpl.this.s.stop();
         }
         
-        public final CreateClassic<Msg,DirRef> create() {
+        public final CreateClassic<Msg, DirRef> create() {
           return Classic.ClassicAgent.ComponentImpl.this.f.forwardedPort();
         }
       }
       
-      
-      public final ClassicAgentComponent.Component<Msg,DirRef> arch() {
+      public final ClassicAgentComponent.Component<Msg, DirRef> arch() {
         return this.arch;
       }
       
       private ExecutorServiceWrapper.Executing.Component s;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_executor_s implements ExecutorServiceWrapper.Executing.Requires {
       }
-      
       
       public final ExecutorServiceWrapper.Executing.Component s() {
         return this.s;
       }
       
-      private Forward.Caller.Component<CreateClassic<Msg,DirRef>> f;
+      private Forward.Caller.Component<CreateClassic<Msg, DirRef>> f;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_fact_f implements Forward.Caller.Requires<CreateClassic<Msg,DirRef>> {
+      private final class BridgeImpl_fact_f implements Forward.Caller.Requires<CreateClassic<Msg, DirRef>> {
       }
       
-      
-      public final Forward.Caller.Component<CreateClassic<Msg,DirRef>> f() {
+      public final Forward.Caller.Component<CreateClassic<Msg, DirRef>> f() {
         return this.f;
       }
       
       private DirRefAsyncReceiver.Receiver.Component<Msg> receive;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_receive_receive implements DirRefAsyncReceiver.Receiver.Requires<Msg> {
         public final Push<Msg> put() {
           return Classic.ClassicAgent.ComponentImpl.this.arch.put();
         }
       }
-      
       
       public final DirRefAsyncReceiver.Receiver.Component<Msg> receive() {
         return this.receive;
@@ -400,16 +355,24 @@ public abstract class Classic<Msg> {
       
       private DirRefAsyncReceiver.Sender.Component<Msg> ss;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_receive_ss implements DirRefAsyncReceiver.Sender.Requires<Msg> {
       }
-      
       
       public final DirRefAsyncReceiver.Sender.Component<Msg> ss() {
         return this.ss;
       }
     }
     
+    public interface Provides<Msg> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<DirRef> me();
+    }
+    
+    public interface Component<Msg> extends Classic.ClassicAgent.Provides<Msg> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -482,11 +445,11 @@ public abstract class Classic<Msg> {
      * This will be called once during the construction of the component to initialize this sub-component.
      * 
      */
-    protected abstract ClassicAgentComponent<Msg,DirRef> make_arch();
+    protected abstract ClassicAgentComponent<Msg, DirRef> make_arch();
     
     private ExecutorServiceWrapper.Executing use_s;
     
-    private Forward.Caller<CreateClassic<Msg,DirRef>> use_f;
+    private Forward.Caller<CreateClassic<Msg, DirRef>> use_f;
     
     private DirRefAsyncReceiver.Receiver<Msg> use_receive;
     
@@ -542,7 +505,6 @@ public abstract class Classic<Msg> {
     }
   }
   
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -588,7 +550,7 @@ public abstract class Classic<Msg> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract CreateClassic<Msg,DirRef> make_create();
+  protected abstract CreateClassic<Msg, DirRef> make_create();
   
   /**
    * This can be called by the implementation to access the required ports.
@@ -628,7 +590,7 @@ public abstract class Classic<Msg> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract Forward<CreateClassic<Msg,DirRef>> make_fact();
+  protected abstract Forward<CreateClassic<Msg, DirRef>> make_fact();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -658,13 +620,13 @@ public abstract class Classic<Msg> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract Classic.ClassicAgent<Msg> make_ClassicAgent(final ClassicBehaviour<Msg,DirRef> beh, final String name);
+  protected abstract Classic.ClassicAgent<Msg> make_ClassicAgent(final ClassicBehaviour<Msg, DirRef> beh, final String name);
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public Classic.ClassicAgent<Msg> _createImplementationOfClassicAgent(final ClassicBehaviour<Msg,DirRef> beh, final String name) {
+  public Classic.ClassicAgent<Msg> _createImplementationOfClassicAgent(final ClassicBehaviour<Msg, DirRef> beh, final String name) {
     Classic.ClassicAgent<Msg> implem = make_ClassicAgent(beh,name);
     if (implem == null) {
     	throw new RuntimeException("make_ClassicAgent() in fr.irit.smac.may.lib.classic.local.Classic should not return null.");
@@ -691,7 +653,7 @@ public abstract class Classic<Msg> {
    * This can be called to create an instance of the species from inside the implementation of the ecosystem.
    * 
    */
-  protected Classic.ClassicAgent.Component<Msg> newClassicAgent(final ClassicBehaviour<Msg,DirRef> beh, final String name) {
+  protected Classic.ClassicAgent.Component<Msg> newClassicAgent(final ClassicBehaviour<Msg, DirRef> beh, final String name) {
     Classic.ClassicAgent<Msg> implem = _createImplementationOfClassicAgent(beh,name);
     return implem._newComponent(new Classic.ClassicAgent.Requires<Msg>() {},true);
   }

@@ -8,13 +8,12 @@ import fr.irit.smac.may.lib.interfaces.Send;
 
 @SuppressWarnings("all")
 public abstract class RemoteReceiver<Msg, LocalRef> {
-  @SuppressWarnings("all")
   public interface Requires<Msg, LocalRef> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Send<Msg,LocalRef> localSend();
+    public Send<Msg, LocalRef> localSend();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -23,32 +22,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     public Pull<Place> myPlace();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg, LocalRef> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Send<Msg,RemoteAgentRef> send();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg, LocalRef> extends RemoteReceiver.Provides<Msg,LocalRef> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg, LocalRef> {
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, LocalRef> implements RemoteReceiver.Component<Msg,LocalRef>, RemoteReceiver.Parts<Msg,LocalRef> {
-    private final RemoteReceiver.Requires<Msg,LocalRef> bridge;
+  public static class ComponentImpl<Msg, LocalRef> implements RemoteReceiver.Component<Msg, LocalRef>, RemoteReceiver.Parts<Msg, LocalRef> {
+    private final RemoteReceiver.Requires<Msg, LocalRef> bridge;
     
-    private final RemoteReceiver<Msg,LocalRef> implementation;
+    private final RemoteReceiver<Msg, LocalRef> implementation;
     
     public void start() {
       this.implementation.start();
@@ -69,7 +49,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       
     }
     
-    public ComponentImpl(final RemoteReceiver<Msg,LocalRef> implem, final RemoteReceiver.Requires<Msg,LocalRef> b, final boolean doInits) {
+    public ComponentImpl(final RemoteReceiver<Msg, LocalRef> implem, final RemoteReceiver.Requires<Msg, LocalRef> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -86,17 +66,25 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       
     }
     
-    private Send<Msg,RemoteAgentRef> send;
+    private Send<Msg, RemoteAgentRef> send;
     
-    public final Send<Msg,RemoteAgentRef> send() {
+    public final Send<Msg, RemoteAgentRef> send() {
       return this.send;
     }
   }
   
+  public interface Provides<Msg, LocalRef> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Send<Msg, RemoteAgentRef> send();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<Msg, LocalRef> extends RemoteReceiver.Provides<Msg, LocalRef> {
+  }
+  
   public abstract static class Agent<Msg, LocalRef> {
-    @SuppressWarnings("all")
     public interface Requires<Msg, LocalRef> {
       /**
        * This can be called by the implementation to access this required port.
@@ -105,38 +93,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       public Pull<LocalRef> localMe();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<Msg, LocalRef> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<RemoteAgentRef> me();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do disconnect();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<Msg, LocalRef> extends RemoteReceiver.Agent.Provides<Msg,LocalRef> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<Msg, LocalRef> {
     }
     
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<Msg, LocalRef> implements RemoteReceiver.Agent.Component<Msg,LocalRef>, RemoteReceiver.Agent.Parts<Msg,LocalRef> {
-      private final RemoteReceiver.Agent.Requires<Msg,LocalRef> bridge;
+    public static class ComponentImpl<Msg, LocalRef> implements RemoteReceiver.Agent.Component<Msg, LocalRef>, RemoteReceiver.Agent.Parts<Msg, LocalRef> {
+      private final RemoteReceiver.Agent.Requires<Msg, LocalRef> bridge;
       
-      private final RemoteReceiver.Agent<Msg,LocalRef> implementation;
+      private final RemoteReceiver.Agent<Msg, LocalRef> implementation;
       
       public void start() {
         this.implementation.start();
@@ -162,7 +125,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
         
       }
       
-      public ComponentImpl(final RemoteReceiver.Agent<Msg,LocalRef> implem, final RemoteReceiver.Agent.Requires<Msg,LocalRef> b, final boolean doInits) {
+      public ComponentImpl(final RemoteReceiver.Agent<Msg, LocalRef> implem, final RemoteReceiver.Agent.Requires<Msg, LocalRef> b, final boolean doInits) {
         this.bridge = b;
         this.implementation = implem;
         
@@ -192,6 +155,22 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       }
     }
     
+    public interface Provides<Msg, LocalRef> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<RemoteAgentRef> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do disconnect();
+    }
+    
+    public interface Component<Msg, LocalRef> extends RemoteReceiver.Agent.Provides<Msg, LocalRef> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -206,7 +185,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      */
     private boolean started = false;;
     
-    private RemoteReceiver.Agent.ComponentImpl<Msg,LocalRef> selfComponent;
+    private RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef> selfComponent;
     
     /**
      * Can be overridden by the implementation.
@@ -224,7 +203,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected RemoteReceiver.Agent.Provides<Msg,LocalRef> provides() {
+    protected RemoteReceiver.Agent.Provides<Msg, LocalRef> provides() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -251,7 +230,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected RemoteReceiver.Agent.Requires<Msg,LocalRef> requires() {
+    protected RemoteReceiver.Agent.Requires<Msg, LocalRef> requires() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -264,7 +243,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected RemoteReceiver.Agent.Parts<Msg,LocalRef> parts() {
+    protected RemoteReceiver.Agent.Parts<Msg, LocalRef> parts() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -277,12 +256,12 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public synchronized RemoteReceiver.Agent.Component<Msg,LocalRef> _newComponent(final RemoteReceiver.Agent.Requires<Msg,LocalRef> b, final boolean start) {
+    public synchronized RemoteReceiver.Agent.Component<Msg, LocalRef> _newComponent(final RemoteReceiver.Agent.Requires<Msg, LocalRef> b, final boolean start) {
       if (this.init) {
       	throw new RuntimeException("This instance of Agent has already been used to create a component, use another one.");
       }
       this.init = true;
-      RemoteReceiver.Agent.ComponentImpl<Msg,LocalRef> comp = new RemoteReceiver.Agent.ComponentImpl<Msg,LocalRef>(this, b, true);
+      RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef> comp = new RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef>(this, b, true);
       if (start) {
       	comp.start();
       }
@@ -290,13 +269,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       
     }
     
-    private RemoteReceiver.ComponentImpl<Msg,LocalRef> ecosystemComponent;
+    private RemoteReceiver.ComponentImpl<Msg, LocalRef> ecosystemComponent;
     
     /**
      * This can be called by the species implementation to access the provided ports of its ecosystem.
      * 
      */
-    protected RemoteReceiver.Provides<Msg,LocalRef> eco_provides() {
+    protected RemoteReceiver.Provides<Msg, LocalRef> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
@@ -306,7 +285,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * This can be called by the species implementation to access the required ports of its ecosystem.
      * 
      */
-    protected RemoteReceiver.Requires<Msg,LocalRef> eco_requires() {
+    protected RemoteReceiver.Requires<Msg, LocalRef> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
       
@@ -316,13 +295,12 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
      * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
      * 
      */
-    protected RemoteReceiver.Parts<Msg,LocalRef> eco_parts() {
+    protected RemoteReceiver.Parts<Msg, LocalRef> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -337,7 +315,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    */
   private boolean started = false;;
   
-  private RemoteReceiver.ComponentImpl<Msg,LocalRef> selfComponent;
+  private RemoteReceiver.ComponentImpl<Msg, LocalRef> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -355,7 +333,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected RemoteReceiver.Provides<Msg,LocalRef> provides() {
+  protected RemoteReceiver.Provides<Msg, LocalRef> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -369,13 +347,13 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract Send<Msg,RemoteAgentRef> make_send();
+  protected abstract Send<Msg, RemoteAgentRef> make_send();
   
   /**
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected RemoteReceiver.Requires<Msg,LocalRef> requires() {
+  protected RemoteReceiver.Requires<Msg, LocalRef> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -388,7 +366,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected RemoteReceiver.Parts<Msg,LocalRef> parts() {
+  protected RemoteReceiver.Parts<Msg, LocalRef> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -401,12 +379,12 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized RemoteReceiver.Component<Msg,LocalRef> _newComponent(final RemoteReceiver.Requires<Msg,LocalRef> b, final boolean start) {
+  public synchronized RemoteReceiver.Component<Msg, LocalRef> _newComponent(final RemoteReceiver.Requires<Msg, LocalRef> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of RemoteReceiver has already been used to create a component, use another one.");
     }
     this.init = true;
-    RemoteReceiver.ComponentImpl<Msg,LocalRef> comp = new RemoteReceiver.ComponentImpl<Msg,LocalRef>(this, b, true);
+    RemoteReceiver.ComponentImpl<Msg, LocalRef> comp = new RemoteReceiver.ComponentImpl<Msg, LocalRef>(this, b, true);
     if (start) {
     	comp.start();
     }
@@ -418,14 +396,14 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract RemoteReceiver.Agent<Msg,LocalRef> make_Agent();
+  protected abstract RemoteReceiver.Agent<Msg, LocalRef> make_Agent();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public RemoteReceiver.Agent<Msg,LocalRef> _createImplementationOfAgent() {
-    RemoteReceiver.Agent<Msg,LocalRef> implem = make_Agent();
+  public RemoteReceiver.Agent<Msg, LocalRef> _createImplementationOfAgent() {
+    RemoteReceiver.Agent<Msg, LocalRef> implem = make_Agent();
     if (implem == null) {
     	throw new RuntimeException("make_Agent() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver should not return null.");
     }

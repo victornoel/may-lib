@@ -6,7 +6,6 @@ import java.util.List;
 
 @SuppressWarnings("all")
 public abstract class IvyBinder {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -27,28 +26,9 @@ public abstract class IvyBinder {
     public Push<List<String>> receive();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<String> reBindMsg();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends IvyBinder.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements IvyBinder.Component, IvyBinder.Parts {
     private final IvyBinder.Requires bridge;
     
@@ -97,6 +77,16 @@ public abstract class IvyBinder {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<String> reBindMsg();
+  }
+  
+  public interface Component extends IvyBinder.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

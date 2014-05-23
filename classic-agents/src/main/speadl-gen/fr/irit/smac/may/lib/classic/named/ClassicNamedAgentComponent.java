@@ -11,13 +11,12 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class ClassicNamedAgentComponent<Msg, Ref> {
-  @SuppressWarnings("all")
   public interface Requires<Msg, Ref> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Send<Msg,Ref> send();
+    public Send<Msg, Ref> send();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -41,26 +40,9 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
      * This can be called by the implementation to access this required port.
      * 
      */
-    public CreateNamed<Msg,Ref> create();
+    public CreateNamed<Msg, Ref> create();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg, Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Msg> put();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends ClassicNamedAgentComponent.Provides<Msg,Ref> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -74,21 +56,19 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public ClassicNamedBehaviour.Component<Msg,Ref> beh();
+    public ClassicNamedBehaviour.Component<Msg, Ref> beh();
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements ClassicNamedAgentComponent.Component<Msg,Ref>, ClassicNamedAgentComponent.Parts<Msg,Ref> {
-    private final ClassicNamedAgentComponent.Requires<Msg,Ref> bridge;
+  public static class ComponentImpl<Msg, Ref> implements ClassicNamedAgentComponent.Component<Msg, Ref>, ClassicNamedAgentComponent.Parts<Msg, Ref> {
+    private final ClassicNamedAgentComponent.Requires<Msg, Ref> bridge;
     
-    private final ClassicNamedAgentComponent<Msg,Ref> implementation;
+    private final ClassicNamedAgentComponent<Msg, Ref> implementation;
     
     public void start() {
       assert this.dispatcher != null: "This is a bug.";
       ((SequentialDispatcher.ComponentImpl<Msg>) this.dispatcher).start();
       assert this.beh != null: "This is a bug.";
-      ((ClassicNamedBehaviour.ComponentImpl<Msg,Ref>) this.beh).start();
+      ((ClassicNamedBehaviour.ComponentImpl<Msg, Ref>) this.beh).start();
       this.implementation.start();
       this.implementation.started = true;
       
@@ -116,7 +96,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       
     }
     
-    public ComponentImpl(final ClassicNamedAgentComponent<Msg,Ref> implem, final ClassicNamedAgentComponent.Requires<Msg,Ref> b, final boolean doInits) {
+    public ComponentImpl(final ClassicNamedAgentComponent<Msg, Ref> implem, final ClassicNamedAgentComponent.Requires<Msg, Ref> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -141,7 +121,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     
     private SequentialDispatcher<Msg> implem_dispatcher;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_dispatcher implements SequentialDispatcher.Requires<Msg> {
       public final Executor executor() {
         return ClassicNamedAgentComponent.ComponentImpl.this.bridge.executor();
@@ -152,18 +131,16 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       }
     }
     
-    
     public final SequentialDispatcher.Component<Msg> dispatcher() {
       return this.dispatcher;
     }
     
-    private ClassicNamedBehaviour.Component<Msg,Ref> beh;
+    private ClassicNamedBehaviour.Component<Msg, Ref> beh;
     
-    private ClassicNamedBehaviour<Msg,Ref> implem_beh;
+    private ClassicNamedBehaviour<Msg, Ref> implem_beh;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_beh implements ClassicNamedBehaviour.Requires<Msg,Ref> {
-      public final Send<Msg,Ref> send() {
+    private final class BridgeImpl_beh implements ClassicNamedBehaviour.Requires<Msg, Ref> {
+      public final Send<Msg, Ref> send() {
         return ClassicNamedAgentComponent.ComponentImpl.this.bridge.send();
       }
       
@@ -175,17 +152,26 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
         return ClassicNamedAgentComponent.ComponentImpl.this.bridge.die();
       }
       
-      public final CreateNamed<Msg,Ref> create() {
+      public final CreateNamed<Msg, Ref> create() {
         return ClassicNamedAgentComponent.ComponentImpl.this.bridge.create();
       }
     }
     
-    
-    public final ClassicNamedBehaviour.Component<Msg,Ref> beh() {
+    public final ClassicNamedBehaviour.Component<Msg, Ref> beh() {
       return this.beh;
     }
   }
   
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Msg> put();
+  }
+  
+  public interface Component<Msg, Ref> extends ClassicNamedAgentComponent.Provides<Msg, Ref> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -200,7 +186,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
    */
   private boolean started = false;;
   
-  private ClassicNamedAgentComponent.ComponentImpl<Msg,Ref> selfComponent;
+  private ClassicNamedAgentComponent.ComponentImpl<Msg, Ref> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -218,7 +204,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected ClassicNamedAgentComponent.Provides<Msg,Ref> provides() {
+  protected ClassicNamedAgentComponent.Provides<Msg, Ref> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -231,7 +217,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected ClassicNamedAgentComponent.Requires<Msg,Ref> requires() {
+  protected ClassicNamedAgentComponent.Requires<Msg, Ref> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -244,7 +230,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected ClassicNamedAgentComponent.Parts<Msg,Ref> parts() {
+  protected ClassicNamedAgentComponent.Parts<Msg, Ref> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -265,18 +251,18 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract ClassicNamedBehaviour<Msg,Ref> make_beh();
+  protected abstract ClassicNamedBehaviour<Msg, Ref> make_beh();
   
   /**
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized ClassicNamedAgentComponent.Component<Msg,Ref> _newComponent(final ClassicNamedAgentComponent.Requires<Msg,Ref> b, final boolean start) {
+  public synchronized ClassicNamedAgentComponent.Component<Msg, Ref> _newComponent(final ClassicNamedAgentComponent.Requires<Msg, Ref> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of ClassicNamedAgentComponent has already been used to create a component, use another one.");
     }
     this.init = true;
-    ClassicNamedAgentComponent.ComponentImpl<Msg,Ref> comp = new ClassicNamedAgentComponent.ComponentImpl<Msg,Ref>(this, b, true);
+    ClassicNamedAgentComponent.ComponentImpl<Msg, Ref> comp = new ClassicNamedAgentComponent.ComponentImpl<Msg, Ref>(this, b, true);
     if (start) {
     	comp.start();
     }

@@ -9,7 +9,6 @@ import java.util.List;
 
 @SuppressWarnings("all")
 public abstract class IvyReceive {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -18,46 +17,9 @@ public abstract class IvyReceive {
     public Push<List<String>> receive();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<String> bindMsg();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<IvyConnectionStatus> connectionStatus();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<IvyConnectionConfig> connect();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do disconnect();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends IvyReceive.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements IvyReceive.Component, IvyReceive.Parts {
     private final IvyReceive.Requires bridge;
     
@@ -139,6 +101,34 @@ public abstract class IvyReceive {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<String> bindMsg();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<IvyConnectionStatus> connectionStatus();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<IvyConnectionConfig> connect();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do disconnect();
+  }
+  
+  public interface Component extends IvyReceive.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

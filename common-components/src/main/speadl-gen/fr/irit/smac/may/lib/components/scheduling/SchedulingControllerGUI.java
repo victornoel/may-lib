@@ -4,7 +4,6 @@ import fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl;
 
 @SuppressWarnings("all")
 public abstract class SchedulingControllerGUI {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -13,23 +12,9 @@ public abstract class SchedulingControllerGUI {
     public SchedulingControl control();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends SchedulingControllerGUI.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements SchedulingControllerGUI.Component, SchedulingControllerGUI.Parts {
     private final SchedulingControllerGUI.Requires bridge;
     
@@ -67,6 +52,11 @@ public abstract class SchedulingControllerGUI {
     }
   }
   
+  public interface Provides {
+  }
+  
+  public interface Component extends SchedulingControllerGUI.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

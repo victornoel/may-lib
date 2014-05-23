@@ -4,32 +4,12 @@ import fr.irit.smac.may.lib.interfaces.RemoteCall;
 
 @SuppressWarnings("all")
 public abstract class WebServiceClient<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public RemoteCall<I,String> service();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends WebServiceClient.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements WebServiceClient.Component<I>, WebServiceClient.Parts<I> {
     private final WebServiceClient.Requires<I> bridge;
     
@@ -71,13 +51,23 @@ public abstract class WebServiceClient<I> {
       
     }
     
-    private RemoteCall<I,String> service;
+    private RemoteCall<I, String> service;
     
-    public final RemoteCall<I,String> service() {
+    public final RemoteCall<I, String> service() {
       return this.service;
     }
   }
   
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public RemoteCall<I, String> service();
+  }
+  
+  public interface Component<I> extends WebServiceClient.Provides<I> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -124,7 +114,7 @@ public abstract class WebServiceClient<I> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract RemoteCall<I,String> make_service();
+  protected abstract RemoteCall<I, String> make_service();
   
   /**
    * This can be called by the implementation to access the required ports.

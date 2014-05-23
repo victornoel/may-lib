@@ -11,13 +11,12 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class RemoteClassicAgentComponent<Msg, Ref> {
-  @SuppressWarnings("all")
   public interface Requires<Msg, Ref> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Send<Msg,Ref> send();
+    public Send<Msg, Ref> send();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -47,32 +46,9 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
      * This can be called by the implementation to access this required port.
      * 
      */
-    public CreateRemoteClassic<Msg,Ref> create();
+    public CreateRemoteClassic<Msg, Ref> create();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg, Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Msg> put();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do die();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends RemoteClassicAgentComponent.Provides<Msg,Ref> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -86,21 +62,19 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public RemoteClassicBehaviour.Component<Msg,Ref> beh();
+    public RemoteClassicBehaviour.Component<Msg, Ref> beh();
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements RemoteClassicAgentComponent.Component<Msg,Ref>, RemoteClassicAgentComponent.Parts<Msg,Ref> {
-    private final RemoteClassicAgentComponent.Requires<Msg,Ref> bridge;
+  public static class ComponentImpl<Msg, Ref> implements RemoteClassicAgentComponent.Component<Msg, Ref>, RemoteClassicAgentComponent.Parts<Msg, Ref> {
+    private final RemoteClassicAgentComponent.Requires<Msg, Ref> bridge;
     
-    private final RemoteClassicAgentComponent<Msg,Ref> implementation;
+    private final RemoteClassicAgentComponent<Msg, Ref> implementation;
     
     public void start() {
       assert this.dispatcher != null: "This is a bug.";
       ((SequentialDispatcher.ComponentImpl<Msg>) this.dispatcher).start();
       assert this.beh != null: "This is a bug.";
-      ((RemoteClassicBehaviour.ComponentImpl<Msg,Ref>) this.beh).start();
+      ((RemoteClassicBehaviour.ComponentImpl<Msg, Ref>) this.beh).start();
       this.implementation.start();
       this.implementation.started = true;
       
@@ -133,7 +107,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       
     }
     
-    public ComponentImpl(final RemoteClassicAgentComponent<Msg,Ref> implem, final RemoteClassicAgentComponent.Requires<Msg,Ref> b, final boolean doInits) {
+    public ComponentImpl(final RemoteClassicAgentComponent<Msg, Ref> implem, final RemoteClassicAgentComponent.Requires<Msg, Ref> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -164,7 +138,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
     
     private SequentialDispatcher<Msg> implem_dispatcher;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_dispatcher implements SequentialDispatcher.Requires<Msg> {
       public final Executor executor() {
         return RemoteClassicAgentComponent.ComponentImpl.this.bridge.executor();
@@ -175,18 +148,16 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       }
     }
     
-    
     public final SequentialDispatcher.Component<Msg> dispatcher() {
       return this.dispatcher;
     }
     
-    private RemoteClassicBehaviour.Component<Msg,Ref> beh;
+    private RemoteClassicBehaviour.Component<Msg, Ref> beh;
     
-    private RemoteClassicBehaviour<Msg,Ref> implem_beh;
+    private RemoteClassicBehaviour<Msg, Ref> implem_beh;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_beh implements RemoteClassicBehaviour.Requires<Msg,Ref> {
-      public final Send<Msg,Ref> send() {
+    private final class BridgeImpl_beh implements RemoteClassicBehaviour.Requires<Msg, Ref> {
+      public final Send<Msg, Ref> send() {
         return RemoteClassicAgentComponent.ComponentImpl.this.bridge.send();
       }
       
@@ -198,17 +169,32 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
         return RemoteClassicAgentComponent.ComponentImpl.this.die();
       }
       
-      public final CreateRemoteClassic<Msg,Ref> create() {
+      public final CreateRemoteClassic<Msg, Ref> create() {
         return RemoteClassicAgentComponent.ComponentImpl.this.bridge.create();
       }
     }
     
-    
-    public final RemoteClassicBehaviour.Component<Msg,Ref> beh() {
+    public final RemoteClassicBehaviour.Component<Msg, Ref> beh() {
       return this.beh;
     }
   }
   
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Msg> put();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do die();
+  }
+  
+  public interface Component<Msg, Ref> extends RemoteClassicAgentComponent.Provides<Msg, Ref> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -223,7 +209,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
    */
   private boolean started = false;;
   
-  private RemoteClassicAgentComponent.ComponentImpl<Msg,Ref> selfComponent;
+  private RemoteClassicAgentComponent.ComponentImpl<Msg, Ref> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -241,7 +227,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected RemoteClassicAgentComponent.Provides<Msg,Ref> provides() {
+  protected RemoteClassicAgentComponent.Provides<Msg, Ref> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -261,7 +247,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected RemoteClassicAgentComponent.Requires<Msg,Ref> requires() {
+  protected RemoteClassicAgentComponent.Requires<Msg, Ref> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -274,7 +260,7 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected RemoteClassicAgentComponent.Parts<Msg,Ref> parts() {
+  protected RemoteClassicAgentComponent.Parts<Msg, Ref> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -295,18 +281,18 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract RemoteClassicBehaviour<Msg,Ref> make_beh();
+  protected abstract RemoteClassicBehaviour<Msg, Ref> make_beh();
   
   /**
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized RemoteClassicAgentComponent.Component<Msg,Ref> _newComponent(final RemoteClassicAgentComponent.Requires<Msg,Ref> b, final boolean start) {
+  public synchronized RemoteClassicAgentComponent.Component<Msg, Ref> _newComponent(final RemoteClassicAgentComponent.Requires<Msg, Ref> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of RemoteClassicAgentComponent has already been used to create a component, use another one.");
     }
     this.init = true;
-    RemoteClassicAgentComponent.ComponentImpl<Msg,Ref> comp = new RemoteClassicAgentComponent.ComponentImpl<Msg,Ref>(this, b, true);
+    RemoteClassicAgentComponent.ComponentImpl<Msg, Ref> comp = new RemoteClassicAgentComponent.ComponentImpl<Msg, Ref>(this, b, true);
     if (start) {
     	comp.start();
     }

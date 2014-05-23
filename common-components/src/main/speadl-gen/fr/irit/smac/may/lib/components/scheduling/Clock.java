@@ -6,7 +6,6 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class Clock {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -21,28 +20,9 @@ public abstract class Clock {
     public Do tick();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public SchedulingControl control();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends Clock.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements Clock.Component, Clock.Parts {
     private final Clock.Requires bridge;
     
@@ -91,6 +71,16 @@ public abstract class Clock {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public SchedulingControl control();
+  }
+  
+  public interface Component extends Clock.Provides {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

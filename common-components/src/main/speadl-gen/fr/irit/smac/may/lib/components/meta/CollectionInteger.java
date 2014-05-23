@@ -6,38 +6,12 @@ import fr.irit.smac.may.lib.interfaces.Pull;
 
 @SuppressWarnings("all")
 public abstract class CollectionInteger<I> {
-  @SuppressWarnings("all")
   public interface Requires<I> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public MapGet<Integer,I> get();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Integer> size();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<I> extends CollectionInteger.Provides<I> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<I> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<I> implements CollectionInteger.Component<I>, CollectionInteger.Parts<I> {
     private final CollectionInteger.Requires<I> bridge;
     
@@ -84,9 +58,9 @@ public abstract class CollectionInteger<I> {
       
     }
     
-    private MapGet<Integer,I> get;
+    private MapGet<Integer, I> get;
     
-    public final MapGet<Integer,I> get() {
+    public final MapGet<Integer, I> get() {
       return this.get;
     }
     
@@ -97,10 +71,24 @@ public abstract class CollectionInteger<I> {
     }
   }
   
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public MapGet<Integer, I> get();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Integer> size();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<I> extends CollectionInteger.Provides<I> {
+  }
+  
   public abstract static class Element<I> {
-    @SuppressWarnings("all")
     public interface Requires<I> {
       /**
        * This can be called by the implementation to access this required port.
@@ -109,34 +97,9 @@ public abstract class CollectionInteger<I> {
       public I forwardedPort();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<Integer> idx();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<I> extends CollectionInteger.Element.Provides<I> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<I> {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<I> implements CollectionInteger.Element.Component<I>, CollectionInteger.Element.Parts<I> {
       private final CollectionInteger.Element.Requires<I> bridge;
       
@@ -196,6 +159,22 @@ public abstract class CollectionInteger<I> {
       }
     }
     
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<Integer> idx();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component<I> extends CollectionInteger.Element.Provides<I> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -327,7 +306,6 @@ public abstract class CollectionInteger<I> {
     }
   }
   
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -373,7 +351,7 @@ public abstract class CollectionInteger<I> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract MapGet<Integer,I> make_get();
+  protected abstract MapGet<Integer, I> make_get();
   
   /**
    * This should be overridden by the implementation to define the provided port.

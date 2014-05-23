@@ -8,13 +8,12 @@ import fr.irit.smac.may.lib.interfaces.Send;
 
 @SuppressWarnings("all")
 public abstract class ClassicBehaviour<Msg, Ref> {
-  @SuppressWarnings("all")
   public interface Requires<Msg, Ref> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Send<Msg,Ref> send();
+    public Send<Msg, Ref> send();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -32,35 +31,16 @@ public abstract class ClassicBehaviour<Msg, Ref> {
      * This can be called by the implementation to access this required port.
      * 
      */
-    public CreateClassic<Msg,Ref> create();
+    public CreateClassic<Msg, Ref> create();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg, Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Msg> cycle();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends ClassicBehaviour.Provides<Msg,Ref> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements ClassicBehaviour.Component<Msg,Ref>, ClassicBehaviour.Parts<Msg,Ref> {
-    private final ClassicBehaviour.Requires<Msg,Ref> bridge;
+  public static class ComponentImpl<Msg, Ref> implements ClassicBehaviour.Component<Msg, Ref>, ClassicBehaviour.Parts<Msg, Ref> {
+    private final ClassicBehaviour.Requires<Msg, Ref> bridge;
     
-    private final ClassicBehaviour<Msg,Ref> implementation;
+    private final ClassicBehaviour<Msg, Ref> implementation;
     
     public void start() {
       this.implementation.start();
@@ -81,7 +61,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
       
     }
     
-    public ComponentImpl(final ClassicBehaviour<Msg,Ref> implem, final ClassicBehaviour.Requires<Msg,Ref> b, final boolean doInits) {
+    public ComponentImpl(final ClassicBehaviour<Msg, Ref> implem, final ClassicBehaviour.Requires<Msg, Ref> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -105,6 +85,16 @@ public abstract class ClassicBehaviour<Msg, Ref> {
     }
   }
   
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Msg> cycle();
+  }
+  
+  public interface Component<Msg, Ref> extends ClassicBehaviour.Provides<Msg, Ref> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -119,7 +109,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
    */
   private boolean started = false;;
   
-  private ClassicBehaviour.ComponentImpl<Msg,Ref> selfComponent;
+  private ClassicBehaviour.ComponentImpl<Msg, Ref> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -137,7 +127,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected ClassicBehaviour.Provides<Msg,Ref> provides() {
+  protected ClassicBehaviour.Provides<Msg, Ref> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -157,7 +147,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected ClassicBehaviour.Requires<Msg,Ref> requires() {
+  protected ClassicBehaviour.Requires<Msg, Ref> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -170,7 +160,7 @@ public abstract class ClassicBehaviour<Msg, Ref> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected ClassicBehaviour.Parts<Msg,Ref> parts() {
+  protected ClassicBehaviour.Parts<Msg, Ref> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -183,12 +173,12 @@ public abstract class ClassicBehaviour<Msg, Ref> {
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized ClassicBehaviour.Component<Msg,Ref> _newComponent(final ClassicBehaviour.Requires<Msg,Ref> b, final boolean start) {
+  public synchronized ClassicBehaviour.Component<Msg, Ref> _newComponent(final ClassicBehaviour.Requires<Msg, Ref> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of ClassicBehaviour has already been used to create a component, use another one.");
     }
     this.init = true;
-    ClassicBehaviour.ComponentImpl<Msg,Ref> comp = new ClassicBehaviour.ComponentImpl<Msg,Ref>(this, b, true);
+    ClassicBehaviour.ComponentImpl<Msg, Ref> comp = new ClassicBehaviour.ComponentImpl<Msg, Ref>(this, b, true);
     if (start) {
     	comp.start();
     }

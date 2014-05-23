@@ -12,7 +12,6 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class IvyJSONBroadcaster<T> {
-  @SuppressWarnings("all")
   public interface Requires<T> {
     /**
      * This can be called by the implementation to access this required port.
@@ -27,23 +26,6 @@ public abstract class IvyJSONBroadcaster<T> {
     public Executor exec();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<T> send();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<T> extends IvyJSONBroadcaster.Provides<T> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -74,8 +56,6 @@ public abstract class IvyJSONBroadcaster<T> {
     public IvyBroadcaster.Component<T> bc();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<T> implements IvyJSONBroadcaster.Component<T>, IvyJSONBroadcaster.Parts<T> {
     private final IvyJSONBroadcaster.Requires<T> bridge;
     
@@ -156,13 +136,11 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private IvyBus implem_ivy;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_ivy implements IvyBus.Requires {
       public final Executor exec() {
         return IvyJSONBroadcaster.ComponentImpl.this.bridge.exec();
       }
     }
-    
     
     public final IvyBus.Component ivy() {
       return this.ivy;
@@ -172,10 +150,8 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private JSONTransformer<T> implem_json;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_json implements JSONTransformer.Requires<T> {
     }
-    
     
     public final JSONTransformer.Component<T> json() {
       return this.json;
@@ -185,7 +161,6 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private IvyBinder implem_binder;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_binder implements IvyBinder.Requires {
       public final Bind bindMsg() {
         return IvyJSONBroadcaster.ComponentImpl.this.ivy.bindMsg();
@@ -200,7 +175,6 @@ public abstract class IvyJSONBroadcaster<T> {
       }
     }
     
-    
     public final IvyBinder.Component binder() {
       return this.binder;
     }
@@ -209,13 +183,12 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private IvyBroadcaster<T> implem_bc;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_bc implements IvyBroadcaster.Requires<T> {
-      public final Transform<String,T> deserializer() {
+      public final Transform<String, T> deserializer() {
         return IvyJSONBroadcaster.ComponentImpl.this.json.deserializer();
       }
       
-      public final Transform<T,String> serializer() {
+      public final Transform<T, String> serializer() {
         return IvyJSONBroadcaster.ComponentImpl.this.json.serializer();
       }
       
@@ -232,12 +205,21 @@ public abstract class IvyJSONBroadcaster<T> {
       }
     }
     
-    
     public final IvyBroadcaster.Component<T> bc() {
       return this.bc;
     }
   }
   
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<T> send();
+  }
+  
+  public interface Component<T> extends IvyJSONBroadcaster.Provides<T> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

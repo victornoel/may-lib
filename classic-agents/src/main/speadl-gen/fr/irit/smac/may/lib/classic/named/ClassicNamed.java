@@ -14,47 +14,23 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class ClassicNamed<Msg> {
-  @SuppressWarnings("all")
   public interface Requires<Msg> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Send<Msg,String> send();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public CreateNamed<Msg,String> create();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg> extends ClassicNamed.Provides<Msg> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public Forward.Component<CreateNamed<Msg,String>> fact();
+    public Forward.Component<CreateNamed<Msg, String>> fact();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public MapRefAsyncReceiver.Component<Msg,String> receive();
+    public MapRefAsyncReceiver.Component<Msg, String> receive();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -64,8 +40,6 @@ public abstract class ClassicNamed<Msg> {
     public ExecutorServiceWrapper.Component executor();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<Msg> implements ClassicNamed.Component<Msg>, ClassicNamed.Parts<Msg> {
     private final ClassicNamed.Requires<Msg> bridge;
     
@@ -73,9 +47,9 @@ public abstract class ClassicNamed<Msg> {
     
     public void start() {
       assert this.fact != null: "This is a bug.";
-      ((Forward.ComponentImpl<CreateNamed<Msg,String>>) this.fact).start();
+      ((Forward.ComponentImpl<CreateNamed<Msg, String>>) this.fact).start();
       assert this.receive != null: "This is a bug.";
-      ((MapRefAsyncReceiver.ComponentImpl<Msg,String>) this.receive).start();
+      ((MapRefAsyncReceiver.ComponentImpl<Msg, String>) this.receive).start();
       assert this.executor != null: "This is a bug.";
       ((ExecutorServiceWrapper.ComponentImpl) this.executor).start();
       this.implementation.start();
@@ -134,42 +108,38 @@ public abstract class ClassicNamed<Msg> {
       
     }
     
-    public final Send<Msg,String> send() {
+    public final Send<Msg, String> send() {
       return this.receive.send();
     }
     
-    private CreateNamed<Msg,String> create;
+    private CreateNamed<Msg, String> create;
     
-    public final CreateNamed<Msg,String> create() {
+    public final CreateNamed<Msg, String> create() {
       return this.create;
     }
     
-    private Forward.Component<CreateNamed<Msg,String>> fact;
+    private Forward.Component<CreateNamed<Msg, String>> fact;
     
-    private Forward<CreateNamed<Msg,String>> implem_fact;
+    private Forward<CreateNamed<Msg, String>> implem_fact;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_fact implements Forward.Requires<CreateNamed<Msg,String>> {
-      public final CreateNamed<Msg,String> forwardedPort() {
+    private final class BridgeImpl_fact implements Forward.Requires<CreateNamed<Msg, String>> {
+      public final CreateNamed<Msg, String> forwardedPort() {
         return ClassicNamed.ComponentImpl.this.create();
       }
     }
     
-    
-    public final Forward.Component<CreateNamed<Msg,String>> fact() {
+    public final Forward.Component<CreateNamed<Msg, String>> fact() {
       return this.fact;
     }
     
-    private MapRefAsyncReceiver.Component<Msg,String> receive;
+    private MapRefAsyncReceiver.Component<Msg, String> receive;
     
-    private MapRefAsyncReceiver<Msg,String> implem_receive;
+    private MapRefAsyncReceiver<Msg, String> implem_receive;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_receive implements MapRefAsyncReceiver.Requires<Msg,String> {
+    private final class BridgeImpl_receive implements MapRefAsyncReceiver.Requires<Msg, String> {
     }
     
-    
-    public final MapRefAsyncReceiver.Component<Msg,String> receive() {
+    public final MapRefAsyncReceiver.Component<Msg, String> receive() {
       return this.receive;
     }
     
@@ -177,42 +147,42 @@ public abstract class ClassicNamed<Msg> {
     
     private ExecutorServiceWrapper implem_executor;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_executor implements ExecutorServiceWrapper.Requires {
     }
-    
     
     public final ExecutorServiceWrapper.Component executor() {
       return this.executor;
     }
   }
   
+  public interface Provides<Msg> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Send<Msg, String> send();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public CreateNamed<Msg, String> create();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<Msg> extends ClassicNamed.Provides<Msg> {
+  }
+  
   public abstract static class ClassicNamedAgent<Msg> {
-    @SuppressWarnings("all")
     public interface Requires<Msg> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<Msg> {
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<Msg> extends ClassicNamed.ClassicNamedAgent.Provides<Msg> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<Msg> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public ClassicNamedAgentComponent.Component<Msg,String> arch();
+      public ClassicNamedAgentComponent.Component<Msg, String> arch();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -226,25 +196,23 @@ public abstract class ClassicNamed<Msg> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public Forward.Caller.Component<CreateNamed<Msg,String>> f();
+      public Forward.Caller.Component<CreateNamed<Msg, String>> f();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public MapRefAsyncReceiver.Receiver.Component<Msg,String> receive();
+      public MapRefAsyncReceiver.Receiver.Component<Msg, String> receive();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public MapRefAsyncReceiver.Sender.Component<Msg,String> ss();
+      public MapRefAsyncReceiver.Sender.Component<Msg, String> ss();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<Msg> implements ClassicNamed.ClassicNamedAgent.Component<Msg>, ClassicNamed.ClassicNamedAgent.Parts<Msg> {
       private final ClassicNamed.ClassicNamedAgent.Requires<Msg> bridge;
       
@@ -252,15 +220,15 @@ public abstract class ClassicNamed<Msg> {
       
       public void start() {
         assert this.arch != null: "This is a bug.";
-        ((ClassicNamedAgentComponent.ComponentImpl<Msg,String>) this.arch).start();
+        ((ClassicNamedAgentComponent.ComponentImpl<Msg, String>) this.arch).start();
         assert this.s != null: "This is a bug.";
         ((ExecutorServiceWrapper.Executing.ComponentImpl) this.s).start();
         assert this.f != null: "This is a bug.";
-        ((Forward.Caller.ComponentImpl<CreateNamed<Msg,String>>) this.f).start();
+        ((Forward.Caller.ComponentImpl<CreateNamed<Msg, String>>) this.f).start();
         assert this.receive != null: "This is a bug.";
-        ((MapRefAsyncReceiver.Receiver.ComponentImpl<Msg,String>) this.receive).start();
+        ((MapRefAsyncReceiver.Receiver.ComponentImpl<Msg, String>) this.receive).start();
         assert this.ss != null: "This is a bug.";
-        ((MapRefAsyncReceiver.Sender.ComponentImpl<Msg,String>) this.ss).start();
+        ((MapRefAsyncReceiver.Sender.ComponentImpl<Msg, String>) this.ss).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -310,13 +278,12 @@ public abstract class ClassicNamed<Msg> {
         
       }
       
-      private ClassicNamedAgentComponent.Component<Msg,String> arch;
+      private ClassicNamedAgentComponent.Component<Msg, String> arch;
       
-      private ClassicNamedAgentComponent<Msg,String> implem_arch;
+      private ClassicNamedAgentComponent<Msg, String> implem_arch;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_arch implements ClassicNamedAgentComponent.Requires<Msg,String> {
-        public final Send<Msg,String> send() {
+      private final class BridgeImpl_arch implements ClassicNamedAgentComponent.Requires<Msg, String> {
+        public final Send<Msg, String> send() {
           return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.ss.send();
         }
         
@@ -328,7 +295,7 @@ public abstract class ClassicNamed<Msg> {
           return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.s.stop();
         }
         
-        public final CreateNamed<Msg,String> create() {
+        public final CreateNamed<Msg, String> create() {
           return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.f.forwardedPort();
         }
         
@@ -337,59 +304,55 @@ public abstract class ClassicNamed<Msg> {
         }
       }
       
-      
-      public final ClassicNamedAgentComponent.Component<Msg,String> arch() {
+      public final ClassicNamedAgentComponent.Component<Msg, String> arch() {
         return this.arch;
       }
       
       private ExecutorServiceWrapper.Executing.Component s;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_executor_s implements ExecutorServiceWrapper.Executing.Requires {
       }
-      
       
       public final ExecutorServiceWrapper.Executing.Component s() {
         return this.s;
       }
       
-      private Forward.Caller.Component<CreateNamed<Msg,String>> f;
+      private Forward.Caller.Component<CreateNamed<Msg, String>> f;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_fact_f implements Forward.Caller.Requires<CreateNamed<Msg,String>> {
+      private final class BridgeImpl_fact_f implements Forward.Caller.Requires<CreateNamed<Msg, String>> {
       }
       
-      
-      public final Forward.Caller.Component<CreateNamed<Msg,String>> f() {
+      public final Forward.Caller.Component<CreateNamed<Msg, String>> f() {
         return this.f;
       }
       
-      private MapRefAsyncReceiver.Receiver.Component<Msg,String> receive;
+      private MapRefAsyncReceiver.Receiver.Component<Msg, String> receive;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_receive_receive implements MapRefAsyncReceiver.Receiver.Requires<Msg,String> {
+      private final class BridgeImpl_receive_receive implements MapRefAsyncReceiver.Receiver.Requires<Msg, String> {
         public final Push<Msg> put() {
           return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.arch.put();
         }
       }
       
-      
-      public final MapRefAsyncReceiver.Receiver.Component<Msg,String> receive() {
+      public final MapRefAsyncReceiver.Receiver.Component<Msg, String> receive() {
         return this.receive;
       }
       
-      private MapRefAsyncReceiver.Sender.Component<Msg,String> ss;
+      private MapRefAsyncReceiver.Sender.Component<Msg, String> ss;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_receive_ss implements MapRefAsyncReceiver.Sender.Requires<Msg,String> {
+      private final class BridgeImpl_receive_ss implements MapRefAsyncReceiver.Sender.Requires<Msg, String> {
       }
       
-      
-      public final MapRefAsyncReceiver.Sender.Component<Msg,String> ss() {
+      public final MapRefAsyncReceiver.Sender.Component<Msg, String> ss() {
         return this.ss;
       }
     }
     
+    public interface Provides<Msg> {
+    }
+    
+    public interface Component<Msg> extends ClassicNamed.ClassicNamedAgent.Provides<Msg> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -462,15 +425,15 @@ public abstract class ClassicNamed<Msg> {
      * This will be called once during the construction of the component to initialize this sub-component.
      * 
      */
-    protected abstract ClassicNamedAgentComponent<Msg,String> make_arch();
+    protected abstract ClassicNamedAgentComponent<Msg, String> make_arch();
     
     private ExecutorServiceWrapper.Executing use_s;
     
-    private Forward.Caller<CreateNamed<Msg,String>> use_f;
+    private Forward.Caller<CreateNamed<Msg, String>> use_f;
     
-    private MapRefAsyncReceiver.Receiver<Msg,String> use_receive;
+    private MapRefAsyncReceiver.Receiver<Msg, String> use_receive;
     
-    private MapRefAsyncReceiver.Sender<Msg,String> use_ss;
+    private MapRefAsyncReceiver.Sender<Msg, String> use_ss;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -522,7 +485,6 @@ public abstract class ClassicNamed<Msg> {
     }
   }
   
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -568,7 +530,7 @@ public abstract class ClassicNamed<Msg> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract CreateNamed<Msg,String> make_create();
+  protected abstract CreateNamed<Msg, String> make_create();
   
   /**
    * This can be called by the implementation to access the required ports.
@@ -601,14 +563,14 @@ public abstract class ClassicNamed<Msg> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract Forward<CreateNamed<Msg,String>> make_fact();
+  protected abstract Forward<CreateNamed<Msg, String>> make_fact();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract MapRefAsyncReceiver<Msg,String> make_receive();
+  protected abstract MapRefAsyncReceiver<Msg, String> make_receive();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -638,13 +600,13 @@ public abstract class ClassicNamed<Msg> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract ClassicNamed.ClassicNamedAgent<Msg> make_ClassicNamedAgent(final ClassicNamedBehaviour<Msg,String> beh, final String name);
+  protected abstract ClassicNamed.ClassicNamedAgent<Msg> make_ClassicNamedAgent(final ClassicNamedBehaviour<Msg, String> beh, final String name);
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public ClassicNamed.ClassicNamedAgent<Msg> _createImplementationOfClassicNamedAgent(final ClassicNamedBehaviour<Msg,String> beh, final String name) {
+  public ClassicNamed.ClassicNamedAgent<Msg> _createImplementationOfClassicNamedAgent(final ClassicNamedBehaviour<Msg, String> beh, final String name) {
     ClassicNamed.ClassicNamedAgent<Msg> implem = make_ClassicNamedAgent(beh,name);
     if (implem == null) {
     	throw new RuntimeException("make_ClassicNamedAgent() in fr.irit.smac.may.lib.classic.named.ClassicNamed should not return null.");
@@ -671,7 +633,7 @@ public abstract class ClassicNamed<Msg> {
    * This can be called to create an instance of the species from inside the implementation of the ecosystem.
    * 
    */
-  protected ClassicNamed.ClassicNamedAgent.Component<Msg> newClassicNamedAgent(final ClassicNamedBehaviour<Msg,String> beh, final String name) {
+  protected ClassicNamed.ClassicNamedAgent.Component<Msg> newClassicNamedAgent(final ClassicNamedBehaviour<Msg, String> beh, final String name) {
     ClassicNamed.ClassicNamedAgent<Msg> implem = _createImplementationOfClassicNamedAgent(beh,name);
     return implem._newComponent(new ClassicNamed.ClassicNamedAgent.Requires<Msg>() {},true);
   }

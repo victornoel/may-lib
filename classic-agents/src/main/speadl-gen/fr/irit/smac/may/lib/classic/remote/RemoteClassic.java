@@ -20,46 +20,16 @@ import java.util.concurrent.Executor;
 
 @SuppressWarnings("all")
 public abstract class RemoteClassic<Msg> {
-  @SuppressWarnings("all")
   public interface Requires<Msg> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Send<Msg,RemoteAgentRef> send();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Place> thisPlace();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public CreateRemoteClassic<Msg,RemoteAgentRef> create();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg> extends RemoteClassic.Provides<Msg> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public Forward.Component<Send<Msg,RemoteAgentRef>> sender();
+    public Forward.Component<Send<Msg, RemoteAgentRef>> sender();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -80,14 +50,14 @@ public abstract class RemoteClassic<Msg> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public RemoteReceiver.Component<Msg,DirRef> remReceive();
+    public RemoteReceiver.Component<Msg, DirRef> remReceive();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public RemoteFactory.Component<Msg,RemoteAgentRef> fact();
+    public RemoteFactory.Component<Msg, RemoteAgentRef> fact();
     
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -97,8 +67,6 @@ public abstract class RemoteClassic<Msg> {
     public ExecutorServiceWrapper.Component executor();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<Msg> implements RemoteClassic.Component<Msg>, RemoteClassic.Parts<Msg> {
     private final RemoteClassic.Requires<Msg> bridge;
     
@@ -106,15 +74,15 @@ public abstract class RemoteClassic<Msg> {
     
     public void start() {
       assert this.sender != null: "This is a bug.";
-      ((Forward.ComponentImpl<Send<Msg,RemoteAgentRef>>) this.sender).start();
+      ((Forward.ComponentImpl<Send<Msg, RemoteAgentRef>>) this.sender).start();
       assert this.receive != null: "This is a bug.";
       ((DirRefAsyncReceiver.ComponentImpl<Msg>) this.receive).start();
       assert this.placed != null: "This is a bug.";
       ((Placed.ComponentImpl) this.placed).start();
       assert this.remReceive != null: "This is a bug.";
-      ((RemoteReceiver.ComponentImpl<Msg,DirRef>) this.remReceive).start();
+      ((RemoteReceiver.ComponentImpl<Msg, DirRef>) this.remReceive).start();
       assert this.fact != null: "This is a bug.";
-      ((RemoteFactory.ComponentImpl<Msg,RemoteAgentRef>) this.fact).start();
+      ((RemoteFactory.ComponentImpl<Msg, RemoteAgentRef>) this.fact).start();
       assert this.executor != null: "This is a bug.";
       ((ExecutorServiceWrapper.ComponentImpl) this.executor).start();
       this.implementation.start();
@@ -194,7 +162,7 @@ public abstract class RemoteClassic<Msg> {
       
     }
     
-    public final Send<Msg,RemoteAgentRef> send() {
+    public final Send<Msg, RemoteAgentRef> send() {
       return this.remReceive.send();
     }
     
@@ -202,25 +170,23 @@ public abstract class RemoteClassic<Msg> {
       return this.placed.thisPlace();
     }
     
-    private CreateRemoteClassic<Msg,RemoteAgentRef> create;
+    private CreateRemoteClassic<Msg, RemoteAgentRef> create;
     
-    public final CreateRemoteClassic<Msg,RemoteAgentRef> create() {
+    public final CreateRemoteClassic<Msg, RemoteAgentRef> create() {
       return this.create;
     }
     
-    private Forward.Component<Send<Msg,RemoteAgentRef>> sender;
+    private Forward.Component<Send<Msg, RemoteAgentRef>> sender;
     
-    private Forward<Send<Msg,RemoteAgentRef>> implem_sender;
+    private Forward<Send<Msg, RemoteAgentRef>> implem_sender;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_sender implements Forward.Requires<Send<Msg,RemoteAgentRef>> {
-      public final Send<Msg,RemoteAgentRef> forwardedPort() {
+    private final class BridgeImpl_sender implements Forward.Requires<Send<Msg, RemoteAgentRef>> {
+      public final Send<Msg, RemoteAgentRef> forwardedPort() {
         return RemoteClassic.ComponentImpl.this.remReceive.send();
       }
     }
     
-    
-    public final Forward.Component<Send<Msg,RemoteAgentRef>> sender() {
+    public final Forward.Component<Send<Msg, RemoteAgentRef>> sender() {
       return this.sender;
     }
     
@@ -228,10 +194,8 @@ public abstract class RemoteClassic<Msg> {
     
     private DirRefAsyncReceiver<Msg> implem_receive;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_receive implements DirRefAsyncReceiver.Requires<Msg> {
     }
-    
     
     public final DirRefAsyncReceiver.Component<Msg> receive() {
       return this.receive;
@@ -241,22 +205,19 @@ public abstract class RemoteClassic<Msg> {
     
     private Placed implem_placed;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_placed implements Placed.Requires {
     }
-    
     
     public final Placed.Component placed() {
       return this.placed;
     }
     
-    private RemoteReceiver.Component<Msg,DirRef> remReceive;
+    private RemoteReceiver.Component<Msg, DirRef> remReceive;
     
-    private RemoteReceiver<Msg,DirRef> implem_remReceive;
+    private RemoteReceiver<Msg, DirRef> implem_remReceive;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_remReceive implements RemoteReceiver.Requires<Msg,DirRef> {
-      public final Send<Msg,DirRef> localSend() {
+    private final class BridgeImpl_remReceive implements RemoteReceiver.Requires<Msg, DirRef> {
+      public final Send<Msg, DirRef> localSend() {
         return RemoteClassic.ComponentImpl.this.receive.send();
       }
       
@@ -265,18 +226,16 @@ public abstract class RemoteClassic<Msg> {
       }
     }
     
-    
-    public final RemoteReceiver.Component<Msg,DirRef> remReceive() {
+    public final RemoteReceiver.Component<Msg, DirRef> remReceive() {
       return this.remReceive;
     }
     
-    private RemoteFactory.Component<Msg,RemoteAgentRef> fact;
+    private RemoteFactory.Component<Msg, RemoteAgentRef> fact;
     
-    private RemoteFactory<Msg,RemoteAgentRef> implem_fact;
+    private RemoteFactory<Msg, RemoteAgentRef> implem_fact;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_fact implements RemoteFactory.Requires<Msg,RemoteAgentRef> {
-      public final CreateRemoteClassic<Msg,RemoteAgentRef> infraCreate() {
+    private final class BridgeImpl_fact implements RemoteFactory.Requires<Msg, RemoteAgentRef> {
+      public final CreateRemoteClassic<Msg, RemoteAgentRef> infraCreate() {
         return RemoteClassic.ComponentImpl.this.create();
       }
       
@@ -285,8 +244,7 @@ public abstract class RemoteClassic<Msg> {
       }
     }
     
-    
-    public final RemoteFactory.Component<Msg,RemoteAgentRef> fact() {
+    public final RemoteFactory.Component<Msg, RemoteAgentRef> fact() {
       return this.fact;
     }
     
@@ -294,47 +252,48 @@ public abstract class RemoteClassic<Msg> {
     
     private ExecutorServiceWrapper implem_executor;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_executor implements ExecutorServiceWrapper.Requires {
     }
-    
     
     public final ExecutorServiceWrapper.Component executor() {
       return this.executor;
     }
   }
   
+  public interface Provides<Msg> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Send<Msg, RemoteAgentRef> send();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Place> thisPlace();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public CreateRemoteClassic<Msg, RemoteAgentRef> create();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<Msg> extends RemoteClassic.Provides<Msg> {
+  }
+  
   public abstract static class ClassicAgent<Msg> {
-    @SuppressWarnings("all")
     public interface Requires<Msg> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<Msg> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<RemoteAgentRef> ref();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<Msg> extends RemoteClassic.ClassicAgent.Provides<Msg> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<Msg> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public RemoteClassicAgentComponent.Component<Msg,RemoteAgentRef> arch();
+      public RemoteClassicAgentComponent.Component<Msg, RemoteAgentRef> arch();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -348,7 +307,7 @@ public abstract class RemoteClassic<Msg> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public RemoteFactory.Agent.Component<Msg,RemoteAgentRef> f();
+      public RemoteFactory.Agent.Component<Msg, RemoteAgentRef> f();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -369,18 +328,16 @@ public abstract class RemoteClassic<Msg> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public Forward.Caller.Component<Send<Msg,RemoteAgentRef>> ss();
+      public Forward.Caller.Component<Send<Msg, RemoteAgentRef>> ss();
       
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public RemoteReceiver.Agent.Component<Msg,DirRef> rr();
+      public RemoteReceiver.Agent.Component<Msg, DirRef> rr();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<Msg> implements RemoteClassic.ClassicAgent.Component<Msg>, RemoteClassic.ClassicAgent.Parts<Msg> {
       private final RemoteClassic.ClassicAgent.Requires<Msg> bridge;
       
@@ -388,19 +345,19 @@ public abstract class RemoteClassic<Msg> {
       
       public void start() {
         assert this.arch != null: "This is a bug.";
-        ((RemoteClassicAgentComponent.ComponentImpl<Msg,RemoteAgentRef>) this.arch).start();
+        ((RemoteClassicAgentComponent.ComponentImpl<Msg, RemoteAgentRef>) this.arch).start();
         assert this.p != null: "This is a bug.";
         ((Placed.Agent.ComponentImpl) this.p).start();
         assert this.f != null: "This is a bug.";
-        ((RemoteFactory.Agent.ComponentImpl<Msg,RemoteAgentRef>) this.f).start();
+        ((RemoteFactory.Agent.ComponentImpl<Msg, RemoteAgentRef>) this.f).start();
         assert this.s != null: "This is a bug.";
         ((ExecutorServiceWrapper.Executing.ComponentImpl) this.s).start();
         assert this.r != null: "This is a bug.";
         ((DirRefAsyncReceiver.Receiver.ComponentImpl<Msg>) this.r).start();
         assert this.ss != null: "This is a bug.";
-        ((Forward.Caller.ComponentImpl<Send<Msg,RemoteAgentRef>>) this.ss).start();
+        ((Forward.Caller.ComponentImpl<Send<Msg, RemoteAgentRef>>) this.ss).start();
         assert this.rr != null: "This is a bug.";
-        ((RemoteReceiver.Agent.ComponentImpl<Msg,DirRef>) this.rr).start();
+        ((RemoteReceiver.Agent.ComponentImpl<Msg, DirRef>) this.rr).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -460,13 +417,12 @@ public abstract class RemoteClassic<Msg> {
         return this.rr.me();
       }
       
-      private RemoteClassicAgentComponent.Component<Msg,RemoteAgentRef> arch;
+      private RemoteClassicAgentComponent.Component<Msg, RemoteAgentRef> arch;
       
-      private RemoteClassicAgentComponent<Msg,RemoteAgentRef> implem_arch;
+      private RemoteClassicAgentComponent<Msg, RemoteAgentRef> implem_arch;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_arch implements RemoteClassicAgentComponent.Requires<Msg,RemoteAgentRef> {
-        public final Send<Msg,RemoteAgentRef> send() {
+      private final class BridgeImpl_arch implements RemoteClassicAgentComponent.Requires<Msg, RemoteAgentRef> {
+        public final Send<Msg, RemoteAgentRef> send() {
           return RemoteClassic.ClassicAgent.ComponentImpl.this.ss.forwardedPort();
         }
         
@@ -486,44 +442,37 @@ public abstract class RemoteClassic<Msg> {
           return RemoteClassic.ClassicAgent.ComponentImpl.this.s.executor();
         }
         
-        public final CreateRemoteClassic<Msg,RemoteAgentRef> create() {
+        public final CreateRemoteClassic<Msg, RemoteAgentRef> create() {
           return RemoteClassic.ClassicAgent.ComponentImpl.this.f.create();
         }
       }
       
-      
-      public final RemoteClassicAgentComponent.Component<Msg,RemoteAgentRef> arch() {
+      public final RemoteClassicAgentComponent.Component<Msg, RemoteAgentRef> arch() {
         return this.arch;
       }
       
       private Placed.Agent.Component p;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_placed_p implements Placed.Agent.Requires {
       }
-      
       
       public final Placed.Agent.Component p() {
         return this.p;
       }
       
-      private RemoteFactory.Agent.Component<Msg,RemoteAgentRef> f;
+      private RemoteFactory.Agent.Component<Msg, RemoteAgentRef> f;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_fact_f implements RemoteFactory.Agent.Requires<Msg,RemoteAgentRef> {
+      private final class BridgeImpl_fact_f implements RemoteFactory.Agent.Requires<Msg, RemoteAgentRef> {
       }
       
-      
-      public final RemoteFactory.Agent.Component<Msg,RemoteAgentRef> f() {
+      public final RemoteFactory.Agent.Component<Msg, RemoteAgentRef> f() {
         return this.f;
       }
       
       private ExecutorServiceWrapper.Executing.Component s;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_executor_s implements ExecutorServiceWrapper.Executing.Requires {
       }
-      
       
       public final ExecutorServiceWrapper.Executing.Component s() {
         return this.s;
@@ -531,44 +480,48 @@ public abstract class RemoteClassic<Msg> {
       
       private DirRefAsyncReceiver.Receiver.Component<Msg> r;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_receive_r implements DirRefAsyncReceiver.Receiver.Requires<Msg> {
         public final Push<Msg> put() {
           return RemoteClassic.ClassicAgent.ComponentImpl.this.arch.put();
         }
       }
       
-      
       public final DirRefAsyncReceiver.Receiver.Component<Msg> r() {
         return this.r;
       }
       
-      private Forward.Caller.Component<Send<Msg,RemoteAgentRef>> ss;
+      private Forward.Caller.Component<Send<Msg, RemoteAgentRef>> ss;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_sender_ss implements Forward.Caller.Requires<Send<Msg,RemoteAgentRef>> {
+      private final class BridgeImpl_sender_ss implements Forward.Caller.Requires<Send<Msg, RemoteAgentRef>> {
       }
       
-      
-      public final Forward.Caller.Component<Send<Msg,RemoteAgentRef>> ss() {
+      public final Forward.Caller.Component<Send<Msg, RemoteAgentRef>> ss() {
         return this.ss;
       }
       
-      private RemoteReceiver.Agent.Component<Msg,DirRef> rr;
+      private RemoteReceiver.Agent.Component<Msg, DirRef> rr;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_remReceive_rr implements RemoteReceiver.Agent.Requires<Msg,DirRef> {
+      private final class BridgeImpl_remReceive_rr implements RemoteReceiver.Agent.Requires<Msg, DirRef> {
         public final Pull<DirRef> localMe() {
           return RemoteClassic.ClassicAgent.ComponentImpl.this.r.me();
         }
       }
       
-      
-      public final RemoteReceiver.Agent.Component<Msg,DirRef> rr() {
+      public final RemoteReceiver.Agent.Component<Msg, DirRef> rr() {
         return this.rr;
       }
     }
     
+    public interface Provides<Msg> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<RemoteAgentRef> ref();
+    }
+    
+    public interface Component<Msg> extends RemoteClassic.ClassicAgent.Provides<Msg> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -641,19 +594,19 @@ public abstract class RemoteClassic<Msg> {
      * This will be called once during the construction of the component to initialize this sub-component.
      * 
      */
-    protected abstract RemoteClassicAgentComponent<Msg,RemoteAgentRef> make_arch();
+    protected abstract RemoteClassicAgentComponent<Msg, RemoteAgentRef> make_arch();
     
     private Placed.Agent use_p;
     
-    private RemoteFactory.Agent<Msg,RemoteAgentRef> use_f;
+    private RemoteFactory.Agent<Msg, RemoteAgentRef> use_f;
     
     private ExecutorServiceWrapper.Executing use_s;
     
     private DirRefAsyncReceiver.Receiver<Msg> use_r;
     
-    private Forward.Caller<Send<Msg,RemoteAgentRef>> use_ss;
+    private Forward.Caller<Send<Msg, RemoteAgentRef>> use_ss;
     
-    private RemoteReceiver.Agent<Msg,DirRef> use_rr;
+    private RemoteReceiver.Agent<Msg, DirRef> use_rr;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -705,7 +658,6 @@ public abstract class RemoteClassic<Msg> {
     }
   }
   
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -751,7 +703,7 @@ public abstract class RemoteClassic<Msg> {
    * This will be called once during the construction of the component to initialize the port.
    * 
    */
-  protected abstract CreateRemoteClassic<Msg,RemoteAgentRef> make_create();
+  protected abstract CreateRemoteClassic<Msg, RemoteAgentRef> make_create();
   
   /**
    * This can be called by the implementation to access the required ports.
@@ -784,7 +736,7 @@ public abstract class RemoteClassic<Msg> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract Forward<Send<Msg,RemoteAgentRef>> make_sender();
+  protected abstract Forward<Send<Msg, RemoteAgentRef>> make_sender();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -805,14 +757,14 @@ public abstract class RemoteClassic<Msg> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract RemoteReceiver<Msg,DirRef> make_remReceive();
+  protected abstract RemoteReceiver<Msg, DirRef> make_remReceive();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract RemoteFactory<Msg,RemoteAgentRef> make_fact();
+  protected abstract RemoteFactory<Msg, RemoteAgentRef> make_fact();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -842,13 +794,13 @@ public abstract class RemoteClassic<Msg> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract RemoteClassic.ClassicAgent<Msg> make_ClassicAgent(final RemoteClassicBehaviour<Msg,RemoteAgentRef> beh, final String name);
+  protected abstract RemoteClassic.ClassicAgent<Msg> make_ClassicAgent(final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, final String name);
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public RemoteClassic.ClassicAgent<Msg> _createImplementationOfClassicAgent(final RemoteClassicBehaviour<Msg,RemoteAgentRef> beh, final String name) {
+  public RemoteClassic.ClassicAgent<Msg> _createImplementationOfClassicAgent(final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, final String name) {
     RemoteClassic.ClassicAgent<Msg> implem = make_ClassicAgent(beh,name);
     if (implem == null) {
     	throw new RuntimeException("make_ClassicAgent() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
@@ -881,7 +833,7 @@ public abstract class RemoteClassic<Msg> {
    * This can be called to create an instance of the species from inside the implementation of the ecosystem.
    * 
    */
-  protected RemoteClassic.ClassicAgent.Component<Msg> newClassicAgent(final RemoteClassicBehaviour<Msg,RemoteAgentRef> beh, final String name) {
+  protected RemoteClassic.ClassicAgent.Component<Msg> newClassicAgent(final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, final String name) {
     RemoteClassic.ClassicAgent<Msg> implem = _createImplementationOfClassicAgent(beh,name);
     return implem._newComponent(new RemoteClassic.ClassicAgent.Requires<Msg>() {},true);
   }

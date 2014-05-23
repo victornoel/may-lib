@@ -7,41 +7,21 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 @SuppressWarnings("all")
 public abstract class Broadcast<M, R> {
-  @SuppressWarnings("all")
   public interface Requires<M, R> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public ReliableSend<M,R> send();
+    public ReliableSend<M, R> send();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<M, R> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<M> broadcast();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<M, R> extends Broadcast.Provides<M,R> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<M, R> {
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<M, R> implements Broadcast.Component<M,R>, Broadcast.Parts<M,R> {
-    private final Broadcast.Requires<M,R> bridge;
+  public static class ComponentImpl<M, R> implements Broadcast.Component<M, R>, Broadcast.Parts<M, R> {
+    private final Broadcast.Requires<M, R> bridge;
     
-    private final Broadcast<M,R> implementation;
+    private final Broadcast<M, R> implementation;
     
     public void start() {
       this.implementation.start();
@@ -62,7 +42,7 @@ public abstract class Broadcast<M, R> {
       
     }
     
-    public ComponentImpl(final Broadcast<M,R> implem, final Broadcast.Requires<M,R> b, final boolean doInits) {
+    public ComponentImpl(final Broadcast<M, R> implem, final Broadcast.Requires<M, R> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -86,10 +66,18 @@ public abstract class Broadcast<M, R> {
     }
   }
   
+  public interface Provides<M, R> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<M> broadcast();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<M, R> extends Broadcast.Provides<M, R> {
+  }
+  
   public abstract static class BroadcastTarget<M, R> {
-    @SuppressWarnings("all")
     public interface Requires<M, R> {
       /**
        * This can be called by the implementation to access this required port.
@@ -98,32 +86,13 @@ public abstract class Broadcast<M, R> {
       public Pull<R> me();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<M, R> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<M, R> extends Broadcast.BroadcastTarget.Provides<M,R> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<M, R> {
     }
     
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<M, R> implements Broadcast.BroadcastTarget.Component<M,R>, Broadcast.BroadcastTarget.Parts<M,R> {
-      private final Broadcast.BroadcastTarget.Requires<M,R> bridge;
+    public static class ComponentImpl<M, R> implements Broadcast.BroadcastTarget.Component<M, R>, Broadcast.BroadcastTarget.Parts<M, R> {
+      private final Broadcast.BroadcastTarget.Requires<M, R> bridge;
       
-      private final Broadcast.BroadcastTarget<M,R> implementation;
+      private final Broadcast.BroadcastTarget<M, R> implementation;
       
       public void start() {
         this.implementation.start();
@@ -144,7 +113,7 @@ public abstract class Broadcast<M, R> {
         
       }
       
-      public ComponentImpl(final Broadcast.BroadcastTarget<M,R> implem, final Broadcast.BroadcastTarget.Requires<M,R> b, final boolean doInits) {
+      public ComponentImpl(final Broadcast.BroadcastTarget<M, R> implem, final Broadcast.BroadcastTarget.Requires<M, R> b, final boolean doInits) {
         this.bridge = b;
         this.implementation = implem;
         
@@ -168,6 +137,16 @@ public abstract class Broadcast<M, R> {
       }
     }
     
+    public interface Provides<M, R> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component<M, R> extends Broadcast.BroadcastTarget.Provides<M, R> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -182,7 +161,7 @@ public abstract class Broadcast<M, R> {
      */
     private boolean started = false;;
     
-    private Broadcast.BroadcastTarget.ComponentImpl<M,R> selfComponent;
+    private Broadcast.BroadcastTarget.ComponentImpl<M, R> selfComponent;
     
     /**
      * Can be overridden by the implementation.
@@ -200,7 +179,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected Broadcast.BroadcastTarget.Provides<M,R> provides() {
+    protected Broadcast.BroadcastTarget.Provides<M, R> provides() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -220,7 +199,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected Broadcast.BroadcastTarget.Requires<M,R> requires() {
+    protected Broadcast.BroadcastTarget.Requires<M, R> requires() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -233,7 +212,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected Broadcast.BroadcastTarget.Parts<M,R> parts() {
+    protected Broadcast.BroadcastTarget.Parts<M, R> parts() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -246,12 +225,12 @@ public abstract class Broadcast<M, R> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public synchronized Broadcast.BroadcastTarget.Component<M,R> _newComponent(final Broadcast.BroadcastTarget.Requires<M,R> b, final boolean start) {
+    public synchronized Broadcast.BroadcastTarget.Component<M, R> _newComponent(final Broadcast.BroadcastTarget.Requires<M, R> b, final boolean start) {
       if (this.init) {
       	throw new RuntimeException("This instance of BroadcastTarget has already been used to create a component, use another one.");
       }
       this.init = true;
-      Broadcast.BroadcastTarget.ComponentImpl<M,R> comp = new Broadcast.BroadcastTarget.ComponentImpl<M,R>(this, b, true);
+      Broadcast.BroadcastTarget.ComponentImpl<M, R> comp = new Broadcast.BroadcastTarget.ComponentImpl<M, R>(this, b, true);
       if (start) {
       	comp.start();
       }
@@ -259,13 +238,13 @@ public abstract class Broadcast<M, R> {
       
     }
     
-    private Broadcast.ComponentImpl<M,R> ecosystemComponent;
+    private Broadcast.ComponentImpl<M, R> ecosystemComponent;
     
     /**
      * This can be called by the species implementation to access the provided ports of its ecosystem.
      * 
      */
-    protected Broadcast.Provides<M,R> eco_provides() {
+    protected Broadcast.Provides<M, R> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
@@ -275,7 +254,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the species implementation to access the required ports of its ecosystem.
      * 
      */
-    protected Broadcast.Requires<M,R> eco_requires() {
+    protected Broadcast.Requires<M, R> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
       
@@ -285,46 +264,24 @@ public abstract class Broadcast<M, R> {
      * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
      * 
      */
-    protected Broadcast.Parts<M,R> eco_parts() {
+    protected Broadcast.Parts<M, R> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
     }
   }
   
-  
-  @SuppressWarnings("all")
   public abstract static class Broadcaster<M, R> {
-    @SuppressWarnings("all")
     public interface Requires<M, R> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<M, R> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Push<M> broadcast();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<M, R> extends Broadcast.Broadcaster.Provides<M,R> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<M, R> {
     }
     
-    
-    @SuppressWarnings("all")
-    public static class ComponentImpl<M, R> implements Broadcast.Broadcaster.Component<M,R>, Broadcast.Broadcaster.Parts<M,R> {
-      private final Broadcast.Broadcaster.Requires<M,R> bridge;
+    public static class ComponentImpl<M, R> implements Broadcast.Broadcaster.Component<M, R>, Broadcast.Broadcaster.Parts<M, R> {
+      private final Broadcast.Broadcaster.Requires<M, R> bridge;
       
-      private final Broadcast.Broadcaster<M,R> implementation;
+      private final Broadcast.Broadcaster<M, R> implementation;
       
       public void start() {
         this.implementation.start();
@@ -345,7 +302,7 @@ public abstract class Broadcast<M, R> {
         
       }
       
-      public ComponentImpl(final Broadcast.Broadcaster<M,R> implem, final Broadcast.Broadcaster.Requires<M,R> b, final boolean doInits) {
+      public ComponentImpl(final Broadcast.Broadcaster<M, R> implem, final Broadcast.Broadcaster.Requires<M, R> b, final boolean doInits) {
         this.bridge = b;
         this.implementation = implem;
         
@@ -369,6 +326,16 @@ public abstract class Broadcast<M, R> {
       }
     }
     
+    public interface Provides<M, R> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Push<M> broadcast();
+    }
+    
+    public interface Component<M, R> extends Broadcast.Broadcaster.Provides<M, R> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -383,7 +350,7 @@ public abstract class Broadcast<M, R> {
      */
     private boolean started = false;;
     
-    private Broadcast.Broadcaster.ComponentImpl<M,R> selfComponent;
+    private Broadcast.Broadcaster.ComponentImpl<M, R> selfComponent;
     
     /**
      * Can be overridden by the implementation.
@@ -401,7 +368,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the implementation to access the provided ports.
      * 
      */
-    protected Broadcast.Broadcaster.Provides<M,R> provides() {
+    protected Broadcast.Broadcaster.Provides<M, R> provides() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -421,7 +388,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the implementation to access the required ports.
      * 
      */
-    protected Broadcast.Broadcaster.Requires<M,R> requires() {
+    protected Broadcast.Broadcaster.Requires<M, R> requires() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -434,7 +401,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the implementation to access the parts and their provided ports.
      * 
      */
-    protected Broadcast.Broadcaster.Parts<M,R> parts() {
+    protected Broadcast.Broadcaster.Parts<M, R> parts() {
       assert this.selfComponent != null: "This is a bug.";
       if (!this.init) {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -447,12 +414,12 @@ public abstract class Broadcast<M, R> {
      * Not meant to be used to manually instantiate components (except for testing).
      * 
      */
-    public synchronized Broadcast.Broadcaster.Component<M,R> _newComponent(final Broadcast.Broadcaster.Requires<M,R> b, final boolean start) {
+    public synchronized Broadcast.Broadcaster.Component<M, R> _newComponent(final Broadcast.Broadcaster.Requires<M, R> b, final boolean start) {
       if (this.init) {
       	throw new RuntimeException("This instance of Broadcaster has already been used to create a component, use another one.");
       }
       this.init = true;
-      Broadcast.Broadcaster.ComponentImpl<M,R> comp = new Broadcast.Broadcaster.ComponentImpl<M,R>(this, b, true);
+      Broadcast.Broadcaster.ComponentImpl<M, R> comp = new Broadcast.Broadcaster.ComponentImpl<M, R>(this, b, true);
       if (start) {
       	comp.start();
       }
@@ -460,13 +427,13 @@ public abstract class Broadcast<M, R> {
       
     }
     
-    private Broadcast.ComponentImpl<M,R> ecosystemComponent;
+    private Broadcast.ComponentImpl<M, R> ecosystemComponent;
     
     /**
      * This can be called by the species implementation to access the provided ports of its ecosystem.
      * 
      */
-    protected Broadcast.Provides<M,R> eco_provides() {
+    protected Broadcast.Provides<M, R> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
@@ -476,7 +443,7 @@ public abstract class Broadcast<M, R> {
      * This can be called by the species implementation to access the required ports of its ecosystem.
      * 
      */
-    protected Broadcast.Requires<M,R> eco_requires() {
+    protected Broadcast.Requires<M, R> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
       
@@ -486,13 +453,12 @@ public abstract class Broadcast<M, R> {
      * This can be called by the species implementation to access the parts of its ecosystem and their provided ports.
      * 
      */
-    protected Broadcast.Parts<M,R> eco_parts() {
+    protected Broadcast.Parts<M, R> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -507,7 +473,7 @@ public abstract class Broadcast<M, R> {
    */
   private boolean started = false;;
   
-  private Broadcast.ComponentImpl<M,R> selfComponent;
+  private Broadcast.ComponentImpl<M, R> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -525,7 +491,7 @@ public abstract class Broadcast<M, R> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected Broadcast.Provides<M,R> provides() {
+  protected Broadcast.Provides<M, R> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -545,7 +511,7 @@ public abstract class Broadcast<M, R> {
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected Broadcast.Requires<M,R> requires() {
+  protected Broadcast.Requires<M, R> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -558,7 +524,7 @@ public abstract class Broadcast<M, R> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected Broadcast.Parts<M,R> parts() {
+  protected Broadcast.Parts<M, R> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -571,12 +537,12 @@ public abstract class Broadcast<M, R> {
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized Broadcast.Component<M,R> _newComponent(final Broadcast.Requires<M,R> b, final boolean start) {
+  public synchronized Broadcast.Component<M, R> _newComponent(final Broadcast.Requires<M, R> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of Broadcast has already been used to create a component, use another one.");
     }
     this.init = true;
-    Broadcast.ComponentImpl<M,R> comp = new Broadcast.ComponentImpl<M,R>(this, b, true);
+    Broadcast.ComponentImpl<M, R> comp = new Broadcast.ComponentImpl<M, R>(this, b, true);
     if (start) {
     	comp.start();
     }
@@ -588,14 +554,14 @@ public abstract class Broadcast<M, R> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract Broadcast.BroadcastTarget<M,R> make_BroadcastTarget();
+  protected abstract Broadcast.BroadcastTarget<M, R> make_BroadcastTarget();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public Broadcast.BroadcastTarget<M,R> _createImplementationOfBroadcastTarget() {
-    Broadcast.BroadcastTarget<M,R> implem = make_BroadcastTarget();
+  public Broadcast.BroadcastTarget<M, R> _createImplementationOfBroadcastTarget() {
+    Broadcast.BroadcastTarget<M, R> implem = make_BroadcastTarget();
     if (implem == null) {
     	throw new RuntimeException("make_BroadcastTarget() in fr.irit.smac.may.lib.components.interactions.Broadcast should not return null.");
     }
@@ -609,14 +575,14 @@ public abstract class Broadcast<M, R> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract Broadcast.Broadcaster<M,R> make_Broadcaster();
+  protected abstract Broadcast.Broadcaster<M, R> make_Broadcaster();
   
   /**
    * Do not call, used by generated code.
    * 
    */
-  public Broadcast.Broadcaster<M,R> _createImplementationOfBroadcaster() {
-    Broadcast.Broadcaster<M,R> implem = make_Broadcaster();
+  public Broadcast.Broadcaster<M, R> _createImplementationOfBroadcaster() {
+    Broadcast.Broadcaster<M, R> implem = make_Broadcaster();
     if (implem == null) {
     	throw new RuntimeException("make_Broadcaster() in fr.irit.smac.may.lib.components.interactions.Broadcast should not return null.");
     }
@@ -630,8 +596,8 @@ public abstract class Broadcast<M, R> {
    * This can be called to create an instance of the species from inside the implementation of the ecosystem.
    * 
    */
-  protected Broadcast.Broadcaster.Component<M,R> newBroadcaster() {
-    Broadcast.Broadcaster<M,R> implem = _createImplementationOfBroadcaster();
-    return implem._newComponent(new Broadcast.Broadcaster.Requires<M,R>() {},true);
+  protected Broadcast.Broadcaster.Component<M, R> newBroadcaster() {
+    Broadcast.Broadcaster<M, R> implem = _createImplementationOfBroadcaster();
+    return implem._newComponent(new Broadcast.Broadcaster.Requires<M, R>() {},true);
   }
 }

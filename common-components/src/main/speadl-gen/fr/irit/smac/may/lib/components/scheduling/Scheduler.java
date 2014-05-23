@@ -6,7 +6,6 @@ import fr.irit.smac.may.lib.interfaces.Do;
 
 @SuppressWarnings("all")
 public abstract class Scheduler {
-  @SuppressWarnings("all")
   public interface Requires {
     /**
      * This can be called by the implementation to access this required port.
@@ -15,34 +14,9 @@ public abstract class Scheduler {
     public AdvancedExecutor executor();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do tick();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public SchedulingControl async();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component extends Scheduler.Provides {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl implements Scheduler.Component, Scheduler.Parts {
     private final Scheduler.Requires bridge;
     
@@ -102,10 +76,24 @@ public abstract class Scheduler {
     }
   }
   
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do tick();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public SchedulingControl async();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component extends Scheduler.Provides {
+  }
+  
   public abstract static class Scheduled {
-    @SuppressWarnings("all")
     public interface Requires {
       /**
        * This can be called by the implementation to access this required port.
@@ -114,28 +102,9 @@ public abstract class Scheduler {
       public Do cycle();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component extends Scheduler.Scheduled.Provides {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts {
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl implements Scheduler.Scheduled.Component, Scheduler.Scheduled.Parts {
       private final Scheduler.Scheduled.Requires bridge;
       
@@ -184,6 +153,16 @@ public abstract class Scheduler {
       }
     }
     
+    public interface Provides {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
+    }
+    
+    public interface Component extends Scheduler.Scheduled.Provides {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -307,7 +286,6 @@ public abstract class Scheduler {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,

@@ -10,27 +10,9 @@ import fr.irit.smac.may.lib.interfaces.Push;
 
 @SuppressWarnings("all")
 public abstract class DirRefValuePublisher<T> {
-  @SuppressWarnings("all")
   public interface Requires<T> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableObserve<T,DirRef> observe();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<T> extends DirRefValuePublisher.Provides<T> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -44,11 +26,9 @@ public abstract class DirRefValuePublisher<T> {
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
      * 
      */
-    public ValuePublisher.Component<T,DirRef> vp();
+    public ValuePublisher.Component<T, DirRef> vp();
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<T> implements DirRefValuePublisher.Component<T>, DirRefValuePublisher.Parts<T> {
     private final DirRefValuePublisher.Requires<T> bridge;
     
@@ -58,7 +38,7 @@ public abstract class DirRefValuePublisher<T> {
       assert this.dr != null: "This is a bug.";
       ((DirectReferences.ComponentImpl<Pull<T>>) this.dr).start();
       assert this.vp != null: "This is a bug.";
-      ((ValuePublisher.ComponentImpl<T,DirRef>) this.vp).start();
+      ((ValuePublisher.ComponentImpl<T, DirRef>) this.vp).start();
       this.implementation.start();
       this.implementation.started = true;
       
@@ -103,7 +83,7 @@ public abstract class DirRefValuePublisher<T> {
       
     }
     
-    public final ReliableObserve<T,DirRef> observe() {
+    public final ReliableObserve<T, DirRef> observe() {
       return this.vp.observe();
     }
     
@@ -111,62 +91,43 @@ public abstract class DirRefValuePublisher<T> {
     
     private DirectReferences<Pull<T>> implem_dr;
     
-    @SuppressWarnings("all")
     private final class BridgeImpl_dr implements DirectReferences.Requires<Pull<T>> {
     }
-    
     
     public final DirectReferences.Component<Pull<T>> dr() {
       return this.dr;
     }
     
-    private ValuePublisher.Component<T,DirRef> vp;
+    private ValuePublisher.Component<T, DirRef> vp;
     
-    private ValuePublisher<T,DirRef> implem_vp;
+    private ValuePublisher<T, DirRef> implem_vp;
     
-    @SuppressWarnings("all")
-    private final class BridgeImpl_vp implements ValuePublisher.Requires<T,DirRef> {
-      public final Call<Pull<T>,DirRef> call() {
+    private final class BridgeImpl_vp implements ValuePublisher.Requires<T, DirRef> {
+      public final Call<Pull<T>, DirRef> call() {
         return DirRefValuePublisher.ComponentImpl.this.dr.call();
       }
     }
     
-    
-    public final ValuePublisher.Component<T,DirRef> vp() {
+    public final ValuePublisher.Component<T, DirRef> vp() {
       return this.vp;
     }
   }
   
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableObserve<T, DirRef> observe();
+  }
   
-  @SuppressWarnings("all")
+  public interface Component<T> extends DirRefValuePublisher.Provides<T> {
+  }
+  
   public abstract static class PublisherPush<T> {
-    @SuppressWarnings("all")
     public interface Requires<T> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<T> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Push<T> set();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<T> extends DirRefValuePublisher.PublisherPush.Provides<T> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<T> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -180,11 +141,9 @@ public abstract class DirRefValuePublisher<T> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public ValuePublisher.PublisherPush.Component<T,DirRef> vp();
+      public ValuePublisher.PublisherPush.Component<T, DirRef> vp();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<T> implements DirRefValuePublisher.PublisherPush.Component<T>, DirRefValuePublisher.PublisherPush.Parts<T> {
       private final DirRefValuePublisher.PublisherPush.Requires<T> bridge;
       
@@ -194,7 +153,7 @@ public abstract class DirRefValuePublisher<T> {
         assert this.dr != null: "This is a bug.";
         ((DirectReferences.Callee.ComponentImpl<Pull<T>>) this.dr).start();
         assert this.vp != null: "This is a bug.";
-        ((ValuePublisher.PublisherPush.ComponentImpl<T,DirRef>) this.vp).start();
+        ((ValuePublisher.PublisherPush.ComponentImpl<T, DirRef>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -241,30 +200,42 @@ public abstract class DirRefValuePublisher<T> {
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Pull<T>> {
         public final Pull<T> toCall() {
           return DirRefValuePublisher.PublisherPush.ComponentImpl.this.vp.toCall();
         }
       }
       
-      
       public final DirectReferences.Callee.Component<Pull<T>> dr() {
         return this.dr;
       }
       
-      private ValuePublisher.PublisherPush.Component<T,DirRef> vp;
+      private ValuePublisher.PublisherPush.Component<T, DirRef> vp;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPush.Requires<T,DirRef> {
+      private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPush.Requires<T, DirRef> {
       }
       
-      
-      public final ValuePublisher.PublisherPush.Component<T,DirRef> vp() {
+      public final ValuePublisher.PublisherPush.Component<T, DirRef> vp() {
         return this.vp;
       }
     }
     
+    public interface Provides<T> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Push<T> set();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+    }
+    
+    public interface Component<T> extends DirRefValuePublisher.PublisherPush.Provides<T> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -334,7 +305,7 @@ public abstract class DirRefValuePublisher<T> {
     
     private DirectReferences.Callee<Pull<T>> use_dr;
     
-    private ValuePublisher.PublisherPush<T,DirRef> use_vp;
+    private ValuePublisher.PublisherPush<T, DirRef> use_vp;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -386,10 +357,7 @@ public abstract class DirRefValuePublisher<T> {
     }
   }
   
-  
-  @SuppressWarnings("all")
   public abstract static class PublisherPull<T> {
-    @SuppressWarnings("all")
     public interface Requires<T> {
       /**
        * This can be called by the implementation to access this required port.
@@ -398,23 +366,6 @@ public abstract class DirRefValuePublisher<T> {
       public Pull<T> getValue();
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<T> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<T> extends DirRefValuePublisher.PublisherPull.Provides<T> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<T> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
@@ -428,11 +379,9 @@ public abstract class DirRefValuePublisher<T> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public ValuePublisher.PublisherPull.Component<T,DirRef> vp();
+      public ValuePublisher.PublisherPull.Component<T, DirRef> vp();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<T> implements DirRefValuePublisher.PublisherPull.Component<T>, DirRefValuePublisher.PublisherPull.Parts<T> {
       private final DirRefValuePublisher.PublisherPull.Requires<T> bridge;
       
@@ -442,7 +391,7 @@ public abstract class DirRefValuePublisher<T> {
         assert this.dr != null: "This is a bug.";
         ((DirectReferences.Callee.ComponentImpl<Pull<T>>) this.dr).start();
         assert this.vp != null: "This is a bug.";
-        ((ValuePublisher.PublisherPull.ComponentImpl<T,DirRef>) this.vp).start();
+        ((ValuePublisher.PublisherPull.ComponentImpl<T, DirRef>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -485,33 +434,39 @@ public abstract class DirRefValuePublisher<T> {
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
       
-      @SuppressWarnings("all")
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Pull<T>> {
         public final Pull<T> toCall() {
           return DirRefValuePublisher.PublisherPull.ComponentImpl.this.vp.toCall();
         }
       }
       
-      
       public final DirectReferences.Callee.Component<Pull<T>> dr() {
         return this.dr;
       }
       
-      private ValuePublisher.PublisherPull.Component<T,DirRef> vp;
+      private ValuePublisher.PublisherPull.Component<T, DirRef> vp;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPull.Requires<T,DirRef> {
+      private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPull.Requires<T, DirRef> {
         public final Pull<T> getValue() {
           return DirRefValuePublisher.PublisherPull.ComponentImpl.this.bridge.getValue();
         }
       }
       
-      
-      public final ValuePublisher.PublisherPull.Component<T,DirRef> vp() {
+      public final ValuePublisher.PublisherPull.Component<T, DirRef> vp() {
         return this.vp;
       }
     }
     
+    public interface Provides<T> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+    }
+    
+    public interface Component<T> extends DirRefValuePublisher.PublisherPull.Provides<T> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -581,7 +536,7 @@ public abstract class DirRefValuePublisher<T> {
     
     private DirectReferences.Callee<Pull<T>> use_dr;
     
-    private ValuePublisher.PublisherPull<T,DirRef> use_vp;
+    private ValuePublisher.PublisherPull<T, DirRef> use_vp;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -633,41 +588,19 @@ public abstract class DirRefValuePublisher<T> {
     }
   }
   
-  
-  @SuppressWarnings("all")
   public abstract static class Observer<T> {
-    @SuppressWarnings("all")
     public interface Requires<T> {
     }
     
-    
-    @SuppressWarnings("all")
-    public interface Provides<T> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableObserve<T,DirRef> observe();
-    }
-    
-    
-    @SuppressWarnings("all")
-    public interface Component<T> extends DirRefValuePublisher.Observer.Provides<T> {
-    }
-    
-    
-    @SuppressWarnings("all")
     public interface Parts<T> {
       /**
        * This can be called by the implementation to access the part and its provided ports.
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public ValuePublisher.Observer.Component<T,DirRef> vp();
+      public ValuePublisher.Observer.Component<T, DirRef> vp();
     }
     
-    
-    @SuppressWarnings("all")
     public static class ComponentImpl<T> implements DirRefValuePublisher.Observer.Component<T>, DirRefValuePublisher.Observer.Parts<T> {
       private final DirRefValuePublisher.Observer.Requires<T> bridge;
       
@@ -675,7 +608,7 @@ public abstract class DirRefValuePublisher<T> {
       
       public void start() {
         assert this.vp != null: "This is a bug.";
-        ((ValuePublisher.Observer.ComponentImpl<T,DirRef>) this.vp).start();
+        ((ValuePublisher.Observer.ComponentImpl<T, DirRef>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
         
@@ -709,22 +642,30 @@ public abstract class DirRefValuePublisher<T> {
         
       }
       
-      public final ReliableObserve<T,DirRef> observe() {
+      public final ReliableObserve<T, DirRef> observe() {
         return this.vp.observe();
       }
       
-      private ValuePublisher.Observer.Component<T,DirRef> vp;
+      private ValuePublisher.Observer.Component<T, DirRef> vp;
       
-      @SuppressWarnings("all")
-      private final class BridgeImpl_vp_vp implements ValuePublisher.Observer.Requires<T,DirRef> {
+      private final class BridgeImpl_vp_vp implements ValuePublisher.Observer.Requires<T, DirRef> {
       }
       
-      
-      public final ValuePublisher.Observer.Component<T,DirRef> vp() {
+      public final ValuePublisher.Observer.Component<T, DirRef> vp() {
         return this.vp;
       }
     }
     
+    public interface Provides<T> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableObserve<T, DirRef> observe();
+    }
+    
+    public interface Component<T> extends DirRefValuePublisher.Observer.Provides<T> {
+    }
     
     /**
      * Used to check that two components are not created from the same implementation,
@@ -792,7 +733,7 @@ public abstract class DirRefValuePublisher<T> {
       
     }
     
-    private ValuePublisher.Observer<T,DirRef> use_vp;
+    private ValuePublisher.Observer<T, DirRef> use_vp;
     
     /**
      * Not meant to be used to manually instantiate components (except for testing).
@@ -843,7 +784,6 @@ public abstract class DirRefValuePublisher<T> {
       
     }
   }
-  
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -923,7 +863,7 @@ public abstract class DirRefValuePublisher<T> {
    * This will be called once during the construction of the component to initialize this sub-component.
    * 
    */
-  protected abstract ValuePublisher<T,DirRef> make_vp();
+  protected abstract ValuePublisher<T, DirRef> make_vp();
   
   /**
    * Not meant to be used to manually instantiate components (except for testing).

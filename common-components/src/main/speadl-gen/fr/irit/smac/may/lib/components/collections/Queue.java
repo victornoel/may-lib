@@ -6,44 +6,12 @@ import java.util.Collection;
 
 @SuppressWarnings("all")
 public abstract class Queue<Truc> {
-  @SuppressWarnings("all")
   public interface Requires<Truc> {
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Truc> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Truc> put();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Truc> get();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Collection<Truc>> getAll();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Truc> extends Queue.Provides<Truc> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Truc> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<Truc> implements Queue.Component<Truc>, Queue.Parts<Truc> {
     private final Queue.Requires<Truc> bridge;
     
@@ -114,6 +82,28 @@ public abstract class Queue<Truc> {
     }
   }
   
+  public interface Provides<Truc> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Truc> put();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Truc> get();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Collection<Truc>> getAll();
+  }
+  
+  public interface Component<Truc> extends Queue.Provides<Truc> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

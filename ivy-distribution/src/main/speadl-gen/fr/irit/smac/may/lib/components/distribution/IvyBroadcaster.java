@@ -6,7 +6,6 @@ import java.util.List;
 
 @SuppressWarnings("all")
 public abstract class IvyBroadcaster<T> {
-  @SuppressWarnings("all")
   public interface Requires<T> {
     /**
      * This can be called by the implementation to access this required port.
@@ -24,13 +23,13 @@ public abstract class IvyBroadcaster<T> {
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Transform<T,String> serializer();
+    public Transform<T, String> serializer();
     
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Transform<String,T> deserializer();
+    public Transform<String, T> deserializer();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -39,34 +38,9 @@ public abstract class IvyBroadcaster<T> {
     public Push<T> handle();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<List<String>> ivyReceive();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<T> send();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<T> extends IvyBroadcaster.Provides<T> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<T> {
   }
   
-  
-  @SuppressWarnings("all")
   public static class ComponentImpl<T> implements IvyBroadcaster.Component<T>, IvyBroadcaster.Parts<T> {
     private final IvyBroadcaster.Requires<T> bridge;
     
@@ -126,6 +100,22 @@ public abstract class IvyBroadcaster<T> {
     }
   }
   
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<List<String>> ivyReceive();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<T> send();
+  }
+  
+  public interface Component<T> extends IvyBroadcaster.Provides<T> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,

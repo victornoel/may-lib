@@ -8,13 +8,12 @@ import fr.irit.smac.may.lib.interfaces.Send;
 
 @SuppressWarnings("all")
 public abstract class RemoteClassicBehaviour<Msg, Ref> {
-  @SuppressWarnings("all")
   public interface Requires<Msg, Ref> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
-    public Send<Msg,Ref> send();
+    public Send<Msg, Ref> send();
     
     /**
      * This can be called by the implementation to access this required port.
@@ -32,35 +31,16 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
      * This can be called by the implementation to access this required port.
      * 
      */
-    public CreateRemoteClassic<Msg,Ref> create();
+    public CreateRemoteClassic<Msg, Ref> create();
   }
   
-  
-  @SuppressWarnings("all")
-  public interface Provides<Msg, Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Msg> cycle();
-  }
-  
-  
-  @SuppressWarnings("all")
-  public interface Component<Msg, Ref> extends RemoteClassicBehaviour.Provides<Msg,Ref> {
-  }
-  
-  
-  @SuppressWarnings("all")
   public interface Parts<Msg, Ref> {
   }
   
-  
-  @SuppressWarnings("all")
-  public static class ComponentImpl<Msg, Ref> implements RemoteClassicBehaviour.Component<Msg,Ref>, RemoteClassicBehaviour.Parts<Msg,Ref> {
-    private final RemoteClassicBehaviour.Requires<Msg,Ref> bridge;
+  public static class ComponentImpl<Msg, Ref> implements RemoteClassicBehaviour.Component<Msg, Ref>, RemoteClassicBehaviour.Parts<Msg, Ref> {
+    private final RemoteClassicBehaviour.Requires<Msg, Ref> bridge;
     
-    private final RemoteClassicBehaviour<Msg,Ref> implementation;
+    private final RemoteClassicBehaviour<Msg, Ref> implementation;
     
     public void start() {
       this.implementation.start();
@@ -81,7 +61,7 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
       
     }
     
-    public ComponentImpl(final RemoteClassicBehaviour<Msg,Ref> implem, final RemoteClassicBehaviour.Requires<Msg,Ref> b, final boolean doInits) {
+    public ComponentImpl(final RemoteClassicBehaviour<Msg, Ref> implem, final RemoteClassicBehaviour.Requires<Msg, Ref> b, final boolean doInits) {
       this.bridge = b;
       this.implementation = implem;
       
@@ -105,6 +85,16 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
     }
   }
   
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Msg> cycle();
+  }
+  
+  public interface Component<Msg, Ref> extends RemoteClassicBehaviour.Provides<Msg, Ref> {
+  }
   
   /**
    * Used to check that two components are not created from the same implementation,
@@ -119,7 +109,7 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
    */
   private boolean started = false;;
   
-  private RemoteClassicBehaviour.ComponentImpl<Msg,Ref> selfComponent;
+  private RemoteClassicBehaviour.ComponentImpl<Msg, Ref> selfComponent;
   
   /**
    * Can be overridden by the implementation.
@@ -137,7 +127,7 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
    * This can be called by the implementation to access the provided ports.
    * 
    */
-  protected RemoteClassicBehaviour.Provides<Msg,Ref> provides() {
+  protected RemoteClassicBehaviour.Provides<Msg, Ref> provides() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
@@ -157,7 +147,7 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
    * This can be called by the implementation to access the required ports.
    * 
    */
-  protected RemoteClassicBehaviour.Requires<Msg,Ref> requires() {
+  protected RemoteClassicBehaviour.Requires<Msg, Ref> requires() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
@@ -170,7 +160,7 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
    * This can be called by the implementation to access the parts and their provided ports.
    * 
    */
-  protected RemoteClassicBehaviour.Parts<Msg,Ref> parts() {
+  protected RemoteClassicBehaviour.Parts<Msg, Ref> parts() {
     assert this.selfComponent != null: "This is a bug.";
     if (!this.init) {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
@@ -183,12 +173,12 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
    * Not meant to be used to manually instantiate components (except for testing).
    * 
    */
-  public synchronized RemoteClassicBehaviour.Component<Msg,Ref> _newComponent(final RemoteClassicBehaviour.Requires<Msg,Ref> b, final boolean start) {
+  public synchronized RemoteClassicBehaviour.Component<Msg, Ref> _newComponent(final RemoteClassicBehaviour.Requires<Msg, Ref> b, final boolean start) {
     if (this.init) {
     	throw new RuntimeException("This instance of RemoteClassicBehaviour has already been used to create a component, use another one.");
     }
     this.init = true;
-    RemoteClassicBehaviour.ComponentImpl<Msg,Ref> comp = new RemoteClassicBehaviour.ComponentImpl<Msg,Ref>(this, b, true);
+    RemoteClassicBehaviour.ComponentImpl<Msg, Ref> comp = new RemoteClassicBehaviour.ComponentImpl<Msg, Ref>(this, b, true);
     if (start) {
     	comp.start();
     }
