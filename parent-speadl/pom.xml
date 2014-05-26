@@ -66,7 +66,7 @@
 						<execution>
 							<!-- hack in order for the file not to be removed on clean but only 
 								prior to code generation from xtext-maven-plugin -->
-							<phase>initialize</phase>
+							<phase>generate-sources</phase>
 							<goals>
 								<goal>clean</goal>
 							</goals>
