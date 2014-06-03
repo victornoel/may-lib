@@ -20,6 +20,17 @@ public abstract class Clock {
     public Do tick();
   }
   
+  public interface Component extends Clock.Provides {
+  }
+  
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public SchedulingControl control();
+  }
+  
   public interface Parts {
   }
   
@@ -31,20 +42,22 @@ public abstract class Clock {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_control() {
       assert this.control == null: "This is a bug.";
       this.control = this.implementation.make_control();
       if (this.control == null) {
       	throw new RuntimeException("make_control() in fr.irit.smac.may.lib.components.scheduling.Clock should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_control();
     }
     
     public ComponentImpl(final Clock implem, final Clock.Requires b, final boolean doInits) {
@@ -61,7 +74,6 @@ public abstract class Clock {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private SchedulingControl control;
@@ -69,17 +81,6 @@ public abstract class Clock {
     public SchedulingControl control() {
       return this.control;
     }
-  }
-  
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public SchedulingControl control();
-  }
-  
-  public interface Component extends Clock.Provides {
   }
   
   /**
@@ -92,6 +93,7 @@ public abstract class Clock {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -106,7 +108,6 @@ public abstract class Clock {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -119,7 +120,6 @@ public abstract class Clock {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -139,7 +139,6 @@ public abstract class Clock {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -152,7 +151,6 @@ public abstract class Clock {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -164,11 +162,10 @@ public abstract class Clock {
     	throw new RuntimeException("This instance of Clock has already been used to create a component, use another one.");
     }
     this.init = true;
-    Clock.ComponentImpl comp = new Clock.ComponentImpl(this, b, true);
+    Clock.ComponentImpl  _comp = new Clock.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

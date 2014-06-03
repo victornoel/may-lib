@@ -13,6 +13,17 @@ public abstract class MapRefAsyncReceiver<M, K> {
   public interface Requires<M, K> {
   }
   
+  public interface Component<M, K> extends MapRefAsyncReceiver.Provides<M, K> {
+  }
+  
+  public interface Provides<M, K> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableSend<M, K> send();
+  }
+  
   public interface Parts<M, K> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -41,25 +52,33 @@ public abstract class MapRefAsyncReceiver<M, K> {
       ((AsyncReceiver.ComponentImpl<M, K>) this.ar).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_mr() {
       assert this.mr == null: "This is a bug.";
       assert this.implem_mr == null: "This is a bug.";
       this.implem_mr = this.implementation.make_mr();
       if (this.implem_mr == null) {
-      	throw new RuntimeException("make_mr() in fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver should not return null.");
+      	throw new RuntimeException("make_mr() in fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver<M, K> should not return null.");
       }
       this.mr = this.implem_mr._newComponent(new BridgeImpl_mr(), false);
+      
+    }
+    
+    private void init_ar() {
       assert this.ar == null: "This is a bug.";
       assert this.implem_ar == null: "This is a bug.";
       this.implem_ar = this.implementation.make_ar();
       if (this.implem_ar == null) {
-      	throw new RuntimeException("make_ar() in fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver should not return null.");
+      	throw new RuntimeException("make_ar() in fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver<M, K> should not return null.");
       }
       this.ar = this.implem_ar._newComponent(new BridgeImpl_ar(), false);
       
+    }
+    
+    protected void initParts() {
+      init_mr();
+      init_ar();
     }
     
     protected void initProvidedPorts() {
@@ -80,11 +99,10 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public ReliableSend<M, K> send() {
-      return this.ar.send();
+      return this.ar().send();
     }
     
     private MapReferences.Component<Push<M>, K> mr;
@@ -104,24 +122,13 @@ public abstract class MapRefAsyncReceiver<M, K> {
     
     private final class BridgeImpl_ar implements AsyncReceiver.Requires<M, K> {
       public final Call<Push<M>, K> call() {
-        return MapRefAsyncReceiver.ComponentImpl.this.mr.call();
+        return MapRefAsyncReceiver.ComponentImpl.this.mr().call();
       }
     }
     
     public final AsyncReceiver.Component<M, K> ar() {
       return this.ar;
     }
-  }
-  
-  public interface Provides<M, K> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableSend<M, K> send();
-  }
-  
-  public interface Component<M, K> extends MapRefAsyncReceiver.Provides<M, K> {
   }
   
   public abstract static class Receiver<M, K> {
@@ -131,6 +138,23 @@ public abstract class MapRefAsyncReceiver<M, K> {
        * 
        */
       public Push<M> put();
+    }
+    
+    public interface Component<M, K> extends MapRefAsyncReceiver.Receiver.Provides<M, K> {
+    }
+    
+    public interface Provides<M, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<K> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<M, K> {
@@ -161,17 +185,25 @@ public abstract class MapRefAsyncReceiver<M, K> {
         ((AsyncReceiver.Receiver.ComponentImpl<M, K>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_mr() {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
+        
+      }
+      
+      private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
         
+      }
+      
+      protected void initParts() {
+        init_mr();
+        init_ar();
       }
       
       protected void initProvidedPorts() {
@@ -192,22 +224,21 @@ public abstract class MapRefAsyncReceiver<M, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<K> me() {
-        return this.mr.me();
+        return this.mr().me();
       }
       
       public Do stop() {
-        return this.mr.stop();
+        return this.mr().stop();
       }
       
       private MapReferences.Callee.Component<Push<M>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.Callee.Requires<Push<M>, K> {
         public final Push<M> toCall() {
-          return MapRefAsyncReceiver.Receiver.ComponentImpl.this.ar.toCall();
+          return MapRefAsyncReceiver.Receiver.ComponentImpl.this.ar().toCall();
         }
       }
       
@@ -228,23 +259,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       }
     }
     
-    public interface Provides<M, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<K> me();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<M, K> extends MapRefAsyncReceiver.Receiver.Provides<M, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -255,6 +269,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -269,7 +284,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -282,7 +296,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -295,7 +308,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -308,7 +320,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private MapReferences.Callee<Push<M>, K> use_mr;
@@ -324,12 +335,11 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("This instance of Receiver has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefAsyncReceiver.Receiver.ComponentImpl<M, K> comp = new MapRefAsyncReceiver.Receiver.ComponentImpl<M, K>(this, b, true);
+      MapRefAsyncReceiver.Receiver.ComponentImpl<M, K>  _comp = new MapRefAsyncReceiver.Receiver.ComponentImpl<M, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefAsyncReceiver.ComponentImpl<M, K> ecosystemComponent;
@@ -341,7 +351,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Provides<M, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -351,7 +360,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Requires<M, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -361,7 +369,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Parts<M, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -378,6 +385,23 @@ public abstract class MapRefAsyncReceiver<M, K> {
        * 
        */
       public Pull<K> key();
+    }
+    
+    public interface Component<M, K> extends MapRefAsyncReceiver.ReceiverKeyPort.Provides<M, K> {
+    }
+    
+    public interface Provides<M, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<K> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<M, K> {
@@ -408,17 +432,25 @@ public abstract class MapRefAsyncReceiver<M, K> {
         ((AsyncReceiver.Receiver.ComponentImpl<M, K>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_mr() {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
+        
+      }
+      
+      private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
         
+      }
+      
+      protected void initParts() {
+        init_mr();
+        init_ar();
       }
       
       protected void initProvidedPorts() {
@@ -439,15 +471,14 @@ public abstract class MapRefAsyncReceiver<M, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<K> me() {
-        return this.mr.me();
+        return this.mr().me();
       }
       
       public Do stop() {
-        return this.mr.stop();
+        return this.mr().stop();
       }
       
       private MapReferences.CalleeKeyPort.Component<Push<M>, K> mr;
@@ -458,7 +489,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
         }
         
         public final Push<M> toCall() {
-          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.ar.toCall();
+          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.ar().toCall();
         }
       }
       
@@ -479,23 +510,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       }
     }
     
-    public interface Provides<M, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<K> me();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<M, K> extends MapRefAsyncReceiver.ReceiverKeyPort.Provides<M, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -506,6 +520,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -520,7 +535,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -533,7 +547,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -546,7 +559,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -559,7 +571,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private MapReferences.CalleeKeyPort<Push<M>, K> use_mr;
@@ -575,12 +586,11 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("This instance of ReceiverKeyPort has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl<M, K> comp = new MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl<M, K>(this, b, true);
+      MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl<M, K>  _comp = new MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl<M, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefAsyncReceiver.ComponentImpl<M, K> ecosystemComponent;
@@ -592,7 +602,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Provides<M, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -602,7 +611,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Requires<M, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -612,12 +620,22 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Parts<M, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Sender<M, K> {
     public interface Requires<M, K> {
+    }
+    
+    public interface Component<M, K> extends MapRefAsyncReceiver.Sender.Provides<M, K> {
+    }
+    
+    public interface Provides<M, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableSend<M, K> send();
     }
     
     public interface Parts<M, K> {
@@ -639,14 +657,17 @@ public abstract class MapRefAsyncReceiver<M, K> {
         ((AsyncReceiver.Sender.ComponentImpl<M, K>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
         
+      }
+      
+      protected void initParts() {
+        init_ar();
       }
       
       protected void initProvidedPorts() {
@@ -667,11 +688,10 @@ public abstract class MapRefAsyncReceiver<M, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public ReliableSend<M, K> send() {
-        return this.ar.send();
+        return this.ar().send();
       }
       
       private AsyncReceiver.Sender.Component<M, K> ar;
@@ -684,17 +704,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       }
     }
     
-    public interface Provides<M, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableSend<M, K> send();
-    }
-    
-    public interface Component<M, K> extends MapRefAsyncReceiver.Sender.Provides<M, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -705,6 +714,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -719,7 +729,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -732,7 +741,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -745,7 +753,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -758,7 +765,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private AsyncReceiver.Sender<M, K> use_ar;
@@ -772,12 +778,11 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("This instance of Sender has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefAsyncReceiver.Sender.ComponentImpl<M, K> comp = new MapRefAsyncReceiver.Sender.ComponentImpl<M, K>(this, b, true);
+      MapRefAsyncReceiver.Sender.ComponentImpl<M, K>  _comp = new MapRefAsyncReceiver.Sender.ComponentImpl<M, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefAsyncReceiver.ComponentImpl<M, K> ecosystemComponent;
@@ -789,7 +794,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Provides<M, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -799,7 +803,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Requires<M, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -809,7 +812,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     protected MapRefAsyncReceiver.Parts<M, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -823,6 +825,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -837,7 +840,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -850,7 +852,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -863,7 +864,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -876,7 +876,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -902,12 +901,11 @@ public abstract class MapRefAsyncReceiver<M, K> {
     	throw new RuntimeException("This instance of MapRefAsyncReceiver has already been used to create a component, use another one.");
     }
     this.init = true;
-    MapRefAsyncReceiver.ComponentImpl<M, K> comp = new MapRefAsyncReceiver.ComponentImpl<M, K>(this, b, true);
+    MapRefAsyncReceiver.ComponentImpl<M, K>  _comp = new MapRefAsyncReceiver.ComponentImpl<M, K>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -993,8 +991,8 @@ public abstract class MapRefAsyncReceiver<M, K> {
    * 
    */
   protected MapRefAsyncReceiver.Sender.Component<M, K> newSender() {
-    MapRefAsyncReceiver.Sender<M, K> implem = _createImplementationOfSender();
-    return implem._newComponent(new MapRefAsyncReceiver.Sender.Requires<M, K>() {},true);
+    MapRefAsyncReceiver.Sender<M, K> _implem = _createImplementationOfSender();
+    return _implem._newComponent(new MapRefAsyncReceiver.Sender.Requires<M, K>() {},true);
   }
   
   /**

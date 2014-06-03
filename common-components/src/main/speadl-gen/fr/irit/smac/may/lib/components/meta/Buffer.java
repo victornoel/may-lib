@@ -12,66 +12,7 @@ public abstract class Buffer<I> {
     public I realPort();
   }
   
-  public interface Parts<I> {
-  }
-  
-  public static class ComponentImpl<I> implements Buffer.Component<I>, Buffer.Parts<I> {
-    private final Buffer.Requires<I> bridge;
-    
-    private final Buffer<I> implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.port == null: "This is a bug.";
-      this.port = this.implementation.make_port();
-      if (this.port == null) {
-      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Buffer should not return null.");
-      }
-      assert this.release == null: "This is a bug.";
-      this.release = this.implementation.make_release();
-      if (this.release == null) {
-      	throw new RuntimeException("make_release() in fr.irit.smac.may.lib.components.meta.Buffer should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final Buffer<I> implem, final Buffer.Requires<I> b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private I port;
-    
-    public I port() {
-      return this.port;
-    }
-    
-    private Do release;
-    
-    public Do release() {
-      return this.release;
-    }
+  public interface Component<I> extends Buffer.Provides<I> {
   }
   
   public interface Provides<I> {
@@ -88,7 +29,71 @@ public abstract class Buffer<I> {
     public Do release();
   }
   
-  public interface Component<I> extends Buffer.Provides<I> {
+  public interface Parts<I> {
+  }
+  
+  public static class ComponentImpl<I> implements Buffer.Component<I>, Buffer.Parts<I> {
+    private final Buffer.Requires<I> bridge;
+    
+    private final Buffer<I> implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_port() {
+      assert this.port == null: "This is a bug.";
+      this.port = this.implementation.make_port();
+      if (this.port == null) {
+      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Buffer<I> should not return null.");
+      }
+    }
+    
+    private void init_release() {
+      assert this.release == null: "This is a bug.";
+      this.release = this.implementation.make_release();
+      if (this.release == null) {
+      	throw new RuntimeException("make_release() in fr.irit.smac.may.lib.components.meta.Buffer<I> should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_port();
+      init_release();
+    }
+    
+    public ComponentImpl(final Buffer<I> implem, final Buffer.Requires<I> b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private I port;
+    
+    public I port() {
+      return this.port;
+    }
+    
+    private Do release;
+    
+    public Do release() {
+      return this.release;
+    }
   }
   
   /**
@@ -101,6 +106,7 @@ public abstract class Buffer<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -115,7 +121,6 @@ public abstract class Buffer<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -128,7 +133,6 @@ public abstract class Buffer<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -155,7 +159,6 @@ public abstract class Buffer<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -168,7 +171,6 @@ public abstract class Buffer<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -180,11 +182,10 @@ public abstract class Buffer<I> {
     	throw new RuntimeException("This instance of Buffer has already been used to create a component, use another one.");
     }
     this.init = true;
-    Buffer.ComponentImpl<I> comp = new Buffer.ComponentImpl<I>(this, b, true);
+    Buffer.ComponentImpl<I>  _comp = new Buffer.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

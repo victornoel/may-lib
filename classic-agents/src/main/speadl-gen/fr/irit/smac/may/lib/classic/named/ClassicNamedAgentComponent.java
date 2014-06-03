@@ -43,6 +43,17 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     public CreateNamed<Msg, Ref> create();
   }
   
+  public interface Component<Msg, Ref> extends ClassicNamedAgentComponent.Provides<Msg, Ref> {
+  }
+  
+  public interface Provides<Msg, Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Msg> put();
+  }
+  
   public interface Parts<Msg, Ref> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -71,25 +82,33 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       ((ClassicNamedBehaviour.ComponentImpl<Msg, Ref>) this.beh).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_dispatcher() {
       assert this.dispatcher == null: "This is a bug.";
       assert this.implem_dispatcher == null: "This is a bug.";
       this.implem_dispatcher = this.implementation.make_dispatcher();
       if (this.implem_dispatcher == null) {
-      	throw new RuntimeException("make_dispatcher() in fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent should not return null.");
+      	throw new RuntimeException("make_dispatcher() in fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent<Msg, Ref> should not return null.");
       }
       this.dispatcher = this.implem_dispatcher._newComponent(new BridgeImpl_dispatcher(), false);
+      
+    }
+    
+    private void init_beh() {
       assert this.beh == null: "This is a bug.";
       assert this.implem_beh == null: "This is a bug.";
       this.implem_beh = this.implementation.make_beh();
       if (this.implem_beh == null) {
-      	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent should not return null.");
+      	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent<Msg, Ref> should not return null.");
       }
       this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
       
+    }
+    
+    protected void initParts() {
+      init_dispatcher();
+      init_beh();
     }
     
     protected void initProvidedPorts() {
@@ -110,11 +129,10 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public Push<Msg> put() {
-      return this.dispatcher.dispatch();
+      return this.dispatcher().dispatch();
     }
     
     private SequentialDispatcher.Component<Msg> dispatcher;
@@ -127,7 +145,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       }
       
       public final Push<Msg> handler() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.beh.cycle();
+        return ClassicNamedAgentComponent.ComponentImpl.this.beh().cycle();
       }
     }
     
@@ -162,17 +180,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     }
   }
   
-  public interface Provides<Msg, Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Msg> put();
-  }
-  
-  public interface Component<Msg, Ref> extends ClassicNamedAgentComponent.Provides<Msg, Ref> {
-  }
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -183,6 +190,7 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -197,7 +205,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -210,7 +217,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -223,7 +229,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -236,7 +241,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -262,11 +266,10 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     	throw new RuntimeException("This instance of ClassicNamedAgentComponent has already been used to create a component, use another one.");
     }
     this.init = true;
-    ClassicNamedAgentComponent.ComponentImpl<Msg, Ref> comp = new ClassicNamedAgentComponent.ComponentImpl<Msg, Ref>(this, b, true);
+    ClassicNamedAgentComponent.ComponentImpl<Msg, Ref>  _comp = new ClassicNamedAgentComponent.ComponentImpl<Msg, Ref>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

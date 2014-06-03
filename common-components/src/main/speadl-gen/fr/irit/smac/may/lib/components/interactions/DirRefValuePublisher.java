@@ -14,6 +14,17 @@ public abstract class DirRefValuePublisher<T> {
   public interface Requires<T> {
   }
   
+  public interface Component<T> extends DirRefValuePublisher.Provides<T> {
+  }
+  
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableObserve<T, DirRef> observe();
+  }
+  
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -42,25 +53,33 @@ public abstract class DirRefValuePublisher<T> {
       ((ValuePublisher.ComponentImpl<T, DirRef>) this.vp).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_dr() {
       assert this.dr == null: "This is a bug.";
       assert this.implem_dr == null: "This is a bug.";
       this.implem_dr = this.implementation.make_dr();
       if (this.implem_dr == null) {
-      	throw new RuntimeException("make_dr() in fr.irit.smac.may.lib.components.interactions.DirRefValuePublisher should not return null.");
+      	throw new RuntimeException("make_dr() in fr.irit.smac.may.lib.components.interactions.DirRefValuePublisher<T> should not return null.");
       }
       this.dr = this.implem_dr._newComponent(new BridgeImpl_dr(), false);
+      
+    }
+    
+    private void init_vp() {
       assert this.vp == null: "This is a bug.";
       assert this.implem_vp == null: "This is a bug.";
       this.implem_vp = this.implementation.make_vp();
       if (this.implem_vp == null) {
-      	throw new RuntimeException("make_vp() in fr.irit.smac.may.lib.components.interactions.DirRefValuePublisher should not return null.");
+      	throw new RuntimeException("make_vp() in fr.irit.smac.may.lib.components.interactions.DirRefValuePublisher<T> should not return null.");
       }
       this.vp = this.implem_vp._newComponent(new BridgeImpl_vp(), false);
       
+    }
+    
+    protected void initParts() {
+      init_dr();
+      init_vp();
     }
     
     protected void initProvidedPorts() {
@@ -81,11 +100,10 @@ public abstract class DirRefValuePublisher<T> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public ReliableObserve<T, DirRef> observe() {
-      return this.vp.observe();
+      return this.vp().observe();
     }
     
     private DirectReferences.Component<Pull<T>> dr;
@@ -105,7 +123,7 @@ public abstract class DirRefValuePublisher<T> {
     
     private final class BridgeImpl_vp implements ValuePublisher.Requires<T, DirRef> {
       public final Call<Pull<T>, DirRef> call() {
-        return DirRefValuePublisher.ComponentImpl.this.dr.call();
+        return DirRefValuePublisher.ComponentImpl.this.dr().call();
       }
     }
     
@@ -114,19 +132,31 @@ public abstract class DirRefValuePublisher<T> {
     }
   }
   
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableObserve<T, DirRef> observe();
-  }
-  
-  public interface Component<T> extends DirRefValuePublisher.Provides<T> {
-  }
-  
   public abstract static class PublisherPush<T> {
     public interface Requires<T> {
+    }
+    
+    public interface Component<T> extends DirRefValuePublisher.PublisherPush.Provides<T> {
+    }
+    
+    public interface Provides<T> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Push<T> set();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<T> {
@@ -157,17 +187,25 @@ public abstract class DirRefValuePublisher<T> {
         ((ValuePublisher.PublisherPush.ComponentImpl<T, DirRef>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_dr() {
         assert this.dr == null: "This is a bug.";
         assert this.implementation.use_dr != null: "This is a bug.";
         this.dr = this.implementation.use_dr._newComponent(new BridgeImpl_dr_dr(), false);
+        
+      }
+      
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_dr();
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -188,26 +226,25 @@ public abstract class DirRefValuePublisher<T> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Push<T> set() {
-        return this.vp.set();
+        return this.vp().set();
       }
       
       public Pull<T> get() {
-        return this.vp.get();
+        return this.vp().get();
       }
       
       public Do stop() {
-        return this.dr.stop();
+        return this.dr().stop();
       }
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
       
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Pull<T>> {
         public final Pull<T> toCall() {
-          return DirRefValuePublisher.PublisherPush.ComponentImpl.this.vp.toCall();
+          return DirRefValuePublisher.PublisherPush.ComponentImpl.this.vp().toCall();
         }
       }
       
@@ -225,29 +262,6 @@ public abstract class DirRefValuePublisher<T> {
       }
     }
     
-    public interface Provides<T> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Push<T> set();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<T> extends DirRefValuePublisher.PublisherPush.Provides<T> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -258,6 +272,7 @@ public abstract class DirRefValuePublisher<T> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -272,7 +287,6 @@ public abstract class DirRefValuePublisher<T> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -285,7 +299,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -298,7 +311,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -311,7 +323,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private DirectReferences.Callee<Pull<T>> use_dr;
@@ -327,12 +338,11 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("This instance of PublisherPush has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirRefValuePublisher.PublisherPush.ComponentImpl<T> comp = new DirRefValuePublisher.PublisherPush.ComponentImpl<T>(this, b, true);
+      DirRefValuePublisher.PublisherPush.ComponentImpl<T>  _comp = new DirRefValuePublisher.PublisherPush.ComponentImpl<T>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirRefValuePublisher.ComponentImpl<T> ecosystemComponent;
@@ -344,7 +354,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Provides<T> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -354,7 +363,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Requires<T> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -364,7 +372,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Parts<T> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -375,6 +382,23 @@ public abstract class DirRefValuePublisher<T> {
        * 
        */
       public Pull<T> getValue();
+    }
+    
+    public interface Component<T> extends DirRefValuePublisher.PublisherPull.Provides<T> {
+    }
+    
+    public interface Provides<T> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<T> {
@@ -405,17 +429,25 @@ public abstract class DirRefValuePublisher<T> {
         ((ValuePublisher.PublisherPull.ComponentImpl<T, DirRef>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_dr() {
         assert this.dr == null: "This is a bug.";
         assert this.implementation.use_dr != null: "This is a bug.";
         this.dr = this.implementation.use_dr._newComponent(new BridgeImpl_dr_dr(), false);
+        
+      }
+      
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_dr();
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -436,22 +468,21 @@ public abstract class DirRefValuePublisher<T> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<T> get() {
-        return this.vp.get();
+        return this.vp().get();
       }
       
       public Do stop() {
-        return this.dr.stop();
+        return this.dr().stop();
       }
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
       
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Pull<T>> {
         public final Pull<T> toCall() {
-          return DirRefValuePublisher.PublisherPull.ComponentImpl.this.vp.toCall();
+          return DirRefValuePublisher.PublisherPull.ComponentImpl.this.vp().toCall();
         }
       }
       
@@ -472,23 +503,6 @@ public abstract class DirRefValuePublisher<T> {
       }
     }
     
-    public interface Provides<T> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<T> extends DirRefValuePublisher.PublisherPull.Provides<T> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -499,6 +513,7 @@ public abstract class DirRefValuePublisher<T> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -513,7 +528,6 @@ public abstract class DirRefValuePublisher<T> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -526,7 +540,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -539,7 +552,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -552,7 +564,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private DirectReferences.Callee<Pull<T>> use_dr;
@@ -568,12 +579,11 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("This instance of PublisherPull has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirRefValuePublisher.PublisherPull.ComponentImpl<T> comp = new DirRefValuePublisher.PublisherPull.ComponentImpl<T>(this, b, true);
+      DirRefValuePublisher.PublisherPull.ComponentImpl<T>  _comp = new DirRefValuePublisher.PublisherPull.ComponentImpl<T>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirRefValuePublisher.ComponentImpl<T> ecosystemComponent;
@@ -585,7 +595,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Provides<T> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -595,7 +604,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Requires<T> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -605,12 +613,22 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Parts<T> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Observer<T> {
     public interface Requires<T> {
+    }
+    
+    public interface Component<T> extends DirRefValuePublisher.Observer.Provides<T> {
+    }
+    
+    public interface Provides<T> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableObserve<T, DirRef> observe();
     }
     
     public interface Parts<T> {
@@ -632,14 +650,17 @@ public abstract class DirRefValuePublisher<T> {
         ((ValuePublisher.Observer.ComponentImpl<T, DirRef>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -660,11 +681,10 @@ public abstract class DirRefValuePublisher<T> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public ReliableObserve<T, DirRef> observe() {
-        return this.vp.observe();
+        return this.vp().observe();
       }
       
       private ValuePublisher.Observer.Component<T, DirRef> vp;
@@ -677,17 +697,6 @@ public abstract class DirRefValuePublisher<T> {
       }
     }
     
-    public interface Provides<T> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableObserve<T, DirRef> observe();
-    }
-    
-    public interface Component<T> extends DirRefValuePublisher.Observer.Provides<T> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -698,6 +707,7 @@ public abstract class DirRefValuePublisher<T> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -712,7 +722,6 @@ public abstract class DirRefValuePublisher<T> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -725,7 +734,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -738,7 +746,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -751,7 +758,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private ValuePublisher.Observer<T, DirRef> use_vp;
@@ -765,12 +771,11 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("This instance of Observer has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirRefValuePublisher.Observer.ComponentImpl<T> comp = new DirRefValuePublisher.Observer.ComponentImpl<T>(this, b, true);
+      DirRefValuePublisher.Observer.ComponentImpl<T>  _comp = new DirRefValuePublisher.Observer.ComponentImpl<T>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirRefValuePublisher.ComponentImpl<T> ecosystemComponent;
@@ -782,7 +787,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Provides<T> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -792,7 +796,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Requires<T> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -802,7 +805,6 @@ public abstract class DirRefValuePublisher<T> {
     protected DirRefValuePublisher.Parts<T> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -816,6 +818,7 @@ public abstract class DirRefValuePublisher<T> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -830,7 +833,6 @@ public abstract class DirRefValuePublisher<T> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -843,7 +845,6 @@ public abstract class DirRefValuePublisher<T> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -856,7 +857,6 @@ public abstract class DirRefValuePublisher<T> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -869,7 +869,6 @@ public abstract class DirRefValuePublisher<T> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -895,12 +894,11 @@ public abstract class DirRefValuePublisher<T> {
     	throw new RuntimeException("This instance of DirRefValuePublisher has already been used to create a component, use another one.");
     }
     this.init = true;
-    DirRefValuePublisher.ComponentImpl<T> comp = new DirRefValuePublisher.ComponentImpl<T>(this, b, true);
+    DirRefValuePublisher.ComponentImpl<T>  _comp = new DirRefValuePublisher.ComponentImpl<T>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -935,8 +933,8 @@ public abstract class DirRefValuePublisher<T> {
    * 
    */
   protected DirRefValuePublisher.PublisherPush.Component<T> newPublisherPush(final String name) {
-    DirRefValuePublisher.PublisherPush<T> implem = _createImplementationOfPublisherPush(name);
-    return implem._newComponent(new DirRefValuePublisher.PublisherPush.Requires<T>() {},true);
+    DirRefValuePublisher.PublisherPush<T> _implem = _createImplementationOfPublisherPush(name);
+    return _implem._newComponent(new DirRefValuePublisher.PublisherPush.Requires<T>() {},true);
   }
   
   /**
@@ -995,8 +993,8 @@ public abstract class DirRefValuePublisher<T> {
    * 
    */
   protected DirRefValuePublisher.Observer.Component<T> newObserver() {
-    DirRefValuePublisher.Observer<T> implem = _createImplementationOfObserver();
-    return implem._newComponent(new DirRefValuePublisher.Observer.Requires<T>() {},true);
+    DirRefValuePublisher.Observer<T> _implem = _createImplementationOfObserver();
+    return _implem._newComponent(new DirRefValuePublisher.Observer.Requires<T>() {},true);
   }
   
   /**

@@ -38,66 +38,7 @@ public abstract class IvyBroadcaster<T> {
     public Push<T> handle();
   }
   
-  public interface Parts<T> {
-  }
-  
-  public static class ComponentImpl<T> implements IvyBroadcaster.Component<T>, IvyBroadcaster.Parts<T> {
-    private final IvyBroadcaster.Requires<T> bridge;
-    
-    private final IvyBroadcaster<T> implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.ivyReceive == null: "This is a bug.";
-      this.ivyReceive = this.implementation.make_ivyReceive();
-      if (this.ivyReceive == null) {
-      	throw new RuntimeException("make_ivyReceive() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster should not return null.");
-      }
-      assert this.send == null: "This is a bug.";
-      this.send = this.implementation.make_send();
-      if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final IvyBroadcaster<T> implem, final IvyBroadcaster.Requires<T> b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private Push<List<String>> ivyReceive;
-    
-    public Push<List<String>> ivyReceive() {
-      return this.ivyReceive;
-    }
-    
-    private Push<T> send;
-    
-    public Push<T> send() {
-      return this.send;
-    }
+  public interface Component<T> extends IvyBroadcaster.Provides<T> {
   }
   
   public interface Provides<T> {
@@ -114,7 +55,71 @@ public abstract class IvyBroadcaster<T> {
     public Push<T> send();
   }
   
-  public interface Component<T> extends IvyBroadcaster.Provides<T> {
+  public interface Parts<T> {
+  }
+  
+  public static class ComponentImpl<T> implements IvyBroadcaster.Component<T>, IvyBroadcaster.Parts<T> {
+    private final IvyBroadcaster.Requires<T> bridge;
+    
+    private final IvyBroadcaster<T> implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_ivyReceive() {
+      assert this.ivyReceive == null: "This is a bug.";
+      this.ivyReceive = this.implementation.make_ivyReceive();
+      if (this.ivyReceive == null) {
+      	throw new RuntimeException("make_ivyReceive() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster<T> should not return null.");
+      }
+    }
+    
+    private void init_send() {
+      assert this.send == null: "This is a bug.";
+      this.send = this.implementation.make_send();
+      if (this.send == null) {
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster<T> should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_ivyReceive();
+      init_send();
+    }
+    
+    public ComponentImpl(final IvyBroadcaster<T> implem, final IvyBroadcaster.Requires<T> b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private Push<List<String>> ivyReceive;
+    
+    public Push<List<String>> ivyReceive() {
+      return this.ivyReceive;
+    }
+    
+    private Push<T> send;
+    
+    public Push<T> send() {
+      return this.send;
+    }
   }
   
   /**
@@ -127,6 +132,7 @@ public abstract class IvyBroadcaster<T> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -141,7 +147,6 @@ public abstract class IvyBroadcaster<T> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -154,7 +159,6 @@ public abstract class IvyBroadcaster<T> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -181,7 +185,6 @@ public abstract class IvyBroadcaster<T> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -194,7 +197,6 @@ public abstract class IvyBroadcaster<T> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -206,11 +208,10 @@ public abstract class IvyBroadcaster<T> {
     	throw new RuntimeException("This instance of IvyBroadcaster has already been used to create a component, use another one.");
     }
     this.init = true;
-    IvyBroadcaster.ComponentImpl<T> comp = new IvyBroadcaster.ComponentImpl<T>(this, b, true);
+    IvyBroadcaster.ComponentImpl<T>  _comp = new IvyBroadcaster.ComponentImpl<T>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

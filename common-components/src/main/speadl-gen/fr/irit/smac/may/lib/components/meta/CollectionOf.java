@@ -9,6 +9,17 @@ public abstract class CollectionOf<I> {
   public interface Requires<I> {
   }
   
+  public interface Component<I> extends CollectionOf.Provides<I> {
+  }
+  
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Collection<I>> get();
+  }
+  
   public interface Parts<I> {
   }
   
@@ -20,20 +31,22 @@ public abstract class CollectionOf<I> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_get() {
       assert this.get == null: "This is a bug.";
       this.get = this.implementation.make_get();
       if (this.get == null) {
-      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.meta.CollectionOf should not return null.");
+      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.meta.CollectionOf<I> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_get();
     }
     
     public ComponentImpl(final CollectionOf<I> implem, final CollectionOf.Requires<I> b, final boolean doInits) {
@@ -50,7 +63,6 @@ public abstract class CollectionOf<I> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Pull<Collection<I>> get;
@@ -60,17 +72,6 @@ public abstract class CollectionOf<I> {
     }
   }
   
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Collection<I>> get();
-  }
-  
-  public interface Component<I> extends CollectionOf.Provides<I> {
-  }
-  
   public abstract static class Element<I> {
     public interface Requires<I> {
       /**
@@ -78,6 +79,17 @@ public abstract class CollectionOf<I> {
        * 
        */
       public I forwardedPort();
+    }
+    
+    public interface Component<I> extends CollectionOf.Element.Provides<I> {
+    }
+    
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<I> {
@@ -91,20 +103,22 @@ public abstract class CollectionOf<I> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.meta.CollectionOf$Element should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.meta.CollectionOf$Element<I> should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_stop();
       }
       
       public ComponentImpl(final CollectionOf.Element<I> implem, final CollectionOf.Element.Requires<I> b, final boolean doInits) {
@@ -121,7 +135,6 @@ public abstract class CollectionOf<I> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private Do stop;
@@ -129,17 +142,6 @@ public abstract class CollectionOf<I> {
       public Do stop() {
         return this.stop;
       }
-    }
-    
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<I> extends CollectionOf.Element.Provides<I> {
     }
     
     /**
@@ -152,6 +154,7 @@ public abstract class CollectionOf<I> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -166,7 +169,6 @@ public abstract class CollectionOf<I> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -179,7 +181,6 @@ public abstract class CollectionOf<I> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -199,7 +200,6 @@ public abstract class CollectionOf<I> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -212,7 +212,6 @@ public abstract class CollectionOf<I> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -224,12 +223,11 @@ public abstract class CollectionOf<I> {
       	throw new RuntimeException("This instance of Element has already been used to create a component, use another one.");
       }
       this.init = true;
-      CollectionOf.Element.ComponentImpl<I> comp = new CollectionOf.Element.ComponentImpl<I>(this, b, true);
+      CollectionOf.Element.ComponentImpl<I>  _comp = new CollectionOf.Element.ComponentImpl<I>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private CollectionOf.ComponentImpl<I> ecosystemComponent;
@@ -241,7 +239,6 @@ public abstract class CollectionOf<I> {
     protected CollectionOf.Provides<I> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -251,7 +248,6 @@ public abstract class CollectionOf<I> {
     protected CollectionOf.Requires<I> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -261,7 +257,6 @@ public abstract class CollectionOf<I> {
     protected CollectionOf.Parts<I> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -275,6 +270,7 @@ public abstract class CollectionOf<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -289,7 +285,6 @@ public abstract class CollectionOf<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -302,7 +297,6 @@ public abstract class CollectionOf<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -322,7 +316,6 @@ public abstract class CollectionOf<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -335,7 +328,6 @@ public abstract class CollectionOf<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -347,12 +339,11 @@ public abstract class CollectionOf<I> {
     	throw new RuntimeException("This instance of CollectionOf has already been used to create a component, use another one.");
     }
     this.init = true;
-    CollectionOf.ComponentImpl<I> comp = new CollectionOf.ComponentImpl<I>(this, b, true);
+    CollectionOf.ComponentImpl<I>  _comp = new CollectionOf.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**

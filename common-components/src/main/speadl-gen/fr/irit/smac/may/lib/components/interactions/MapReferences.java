@@ -9,6 +9,17 @@ public abstract class MapReferences<I, K> {
   public interface Requires<I, K> {
   }
   
+  public interface Component<I, K> extends MapReferences.Provides<I, K> {
+  }
+  
+  public interface Provides<I, K> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Call<I, K> call();
+  }
+  
   public interface Parts<I, K> {
   }
   
@@ -20,20 +31,22 @@ public abstract class MapReferences<I, K> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_call() {
       assert this.call == null: "This is a bug.";
       this.call = this.implementation.make_call();
       if (this.call == null) {
-      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences should not return null.");
+      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences<I, K> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_call();
     }
     
     public ComponentImpl(final MapReferences<I, K> implem, final MapReferences.Requires<I, K> b, final boolean doInits) {
@@ -50,7 +63,6 @@ public abstract class MapReferences<I, K> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Call<I, K> call;
@@ -58,17 +70,6 @@ public abstract class MapReferences<I, K> {
     public Call<I, K> call() {
       return this.call;
     }
-  }
-  
-  public interface Provides<I, K> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Call<I, K> call();
-  }
-  
-  public interface Component<I, K> extends MapReferences.Provides<I, K> {
   }
   
   public abstract static class Callee<I, K> {
@@ -80,66 +81,7 @@ public abstract class MapReferences<I, K> {
       public I toCall();
     }
     
-    public interface Parts<I, K> {
-    }
-    
-    public static class ComponentImpl<I, K> implements MapReferences.Callee.Component<I, K>, MapReferences.Callee.Parts<I, K> {
-      private final MapReferences.Callee.Requires<I, K> bridge;
-      
-      private final MapReferences.Callee<I, K> implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.me == null: "This is a bug.";
-        this.me = this.implementation.make_me();
-        if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee should not return null.");
-        }
-        assert this.stop == null: "This is a bug.";
-        this.stop = this.implementation.make_stop();
-        if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final MapReferences.Callee<I, K> implem, final MapReferences.Callee.Requires<I, K> b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private Pull<K> me;
-      
-      public Pull<K> me() {
-        return this.me;
-      }
-      
-      private Do stop;
-      
-      public Do stop() {
-        return this.stop;
-      }
+    public interface Component<I, K> extends MapReferences.Callee.Provides<I, K> {
     }
     
     public interface Provides<I, K> {
@@ -156,7 +98,71 @@ public abstract class MapReferences<I, K> {
       public Do stop();
     }
     
-    public interface Component<I, K> extends MapReferences.Callee.Provides<I, K> {
+    public interface Parts<I, K> {
+    }
+    
+    public static class ComponentImpl<I, K> implements MapReferences.Callee.Component<I, K>, MapReferences.Callee.Parts<I, K> {
+      private final MapReferences.Callee.Requires<I, K> bridge;
+      
+      private final MapReferences.Callee<I, K> implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_me() {
+        assert this.me == null: "This is a bug.";
+        this.me = this.implementation.make_me();
+        if (this.me == null) {
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee<I, K> should not return null.");
+        }
+      }
+      
+      private void init_stop() {
+        assert this.stop == null: "This is a bug.";
+        this.stop = this.implementation.make_stop();
+        if (this.stop == null) {
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee<I, K> should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_me();
+        init_stop();
+      }
+      
+      public ComponentImpl(final MapReferences.Callee<I, K> implem, final MapReferences.Callee.Requires<I, K> b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private Pull<K> me;
+      
+      public Pull<K> me() {
+        return this.me;
+      }
+      
+      private Do stop;
+      
+      public Do stop() {
+        return this.stop;
+      }
     }
     
     /**
@@ -169,6 +175,7 @@ public abstract class MapReferences<I, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -183,7 +190,6 @@ public abstract class MapReferences<I, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -196,7 +202,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -223,7 +228,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -236,7 +240,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -248,12 +251,11 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("This instance of Callee has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapReferences.Callee.ComponentImpl<I, K> comp = new MapReferences.Callee.ComponentImpl<I, K>(this, b, true);
+      MapReferences.Callee.ComponentImpl<I, K>  _comp = new MapReferences.Callee.ComponentImpl<I, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapReferences.ComponentImpl<I, K> ecosystemComponent;
@@ -265,7 +267,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Provides<I, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -275,7 +276,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Requires<I, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -285,7 +285,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Parts<I, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -304,66 +303,7 @@ public abstract class MapReferences<I, K> {
       public Pull<K> key();
     }
     
-    public interface Parts<I, K> {
-    }
-    
-    public static class ComponentImpl<I, K> implements MapReferences.CalleeKeyPort.Component<I, K>, MapReferences.CalleeKeyPort.Parts<I, K> {
-      private final MapReferences.CalleeKeyPort.Requires<I, K> bridge;
-      
-      private final MapReferences.CalleeKeyPort<I, K> implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.me == null: "This is a bug.";
-        this.me = this.implementation.make_me();
-        if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort should not return null.");
-        }
-        assert this.stop == null: "This is a bug.";
-        this.stop = this.implementation.make_stop();
-        if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final MapReferences.CalleeKeyPort<I, K> implem, final MapReferences.CalleeKeyPort.Requires<I, K> b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private Pull<K> me;
-      
-      public Pull<K> me() {
-        return this.me;
-      }
-      
-      private Do stop;
-      
-      public Do stop() {
-        return this.stop;
-      }
+    public interface Component<I, K> extends MapReferences.CalleeKeyPort.Provides<I, K> {
     }
     
     public interface Provides<I, K> {
@@ -380,7 +320,71 @@ public abstract class MapReferences<I, K> {
       public Do stop();
     }
     
-    public interface Component<I, K> extends MapReferences.CalleeKeyPort.Provides<I, K> {
+    public interface Parts<I, K> {
+    }
+    
+    public static class ComponentImpl<I, K> implements MapReferences.CalleeKeyPort.Component<I, K>, MapReferences.CalleeKeyPort.Parts<I, K> {
+      private final MapReferences.CalleeKeyPort.Requires<I, K> bridge;
+      
+      private final MapReferences.CalleeKeyPort<I, K> implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_me() {
+        assert this.me == null: "This is a bug.";
+        this.me = this.implementation.make_me();
+        if (this.me == null) {
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort<I, K> should not return null.");
+        }
+      }
+      
+      private void init_stop() {
+        assert this.stop == null: "This is a bug.";
+        this.stop = this.implementation.make_stop();
+        if (this.stop == null) {
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort<I, K> should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_me();
+        init_stop();
+      }
+      
+      public ComponentImpl(final MapReferences.CalleeKeyPort<I, K> implem, final MapReferences.CalleeKeyPort.Requires<I, K> b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private Pull<K> me;
+      
+      public Pull<K> me() {
+        return this.me;
+      }
+      
+      private Do stop;
+      
+      public Do stop() {
+        return this.stop;
+      }
     }
     
     /**
@@ -393,6 +397,7 @@ public abstract class MapReferences<I, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -407,7 +412,6 @@ public abstract class MapReferences<I, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -420,7 +424,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -447,7 +450,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -460,7 +462,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -472,12 +473,11 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("This instance of CalleeKeyPort has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapReferences.CalleeKeyPort.ComponentImpl<I, K> comp = new MapReferences.CalleeKeyPort.ComponentImpl<I, K>(this, b, true);
+      MapReferences.CalleeKeyPort.ComponentImpl<I, K>  _comp = new MapReferences.CalleeKeyPort.ComponentImpl<I, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapReferences.ComponentImpl<I, K> ecosystemComponent;
@@ -489,7 +489,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Provides<I, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -499,7 +498,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Requires<I, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -509,12 +507,22 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Parts<I, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Caller<I, K> {
     public interface Requires<I, K> {
+    }
+    
+    public interface Component<I, K> extends MapReferences.Caller.Provides<I, K> {
+    }
+    
+    public interface Provides<I, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Call<I, K> call();
     }
     
     public interface Parts<I, K> {
@@ -528,20 +536,22 @@ public abstract class MapReferences<I, K> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_call() {
         assert this.call == null: "This is a bug.";
         this.call = this.implementation.make_call();
         if (this.call == null) {
-        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences$Caller should not return null.");
+        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences$Caller<I, K> should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_call();
       }
       
       public ComponentImpl(final MapReferences.Caller<I, K> implem, final MapReferences.Caller.Requires<I, K> b, final boolean doInits) {
@@ -558,7 +568,6 @@ public abstract class MapReferences<I, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private Call<I, K> call;
@@ -566,17 +575,6 @@ public abstract class MapReferences<I, K> {
       public Call<I, K> call() {
         return this.call;
       }
-    }
-    
-    public interface Provides<I, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Call<I, K> call();
-    }
-    
-    public interface Component<I, K> extends MapReferences.Caller.Provides<I, K> {
     }
     
     /**
@@ -589,6 +587,7 @@ public abstract class MapReferences<I, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -603,7 +602,6 @@ public abstract class MapReferences<I, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -616,7 +614,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -636,7 +633,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -649,7 +645,6 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -661,12 +656,11 @@ public abstract class MapReferences<I, K> {
       	throw new RuntimeException("This instance of Caller has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapReferences.Caller.ComponentImpl<I, K> comp = new MapReferences.Caller.ComponentImpl<I, K>(this, b, true);
+      MapReferences.Caller.ComponentImpl<I, K>  _comp = new MapReferences.Caller.ComponentImpl<I, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapReferences.ComponentImpl<I, K> ecosystemComponent;
@@ -678,7 +672,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Provides<I, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -688,7 +681,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Requires<I, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -698,7 +690,6 @@ public abstract class MapReferences<I, K> {
     protected MapReferences.Parts<I, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -712,6 +703,7 @@ public abstract class MapReferences<I, K> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -726,7 +718,6 @@ public abstract class MapReferences<I, K> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -739,7 +730,6 @@ public abstract class MapReferences<I, K> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -759,7 +749,6 @@ public abstract class MapReferences<I, K> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -772,7 +761,6 @@ public abstract class MapReferences<I, K> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -784,12 +772,11 @@ public abstract class MapReferences<I, K> {
     	throw new RuntimeException("This instance of MapReferences has already been used to create a component, use another one.");
     }
     this.init = true;
-    MapReferences.ComponentImpl<I, K> comp = new MapReferences.ComponentImpl<I, K>(this, b, true);
+    MapReferences.ComponentImpl<I, K>  _comp = new MapReferences.ComponentImpl<I, K>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -860,8 +847,8 @@ public abstract class MapReferences<I, K> {
    * 
    */
   protected MapReferences.Caller.Component<I, K> newCaller() {
-    MapReferences.Caller<I, K> implem = _createImplementationOfCaller();
-    return implem._newComponent(new MapReferences.Caller.Requires<I, K>() {},true);
+    MapReferences.Caller<I, K> _implem = _createImplementationOfCaller();
+    return _implem._newComponent(new MapReferences.Caller.Requires<I, K>() {},true);
   }
   
   /**

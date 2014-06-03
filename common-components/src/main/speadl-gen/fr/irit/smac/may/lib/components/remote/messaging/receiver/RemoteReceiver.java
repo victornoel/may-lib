@@ -22,6 +22,17 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     public Pull<Place> myPlace();
   }
   
+  public interface Component<Msg, LocalRef> extends RemoteReceiver.Provides<Msg, LocalRef> {
+  }
+  
+  public interface Provides<Msg, LocalRef> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Send<Msg, RemoteAgentRef> send();
+  }
+  
   public interface Parts<Msg, LocalRef> {
   }
   
@@ -33,20 +44,22 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_send() {
       assert this.send == null: "This is a bug.";
       this.send = this.implementation.make_send();
       if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver should not return null.");
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver<Msg, LocalRef> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_send();
     }
     
     public ComponentImpl(final RemoteReceiver<Msg, LocalRef> implem, final RemoteReceiver.Requires<Msg, LocalRef> b, final boolean doInits) {
@@ -63,7 +76,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Send<Msg, RemoteAgentRef> send;
@@ -71,17 +83,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     public Send<Msg, RemoteAgentRef> send() {
       return this.send;
     }
-  }
-  
-  public interface Provides<Msg, LocalRef> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Send<Msg, RemoteAgentRef> send();
-  }
-  
-  public interface Component<Msg, LocalRef> extends RemoteReceiver.Provides<Msg, LocalRef> {
   }
   
   public abstract static class Agent<Msg, LocalRef> {
@@ -93,66 +94,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       public Pull<LocalRef> localMe();
     }
     
-    public interface Parts<Msg, LocalRef> {
-    }
-    
-    public static class ComponentImpl<Msg, LocalRef> implements RemoteReceiver.Agent.Component<Msg, LocalRef>, RemoteReceiver.Agent.Parts<Msg, LocalRef> {
-      private final RemoteReceiver.Agent.Requires<Msg, LocalRef> bridge;
-      
-      private final RemoteReceiver.Agent<Msg, LocalRef> implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.me == null: "This is a bug.";
-        this.me = this.implementation.make_me();
-        if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent should not return null.");
-        }
-        assert this.disconnect == null: "This is a bug.";
-        this.disconnect = this.implementation.make_disconnect();
-        if (this.disconnect == null) {
-        	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final RemoteReceiver.Agent<Msg, LocalRef> implem, final RemoteReceiver.Agent.Requires<Msg, LocalRef> b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private Pull<RemoteAgentRef> me;
-      
-      public Pull<RemoteAgentRef> me() {
-        return this.me;
-      }
-      
-      private Do disconnect;
-      
-      public Do disconnect() {
-        return this.disconnect;
-      }
+    public interface Component<Msg, LocalRef> extends RemoteReceiver.Agent.Provides<Msg, LocalRef> {
     }
     
     public interface Provides<Msg, LocalRef> {
@@ -169,7 +111,71 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       public Do disconnect();
     }
     
-    public interface Component<Msg, LocalRef> extends RemoteReceiver.Agent.Provides<Msg, LocalRef> {
+    public interface Parts<Msg, LocalRef> {
+    }
+    
+    public static class ComponentImpl<Msg, LocalRef> implements RemoteReceiver.Agent.Component<Msg, LocalRef>, RemoteReceiver.Agent.Parts<Msg, LocalRef> {
+      private final RemoteReceiver.Agent.Requires<Msg, LocalRef> bridge;
+      
+      private final RemoteReceiver.Agent<Msg, LocalRef> implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_me() {
+        assert this.me == null: "This is a bug.";
+        this.me = this.implementation.make_me();
+        if (this.me == null) {
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent<Msg, LocalRef> should not return null.");
+        }
+      }
+      
+      private void init_disconnect() {
+        assert this.disconnect == null: "This is a bug.";
+        this.disconnect = this.implementation.make_disconnect();
+        if (this.disconnect == null) {
+        	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent<Msg, LocalRef> should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_me();
+        init_disconnect();
+      }
+      
+      public ComponentImpl(final RemoteReceiver.Agent<Msg, LocalRef> implem, final RemoteReceiver.Agent.Requires<Msg, LocalRef> b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private Pull<RemoteAgentRef> me;
+      
+      public Pull<RemoteAgentRef> me() {
+        return this.me;
+      }
+      
+      private Do disconnect;
+      
+      public Do disconnect() {
+        return this.disconnect;
+      }
     }
     
     /**
@@ -182,6 +188,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -196,7 +203,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -209,7 +215,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -236,7 +241,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -249,7 +253,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -261,12 +264,11 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       	throw new RuntimeException("This instance of Agent has already been used to create a component, use another one.");
       }
       this.init = true;
-      RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef> comp = new RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef>(this, b, true);
+      RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef>  _comp = new RemoteReceiver.Agent.ComponentImpl<Msg, LocalRef>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private RemoteReceiver.ComponentImpl<Msg, LocalRef> ecosystemComponent;
@@ -278,7 +280,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     protected RemoteReceiver.Provides<Msg, LocalRef> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -288,7 +289,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     protected RemoteReceiver.Requires<Msg, LocalRef> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -298,7 +298,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     protected RemoteReceiver.Parts<Msg, LocalRef> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -312,6 +311,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -326,7 +326,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -339,7 +338,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -359,7 +357,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -372,7 +369,6 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -384,12 +380,11 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     	throw new RuntimeException("This instance of RemoteReceiver has already been used to create a component, use another one.");
     }
     this.init = true;
-    RemoteReceiver.ComponentImpl<Msg, LocalRef> comp = new RemoteReceiver.ComponentImpl<Msg, LocalRef>(this, b, true);
+    RemoteReceiver.ComponentImpl<Msg, LocalRef>  _comp = new RemoteReceiver.ComponentImpl<Msg, LocalRef>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**

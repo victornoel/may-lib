@@ -19,6 +19,17 @@ public abstract class UnEither<L, R> {
     public Push<R> right();
   }
   
+  public interface Component<L, R> extends UnEither.Provides<L, R> {
+  }
+  
+  public interface Provides<L, R> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<Either<L, R>> in();
+  }
+  
   public interface Parts<L, R> {
   }
   
@@ -30,20 +41,22 @@ public abstract class UnEither<L, R> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_in() {
       assert this.in == null: "This is a bug.";
       this.in = this.implementation.make_in();
       if (this.in == null) {
-      	throw new RuntimeException("make_in() in fr.irit.smac.may.lib.components.either.UnEither should not return null.");
+      	throw new RuntimeException("make_in() in fr.irit.smac.may.lib.components.either.UnEither<L, R> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_in();
     }
     
     public ComponentImpl(final UnEither<L, R> implem, final UnEither.Requires<L, R> b, final boolean doInits) {
@@ -60,7 +73,6 @@ public abstract class UnEither<L, R> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Push<Either<L, R>> in;
@@ -68,17 +80,6 @@ public abstract class UnEither<L, R> {
     public Push<Either<L, R>> in() {
       return this.in;
     }
-  }
-  
-  public interface Provides<L, R> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<Either<L, R>> in();
-  }
-  
-  public interface Component<L, R> extends UnEither.Provides<L, R> {
   }
   
   /**
@@ -91,6 +92,7 @@ public abstract class UnEither<L, R> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -105,7 +107,6 @@ public abstract class UnEither<L, R> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -118,7 +119,6 @@ public abstract class UnEither<L, R> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -138,7 +138,6 @@ public abstract class UnEither<L, R> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -151,7 +150,6 @@ public abstract class UnEither<L, R> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -163,11 +161,10 @@ public abstract class UnEither<L, R> {
     	throw new RuntimeException("This instance of UnEither has already been used to create a component, use another one.");
     }
     this.init = true;
-    UnEither.ComponentImpl<L, R> comp = new UnEither.ComponentImpl<L, R>(this, b, true);
+    UnEither.ComponentImpl<L, R>  _comp = new UnEither.ComponentImpl<L, R>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

@@ -15,6 +15,17 @@ public abstract class ValuePublisher<T, K> {
     public Call<Pull<T>, K> call();
   }
   
+  public interface Component<T, K> extends ValuePublisher.Provides<T, K> {
+  }
+  
+  public interface Provides<T, K> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableObserve<T, K> observe();
+  }
+  
   public interface Parts<T, K> {
   }
   
@@ -26,20 +37,22 @@ public abstract class ValuePublisher<T, K> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_observe() {
       assert this.observe == null: "This is a bug.";
       this.observe = this.implementation.make_observe();
       if (this.observe == null) {
-      	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher should not return null.");
+      	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher<T, K> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_observe();
     }
     
     public ComponentImpl(final ValuePublisher<T, K> implem, final ValuePublisher.Requires<T, K> b, final boolean doInits) {
@@ -56,7 +69,6 @@ public abstract class ValuePublisher<T, K> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private ReliableObserve<T, K> observe;
@@ -66,85 +78,11 @@ public abstract class ValuePublisher<T, K> {
     }
   }
   
-  public interface Provides<T, K> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableObserve<T, K> observe();
-  }
-  
-  public interface Component<T, K> extends ValuePublisher.Provides<T, K> {
-  }
-  
   public abstract static class PublisherPush<T, K> {
     public interface Requires<T, K> {
     }
     
-    public interface Parts<T, K> {
-    }
-    
-    public static class ComponentImpl<T, K> implements ValuePublisher.PublisherPush.Component<T, K>, ValuePublisher.PublisherPush.Parts<T, K> {
-      private final ValuePublisher.PublisherPush.Requires<T, K> bridge;
-      
-      private final ValuePublisher.PublisherPush<T, K> implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.set == null: "This is a bug.";
-        this.set = this.implementation.make_set();
-        if (this.set == null) {
-        	throw new RuntimeException("make_set() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush should not return null.");
-        }
-        assert this.get == null: "This is a bug.";
-        this.get = this.implementation.make_get();
-        if (this.get == null) {
-        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final ValuePublisher.PublisherPush<T, K> implem, final ValuePublisher.PublisherPush.Requires<T, K> b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private Push<T> set;
-      
-      public Push<T> set() {
-        return this.set;
-      }
-      
-      private Pull<T> get;
-      
-      public Pull<T> get() {
-        return this.get;
-      }
-      
-      public Pull<T> toCall() {
-        return this.get();
-      }
+    public interface Component<T, K> extends ValuePublisher.PublisherPush.Provides<T, K> {
     }
     
     public interface Provides<T, K> {
@@ -167,7 +105,75 @@ public abstract class ValuePublisher<T, K> {
       public Pull<T> toCall();
     }
     
-    public interface Component<T, K> extends ValuePublisher.PublisherPush.Provides<T, K> {
+    public interface Parts<T, K> {
+    }
+    
+    public static class ComponentImpl<T, K> implements ValuePublisher.PublisherPush.Component<T, K>, ValuePublisher.PublisherPush.Parts<T, K> {
+      private final ValuePublisher.PublisherPush.Requires<T, K> bridge;
+      
+      private final ValuePublisher.PublisherPush<T, K> implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_set() {
+        assert this.set == null: "This is a bug.";
+        this.set = this.implementation.make_set();
+        if (this.set == null) {
+        	throw new RuntimeException("make_set() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush<T, K> should not return null.");
+        }
+      }
+      
+      private void init_get() {
+        assert this.get == null: "This is a bug.";
+        this.get = this.implementation.make_get();
+        if (this.get == null) {
+        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush<T, K> should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_set();
+        init_get();
+      }
+      
+      public ComponentImpl(final ValuePublisher.PublisherPush<T, K> implem, final ValuePublisher.PublisherPush.Requires<T, K> b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private Push<T> set;
+      
+      public Push<T> set() {
+        return this.set;
+      }
+      
+      private Pull<T> get;
+      
+      public Pull<T> get() {
+        return this.get;
+      }
+      
+      public Pull<T> toCall() {
+        return this.get();
+      }
     }
     
     /**
@@ -180,6 +186,7 @@ public abstract class ValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -194,7 +201,6 @@ public abstract class ValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -207,7 +213,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -234,7 +239,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -247,7 +251,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -259,12 +262,11 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("This instance of PublisherPush has already been used to create a component, use another one.");
       }
       this.init = true;
-      ValuePublisher.PublisherPush.ComponentImpl<T, K> comp = new ValuePublisher.PublisherPush.ComponentImpl<T, K>(this, b, true);
+      ValuePublisher.PublisherPush.ComponentImpl<T, K>  _comp = new ValuePublisher.PublisherPush.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private ValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -276,7 +278,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -286,7 +287,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -296,7 +296,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -309,59 +308,7 @@ public abstract class ValuePublisher<T, K> {
       public Pull<T> getValue();
     }
     
-    public interface Parts<T, K> {
-    }
-    
-    public static class ComponentImpl<T, K> implements ValuePublisher.PublisherPull.Component<T, K>, ValuePublisher.PublisherPull.Parts<T, K> {
-      private final ValuePublisher.PublisherPull.Requires<T, K> bridge;
-      
-      private final ValuePublisher.PublisherPull<T, K> implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.get == null: "This is a bug.";
-        this.get = this.implementation.make_get();
-        if (this.get == null) {
-        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPull should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final ValuePublisher.PublisherPull<T, K> implem, final ValuePublisher.PublisherPull.Requires<T, K> b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private Pull<T> get;
-      
-      public Pull<T> get() {
-        return this.get;
-      }
-      
-      public Pull<T> toCall() {
-        return this.get();
-      }
+    public interface Component<T, K> extends ValuePublisher.PublisherPull.Provides<T, K> {
     }
     
     public interface Provides<T, K> {
@@ -378,7 +325,60 @@ public abstract class ValuePublisher<T, K> {
       public Pull<T> toCall();
     }
     
-    public interface Component<T, K> extends ValuePublisher.PublisherPull.Provides<T, K> {
+    public interface Parts<T, K> {
+    }
+    
+    public static class ComponentImpl<T, K> implements ValuePublisher.PublisherPull.Component<T, K>, ValuePublisher.PublisherPull.Parts<T, K> {
+      private final ValuePublisher.PublisherPull.Requires<T, K> bridge;
+      
+      private final ValuePublisher.PublisherPull<T, K> implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_get() {
+        assert this.get == null: "This is a bug.";
+        this.get = this.implementation.make_get();
+        if (this.get == null) {
+        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPull<T, K> should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_get();
+      }
+      
+      public ComponentImpl(final ValuePublisher.PublisherPull<T, K> implem, final ValuePublisher.PublisherPull.Requires<T, K> b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private Pull<T> get;
+      
+      public Pull<T> get() {
+        return this.get;
+      }
+      
+      public Pull<T> toCall() {
+        return this.get();
+      }
     }
     
     /**
@@ -391,6 +391,7 @@ public abstract class ValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -405,7 +406,6 @@ public abstract class ValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -418,7 +418,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -438,7 +437,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -451,7 +449,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -463,12 +460,11 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("This instance of PublisherPull has already been used to create a component, use another one.");
       }
       this.init = true;
-      ValuePublisher.PublisherPull.ComponentImpl<T, K> comp = new ValuePublisher.PublisherPull.ComponentImpl<T, K>(this, b, true);
+      ValuePublisher.PublisherPull.ComponentImpl<T, K>  _comp = new ValuePublisher.PublisherPull.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private ValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -480,7 +476,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -490,7 +485,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -500,12 +494,22 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Observer<T, K> {
     public interface Requires<T, K> {
+    }
+    
+    public interface Component<T, K> extends ValuePublisher.Observer.Provides<T, K> {
+    }
+    
+    public interface Provides<T, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableObserve<T, K> observe();
     }
     
     public interface Parts<T, K> {
@@ -519,20 +523,22 @@ public abstract class ValuePublisher<T, K> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_observe() {
         assert this.observe == null: "This is a bug.";
         this.observe = this.implementation.make_observe();
         if (this.observe == null) {
-        	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$Observer should not return null.");
+        	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$Observer<T, K> should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_observe();
       }
       
       public ComponentImpl(final ValuePublisher.Observer<T, K> implem, final ValuePublisher.Observer.Requires<T, K> b, final boolean doInits) {
@@ -549,7 +555,6 @@ public abstract class ValuePublisher<T, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private ReliableObserve<T, K> observe;
@@ -557,17 +562,6 @@ public abstract class ValuePublisher<T, K> {
       public ReliableObserve<T, K> observe() {
         return this.observe;
       }
-    }
-    
-    public interface Provides<T, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableObserve<T, K> observe();
-    }
-    
-    public interface Component<T, K> extends ValuePublisher.Observer.Provides<T, K> {
     }
     
     /**
@@ -580,6 +574,7 @@ public abstract class ValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -594,7 +589,6 @@ public abstract class ValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -607,7 +601,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -627,7 +620,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -640,7 +632,6 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -652,12 +643,11 @@ public abstract class ValuePublisher<T, K> {
       	throw new RuntimeException("This instance of Observer has already been used to create a component, use another one.");
       }
       this.init = true;
-      ValuePublisher.Observer.ComponentImpl<T, K> comp = new ValuePublisher.Observer.ComponentImpl<T, K>(this, b, true);
+      ValuePublisher.Observer.ComponentImpl<T, K>  _comp = new ValuePublisher.Observer.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private ValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -669,7 +659,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -679,7 +668,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -689,7 +677,6 @@ public abstract class ValuePublisher<T, K> {
     protected ValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -703,6 +690,7 @@ public abstract class ValuePublisher<T, K> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -717,7 +705,6 @@ public abstract class ValuePublisher<T, K> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -730,7 +717,6 @@ public abstract class ValuePublisher<T, K> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -750,7 +736,6 @@ public abstract class ValuePublisher<T, K> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -763,7 +748,6 @@ public abstract class ValuePublisher<T, K> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -775,12 +759,11 @@ public abstract class ValuePublisher<T, K> {
     	throw new RuntimeException("This instance of ValuePublisher has already been used to create a component, use another one.");
     }
     this.init = true;
-    ValuePublisher.ComponentImpl<T, K> comp = new ValuePublisher.ComponentImpl<T, K>(this, b, true);
+    ValuePublisher.ComponentImpl<T, K>  _comp = new ValuePublisher.ComponentImpl<T, K>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -809,8 +792,8 @@ public abstract class ValuePublisher<T, K> {
    * 
    */
   protected ValuePublisher.PublisherPush.Component<T, K> newPublisherPush() {
-    ValuePublisher.PublisherPush<T, K> implem = _createImplementationOfPublisherPush();
-    return implem._newComponent(new ValuePublisher.PublisherPush.Requires<T, K>() {},true);
+    ValuePublisher.PublisherPush<T, K> _implem = _createImplementationOfPublisherPush();
+    return _implem._newComponent(new ValuePublisher.PublisherPush.Requires<T, K>() {},true);
   }
   
   /**
@@ -860,7 +843,7 @@ public abstract class ValuePublisher<T, K> {
    * 
    */
   protected ValuePublisher.Observer.Component<T, K> newObserver() {
-    ValuePublisher.Observer<T, K> implem = _createImplementationOfObserver();
-    return implem._newComponent(new ValuePublisher.Observer.Requires<T, K>() {},true);
+    ValuePublisher.Observer<T, K> _implem = _createImplementationOfObserver();
+    return _implem._newComponent(new ValuePublisher.Observer.Requires<T, K>() {},true);
   }
 }

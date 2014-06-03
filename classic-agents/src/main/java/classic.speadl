@@ -8,7 +8,6 @@ import fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver
 import fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef
 import fr.irit.smac.may.lib.components.interactions.interfaces.Observe
-import fr.irit.smac.may.lib.components.meta.Forward
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver
 import fr.irit.smac.may.lib.components.remote.place.Place
@@ -93,10 +92,6 @@ namespace fr.irit.smac.may.lib.classic {
 			
 			provides send: Send[Msg, String] = receive.send
 			provides create: CreateNamed[Msg, String]
-						
-			part fact: Forward[CreateNamed[Msg, String]] {
-				bind forwardedPort to create
-			}
 			
 			part receive: MapRefAsyncReceiver[Msg,String]
 			
@@ -107,13 +102,11 @@ namespace fr.irit.smac.may.lib.classic {
 					bind send to ss.send
 					bind executor to s.executor
 					bind die to s.stop
-					bind create to f.forwardedPort
+					bind create to eco create
 					bind me to receive.me
 				}
 
 				use s: executor.Executing
-
-				use f: fact.Caller
 
 				use receive: receive.Receiver(name) {
 					bind put to arch.put
@@ -174,10 +167,6 @@ namespace fr.irit.smac.may.lib.classic {
 			
 			part receive: DirRefAsyncReceiver[Msg]
 
-			part fact: Forward[CreateClassic[Msg, DirRef]] {
-				bind forwardedPort to create
-			}
-
 			part executor: ExecutorServiceWrapper
 
 			species ClassicAgent(beh: ClassicBehaviour[Msg,DirRef], name: String) {
@@ -188,12 +177,10 @@ namespace fr.irit.smac.may.lib.classic {
 					bind me to receive.me
 					bind executor to s.executor
 					bind die to s.stop
-					bind create to f.forwardedPort
+					bind create to eco create
 				}
 
 				use s: executor.Executing
-
-				use f: fact.Caller
 				
 				use receive: receive.Receiver(name) {
 					bind put to arch.put
@@ -273,10 +260,6 @@ namespace fr.irit.smac.may.lib.classic {
 			provides thisPlace: Pull[Place] = placed.thisPlace
 			provides create: CreateRemoteClassic[Msg, RemoteAgentRef]
 			
-			part sender: Forward[Send[Msg, RemoteAgentRef]] {
-				bind forwardedPort to remReceive.send
-			}
-
 			part receive: DirRefAsyncReceiver[Msg]
 
 			part placed: Placed
@@ -294,10 +277,9 @@ namespace fr.irit.smac.may.lib.classic {
 			part executor: ExecutorServiceWrapper
 
 			species ClassicAgent(beh: RemoteClassicBehaviour[Msg, RemoteAgentRef], name: String) {
-			//species ClassicAgent(name: String) {
 				provides ref: Pull[RemoteAgentRef] = rr.me
 				part arch: RemoteClassicAgentComponent[Msg, RemoteAgentRef] {
-					bind send to ss.forwardedPort
+					bind send to eco remReceive.send
 					bind me to rr.me
 					bind stopExec to s.stop
 					bind stopReceive to rr.disconnect
@@ -310,7 +292,6 @@ namespace fr.irit.smac.may.lib.classic {
 				use r: receive.Receiver(name) {
 					bind put to arch.put
 				}
-				use ss: sender.Caller
 				use rr: remReceive.Agent {
 					bind localMe to r.me
 				}

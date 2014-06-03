@@ -7,6 +7,17 @@ public abstract class WebServiceClient<I> {
   public interface Requires<I> {
   }
   
+  public interface Component<I> extends WebServiceClient.Provides<I> {
+  }
+  
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public RemoteCall<I, String> service();
+  }
+  
   public interface Parts<I> {
   }
   
@@ -18,20 +29,22 @@ public abstract class WebServiceClient<I> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_service() {
       assert this.service == null: "This is a bug.";
       this.service = this.implementation.make_service();
       if (this.service == null) {
-      	throw new RuntimeException("make_service() in fr.irit.smac.may.lib.webservices.WebServiceClient should not return null.");
+      	throw new RuntimeException("make_service() in fr.irit.smac.may.lib.webservices.WebServiceClient<I> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_service();
     }
     
     public ComponentImpl(final WebServiceClient<I> implem, final WebServiceClient.Requires<I> b, final boolean doInits) {
@@ -48,7 +61,6 @@ public abstract class WebServiceClient<I> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private RemoteCall<I, String> service;
@@ -56,17 +68,6 @@ public abstract class WebServiceClient<I> {
     public RemoteCall<I, String> service() {
       return this.service;
     }
-  }
-  
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public RemoteCall<I, String> service();
-  }
-  
-  public interface Component<I> extends WebServiceClient.Provides<I> {
   }
   
   /**
@@ -79,6 +80,7 @@ public abstract class WebServiceClient<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -93,7 +95,6 @@ public abstract class WebServiceClient<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -106,7 +107,6 @@ public abstract class WebServiceClient<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -126,7 +126,6 @@ public abstract class WebServiceClient<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -139,7 +138,6 @@ public abstract class WebServiceClient<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -151,12 +149,11 @@ public abstract class WebServiceClient<I> {
     	throw new RuntimeException("This instance of WebServiceClient has already been used to create a component, use another one.");
     }
     this.init = true;
-    WebServiceClient.ComponentImpl<I> comp = new WebServiceClient.ComponentImpl<I>(this, b, true);
+    WebServiceClient.ComponentImpl<I>  _comp = new WebServiceClient.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**

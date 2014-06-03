@@ -1,13 +1,19 @@
 package fr.irit.smac.may.lib.webservices;
 
 @SuppressWarnings("all")
-public abstract class WebServiceEndpoint<I> {
+public class WebServiceEndpoint<I> {
   public interface Requires<I> {
     /**
      * This can be called by the implementation to access this required port.
      * 
      */
     public I service();
+  }
+  
+  public interface Component<I> extends WebServiceEndpoint.Provides<I> {
+  }
+  
+  public interface Provides<I> {
   }
   
   public interface Parts<I> {
@@ -21,7 +27,6 @@ public abstract class WebServiceEndpoint<I> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
@@ -46,14 +51,7 @@ public abstract class WebServiceEndpoint<I> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
-  }
-  
-  public interface Provides<I> {
-  }
-  
-  public interface Component<I> extends WebServiceEndpoint.Provides<I> {
   }
   
   /**
@@ -66,6 +64,7 @@ public abstract class WebServiceEndpoint<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -80,7 +79,6 @@ public abstract class WebServiceEndpoint<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -93,7 +91,6 @@ public abstract class WebServiceEndpoint<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -106,7 +103,6 @@ public abstract class WebServiceEndpoint<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -119,7 +115,6 @@ public abstract class WebServiceEndpoint<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -131,11 +126,10 @@ public abstract class WebServiceEndpoint<I> {
     	throw new RuntimeException("This instance of WebServiceEndpoint has already been used to create a component, use another one.");
     }
     this.init = true;
-    WebServiceEndpoint.ComponentImpl<I> comp = new WebServiceEndpoint.ComponentImpl<I>(this, b, true);
+    WebServiceEndpoint.ComponentImpl<I>  _comp = new WebServiceEndpoint.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

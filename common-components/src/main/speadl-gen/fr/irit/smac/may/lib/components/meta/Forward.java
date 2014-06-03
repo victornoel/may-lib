@@ -10,6 +10,12 @@ public abstract class Forward<I> {
     public I forwardedPort();
   }
   
+  public interface Component<I> extends Forward.Provides<I> {
+  }
+  
+  public interface Provides<I> {
+  }
+  
   public interface Parts<I> {
   }
   
@@ -21,7 +27,6 @@ public abstract class Forward<I> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
@@ -46,18 +51,22 @@ public abstract class Forward<I> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
-  }
-  
-  public interface Provides<I> {
-  }
-  
-  public interface Component<I> extends Forward.Provides<I> {
   }
   
   public abstract static class Caller<I> {
     public interface Requires<I> {
+    }
+    
+    public interface Component<I> extends Forward.Caller.Provides<I> {
+    }
+    
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public I forwardedPort();
     }
     
     public interface Parts<I> {
@@ -71,20 +80,22 @@ public abstract class Forward<I> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_forwardedPort() {
         assert this.forwardedPort == null: "This is a bug.";
         this.forwardedPort = this.implementation.make_forwardedPort();
         if (this.forwardedPort == null) {
-        	throw new RuntimeException("make_forwardedPort() in fr.irit.smac.may.lib.components.meta.Forward$Caller should not return null.");
+        	throw new RuntimeException("make_forwardedPort() in fr.irit.smac.may.lib.components.meta.Forward$Caller<I> should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_forwardedPort();
       }
       
       public ComponentImpl(final Forward.Caller<I> implem, final Forward.Caller.Requires<I> b, final boolean doInits) {
@@ -101,7 +112,6 @@ public abstract class Forward<I> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private I forwardedPort;
@@ -109,17 +119,6 @@ public abstract class Forward<I> {
       public I forwardedPort() {
         return this.forwardedPort;
       }
-    }
-    
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public I forwardedPort();
-    }
-    
-    public interface Component<I> extends Forward.Caller.Provides<I> {
     }
     
     /**
@@ -132,6 +131,7 @@ public abstract class Forward<I> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -146,7 +146,6 @@ public abstract class Forward<I> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -159,7 +158,6 @@ public abstract class Forward<I> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -179,7 +177,6 @@ public abstract class Forward<I> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -192,7 +189,6 @@ public abstract class Forward<I> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -204,12 +200,11 @@ public abstract class Forward<I> {
       	throw new RuntimeException("This instance of Caller has already been used to create a component, use another one.");
       }
       this.init = true;
-      Forward.Caller.ComponentImpl<I> comp = new Forward.Caller.ComponentImpl<I>(this, b, true);
+      Forward.Caller.ComponentImpl<I>  _comp = new Forward.Caller.ComponentImpl<I>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private Forward.ComponentImpl<I> ecosystemComponent;
@@ -221,7 +216,6 @@ public abstract class Forward<I> {
     protected Forward.Provides<I> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -231,7 +225,6 @@ public abstract class Forward<I> {
     protected Forward.Requires<I> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -241,7 +234,6 @@ public abstract class Forward<I> {
     protected Forward.Parts<I> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -255,6 +247,7 @@ public abstract class Forward<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -269,7 +262,6 @@ public abstract class Forward<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -282,7 +274,6 @@ public abstract class Forward<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -295,7 +286,6 @@ public abstract class Forward<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -308,7 +298,6 @@ public abstract class Forward<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -320,12 +309,11 @@ public abstract class Forward<I> {
     	throw new RuntimeException("This instance of Forward has already been used to create a component, use another one.");
     }
     this.init = true;
-    Forward.ComponentImpl<I> comp = new Forward.ComponentImpl<I>(this, b, true);
+    Forward.ComponentImpl<I>  _comp = new Forward.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -354,7 +342,7 @@ public abstract class Forward<I> {
    * 
    */
   protected Forward.Caller.Component<I> newCaller() {
-    Forward.Caller<I> implem = _createImplementationOfCaller();
-    return implem._newComponent(new Forward.Caller.Requires<I>() {},true);
+    Forward.Caller<I> _implem = _createImplementationOfCaller();
+    return _implem._newComponent(new Forward.Caller.Requires<I>() {},true);
   }
 }

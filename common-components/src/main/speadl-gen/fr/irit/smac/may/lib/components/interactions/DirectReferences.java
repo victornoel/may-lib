@@ -10,6 +10,17 @@ public abstract class DirectReferences<I> {
   public interface Requires<I> {
   }
   
+  public interface Component<I> extends DirectReferences.Provides<I> {
+  }
+  
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Call<I, DirRef> call();
+  }
+  
   public interface Parts<I> {
   }
   
@@ -21,20 +32,22 @@ public abstract class DirectReferences<I> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_call() {
       assert this.call == null: "This is a bug.";
       this.call = this.implementation.make_call();
       if (this.call == null) {
-      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences should not return null.");
+      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences<I> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_call();
     }
     
     public ComponentImpl(final DirectReferences<I> implem, final DirectReferences.Requires<I> b, final boolean doInits) {
@@ -51,7 +64,6 @@ public abstract class DirectReferences<I> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Call<I, DirRef> call;
@@ -59,17 +71,6 @@ public abstract class DirectReferences<I> {
     public Call<I, DirRef> call() {
       return this.call;
     }
-  }
-  
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Call<I, DirRef> call();
-  }
-  
-  public interface Component<I> extends DirectReferences.Provides<I> {
   }
   
   public abstract static class Callee<I> {
@@ -81,66 +82,7 @@ public abstract class DirectReferences<I> {
       public I toCall();
     }
     
-    public interface Parts<I> {
-    }
-    
-    public static class ComponentImpl<I> implements DirectReferences.Callee.Component<I>, DirectReferences.Callee.Parts<I> {
-      private final DirectReferences.Callee.Requires<I> bridge;
-      
-      private final DirectReferences.Callee<I> implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.me == null: "This is a bug.";
-        this.me = this.implementation.make_me();
-        if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee should not return null.");
-        }
-        assert this.stop == null: "This is a bug.";
-        this.stop = this.implementation.make_stop();
-        if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final DirectReferences.Callee<I> implem, final DirectReferences.Callee.Requires<I> b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private Pull<DirRef> me;
-      
-      public Pull<DirRef> me() {
-        return this.me;
-      }
-      
-      private Do stop;
-      
-      public Do stop() {
-        return this.stop;
-      }
+    public interface Component<I> extends DirectReferences.Callee.Provides<I> {
     }
     
     public interface Provides<I> {
@@ -157,7 +99,71 @@ public abstract class DirectReferences<I> {
       public Do stop();
     }
     
-    public interface Component<I> extends DirectReferences.Callee.Provides<I> {
+    public interface Parts<I> {
+    }
+    
+    public static class ComponentImpl<I> implements DirectReferences.Callee.Component<I>, DirectReferences.Callee.Parts<I> {
+      private final DirectReferences.Callee.Requires<I> bridge;
+      
+      private final DirectReferences.Callee<I> implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_me() {
+        assert this.me == null: "This is a bug.";
+        this.me = this.implementation.make_me();
+        if (this.me == null) {
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee<I> should not return null.");
+        }
+      }
+      
+      private void init_stop() {
+        assert this.stop == null: "This is a bug.";
+        this.stop = this.implementation.make_stop();
+        if (this.stop == null) {
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee<I> should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_me();
+        init_stop();
+      }
+      
+      public ComponentImpl(final DirectReferences.Callee<I> implem, final DirectReferences.Callee.Requires<I> b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private Pull<DirRef> me;
+      
+      public Pull<DirRef> me() {
+        return this.me;
+      }
+      
+      private Do stop;
+      
+      public Do stop() {
+        return this.stop;
+      }
     }
     
     /**
@@ -170,6 +176,7 @@ public abstract class DirectReferences<I> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -184,7 +191,6 @@ public abstract class DirectReferences<I> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -197,7 +203,6 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -224,7 +229,6 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -237,7 +241,6 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -249,12 +252,11 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("This instance of Callee has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirectReferences.Callee.ComponentImpl<I> comp = new DirectReferences.Callee.ComponentImpl<I>(this, b, true);
+      DirectReferences.Callee.ComponentImpl<I>  _comp = new DirectReferences.Callee.ComponentImpl<I>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirectReferences.ComponentImpl<I> ecosystemComponent;
@@ -266,7 +268,6 @@ public abstract class DirectReferences<I> {
     protected DirectReferences.Provides<I> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -276,7 +277,6 @@ public abstract class DirectReferences<I> {
     protected DirectReferences.Requires<I> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -286,12 +286,22 @@ public abstract class DirectReferences<I> {
     protected DirectReferences.Parts<I> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Caller<I> {
     public interface Requires<I> {
+    }
+    
+    public interface Component<I> extends DirectReferences.Caller.Provides<I> {
+    }
+    
+    public interface Provides<I> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Call<I, DirRef> call();
     }
     
     public interface Parts<I> {
@@ -305,20 +315,22 @@ public abstract class DirectReferences<I> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_call() {
         assert this.call == null: "This is a bug.";
         this.call = this.implementation.make_call();
         if (this.call == null) {
-        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Caller should not return null.");
+        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Caller<I> should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_call();
       }
       
       public ComponentImpl(final DirectReferences.Caller<I> implem, final DirectReferences.Caller.Requires<I> b, final boolean doInits) {
@@ -335,7 +347,6 @@ public abstract class DirectReferences<I> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private Call<I, DirRef> call;
@@ -343,17 +354,6 @@ public abstract class DirectReferences<I> {
       public Call<I, DirRef> call() {
         return this.call;
       }
-    }
-    
-    public interface Provides<I> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Call<I, DirRef> call();
-    }
-    
-    public interface Component<I> extends DirectReferences.Caller.Provides<I> {
     }
     
     /**
@@ -366,6 +366,7 @@ public abstract class DirectReferences<I> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -380,7 +381,6 @@ public abstract class DirectReferences<I> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -393,7 +393,6 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -413,7 +412,6 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -426,7 +424,6 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -438,12 +435,11 @@ public abstract class DirectReferences<I> {
       	throw new RuntimeException("This instance of Caller has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirectReferences.Caller.ComponentImpl<I> comp = new DirectReferences.Caller.ComponentImpl<I>(this, b, true);
+      DirectReferences.Caller.ComponentImpl<I>  _comp = new DirectReferences.Caller.ComponentImpl<I>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirectReferences.ComponentImpl<I> ecosystemComponent;
@@ -455,7 +451,6 @@ public abstract class DirectReferences<I> {
     protected DirectReferences.Provides<I> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -465,7 +460,6 @@ public abstract class DirectReferences<I> {
     protected DirectReferences.Requires<I> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -475,7 +469,6 @@ public abstract class DirectReferences<I> {
     protected DirectReferences.Parts<I> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -489,6 +482,7 @@ public abstract class DirectReferences<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -503,7 +497,6 @@ public abstract class DirectReferences<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -516,7 +509,6 @@ public abstract class DirectReferences<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -536,7 +528,6 @@ public abstract class DirectReferences<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -549,7 +540,6 @@ public abstract class DirectReferences<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -561,12 +551,11 @@ public abstract class DirectReferences<I> {
     	throw new RuntimeException("This instance of DirectReferences has already been used to create a component, use another one.");
     }
     this.init = true;
-    DirectReferences.ComponentImpl<I> comp = new DirectReferences.ComponentImpl<I>(this, b, true);
+    DirectReferences.ComponentImpl<I>  _comp = new DirectReferences.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -616,8 +605,8 @@ public abstract class DirectReferences<I> {
    * 
    */
   protected DirectReferences.Caller.Component<I> newCaller() {
-    DirectReferences.Caller<I> implem = _createImplementationOfCaller();
-    return implem._newComponent(new DirectReferences.Caller.Requires<I>() {},true);
+    DirectReferences.Caller<I> _implem = _createImplementationOfCaller();
+    return _implem._newComponent(new DirectReferences.Caller.Requires<I>() {},true);
   }
   
   /**

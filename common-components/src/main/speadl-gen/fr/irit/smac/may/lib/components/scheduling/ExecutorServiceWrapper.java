@@ -8,66 +8,7 @@ public abstract class ExecutorServiceWrapper {
   public interface Requires {
   }
   
-  public interface Parts {
-  }
-  
-  public static class ComponentImpl implements ExecutorServiceWrapper.Component, ExecutorServiceWrapper.Parts {
-    private final ExecutorServiceWrapper.Requires bridge;
-    
-    private final ExecutorServiceWrapper implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.executor == null: "This is a bug.";
-      this.executor = this.implementation.make_executor();
-      if (this.executor == null) {
-      	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper should not return null.");
-      }
-      assert this.stop == null: "This is a bug.";
-      this.stop = this.implementation.make_stop();
-      if (this.stop == null) {
-      	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final ExecutorServiceWrapper implem, final ExecutorServiceWrapper.Requires b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private AdvancedExecutor executor;
-    
-    public AdvancedExecutor executor() {
-      return this.executor;
-    }
-    
-    private Do stop;
-    
-    public Do stop() {
-      return this.stop;
-    }
+  public interface Component extends ExecutorServiceWrapper.Provides {
   }
   
   public interface Provides {
@@ -84,73 +25,78 @@ public abstract class ExecutorServiceWrapper {
     public Do stop();
   }
   
-  public interface Component extends ExecutorServiceWrapper.Provides {
+  public interface Parts {
+  }
+  
+  public static class ComponentImpl implements ExecutorServiceWrapper.Component, ExecutorServiceWrapper.Parts {
+    private final ExecutorServiceWrapper.Requires bridge;
+    
+    private final ExecutorServiceWrapper implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_executor() {
+      assert this.executor == null: "This is a bug.";
+      this.executor = this.implementation.make_executor();
+      if (this.executor == null) {
+      	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper should not return null.");
+      }
+    }
+    
+    private void init_stop() {
+      assert this.stop == null: "This is a bug.";
+      this.stop = this.implementation.make_stop();
+      if (this.stop == null) {
+      	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_executor();
+      init_stop();
+    }
+    
+    public ComponentImpl(final ExecutorServiceWrapper implem, final ExecutorServiceWrapper.Requires b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private AdvancedExecutor executor;
+    
+    public AdvancedExecutor executor() {
+      return this.executor;
+    }
+    
+    private Do stop;
+    
+    public Do stop() {
+      return this.stop;
+    }
   }
   
   public abstract static class Executing {
     public interface Requires {
     }
     
-    public interface Parts {
-    }
-    
-    public static class ComponentImpl implements ExecutorServiceWrapper.Executing.Component, ExecutorServiceWrapper.Executing.Parts {
-      private final ExecutorServiceWrapper.Executing.Requires bridge;
-      
-      private final ExecutorServiceWrapper.Executing implementation;
-      
-      public void start() {
-        this.implementation.start();
-        this.implementation.started = true;
-        
-      }
-      
-      protected void initParts() {
-        
-      }
-      
-      protected void initProvidedPorts() {
-        assert this.executor == null: "This is a bug.";
-        this.executor = this.implementation.make_executor();
-        if (this.executor == null) {
-        	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing should not return null.");
-        }
-        assert this.stop == null: "This is a bug.";
-        this.stop = this.implementation.make_stop();
-        if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing should not return null.");
-        }
-        
-      }
-      
-      public ComponentImpl(final ExecutorServiceWrapper.Executing implem, final ExecutorServiceWrapper.Executing.Requires b, final boolean doInits) {
-        this.bridge = b;
-        this.implementation = implem;
-        
-        assert implem.selfComponent == null: "This is a bug.";
-        implem.selfComponent = this;
-        
-        // prevent them to be called twice if we are in
-        // a specialized component: only the last of the
-        // hierarchy will call them after everything is initialised
-        if (doInits) {
-        	initParts();
-        	initProvidedPorts();
-        }
-        
-      }
-      
-      private AdvancedExecutor executor;
-      
-      public AdvancedExecutor executor() {
-        return this.executor;
-      }
-      
-      private Do stop;
-      
-      public Do stop() {
-        return this.stop;
-      }
+    public interface Component extends ExecutorServiceWrapper.Executing.Provides {
     }
     
     public interface Provides {
@@ -167,7 +113,71 @@ public abstract class ExecutorServiceWrapper {
       public Do stop();
     }
     
-    public interface Component extends ExecutorServiceWrapper.Executing.Provides {
+    public interface Parts {
+    }
+    
+    public static class ComponentImpl implements ExecutorServiceWrapper.Executing.Component, ExecutorServiceWrapper.Executing.Parts {
+      private final ExecutorServiceWrapper.Executing.Requires bridge;
+      
+      private final ExecutorServiceWrapper.Executing implementation;
+      
+      public void start() {
+        this.implementation.start();
+        this.implementation.started = true;
+      }
+      
+      protected void initParts() {
+        
+      }
+      
+      private void init_executor() {
+        assert this.executor == null: "This is a bug.";
+        this.executor = this.implementation.make_executor();
+        if (this.executor == null) {
+        	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing should not return null.");
+        }
+      }
+      
+      private void init_stop() {
+        assert this.stop == null: "This is a bug.";
+        this.stop = this.implementation.make_stop();
+        if (this.stop == null) {
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing should not return null.");
+        }
+      }
+      
+      protected void initProvidedPorts() {
+        init_executor();
+        init_stop();
+      }
+      
+      public ComponentImpl(final ExecutorServiceWrapper.Executing implem, final ExecutorServiceWrapper.Executing.Requires b, final boolean doInits) {
+        this.bridge = b;
+        this.implementation = implem;
+        
+        assert implem.selfComponent == null: "This is a bug.";
+        implem.selfComponent = this;
+        
+        // prevent them to be called twice if we are in
+        // a specialized component: only the last of the
+        // hierarchy will call them after everything is initialised
+        if (doInits) {
+        	initParts();
+        	initProvidedPorts();
+        }
+      }
+      
+      private AdvancedExecutor executor;
+      
+      public AdvancedExecutor executor() {
+        return this.executor;
+      }
+      
+      private Do stop;
+      
+      public Do stop() {
+        return this.stop;
+      }
     }
     
     /**
@@ -180,6 +190,7 @@ public abstract class ExecutorServiceWrapper {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -194,7 +205,6 @@ public abstract class ExecutorServiceWrapper {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -207,7 +217,6 @@ public abstract class ExecutorServiceWrapper {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -234,7 +243,6 @@ public abstract class ExecutorServiceWrapper {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -247,7 +255,6 @@ public abstract class ExecutorServiceWrapper {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -259,12 +266,11 @@ public abstract class ExecutorServiceWrapper {
       	throw new RuntimeException("This instance of Executing has already been used to create a component, use another one.");
       }
       this.init = true;
-      ExecutorServiceWrapper.Executing.ComponentImpl comp = new ExecutorServiceWrapper.Executing.ComponentImpl(this, b, true);
+      ExecutorServiceWrapper.Executing.ComponentImpl  _comp = new ExecutorServiceWrapper.Executing.ComponentImpl(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private ExecutorServiceWrapper.ComponentImpl ecosystemComponent;
@@ -276,7 +282,6 @@ public abstract class ExecutorServiceWrapper {
     protected ExecutorServiceWrapper.Provides eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -286,7 +291,6 @@ public abstract class ExecutorServiceWrapper {
     protected ExecutorServiceWrapper.Requires eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -296,7 +300,6 @@ public abstract class ExecutorServiceWrapper {
     protected ExecutorServiceWrapper.Parts eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -310,6 +313,7 @@ public abstract class ExecutorServiceWrapper {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -324,7 +328,6 @@ public abstract class ExecutorServiceWrapper {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -337,7 +340,6 @@ public abstract class ExecutorServiceWrapper {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -364,7 +366,6 @@ public abstract class ExecutorServiceWrapper {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -377,7 +378,6 @@ public abstract class ExecutorServiceWrapper {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -389,12 +389,11 @@ public abstract class ExecutorServiceWrapper {
     	throw new RuntimeException("This instance of ExecutorServiceWrapper has already been used to create a component, use another one.");
     }
     this.init = true;
-    ExecutorServiceWrapper.ComponentImpl comp = new ExecutorServiceWrapper.ComponentImpl(this, b, true);
+    ExecutorServiceWrapper.ComponentImpl  _comp = new ExecutorServiceWrapper.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -423,8 +422,8 @@ public abstract class ExecutorServiceWrapper {
    * 
    */
   protected ExecutorServiceWrapper.Executing.Component newExecuting() {
-    ExecutorServiceWrapper.Executing implem = _createImplementationOfExecuting();
-    return implem._newComponent(new ExecutorServiceWrapper.Executing.Requires() {},true);
+    ExecutorServiceWrapper.Executing _implem = _createImplementationOfExecuting();
+    return _implem._newComponent(new ExecutorServiceWrapper.Executing.Requires() {},true);
   }
   
   /**

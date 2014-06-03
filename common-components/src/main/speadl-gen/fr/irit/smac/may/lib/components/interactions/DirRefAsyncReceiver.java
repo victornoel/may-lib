@@ -14,6 +14,17 @@ public abstract class DirRefAsyncReceiver<M> {
   public interface Requires<M> {
   }
   
+  public interface Component<M> extends DirRefAsyncReceiver.Provides<M> {
+  }
+  
+  public interface Provides<M> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableSend<M, DirRef> send();
+  }
+  
   public interface Parts<M> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -42,25 +53,33 @@ public abstract class DirRefAsyncReceiver<M> {
       ((AsyncReceiver.ComponentImpl<M, DirRef>) this.ar).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_dr() {
       assert this.dr == null: "This is a bug.";
       assert this.implem_dr == null: "This is a bug.";
       this.implem_dr = this.implementation.make_dr();
       if (this.implem_dr == null) {
-      	throw new RuntimeException("make_dr() in fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver should not return null.");
+      	throw new RuntimeException("make_dr() in fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver<M> should not return null.");
       }
       this.dr = this.implem_dr._newComponent(new BridgeImpl_dr(), false);
+      
+    }
+    
+    private void init_ar() {
       assert this.ar == null: "This is a bug.";
       assert this.implem_ar == null: "This is a bug.";
       this.implem_ar = this.implementation.make_ar();
       if (this.implem_ar == null) {
-      	throw new RuntimeException("make_ar() in fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver should not return null.");
+      	throw new RuntimeException("make_ar() in fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver<M> should not return null.");
       }
       this.ar = this.implem_ar._newComponent(new BridgeImpl_ar(), false);
       
+    }
+    
+    protected void initParts() {
+      init_dr();
+      init_ar();
     }
     
     protected void initProvidedPorts() {
@@ -81,11 +100,10 @@ public abstract class DirRefAsyncReceiver<M> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public ReliableSend<M, DirRef> send() {
-      return this.ar.send();
+      return this.ar().send();
     }
     
     private DirectReferences.Component<Push<M>> dr;
@@ -105,24 +123,13 @@ public abstract class DirRefAsyncReceiver<M> {
     
     private final class BridgeImpl_ar implements AsyncReceiver.Requires<M, DirRef> {
       public final Call<Push<M>, DirRef> call() {
-        return DirRefAsyncReceiver.ComponentImpl.this.dr.call();
+        return DirRefAsyncReceiver.ComponentImpl.this.dr().call();
       }
     }
     
     public final AsyncReceiver.Component<M, DirRef> ar() {
       return this.ar;
     }
-  }
-  
-  public interface Provides<M> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableSend<M, DirRef> send();
-  }
-  
-  public interface Component<M> extends DirRefAsyncReceiver.Provides<M> {
   }
   
   public abstract static class Receiver<M> {
@@ -132,6 +139,23 @@ public abstract class DirRefAsyncReceiver<M> {
        * 
        */
       public Push<M> put();
+    }
+    
+    public interface Component<M> extends DirRefAsyncReceiver.Receiver.Provides<M> {
+    }
+    
+    public interface Provides<M> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<DirRef> me();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<M> {
@@ -162,17 +186,25 @@ public abstract class DirRefAsyncReceiver<M> {
         ((AsyncReceiver.Receiver.ComponentImpl<M, DirRef>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_dr() {
         assert this.dr == null: "This is a bug.";
         assert this.implementation.use_dr != null: "This is a bug.";
         this.dr = this.implementation.use_dr._newComponent(new BridgeImpl_dr_dr(), false);
+        
+      }
+      
+      private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
         
+      }
+      
+      protected void initParts() {
+        init_dr();
+        init_ar();
       }
       
       protected void initProvidedPorts() {
@@ -193,22 +225,21 @@ public abstract class DirRefAsyncReceiver<M> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<DirRef> me() {
-        return this.dr.me();
+        return this.dr().me();
       }
       
       public Do stop() {
-        return this.dr.stop();
+        return this.dr().stop();
       }
       
       private DirectReferences.Callee.Component<Push<M>> dr;
       
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Push<M>> {
         public final Push<M> toCall() {
-          return DirRefAsyncReceiver.Receiver.ComponentImpl.this.ar.toCall();
+          return DirRefAsyncReceiver.Receiver.ComponentImpl.this.ar().toCall();
         }
       }
       
@@ -229,23 +260,6 @@ public abstract class DirRefAsyncReceiver<M> {
       }
     }
     
-    public interface Provides<M> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<DirRef> me();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<M> extends DirRefAsyncReceiver.Receiver.Provides<M> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -256,6 +270,7 @@ public abstract class DirRefAsyncReceiver<M> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -270,7 +285,6 @@ public abstract class DirRefAsyncReceiver<M> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -283,7 +297,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -296,7 +309,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -309,7 +321,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private DirectReferences.Callee<Push<M>> use_dr;
@@ -325,12 +336,11 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("This instance of Receiver has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirRefAsyncReceiver.Receiver.ComponentImpl<M> comp = new DirRefAsyncReceiver.Receiver.ComponentImpl<M>(this, b, true);
+      DirRefAsyncReceiver.Receiver.ComponentImpl<M>  _comp = new DirRefAsyncReceiver.Receiver.ComponentImpl<M>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirRefAsyncReceiver.ComponentImpl<M> ecosystemComponent;
@@ -342,7 +352,6 @@ public abstract class DirRefAsyncReceiver<M> {
     protected DirRefAsyncReceiver.Provides<M> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -352,7 +361,6 @@ public abstract class DirRefAsyncReceiver<M> {
     protected DirRefAsyncReceiver.Requires<M> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -362,12 +370,22 @@ public abstract class DirRefAsyncReceiver<M> {
     protected DirRefAsyncReceiver.Parts<M> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Sender<M> {
     public interface Requires<M> {
+    }
+    
+    public interface Component<M> extends DirRefAsyncReceiver.Sender.Provides<M> {
+    }
+    
+    public interface Provides<M> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableSend<M, DirRef> send();
     }
     
     public interface Parts<M> {
@@ -389,14 +407,17 @@ public abstract class DirRefAsyncReceiver<M> {
         ((AsyncReceiver.Sender.ComponentImpl<M, DirRef>) this.ar).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
         
+      }
+      
+      protected void initParts() {
+        init_ar();
       }
       
       protected void initProvidedPorts() {
@@ -417,11 +438,10 @@ public abstract class DirRefAsyncReceiver<M> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public ReliableSend<M, DirRef> send() {
-        return this.ar.send();
+        return this.ar().send();
       }
       
       private AsyncReceiver.Sender.Component<M, DirRef> ar;
@@ -434,17 +454,6 @@ public abstract class DirRefAsyncReceiver<M> {
       }
     }
     
-    public interface Provides<M> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableSend<M, DirRef> send();
-    }
-    
-    public interface Component<M> extends DirRefAsyncReceiver.Sender.Provides<M> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -455,6 +464,7 @@ public abstract class DirRefAsyncReceiver<M> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -469,7 +479,6 @@ public abstract class DirRefAsyncReceiver<M> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -482,7 +491,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -495,7 +503,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -508,7 +515,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private AsyncReceiver.Sender<M, DirRef> use_ar;
@@ -522,12 +528,11 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("This instance of Sender has already been used to create a component, use another one.");
       }
       this.init = true;
-      DirRefAsyncReceiver.Sender.ComponentImpl<M> comp = new DirRefAsyncReceiver.Sender.ComponentImpl<M>(this, b, true);
+      DirRefAsyncReceiver.Sender.ComponentImpl<M>  _comp = new DirRefAsyncReceiver.Sender.ComponentImpl<M>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private DirRefAsyncReceiver.ComponentImpl<M> ecosystemComponent;
@@ -539,7 +544,6 @@ public abstract class DirRefAsyncReceiver<M> {
     protected DirRefAsyncReceiver.Provides<M> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -549,7 +553,6 @@ public abstract class DirRefAsyncReceiver<M> {
     protected DirRefAsyncReceiver.Requires<M> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -559,7 +562,6 @@ public abstract class DirRefAsyncReceiver<M> {
     protected DirRefAsyncReceiver.Parts<M> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -573,6 +575,7 @@ public abstract class DirRefAsyncReceiver<M> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -587,7 +590,6 @@ public abstract class DirRefAsyncReceiver<M> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -600,7 +602,6 @@ public abstract class DirRefAsyncReceiver<M> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -613,7 +614,6 @@ public abstract class DirRefAsyncReceiver<M> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -626,7 +626,6 @@ public abstract class DirRefAsyncReceiver<M> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -652,12 +651,11 @@ public abstract class DirRefAsyncReceiver<M> {
     	throw new RuntimeException("This instance of DirRefAsyncReceiver has already been used to create a component, use another one.");
     }
     this.init = true;
-    DirRefAsyncReceiver.ComponentImpl<M> comp = new DirRefAsyncReceiver.ComponentImpl<M>(this, b, true);
+    DirRefAsyncReceiver.ComponentImpl<M>  _comp = new DirRefAsyncReceiver.ComponentImpl<M>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -716,8 +714,8 @@ public abstract class DirRefAsyncReceiver<M> {
    * 
    */
   protected DirRefAsyncReceiver.Sender.Component<M> newSender() {
-    DirRefAsyncReceiver.Sender<M> implem = _createImplementationOfSender();
-    return implem._newComponent(new DirRefAsyncReceiver.Sender.Requires<M>() {},true);
+    DirRefAsyncReceiver.Sender<M> _implem = _createImplementationOfSender();
+    return _implem._newComponent(new DirRefAsyncReceiver.Sender.Requires<M>() {},true);
   }
   
   /**

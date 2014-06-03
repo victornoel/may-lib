@@ -13,6 +13,17 @@ public abstract class MapRefValuePublisher<T, K> {
   public interface Requires<T, K> {
   }
   
+  public interface Component<T, K> extends MapRefValuePublisher.Provides<T, K> {
+  }
+  
+  public interface Provides<T, K> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableObserve<T, K> observe();
+  }
+  
   public interface Parts<T, K> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -41,25 +52,33 @@ public abstract class MapRefValuePublisher<T, K> {
       ((ValuePublisher.ComponentImpl<T, K>) this.vp).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_mr() {
       assert this.mr == null: "This is a bug.";
       assert this.implem_mr == null: "This is a bug.";
       this.implem_mr = this.implementation.make_mr();
       if (this.implem_mr == null) {
-      	throw new RuntimeException("make_mr() in fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher should not return null.");
+      	throw new RuntimeException("make_mr() in fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher<T, K> should not return null.");
       }
       this.mr = this.implem_mr._newComponent(new BridgeImpl_mr(), false);
+      
+    }
+    
+    private void init_vp() {
       assert this.vp == null: "This is a bug.";
       assert this.implem_vp == null: "This is a bug.";
       this.implem_vp = this.implementation.make_vp();
       if (this.implem_vp == null) {
-      	throw new RuntimeException("make_vp() in fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher should not return null.");
+      	throw new RuntimeException("make_vp() in fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher<T, K> should not return null.");
       }
       this.vp = this.implem_vp._newComponent(new BridgeImpl_vp(), false);
       
+    }
+    
+    protected void initParts() {
+      init_mr();
+      init_vp();
     }
     
     protected void initProvidedPorts() {
@@ -80,11 +99,10 @@ public abstract class MapRefValuePublisher<T, K> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public ReliableObserve<T, K> observe() {
-      return this.vp.observe();
+      return this.vp().observe();
     }
     
     private MapReferences.Component<Pull<T>, K> mr;
@@ -104,7 +122,7 @@ public abstract class MapRefValuePublisher<T, K> {
     
     private final class BridgeImpl_vp implements ValuePublisher.Requires<T, K> {
       public final Call<Pull<T>, K> call() {
-        return MapRefValuePublisher.ComponentImpl.this.mr.call();
+        return MapRefValuePublisher.ComponentImpl.this.mr().call();
       }
     }
     
@@ -113,19 +131,31 @@ public abstract class MapRefValuePublisher<T, K> {
     }
   }
   
-  public interface Provides<T, K> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableObserve<T, K> observe();
-  }
-  
-  public interface Component<T, K> extends MapRefValuePublisher.Provides<T, K> {
-  }
-  
   public abstract static class PublisherPush<T, K> {
     public interface Requires<T, K> {
+    }
+    
+    public interface Component<T, K> extends MapRefValuePublisher.PublisherPush.Provides<T, K> {
+    }
+    
+    public interface Provides<T, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Push<T> set();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<T, K> {
@@ -156,17 +186,25 @@ public abstract class MapRefValuePublisher<T, K> {
         ((ValuePublisher.PublisherPush.ComponentImpl<T, K>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_mr() {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
+        
+      }
+      
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_mr();
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -187,26 +225,25 @@ public abstract class MapRefValuePublisher<T, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Push<T> set() {
-        return this.vp.set();
+        return this.vp().set();
       }
       
       public Pull<T> get() {
-        return this.vp.get();
+        return this.vp().get();
       }
       
       public Do stop() {
-        return this.mr.stop();
+        return this.mr().stop();
       }
       
       private MapReferences.Callee.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.Callee.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPush.ComponentImpl.this.vp.toCall();
+          return MapRefValuePublisher.PublisherPush.ComponentImpl.this.vp().toCall();
         }
       }
       
@@ -224,29 +261,6 @@ public abstract class MapRefValuePublisher<T, K> {
       }
     }
     
-    public interface Provides<T, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Push<T> set();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<T, K> extends MapRefValuePublisher.PublisherPush.Provides<T, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -257,6 +271,7 @@ public abstract class MapRefValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -271,7 +286,6 @@ public abstract class MapRefValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -284,7 +298,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -297,7 +310,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -310,7 +322,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private MapReferences.Callee<Pull<T>, K> use_mr;
@@ -326,12 +337,11 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("This instance of PublisherPush has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefValuePublisher.PublisherPush.ComponentImpl<T, K> comp = new MapRefValuePublisher.PublisherPush.ComponentImpl<T, K>(this, b, true);
+      MapRefValuePublisher.PublisherPush.ComponentImpl<T, K>  _comp = new MapRefValuePublisher.PublisherPush.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -343,7 +353,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -353,7 +362,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -363,7 +371,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -374,6 +381,23 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<T> getValue();
+    }
+    
+    public interface Component<T, K> extends MapRefValuePublisher.PublisherPull.Provides<T, K> {
+    }
+    
+    public interface Provides<T, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<T, K> {
@@ -404,17 +428,25 @@ public abstract class MapRefValuePublisher<T, K> {
         ((ValuePublisher.PublisherPull.ComponentImpl<T, K>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_mr() {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
+        
+      }
+      
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_mr();
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -435,22 +467,21 @@ public abstract class MapRefValuePublisher<T, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<T> get() {
-        return this.vp.get();
+        return this.vp().get();
       }
       
       public Do stop() {
-        return this.mr.stop();
+        return this.mr().stop();
       }
       
       private MapReferences.Callee.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.Callee.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPull.ComponentImpl.this.vp.toCall();
+          return MapRefValuePublisher.PublisherPull.ComponentImpl.this.vp().toCall();
         }
       }
       
@@ -471,23 +502,6 @@ public abstract class MapRefValuePublisher<T, K> {
       }
     }
     
-    public interface Provides<T, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<T, K> extends MapRefValuePublisher.PublisherPull.Provides<T, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -498,6 +512,7 @@ public abstract class MapRefValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -512,7 +527,6 @@ public abstract class MapRefValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -525,7 +539,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -538,7 +551,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -551,7 +563,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private MapReferences.Callee<Pull<T>, K> use_mr;
@@ -567,12 +578,11 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("This instance of PublisherPull has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefValuePublisher.PublisherPull.ComponentImpl<T, K> comp = new MapRefValuePublisher.PublisherPull.ComponentImpl<T, K>(this, b, true);
+      MapRefValuePublisher.PublisherPull.ComponentImpl<T, K>  _comp = new MapRefValuePublisher.PublisherPull.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -584,7 +594,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -594,7 +603,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -604,7 +612,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -615,6 +622,29 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<K> key();
+    }
+    
+    public interface Component<T, K> extends MapRefValuePublisher.PublisherPushKeyPort.Provides<T, K> {
+    }
+    
+    public interface Provides<T, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Push<T> set();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<T, K> {
@@ -645,17 +675,25 @@ public abstract class MapRefValuePublisher<T, K> {
         ((ValuePublisher.PublisherPush.ComponentImpl<T, K>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_mr() {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
+        
+      }
+      
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_mr();
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -676,26 +714,25 @@ public abstract class MapRefValuePublisher<T, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Push<T> set() {
-        return this.vp.set();
+        return this.vp().set();
       }
       
       public Pull<T> get() {
-        return this.vp.get();
+        return this.vp().get();
       }
       
       public Do stop() {
-        return this.mr.stop();
+        return this.mr().stop();
       }
       
       private MapReferences.CalleeKeyPort.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.CalleeKeyPort.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl.this.vp.toCall();
+          return MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl.this.vp().toCall();
         }
         
         public final Pull<K> key() {
@@ -717,29 +754,6 @@ public abstract class MapRefValuePublisher<T, K> {
       }
     }
     
-    public interface Provides<T, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Push<T> set();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<T, K> extends MapRefValuePublisher.PublisherPushKeyPort.Provides<T, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -750,6 +764,7 @@ public abstract class MapRefValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -764,7 +779,6 @@ public abstract class MapRefValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -777,7 +791,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -790,7 +803,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -803,7 +815,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private MapReferences.CalleeKeyPort<Pull<T>, K> use_mr;
@@ -819,12 +830,11 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("This instance of PublisherPushKeyPort has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl<T, K> comp = new MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl<T, K>(this, b, true);
+      MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl<T, K>  _comp = new MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -836,7 +846,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -846,7 +855,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -856,7 +864,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -873,6 +880,23 @@ public abstract class MapRefValuePublisher<T, K> {
        * 
        */
       public Pull<K> key();
+    }
+    
+    public interface Component<T, K> extends MapRefValuePublisher.PublisherPullKeyPort.Provides<T, K> {
+    }
+    
+    public interface Provides<T, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<T> get();
+      
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Do stop();
     }
     
     public interface Parts<T, K> {
@@ -903,17 +927,25 @@ public abstract class MapRefValuePublisher<T, K> {
         ((ValuePublisher.PublisherPull.ComponentImpl<T, K>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_mr() {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
+        
+      }
+      
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_mr();
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -934,22 +966,21 @@ public abstract class MapRefValuePublisher<T, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<T> get() {
-        return this.vp.get();
+        return this.vp().get();
       }
       
       public Do stop() {
-        return this.mr.stop();
+        return this.mr().stop();
       }
       
       private MapReferences.CalleeKeyPort.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.CalleeKeyPort.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.vp.toCall();
+          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.vp().toCall();
         }
         
         public final Pull<K> key() {
@@ -974,23 +1005,6 @@ public abstract class MapRefValuePublisher<T, K> {
       }
     }
     
-    public interface Provides<T, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<T> get();
-      
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Do stop();
-    }
-    
-    public interface Component<T, K> extends MapRefValuePublisher.PublisherPullKeyPort.Provides<T, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -1001,6 +1015,7 @@ public abstract class MapRefValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -1015,7 +1030,6 @@ public abstract class MapRefValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -1028,7 +1042,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -1041,7 +1054,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -1054,7 +1066,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private MapReferences.CalleeKeyPort<Pull<T>, K> use_mr;
@@ -1070,12 +1081,11 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("This instance of PublisherPullKeyPort has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl<T, K> comp = new MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl<T, K>(this, b, true);
+      MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl<T, K>  _comp = new MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -1087,7 +1097,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -1097,7 +1106,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -1107,12 +1115,22 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Observer<T, K> {
     public interface Requires<T, K> {
+    }
+    
+    public interface Component<T, K> extends MapRefValuePublisher.Observer.Provides<T, K> {
+    }
+    
+    public interface Provides<T, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableObserve<T, K> observe();
     }
     
     public interface Parts<T, K> {
@@ -1134,14 +1152,17 @@ public abstract class MapRefValuePublisher<T, K> {
         ((ValuePublisher.Observer.ComponentImpl<T, K>) this.vp).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
         
+      }
+      
+      protected void initParts() {
+        init_vp();
       }
       
       protected void initProvidedPorts() {
@@ -1162,11 +1183,10 @@ public abstract class MapRefValuePublisher<T, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public ReliableObserve<T, K> observe() {
-        return this.vp.observe();
+        return this.vp().observe();
       }
       
       private ValuePublisher.Observer.Component<T, K> vp;
@@ -1179,17 +1199,6 @@ public abstract class MapRefValuePublisher<T, K> {
       }
     }
     
-    public interface Provides<T, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableObserve<T, K> observe();
-    }
-    
-    public interface Component<T, K> extends MapRefValuePublisher.Observer.Provides<T, K> {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -1200,6 +1209,7 @@ public abstract class MapRefValuePublisher<T, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -1214,7 +1224,6 @@ public abstract class MapRefValuePublisher<T, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -1227,7 +1236,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -1240,7 +1248,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -1253,7 +1260,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private ValuePublisher.Observer<T, K> use_vp;
@@ -1267,12 +1273,11 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("This instance of Observer has already been used to create a component, use another one.");
       }
       this.init = true;
-      MapRefValuePublisher.Observer.ComponentImpl<T, K> comp = new MapRefValuePublisher.Observer.ComponentImpl<T, K>(this, b, true);
+      MapRefValuePublisher.Observer.ComponentImpl<T, K>  _comp = new MapRefValuePublisher.Observer.ComponentImpl<T, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private MapRefValuePublisher.ComponentImpl<T, K> ecosystemComponent;
@@ -1284,7 +1289,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Provides<T, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -1294,7 +1298,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Requires<T, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -1304,7 +1307,6 @@ public abstract class MapRefValuePublisher<T, K> {
     protected MapRefValuePublisher.Parts<T, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -1318,6 +1320,7 @@ public abstract class MapRefValuePublisher<T, K> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -1332,7 +1335,6 @@ public abstract class MapRefValuePublisher<T, K> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -1345,7 +1347,6 @@ public abstract class MapRefValuePublisher<T, K> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -1358,7 +1359,6 @@ public abstract class MapRefValuePublisher<T, K> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -1371,7 +1371,6 @@ public abstract class MapRefValuePublisher<T, K> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -1397,12 +1396,11 @@ public abstract class MapRefValuePublisher<T, K> {
     	throw new RuntimeException("This instance of MapRefValuePublisher has already been used to create a component, use another one.");
     }
     this.init = true;
-    MapRefValuePublisher.ComponentImpl<T, K> comp = new MapRefValuePublisher.ComponentImpl<T, K>(this, b, true);
+    MapRefValuePublisher.ComponentImpl<T, K>  _comp = new MapRefValuePublisher.ComponentImpl<T, K>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -1437,8 +1435,8 @@ public abstract class MapRefValuePublisher<T, K> {
    * 
    */
   protected MapRefValuePublisher.PublisherPush.Component<T, K> newPublisherPush(final K key) {
-    MapRefValuePublisher.PublisherPush<T, K> implem = _createImplementationOfPublisherPush(key);
-    return implem._newComponent(new MapRefValuePublisher.PublisherPush.Requires<T, K>() {},true);
+    MapRefValuePublisher.PublisherPush<T, K> _implem = _createImplementationOfPublisherPush(key);
+    return _implem._newComponent(new MapRefValuePublisher.PublisherPush.Requires<T, K>() {},true);
   }
   
   /**
@@ -1551,8 +1549,8 @@ public abstract class MapRefValuePublisher<T, K> {
    * 
    */
   protected MapRefValuePublisher.Observer.Component<T, K> newObserver() {
-    MapRefValuePublisher.Observer<T, K> implem = _createImplementationOfObserver();
-    return implem._newComponent(new MapRefValuePublisher.Observer.Requires<T, K>() {},true);
+    MapRefValuePublisher.Observer<T, K> _implem = _createImplementationOfObserver();
+    return _implem._newComponent(new MapRefValuePublisher.Observer.Requires<T, K>() {},true);
   }
   
   /**

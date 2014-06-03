@@ -1,5 +1,8 @@
 Release procedure:
 
+ * Increase memory
+   -> export MAVEN_OPTS="-Xmx512m -XX:MaxPermSize=256m"
+
  * Prepare for release:
   * Clean everything
     -> mvn clean

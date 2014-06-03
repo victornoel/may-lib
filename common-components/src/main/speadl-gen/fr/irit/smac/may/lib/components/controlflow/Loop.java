@@ -19,6 +19,17 @@ public abstract class Loop {
     public Do handler();
   }
   
+  public interface Component extends Loop.Provides {
+  }
+  
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do stop();
+  }
+  
   public interface Parts {
   }
   
@@ -30,20 +41,22 @@ public abstract class Loop {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_stop() {
       assert this.stop == null: "This is a bug.";
       this.stop = this.implementation.make_stop();
       if (this.stop == null) {
       	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.controlflow.Loop should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_stop();
     }
     
     public ComponentImpl(final Loop implem, final Loop.Requires b, final boolean doInits) {
@@ -60,7 +73,6 @@ public abstract class Loop {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Do stop;
@@ -68,17 +80,6 @@ public abstract class Loop {
     public Do stop() {
       return this.stop;
     }
-  }
-  
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do stop();
-  }
-  
-  public interface Component extends Loop.Provides {
   }
   
   /**
@@ -91,6 +92,7 @@ public abstract class Loop {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -105,7 +107,6 @@ public abstract class Loop {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -118,7 +119,6 @@ public abstract class Loop {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -138,7 +138,6 @@ public abstract class Loop {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -151,7 +150,6 @@ public abstract class Loop {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -163,11 +161,10 @@ public abstract class Loop {
     	throw new RuntimeException("This instance of Loop has already been used to create a component, use another one.");
     }
     this.init = true;
-    Loop.ComponentImpl comp = new Loop.ComponentImpl(this, b, true);
+    Loop.ComponentImpl  _comp = new Loop.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

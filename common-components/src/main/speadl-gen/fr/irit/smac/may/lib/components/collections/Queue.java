@@ -9,77 +9,7 @@ public abstract class Queue<Truc> {
   public interface Requires<Truc> {
   }
   
-  public interface Parts<Truc> {
-  }
-  
-  public static class ComponentImpl<Truc> implements Queue.Component<Truc>, Queue.Parts<Truc> {
-    private final Queue.Requires<Truc> bridge;
-    
-    private final Queue<Truc> implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.put == null: "This is a bug.";
-      this.put = this.implementation.make_put();
-      if (this.put == null) {
-      	throw new RuntimeException("make_put() in fr.irit.smac.may.lib.components.collections.Queue should not return null.");
-      }
-      assert this.get == null: "This is a bug.";
-      this.get = this.implementation.make_get();
-      if (this.get == null) {
-      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.collections.Queue should not return null.");
-      }
-      assert this.getAll == null: "This is a bug.";
-      this.getAll = this.implementation.make_getAll();
-      if (this.getAll == null) {
-      	throw new RuntimeException("make_getAll() in fr.irit.smac.may.lib.components.collections.Queue should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final Queue<Truc> implem, final Queue.Requires<Truc> b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private Push<Truc> put;
-    
-    public Push<Truc> put() {
-      return this.put;
-    }
-    
-    private Pull<Truc> get;
-    
-    public Pull<Truc> get() {
-      return this.get;
-    }
-    
-    private Pull<Collection<Truc>> getAll;
-    
-    public Pull<Collection<Truc>> getAll() {
-      return this.getAll;
-    }
+  public interface Component<Truc> extends Queue.Provides<Truc> {
   }
   
   public interface Provides<Truc> {
@@ -102,7 +32,86 @@ public abstract class Queue<Truc> {
     public Pull<Collection<Truc>> getAll();
   }
   
-  public interface Component<Truc> extends Queue.Provides<Truc> {
+  public interface Parts<Truc> {
+  }
+  
+  public static class ComponentImpl<Truc> implements Queue.Component<Truc>, Queue.Parts<Truc> {
+    private final Queue.Requires<Truc> bridge;
+    
+    private final Queue<Truc> implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_put() {
+      assert this.put == null: "This is a bug.";
+      this.put = this.implementation.make_put();
+      if (this.put == null) {
+      	throw new RuntimeException("make_put() in fr.irit.smac.may.lib.components.collections.Queue<Truc> should not return null.");
+      }
+    }
+    
+    private void init_get() {
+      assert this.get == null: "This is a bug.";
+      this.get = this.implementation.make_get();
+      if (this.get == null) {
+      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.collections.Queue<Truc> should not return null.");
+      }
+    }
+    
+    private void init_getAll() {
+      assert this.getAll == null: "This is a bug.";
+      this.getAll = this.implementation.make_getAll();
+      if (this.getAll == null) {
+      	throw new RuntimeException("make_getAll() in fr.irit.smac.may.lib.components.collections.Queue<Truc> should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_put();
+      init_get();
+      init_getAll();
+    }
+    
+    public ComponentImpl(final Queue<Truc> implem, final Queue.Requires<Truc> b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private Push<Truc> put;
+    
+    public Push<Truc> put() {
+      return this.put;
+    }
+    
+    private Pull<Truc> get;
+    
+    public Pull<Truc> get() {
+      return this.get;
+    }
+    
+    private Pull<Collection<Truc>> getAll;
+    
+    public Pull<Collection<Truc>> getAll() {
+      return this.getAll;
+    }
   }
   
   /**
@@ -115,6 +124,7 @@ public abstract class Queue<Truc> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -129,7 +139,6 @@ public abstract class Queue<Truc> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -142,7 +151,6 @@ public abstract class Queue<Truc> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -176,7 +184,6 @@ public abstract class Queue<Truc> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -189,7 +196,6 @@ public abstract class Queue<Truc> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -201,12 +207,11 @@ public abstract class Queue<Truc> {
     	throw new RuntimeException("This instance of Queue has already been used to create a component, use another one.");
     }
     this.init = true;
-    Queue.ComponentImpl<Truc> comp = new Queue.ComponentImpl<Truc>(this, b, true);
+    Queue.ComponentImpl<Truc>  _comp = new Queue.ComponentImpl<Truc>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**

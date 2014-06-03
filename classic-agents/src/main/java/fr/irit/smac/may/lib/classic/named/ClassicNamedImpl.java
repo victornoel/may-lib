@@ -5,8 +5,6 @@ import java.util.concurrent.Executors;
 import fr.irit.smac.may.lib.classic.interfaces.CreateNamed;
 import fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiverImpl;
-import fr.irit.smac.may.lib.components.meta.Forward;
-import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 
@@ -22,10 +20,11 @@ public class ClassicNamedImpl<Msg> extends ClassicNamed<Msg> {
 		return new MapRefAsyncReceiverImpl<Msg, String>();
 	}
 
-	@Override
-	protected Forward<CreateNamed<Msg, String>> make_fact() {
-		return new ForwardImpl<CreateNamed<Msg,String>>();
-	}
+//	@Override
+//	protected Forward<CreateNamed<Msg, String>> make_fact() {
+//		return new ForwardImpl<CreateNamed<Msg,String>>();
+//	}
+	
 	@Override
 	protected CreateNamed<Msg, String> make_create() {
 		return new CreateNamed<Msg, String>() {

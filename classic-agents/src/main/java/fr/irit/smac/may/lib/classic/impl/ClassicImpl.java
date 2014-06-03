@@ -9,8 +9,6 @@ import fr.irit.smac.may.lib.classic.local.ClassicBehaviour;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiverImpl;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
-import fr.irit.smac.may.lib.components.meta.Forward;
-import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
 
@@ -28,10 +26,10 @@ public class ClassicImpl<Msg> extends Classic<Msg> {
 		return new DirRefAsyncReceiverImpl<Msg>();
 	}
 	
-	@Override
-	protected Forward<CreateClassic<Msg, DirRef>> make_fact() {
-		return new ForwardImpl<CreateClassic<Msg,DirRef>>();
-	}
+//	@Override
+//	protected Forward<CreateClassic<Msg, DirRef>> make_fact() {
+//		return new ForwardImpl<CreateClassic<Msg,DirRef>>();
+//	}
 	
 	@Override
 	protected CreateClassic<Msg, DirRef> make_create() {

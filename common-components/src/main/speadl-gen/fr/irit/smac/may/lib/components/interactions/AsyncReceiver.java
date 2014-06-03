@@ -14,6 +14,17 @@ public abstract class AsyncReceiver<M, K> {
     public Call<Push<M>, K> call();
   }
   
+  public interface Component<M, K> extends AsyncReceiver.Provides<M, K> {
+  }
+  
+  public interface Provides<M, K> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public ReliableSend<M, K> send();
+  }
+  
   public interface Parts<M, K> {
   }
   
@@ -25,20 +36,22 @@ public abstract class AsyncReceiver<M, K> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_send() {
       assert this.send == null: "This is a bug.";
       this.send = this.implementation.make_send();
       if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver should not return null.");
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver<M, K> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_send();
     }
     
     public ComponentImpl(final AsyncReceiver<M, K> implem, final AsyncReceiver.Requires<M, K> b, final boolean doInits) {
@@ -55,7 +68,6 @@ public abstract class AsyncReceiver<M, K> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private ReliableSend<M, K> send;
@@ -65,24 +77,24 @@ public abstract class AsyncReceiver<M, K> {
     }
   }
   
-  public interface Provides<M, K> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public ReliableSend<M, K> send();
-  }
-  
-  public interface Component<M, K> extends AsyncReceiver.Provides<M, K> {
-  }
-  
-  public abstract static class Receiver<M, K> {
+  public static class Receiver<M, K> {
     public interface Requires<M, K> {
       /**
        * This can be called by the implementation to access this required port.
        * 
        */
       public Push<M> put();
+    }
+    
+    public interface Component<M, K> extends AsyncReceiver.Receiver.Provides<M, K> {
+    }
+    
+    public interface Provides<M, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Push<M> toCall();
     }
     
     public interface Parts<M, K> {
@@ -96,7 +108,6 @@ public abstract class AsyncReceiver<M, K> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
@@ -121,23 +132,11 @@ public abstract class AsyncReceiver<M, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Push<M> toCall() {
         return this.bridge.put();
       }
-    }
-    
-    public interface Provides<M, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Push<M> toCall();
-    }
-    
-    public interface Component<M, K> extends AsyncReceiver.Receiver.Provides<M, K> {
     }
     
     /**
@@ -150,6 +149,7 @@ public abstract class AsyncReceiver<M, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -164,7 +164,6 @@ public abstract class AsyncReceiver<M, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -177,7 +176,6 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -190,7 +188,6 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -203,7 +200,6 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -215,12 +211,11 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("This instance of Receiver has already been used to create a component, use another one.");
       }
       this.init = true;
-      AsyncReceiver.Receiver.ComponentImpl<M, K> comp = new AsyncReceiver.Receiver.ComponentImpl<M, K>(this, b, true);
+      AsyncReceiver.Receiver.ComponentImpl<M, K>  _comp = new AsyncReceiver.Receiver.ComponentImpl<M, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private AsyncReceiver.ComponentImpl<M, K> ecosystemComponent;
@@ -232,7 +227,6 @@ public abstract class AsyncReceiver<M, K> {
     protected AsyncReceiver.Provides<M, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -242,7 +236,6 @@ public abstract class AsyncReceiver<M, K> {
     protected AsyncReceiver.Requires<M, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -252,12 +245,22 @@ public abstract class AsyncReceiver<M, K> {
     protected AsyncReceiver.Parts<M, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Sender<M, K> {
     public interface Requires<M, K> {
+    }
+    
+    public interface Component<M, K> extends AsyncReceiver.Sender.Provides<M, K> {
+    }
+    
+    public interface Provides<M, K> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public ReliableSend<M, K> send();
     }
     
     public interface Parts<M, K> {
@@ -271,20 +274,22 @@ public abstract class AsyncReceiver<M, K> {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_send() {
         assert this.send == null: "This is a bug.";
         this.send = this.implementation.make_send();
         if (this.send == null) {
-        	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver$Sender should not return null.");
+        	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver$Sender<M, K> should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_send();
       }
       
       public ComponentImpl(final AsyncReceiver.Sender<M, K> implem, final AsyncReceiver.Sender.Requires<M, K> b, final boolean doInits) {
@@ -301,7 +306,6 @@ public abstract class AsyncReceiver<M, K> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private ReliableSend<M, K> send;
@@ -309,17 +313,6 @@ public abstract class AsyncReceiver<M, K> {
       public ReliableSend<M, K> send() {
         return this.send;
       }
-    }
-    
-    public interface Provides<M, K> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public ReliableSend<M, K> send();
-    }
-    
-    public interface Component<M, K> extends AsyncReceiver.Sender.Provides<M, K> {
     }
     
     /**
@@ -332,6 +325,7 @@ public abstract class AsyncReceiver<M, K> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -346,7 +340,6 @@ public abstract class AsyncReceiver<M, K> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -359,7 +352,6 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -379,7 +371,6 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -392,7 +383,6 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -404,12 +394,11 @@ public abstract class AsyncReceiver<M, K> {
       	throw new RuntimeException("This instance of Sender has already been used to create a component, use another one.");
       }
       this.init = true;
-      AsyncReceiver.Sender.ComponentImpl<M, K> comp = new AsyncReceiver.Sender.ComponentImpl<M, K>(this, b, true);
+      AsyncReceiver.Sender.ComponentImpl<M, K>  _comp = new AsyncReceiver.Sender.ComponentImpl<M, K>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private AsyncReceiver.ComponentImpl<M, K> ecosystemComponent;
@@ -421,7 +410,6 @@ public abstract class AsyncReceiver<M, K> {
     protected AsyncReceiver.Provides<M, K> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -431,7 +419,6 @@ public abstract class AsyncReceiver<M, K> {
     protected AsyncReceiver.Requires<M, K> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -441,7 +428,6 @@ public abstract class AsyncReceiver<M, K> {
     protected AsyncReceiver.Parts<M, K> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -455,6 +441,7 @@ public abstract class AsyncReceiver<M, K> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -469,7 +456,6 @@ public abstract class AsyncReceiver<M, K> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -482,7 +468,6 @@ public abstract class AsyncReceiver<M, K> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -502,7 +487,6 @@ public abstract class AsyncReceiver<M, K> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -515,7 +499,6 @@ public abstract class AsyncReceiver<M, K> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -527,19 +510,20 @@ public abstract class AsyncReceiver<M, K> {
     	throw new RuntimeException("This instance of AsyncReceiver has already been used to create a component, use another one.");
     }
     this.init = true;
-    AsyncReceiver.ComponentImpl<M, K> comp = new AsyncReceiver.ComponentImpl<M, K>(this, b, true);
+    AsyncReceiver.ComponentImpl<M, K>  _comp = new AsyncReceiver.ComponentImpl<M, K>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract AsyncReceiver.Receiver<M, K> make_Receiver();
+  protected AsyncReceiver.Receiver<M, K> make_Receiver() {
+    return new AsyncReceiver.Receiver<M, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -582,7 +566,7 @@ public abstract class AsyncReceiver<M, K> {
    * 
    */
   protected AsyncReceiver.Sender.Component<M, K> newSender() {
-    AsyncReceiver.Sender<M, K> implem = _createImplementationOfSender();
-    return implem._newComponent(new AsyncReceiver.Sender.Requires<M, K>() {},true);
+    AsyncReceiver.Sender<M, K> _implem = _createImplementationOfSender();
+    return _implem._newComponent(new AsyncReceiver.Sender.Requires<M, K>() {},true);
   }
 }

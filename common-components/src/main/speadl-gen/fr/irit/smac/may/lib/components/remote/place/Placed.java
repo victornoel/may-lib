@@ -8,6 +8,17 @@ public abstract class Placed {
   public interface Requires {
   }
   
+  public interface Component extends Placed.Provides {
+  }
+  
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Place> thisPlace();
+  }
+  
   public interface Parts {
   }
   
@@ -19,20 +30,22 @@ public abstract class Placed {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_thisPlace() {
       assert this.thisPlace == null: "This is a bug.";
       this.thisPlace = this.implementation.make_thisPlace();
       if (this.thisPlace == null) {
       	throw new RuntimeException("make_thisPlace() in fr.irit.smac.may.lib.components.remote.place.Placed should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_thisPlace();
     }
     
     public ComponentImpl(final Placed implem, final Placed.Requires b, final boolean doInits) {
@@ -49,7 +62,6 @@ public abstract class Placed {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Pull<Place> thisPlace;
@@ -59,19 +71,19 @@ public abstract class Placed {
     }
   }
   
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Place> thisPlace();
-  }
-  
-  public interface Component extends Placed.Provides {
-  }
-  
   public abstract static class Agent {
     public interface Requires {
+    }
+    
+    public interface Component extends Placed.Agent.Provides {
+    }
+    
+    public interface Provides {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<Place> myPlace();
     }
     
     public interface Parts {
@@ -85,20 +97,22 @@ public abstract class Placed {
       public void start() {
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
       protected void initParts() {
         
       }
       
-      protected void initProvidedPorts() {
+      private void init_myPlace() {
         assert this.myPlace == null: "This is a bug.";
         this.myPlace = this.implementation.make_myPlace();
         if (this.myPlace == null) {
         	throw new RuntimeException("make_myPlace() in fr.irit.smac.may.lib.components.remote.place.Placed$Agent should not return null.");
         }
-        
+      }
+      
+      protected void initProvidedPorts() {
+        init_myPlace();
       }
       
       public ComponentImpl(final Placed.Agent implem, final Placed.Agent.Requires b, final boolean doInits) {
@@ -115,7 +129,6 @@ public abstract class Placed {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private Pull<Place> myPlace;
@@ -123,17 +136,6 @@ public abstract class Placed {
       public Pull<Place> myPlace() {
         return this.myPlace;
       }
-    }
-    
-    public interface Provides {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<Place> myPlace();
-    }
-    
-    public interface Component extends Placed.Agent.Provides {
     }
     
     /**
@@ -146,6 +148,7 @@ public abstract class Placed {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -160,7 +163,6 @@ public abstract class Placed {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -173,7 +175,6 @@ public abstract class Placed {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -193,7 +194,6 @@ public abstract class Placed {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -206,7 +206,6 @@ public abstract class Placed {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -218,12 +217,11 @@ public abstract class Placed {
       	throw new RuntimeException("This instance of Agent has already been used to create a component, use another one.");
       }
       this.init = true;
-      Placed.Agent.ComponentImpl comp = new Placed.Agent.ComponentImpl(this, b, true);
+      Placed.Agent.ComponentImpl  _comp = new Placed.Agent.ComponentImpl(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private Placed.ComponentImpl ecosystemComponent;
@@ -235,7 +233,6 @@ public abstract class Placed {
     protected Placed.Provides eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -245,7 +242,6 @@ public abstract class Placed {
     protected Placed.Requires eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -255,7 +251,6 @@ public abstract class Placed {
     protected Placed.Parts eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -269,6 +264,7 @@ public abstract class Placed {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -283,7 +279,6 @@ public abstract class Placed {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -296,7 +291,6 @@ public abstract class Placed {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -316,7 +310,6 @@ public abstract class Placed {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -329,7 +322,6 @@ public abstract class Placed {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -341,12 +333,11 @@ public abstract class Placed {
     	throw new RuntimeException("This instance of Placed has already been used to create a component, use another one.");
     }
     this.init = true;
-    Placed.ComponentImpl comp = new Placed.ComponentImpl(this, b, true);
+    Placed.ComponentImpl  _comp = new Placed.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -375,8 +366,8 @@ public abstract class Placed {
    * 
    */
   protected Placed.Agent.Component newAgent() {
-    Placed.Agent implem = _createImplementationOfAgent();
-    return implem._newComponent(new Placed.Agent.Requires() {},true);
+    Placed.Agent _implem = _createImplementationOfAgent();
+    return _implem._newComponent(new Placed.Agent.Requires() {},true);
   }
   
   /**

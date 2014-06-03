@@ -26,6 +26,17 @@ public abstract class IvyJSONBroadcaster<T> {
     public Executor exec();
   }
   
+  public interface Component<T> extends IvyJSONBroadcaster.Provides<T> {
+  }
+  
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<T> send();
+  }
+  
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -72,39 +83,57 @@ public abstract class IvyJSONBroadcaster<T> {
       ((IvyBroadcaster.ComponentImpl<T>) this.bc).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_ivy() {
       assert this.ivy == null: "This is a bug.";
       assert this.implem_ivy == null: "This is a bug.";
       this.implem_ivy = this.implementation.make_ivy();
       if (this.implem_ivy == null) {
-      	throw new RuntimeException("make_ivy() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster should not return null.");
+      	throw new RuntimeException("make_ivy() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.ivy = this.implem_ivy._newComponent(new BridgeImpl_ivy(), false);
+      
+    }
+    
+    private void init_json() {
       assert this.json == null: "This is a bug.";
       assert this.implem_json == null: "This is a bug.";
       this.implem_json = this.implementation.make_json();
       if (this.implem_json == null) {
-      	throw new RuntimeException("make_json() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster should not return null.");
+      	throw new RuntimeException("make_json() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.json = this.implem_json._newComponent(new BridgeImpl_json(), false);
+      
+    }
+    
+    private void init_binder() {
       assert this.binder == null: "This is a bug.";
       assert this.implem_binder == null: "This is a bug.";
       this.implem_binder = this.implementation.make_binder();
       if (this.implem_binder == null) {
-      	throw new RuntimeException("make_binder() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster should not return null.");
+      	throw new RuntimeException("make_binder() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.binder = this.implem_binder._newComponent(new BridgeImpl_binder(), false);
+      
+    }
+    
+    private void init_bc() {
       assert this.bc == null: "This is a bug.";
       assert this.implem_bc == null: "This is a bug.";
       this.implem_bc = this.implementation.make_bc();
       if (this.implem_bc == null) {
-      	throw new RuntimeException("make_bc() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster should not return null.");
+      	throw new RuntimeException("make_bc() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.bc = this.implem_bc._newComponent(new BridgeImpl_bc(), false);
       
+    }
+    
+    protected void initParts() {
+      init_ivy();
+      init_json();
+      init_binder();
+      init_bc();
     }
     
     protected void initProvidedPorts() {
@@ -125,11 +154,10 @@ public abstract class IvyJSONBroadcaster<T> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public Push<T> send() {
-      return this.bc.send();
+      return this.bc().send();
     }
     
     private IvyBus.Component ivy;
@@ -163,15 +191,15 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private final class BridgeImpl_binder implements IvyBinder.Requires {
       public final Bind bindMsg() {
-        return IvyJSONBroadcaster.ComponentImpl.this.ivy.bindMsg();
+        return IvyJSONBroadcaster.ComponentImpl.this.ivy().bindMsg();
       }
       
       public final Push<List<String>> receive() {
-        return IvyJSONBroadcaster.ComponentImpl.this.bc.ivyReceive();
+        return IvyJSONBroadcaster.ComponentImpl.this.bc().ivyReceive();
       }
       
       public final Push<Integer> unBindMsg() {
-        return IvyJSONBroadcaster.ComponentImpl.this.ivy.unBindMsg();
+        return IvyJSONBroadcaster.ComponentImpl.this.ivy().unBindMsg();
       }
     }
     
@@ -185,11 +213,11 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private final class BridgeImpl_bc implements IvyBroadcaster.Requires<T> {
       public final Transform<String, T> deserializer() {
-        return IvyJSONBroadcaster.ComponentImpl.this.json.deserializer();
+        return IvyJSONBroadcaster.ComponentImpl.this.json().deserializer();
       }
       
       public final Transform<T, String> serializer() {
-        return IvyJSONBroadcaster.ComponentImpl.this.json.serializer();
+        return IvyJSONBroadcaster.ComponentImpl.this.json().serializer();
       }
       
       public final Push<T> handle() {
@@ -197,28 +225,17 @@ public abstract class IvyJSONBroadcaster<T> {
       }
       
       public final Push<String> ivyBindMsg() {
-        return IvyJSONBroadcaster.ComponentImpl.this.binder.reBindMsg();
+        return IvyJSONBroadcaster.ComponentImpl.this.binder().reBindMsg();
       }
       
       public final Push<String> ivySend() {
-        return IvyJSONBroadcaster.ComponentImpl.this.ivy.send();
+        return IvyJSONBroadcaster.ComponentImpl.this.ivy().send();
       }
     }
     
     public final IvyBroadcaster.Component<T> bc() {
       return this.bc;
     }
-  }
-  
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<T> send();
-  }
-  
-  public interface Component<T> extends IvyJSONBroadcaster.Provides<T> {
   }
   
   /**
@@ -231,6 +248,7 @@ public abstract class IvyJSONBroadcaster<T> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -245,7 +263,6 @@ public abstract class IvyJSONBroadcaster<T> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -258,7 +275,6 @@ public abstract class IvyJSONBroadcaster<T> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -271,7 +287,6 @@ public abstract class IvyJSONBroadcaster<T> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -284,7 +299,6 @@ public abstract class IvyJSONBroadcaster<T> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -324,11 +338,10 @@ public abstract class IvyJSONBroadcaster<T> {
     	throw new RuntimeException("This instance of IvyJSONBroadcaster has already been used to create a component, use another one.");
     }
     this.init = true;
-    IvyJSONBroadcaster.ComponentImpl<T> comp = new IvyJSONBroadcaster.ComponentImpl<T>(this, b, true);
+    IvyJSONBroadcaster.ComponentImpl<T>  _comp = new IvyJSONBroadcaster.ComponentImpl<T>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

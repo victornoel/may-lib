@@ -5,6 +5,17 @@ public abstract class Void<I> {
   public interface Requires<I> {
   }
   
+  public interface Component<I> extends Void.Provides<I> {
+  }
+  
+  public interface Provides<I> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public I port();
+  }
+  
   public interface Parts<I> {
   }
   
@@ -16,20 +27,22 @@ public abstract class Void<I> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_port() {
       assert this.port == null: "This is a bug.";
       this.port = this.implementation.make_port();
       if (this.port == null) {
-      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Void should not return null.");
+      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Void<I> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_port();
     }
     
     public ComponentImpl(final Void<I> implem, final Void.Requires<I> b, final boolean doInits) {
@@ -46,7 +59,6 @@ public abstract class Void<I> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private I port;
@@ -54,17 +66,6 @@ public abstract class Void<I> {
     public I port() {
       return this.port;
     }
-  }
-  
-  public interface Provides<I> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public I port();
-  }
-  
-  public interface Component<I> extends Void.Provides<I> {
   }
   
   /**
@@ -77,6 +78,7 @@ public abstract class Void<I> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -91,7 +93,6 @@ public abstract class Void<I> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -104,7 +105,6 @@ public abstract class Void<I> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -124,7 +124,6 @@ public abstract class Void<I> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -137,7 +136,6 @@ public abstract class Void<I> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -149,12 +147,11 @@ public abstract class Void<I> {
     	throw new RuntimeException("This instance of Void has already been used to create a component, use another one.");
     }
     this.init = true;
-    Void.ComponentImpl<I> comp = new Void.ComponentImpl<I>(this, b, true);
+    Void.ComponentImpl<I>  _comp = new Void.ComponentImpl<I>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**

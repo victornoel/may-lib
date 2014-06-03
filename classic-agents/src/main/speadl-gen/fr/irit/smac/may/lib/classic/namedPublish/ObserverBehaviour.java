@@ -13,6 +13,17 @@ public abstract class ObserverBehaviour<Ref> {
     public Observe<Integer, Ref> observe();
   }
   
+  public interface Component<Ref> extends ObserverBehaviour.Provides<Ref> {
+  }
+  
+  public interface Provides<Ref> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Do cycle();
+  }
+  
   public interface Parts<Ref> {
   }
   
@@ -24,20 +35,22 @@ public abstract class ObserverBehaviour<Ref> {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_cycle() {
       assert this.cycle == null: "This is a bug.";
       this.cycle = this.implementation.make_cycle();
       if (this.cycle == null) {
-      	throw new RuntimeException("make_cycle() in fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour should not return null.");
+      	throw new RuntimeException("make_cycle() in fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour<Ref> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_cycle();
     }
     
     public ComponentImpl(final ObserverBehaviour<Ref> implem, final ObserverBehaviour.Requires<Ref> b, final boolean doInits) {
@@ -54,7 +67,6 @@ public abstract class ObserverBehaviour<Ref> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Do cycle;
@@ -62,17 +74,6 @@ public abstract class ObserverBehaviour<Ref> {
     public Do cycle() {
       return this.cycle;
     }
-  }
-  
-  public interface Provides<Ref> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Do cycle();
-  }
-  
-  public interface Component<Ref> extends ObserverBehaviour.Provides<Ref> {
   }
   
   /**
@@ -85,6 +86,7 @@ public abstract class ObserverBehaviour<Ref> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -99,7 +101,6 @@ public abstract class ObserverBehaviour<Ref> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -112,7 +113,6 @@ public abstract class ObserverBehaviour<Ref> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -132,7 +132,6 @@ public abstract class ObserverBehaviour<Ref> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -145,7 +144,6 @@ public abstract class ObserverBehaviour<Ref> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -157,11 +155,10 @@ public abstract class ObserverBehaviour<Ref> {
     	throw new RuntimeException("This instance of ObserverBehaviour has already been used to create a component, use another one.");
     }
     this.init = true;
-    ObserverBehaviour.ComponentImpl<Ref> comp = new ObserverBehaviour.ComponentImpl<Ref>(this, b, true);
+    ObserverBehaviour.ComponentImpl<Ref>  _comp = new ObserverBehaviour.ComponentImpl<Ref>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

@@ -17,88 +17,7 @@ public abstract class IvyReceive {
     public Push<List<String>> receive();
   }
   
-  public interface Parts {
-  }
-  
-  public static class ComponentImpl implements IvyReceive.Component, IvyReceive.Parts {
-    private final IvyReceive.Requires bridge;
-    
-    private final IvyReceive implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.bindMsg == null: "This is a bug.";
-      this.bindMsg = this.implementation.make_bindMsg();
-      if (this.bindMsg == null) {
-      	throw new RuntimeException("make_bindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
-      }
-      assert this.connectionStatus == null: "This is a bug.";
-      this.connectionStatus = this.implementation.make_connectionStatus();
-      if (this.connectionStatus == null) {
-      	throw new RuntimeException("make_connectionStatus() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
-      }
-      assert this.connect == null: "This is a bug.";
-      this.connect = this.implementation.make_connect();
-      if (this.connect == null) {
-      	throw new RuntimeException("make_connect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
-      }
-      assert this.disconnect == null: "This is a bug.";
-      this.disconnect = this.implementation.make_disconnect();
-      if (this.disconnect == null) {
-      	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final IvyReceive implem, final IvyReceive.Requires b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private Push<String> bindMsg;
-    
-    public Push<String> bindMsg() {
-      return this.bindMsg;
-    }
-    
-    private Pull<IvyConnectionStatus> connectionStatus;
-    
-    public Pull<IvyConnectionStatus> connectionStatus() {
-      return this.connectionStatus;
-    }
-    
-    private Push<IvyConnectionConfig> connect;
-    
-    public Push<IvyConnectionConfig> connect() {
-      return this.connect;
-    }
-    
-    private Do disconnect;
-    
-    public Do disconnect() {
-      return this.disconnect;
-    }
+  public interface Component extends IvyReceive.Provides {
   }
   
   public interface Provides {
@@ -127,7 +46,101 @@ public abstract class IvyReceive {
     public Do disconnect();
   }
   
-  public interface Component extends IvyReceive.Provides {
+  public interface Parts {
+  }
+  
+  public static class ComponentImpl implements IvyReceive.Component, IvyReceive.Parts {
+    private final IvyReceive.Requires bridge;
+    
+    private final IvyReceive implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_bindMsg() {
+      assert this.bindMsg == null: "This is a bug.";
+      this.bindMsg = this.implementation.make_bindMsg();
+      if (this.bindMsg == null) {
+      	throw new RuntimeException("make_bindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      }
+    }
+    
+    private void init_connectionStatus() {
+      assert this.connectionStatus == null: "This is a bug.";
+      this.connectionStatus = this.implementation.make_connectionStatus();
+      if (this.connectionStatus == null) {
+      	throw new RuntimeException("make_connectionStatus() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      }
+    }
+    
+    private void init_connect() {
+      assert this.connect == null: "This is a bug.";
+      this.connect = this.implementation.make_connect();
+      if (this.connect == null) {
+      	throw new RuntimeException("make_connect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      }
+    }
+    
+    private void init_disconnect() {
+      assert this.disconnect == null: "This is a bug.";
+      this.disconnect = this.implementation.make_disconnect();
+      if (this.disconnect == null) {
+      	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_bindMsg();
+      init_connectionStatus();
+      init_connect();
+      init_disconnect();
+    }
+    
+    public ComponentImpl(final IvyReceive implem, final IvyReceive.Requires b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private Push<String> bindMsg;
+    
+    public Push<String> bindMsg() {
+      return this.bindMsg;
+    }
+    
+    private Pull<IvyConnectionStatus> connectionStatus;
+    
+    public Pull<IvyConnectionStatus> connectionStatus() {
+      return this.connectionStatus;
+    }
+    
+    private Push<IvyConnectionConfig> connect;
+    
+    public Push<IvyConnectionConfig> connect() {
+      return this.connect;
+    }
+    
+    private Do disconnect;
+    
+    public Do disconnect() {
+      return this.disconnect;
+    }
   }
   
   /**
@@ -140,6 +153,7 @@ public abstract class IvyReceive {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -154,7 +168,6 @@ public abstract class IvyReceive {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -167,7 +180,6 @@ public abstract class IvyReceive {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -208,7 +220,6 @@ public abstract class IvyReceive {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -221,7 +232,6 @@ public abstract class IvyReceive {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -233,11 +243,10 @@ public abstract class IvyReceive {
     	throw new RuntimeException("This instance of IvyReceive has already been used to create a component, use another one.");
     }
     this.init = true;
-    IvyReceive.ComponentImpl comp = new IvyReceive.ComponentImpl(this, b, true);
+    IvyReceive.ComponentImpl  _comp = new IvyReceive.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

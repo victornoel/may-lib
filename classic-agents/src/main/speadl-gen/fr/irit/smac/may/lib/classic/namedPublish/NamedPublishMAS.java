@@ -20,6 +20,17 @@ public abstract class NamedPublishMAS {
   public interface Requires {
   }
   
+  public interface Component extends NamedPublishMAS.Provides {
+  }
+  
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public NamedPublishMASFactory create();
+  }
+  
   public interface Parts {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -75,10 +86,9 @@ public abstract class NamedPublishMAS {
       ((SchedulingControllerGUI.ComponentImpl) this.gui).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_observeds() {
       assert this.observeds == null: "This is a bug.";
       assert this.implem_observeds == null: "This is a bug.";
       this.implem_observeds = this.implementation.make_observeds();
@@ -86,6 +96,10 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_observeds() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.observeds = this.implem_observeds._newComponent(new BridgeImpl_observeds(), false);
+      
+    }
+    
+    private void init_executor() {
       assert this.executor == null: "This is a bug.";
       assert this.implem_executor == null: "This is a bug.";
       this.implem_executor = this.implementation.make_executor();
@@ -93,6 +107,10 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.executor = this.implem_executor._newComponent(new BridgeImpl_executor(), false);
+      
+    }
+    
+    private void init_schedule() {
       assert this.schedule == null: "This is a bug.";
       assert this.implem_schedule == null: "This is a bug.";
       this.implem_schedule = this.implementation.make_schedule();
@@ -100,6 +118,10 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_schedule() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.schedule = this.implem_schedule._newComponent(new BridgeImpl_schedule(), false);
+      
+    }
+    
+    private void init_clock() {
       assert this.clock == null: "This is a bug.";
       assert this.implem_clock == null: "This is a bug.";
       this.implem_clock = this.implementation.make_clock();
@@ -107,6 +129,10 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_clock() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.clock = this.implem_clock._newComponent(new BridgeImpl_clock(), false);
+      
+    }
+    
+    private void init_gui() {
       assert this.gui == null: "This is a bug.";
       assert this.implem_gui == null: "This is a bug.";
       this.implem_gui = this.implementation.make_gui();
@@ -117,13 +143,24 @@ public abstract class NamedPublishMAS {
       
     }
     
-    protected void initProvidedPorts() {
+    protected void initParts() {
+      init_observeds();
+      init_executor();
+      init_schedule();
+      init_clock();
+      init_gui();
+    }
+    
+    private void init_create() {
       assert this.create == null: "This is a bug.";
       this.create = this.implementation.make_create();
       if (this.create == null) {
       	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_create();
     }
     
     public ComponentImpl(final NamedPublishMAS implem, final NamedPublishMAS.Requires b, final boolean doInits) {
@@ -140,7 +177,6 @@ public abstract class NamedPublishMAS {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private NamedPublishMASFactory create;
@@ -177,7 +213,7 @@ public abstract class NamedPublishMAS {
     
     private final class BridgeImpl_schedule implements Scheduler.Requires {
       public final AdvancedExecutor executor() {
-        return NamedPublishMAS.ComponentImpl.this.executor.executor();
+        return NamedPublishMAS.ComponentImpl.this.executor().executor();
       }
     }
     
@@ -191,11 +227,11 @@ public abstract class NamedPublishMAS {
     
     private final class BridgeImpl_clock implements Clock.Requires {
       public final Executor sched() {
-        return NamedPublishMAS.ComponentImpl.this.executor.executor();
+        return NamedPublishMAS.ComponentImpl.this.executor().executor();
       }
       
       public final Do tick() {
-        return NamedPublishMAS.ComponentImpl.this.schedule.tick();
+        return NamedPublishMAS.ComponentImpl.this.schedule().tick();
       }
     }
     
@@ -209,7 +245,7 @@ public abstract class NamedPublishMAS {
     
     private final class BridgeImpl_gui implements SchedulingControllerGUI.Requires {
       public final SchedulingControl control() {
-        return NamedPublishMAS.ComponentImpl.this.clock.control();
+        return NamedPublishMAS.ComponentImpl.this.clock().control();
       }
     }
     
@@ -218,19 +254,14 @@ public abstract class NamedPublishMAS {
     }
   }
   
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public NamedPublishMASFactory create();
-  }
-  
-  public interface Component extends NamedPublishMAS.Provides {
-  }
-  
   public abstract static class Observed {
     public interface Requires {
+    }
+    
+    public interface Component extends NamedPublishMAS.Observed.Provides {
+    }
+    
+    public interface Provides {
     }
     
     public interface Parts {
@@ -270,13 +301,16 @@ public abstract class NamedPublishMAS {
         ((MapRefValuePublisher.PublisherPush.ComponentImpl<Integer, String>) this.observed).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_sched() {
         assert this.sched == null: "This is a bug.";
         assert this.implementation.use_sched != null: "This is a bug.";
         this.sched = this.implementation.use_sched._newComponent(new BridgeImpl_schedule_sched(), false);
+        
+      }
+      
+      private void init_beh() {
         assert this.beh == null: "This is a bug.";
         assert this.implem_beh == null: "This is a bug.";
         this.implem_beh = this.implementation.make_beh();
@@ -284,10 +318,20 @@ public abstract class NamedPublishMAS {
         	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS$Observed should not return null.");
         }
         this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
+        
+      }
+      
+      private void init_observed() {
         assert this.observed == null: "This is a bug.";
         assert this.implementation.use_observed != null: "This is a bug.";
         this.observed = this.implementation.use_observed._newComponent(new BridgeImpl_observeds_observed(), false);
         
+      }
+      
+      protected void initParts() {
+        init_sched();
+        init_beh();
+        init_observed();
       }
       
       protected void initProvidedPorts() {
@@ -308,14 +352,13 @@ public abstract class NamedPublishMAS {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private Scheduler.Scheduled.Component sched;
       
       private final class BridgeImpl_schedule_sched implements Scheduler.Scheduled.Requires {
         public final Do cycle() {
-          return NamedPublishMAS.Observed.ComponentImpl.this.beh.cycle();
+          return NamedPublishMAS.Observed.ComponentImpl.this.beh().cycle();
         }
       }
       
@@ -329,7 +372,7 @@ public abstract class NamedPublishMAS {
       
       private final class BridgeImpl_beh implements ObservedBehaviour.Requires {
         public final Push<Integer> changeValue() {
-          return NamedPublishMAS.Observed.ComponentImpl.this.observed.set();
+          return NamedPublishMAS.Observed.ComponentImpl.this.observed().set();
         }
       }
       
@@ -347,12 +390,6 @@ public abstract class NamedPublishMAS {
       }
     }
     
-    public interface Provides {
-    }
-    
-    public interface Component extends NamedPublishMAS.Observed.Provides {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -363,6 +400,7 @@ public abstract class NamedPublishMAS {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -377,7 +415,6 @@ public abstract class NamedPublishMAS {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -390,7 +427,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -403,7 +439,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -416,7 +451,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private Scheduler.Scheduled use_sched;
@@ -439,12 +473,11 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("This instance of Observed has already been used to create a component, use another one.");
       }
       this.init = true;
-      NamedPublishMAS.Observed.ComponentImpl comp = new NamedPublishMAS.Observed.ComponentImpl(this, b, true);
+      NamedPublishMAS.Observed.ComponentImpl  _comp = new NamedPublishMAS.Observed.ComponentImpl(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private NamedPublishMAS.ComponentImpl ecosystemComponent;
@@ -456,7 +489,6 @@ public abstract class NamedPublishMAS {
     protected NamedPublishMAS.Provides eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -466,7 +498,6 @@ public abstract class NamedPublishMAS {
     protected NamedPublishMAS.Requires eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -476,12 +507,17 @@ public abstract class NamedPublishMAS {
     protected NamedPublishMAS.Parts eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
   public abstract static class Observer {
     public interface Requires {
+    }
+    
+    public interface Component extends NamedPublishMAS.Observer.Provides {
+    }
+    
+    public interface Provides {
     }
     
     public interface Parts {
@@ -521,13 +557,16 @@ public abstract class NamedPublishMAS {
         ((MapRefValuePublisher.Observer.ComponentImpl<Integer, String>) this.observer).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_sched() {
         assert this.sched == null: "This is a bug.";
         assert this.implementation.use_sched != null: "This is a bug.";
         this.sched = this.implementation.use_sched._newComponent(new BridgeImpl_schedule_sched(), false);
+        
+      }
+      
+      private void init_beh() {
         assert this.beh == null: "This is a bug.";
         assert this.implem_beh == null: "This is a bug.";
         this.implem_beh = this.implementation.make_beh();
@@ -535,10 +574,20 @@ public abstract class NamedPublishMAS {
         	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS$Observer should not return null.");
         }
         this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
+        
+      }
+      
+      private void init_observer() {
         assert this.observer == null: "This is a bug.";
         assert this.implementation.use_observer != null: "This is a bug.";
         this.observer = this.implementation.use_observer._newComponent(new BridgeImpl_observeds_observer(), false);
         
+      }
+      
+      protected void initParts() {
+        init_sched();
+        init_beh();
+        init_observer();
       }
       
       protected void initProvidedPorts() {
@@ -559,14 +608,13 @@ public abstract class NamedPublishMAS {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       private Scheduler.Scheduled.Component sched;
       
       private final class BridgeImpl_schedule_sched implements Scheduler.Scheduled.Requires {
         public final Do cycle() {
-          return NamedPublishMAS.Observer.ComponentImpl.this.beh.cycle();
+          return NamedPublishMAS.Observer.ComponentImpl.this.beh().cycle();
         }
       }
       
@@ -580,7 +628,7 @@ public abstract class NamedPublishMAS {
       
       private final class BridgeImpl_beh implements ObserverBehaviour.Requires<String> {
         public final Observe<Integer, String> observe() {
-          return NamedPublishMAS.Observer.ComponentImpl.this.observer.observe();
+          return NamedPublishMAS.Observer.ComponentImpl.this.observer().observe();
         }
       }
       
@@ -598,12 +646,6 @@ public abstract class NamedPublishMAS {
       }
     }
     
-    public interface Provides {
-    }
-    
-    public interface Component extends NamedPublishMAS.Observer.Provides {
-    }
-    
     /**
      * Used to check that two components are not created from the same implementation,
      * that the component has been started to call requires(), provides() and parts()
@@ -614,6 +656,7 @@ public abstract class NamedPublishMAS {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -628,7 +671,6 @@ public abstract class NamedPublishMAS {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -641,7 +683,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -654,7 +695,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -667,7 +707,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     private Scheduler.Scheduled use_sched;
@@ -690,12 +729,11 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("This instance of Observer has already been used to create a component, use another one.");
       }
       this.init = true;
-      NamedPublishMAS.Observer.ComponentImpl comp = new NamedPublishMAS.Observer.ComponentImpl(this, b, true);
+      NamedPublishMAS.Observer.ComponentImpl  _comp = new NamedPublishMAS.Observer.ComponentImpl(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private NamedPublishMAS.ComponentImpl ecosystemComponent;
@@ -707,7 +745,6 @@ public abstract class NamedPublishMAS {
     protected NamedPublishMAS.Provides eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -717,7 +754,6 @@ public abstract class NamedPublishMAS {
     protected NamedPublishMAS.Requires eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -727,7 +763,6 @@ public abstract class NamedPublishMAS {
     protected NamedPublishMAS.Parts eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -741,6 +776,7 @@ public abstract class NamedPublishMAS {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -755,7 +791,6 @@ public abstract class NamedPublishMAS {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -768,7 +803,6 @@ public abstract class NamedPublishMAS {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -788,7 +822,6 @@ public abstract class NamedPublishMAS {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -801,7 +834,6 @@ public abstract class NamedPublishMAS {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -848,12 +880,11 @@ public abstract class NamedPublishMAS {
     	throw new RuntimeException("This instance of NamedPublishMAS has already been used to create a component, use another one.");
     }
     this.init = true;
-    NamedPublishMAS.ComponentImpl comp = new NamedPublishMAS.ComponentImpl(this, b, true);
+    NamedPublishMAS.ComponentImpl  _comp = new NamedPublishMAS.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -888,8 +919,8 @@ public abstract class NamedPublishMAS {
    * 
    */
   protected NamedPublishMAS.Observed.Component newObserved(final String name, final ObservedBehaviour implem) {
-    NamedPublishMAS.Observed implem_1 = _createImplementationOfObserved(name,implem);
-    return implem_1._newComponent(new NamedPublishMAS.Observed.Requires() {},true);
+    NamedPublishMAS.Observed _implem = _createImplementationOfObserved(name,implem);
+    return _implem._newComponent(new NamedPublishMAS.Observed.Requires() {},true);
   }
   
   /**
@@ -924,8 +955,8 @@ public abstract class NamedPublishMAS {
    * 
    */
   protected NamedPublishMAS.Observer.Component newObserver(final ObserverBehaviour<String> beha) {
-    NamedPublishMAS.Observer implem = _createImplementationOfObserver(beha);
-    return implem._newComponent(new NamedPublishMAS.Observer.Requires() {},true);
+    NamedPublishMAS.Observer _implem = _createImplementationOfObserver(beha);
+    return _implem._newComponent(new NamedPublishMAS.Observer.Requires() {},true);
   }
   
   /**

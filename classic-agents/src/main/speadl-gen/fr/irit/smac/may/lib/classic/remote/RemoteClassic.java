@@ -6,7 +6,6 @@ import fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour;
 import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
-import fr.irit.smac.may.lib.components.meta.Forward;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
 import fr.irit.smac.may.lib.components.remote.place.Place;
@@ -23,14 +22,30 @@ public abstract class RemoteClassic<Msg> {
   public interface Requires<Msg> {
   }
   
-  public interface Parts<Msg> {
+  public interface Component<Msg> extends RemoteClassic.Provides<Msg> {
+  }
+  
+  public interface Provides<Msg> {
     /**
-     * This can be called by the implementation to access the part and its provided ports.
-     * It will be initialized after the required ports are initialized and before the provided ports are initialized.
+     * This can be called to access the provided port.
      * 
      */
-    public Forward.Component<Send<Msg, RemoteAgentRef>> sender();
+    public Send<Msg, RemoteAgentRef> send();
     
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Pull<Place> thisPlace();
+    
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public CreateRemoteClassic<Msg, RemoteAgentRef> create();
+  }
+  
+  public interface Parts<Msg> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
      * It will be initialized after the required ports are initialized and before the provided ports are initialized.
@@ -73,8 +88,6 @@ public abstract class RemoteClassic<Msg> {
     private final RemoteClassic<Msg> implementation;
     
     public void start() {
-      assert this.sender != null: "This is a bug.";
-      ((Forward.ComponentImpl<Send<Msg, RemoteAgentRef>>) this.sender).start();
       assert this.receive != null: "This is a bug.";
       ((DirRefAsyncReceiver.ComponentImpl<Msg>) this.receive).start();
       assert this.placed != null: "This is a bug.";
@@ -87,62 +100,81 @@ public abstract class RemoteClassic<Msg> {
       ((ExecutorServiceWrapper.ComponentImpl) this.executor).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
-      assert this.sender == null: "This is a bug.";
-      assert this.implem_sender == null: "This is a bug.";
-      this.implem_sender = this.implementation.make_sender();
-      if (this.implem_sender == null) {
-      	throw new RuntimeException("make_sender() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
-      }
-      this.sender = this.implem_sender._newComponent(new BridgeImpl_sender(), false);
+    private void init_receive() {
       assert this.receive == null: "This is a bug.";
       assert this.implem_receive == null: "This is a bug.";
       this.implem_receive = this.implementation.make_receive();
       if (this.implem_receive == null) {
-      	throw new RuntimeException("make_receive() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
+      	throw new RuntimeException("make_receive() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.receive = this.implem_receive._newComponent(new BridgeImpl_receive(), false);
+      
+    }
+    
+    private void init_placed() {
       assert this.placed == null: "This is a bug.";
       assert this.implem_placed == null: "This is a bug.";
       this.implem_placed = this.implementation.make_placed();
       if (this.implem_placed == null) {
-      	throw new RuntimeException("make_placed() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
+      	throw new RuntimeException("make_placed() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.placed = this.implem_placed._newComponent(new BridgeImpl_placed(), false);
+      
+    }
+    
+    private void init_remReceive() {
       assert this.remReceive == null: "This is a bug.";
       assert this.implem_remReceive == null: "This is a bug.";
       this.implem_remReceive = this.implementation.make_remReceive();
       if (this.implem_remReceive == null) {
-      	throw new RuntimeException("make_remReceive() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
+      	throw new RuntimeException("make_remReceive() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.remReceive = this.implem_remReceive._newComponent(new BridgeImpl_remReceive(), false);
+      
+    }
+    
+    private void init_fact() {
       assert this.fact == null: "This is a bug.";
       assert this.implem_fact == null: "This is a bug.";
       this.implem_fact = this.implementation.make_fact();
       if (this.implem_fact == null) {
-      	throw new RuntimeException("make_fact() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
+      	throw new RuntimeException("make_fact() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.fact = this.implem_fact._newComponent(new BridgeImpl_fact(), false);
+      
+    }
+    
+    private void init_executor() {
       assert this.executor == null: "This is a bug.";
       assert this.implem_executor == null: "This is a bug.";
       this.implem_executor = this.implementation.make_executor();
       if (this.implem_executor == null) {
-      	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
+      	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.executor = this.implem_executor._newComponent(new BridgeImpl_executor(), false);
       
     }
     
-    protected void initProvidedPorts() {
+    protected void initParts() {
+      init_receive();
+      init_placed();
+      init_remReceive();
+      init_fact();
+      init_executor();
+    }
+    
+    private void init_create() {
       assert this.create == null: "This is a bug.";
       this.create = this.implementation.make_create();
       if (this.create == null) {
-      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.remote.RemoteClassic should not return null.");
+      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_create();
     }
     
     public ComponentImpl(final RemoteClassic<Msg> implem, final RemoteClassic.Requires<Msg> b, final boolean doInits) {
@@ -159,35 +191,20 @@ public abstract class RemoteClassic<Msg> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     public Send<Msg, RemoteAgentRef> send() {
-      return this.remReceive.send();
+      return this.remReceive().send();
     }
     
     public Pull<Place> thisPlace() {
-      return this.placed.thisPlace();
+      return this.placed().thisPlace();
     }
     
     private CreateRemoteClassic<Msg, RemoteAgentRef> create;
     
     public CreateRemoteClassic<Msg, RemoteAgentRef> create() {
       return this.create;
-    }
-    
-    private Forward.Component<Send<Msg, RemoteAgentRef>> sender;
-    
-    private Forward<Send<Msg, RemoteAgentRef>> implem_sender;
-    
-    private final class BridgeImpl_sender implements Forward.Requires<Send<Msg, RemoteAgentRef>> {
-      public final Send<Msg, RemoteAgentRef> forwardedPort() {
-        return RemoteClassic.ComponentImpl.this.remReceive.send();
-      }
-    }
-    
-    public final Forward.Component<Send<Msg, RemoteAgentRef>> sender() {
-      return this.sender;
     }
     
     private DirRefAsyncReceiver.Component<Msg> receive;
@@ -218,11 +235,11 @@ public abstract class RemoteClassic<Msg> {
     
     private final class BridgeImpl_remReceive implements RemoteReceiver.Requires<Msg, DirRef> {
       public final Send<Msg, DirRef> localSend() {
-        return RemoteClassic.ComponentImpl.this.receive.send();
+        return RemoteClassic.ComponentImpl.this.receive().send();
       }
       
       public final Pull<Place> myPlace() {
-        return RemoteClassic.ComponentImpl.this.placed.thisPlace();
+        return RemoteClassic.ComponentImpl.this.placed().thisPlace();
       }
     }
     
@@ -240,7 +257,7 @@ public abstract class RemoteClassic<Msg> {
       }
       
       public final Pull<Place> thisPlace() {
-        return RemoteClassic.ComponentImpl.this.placed.thisPlace();
+        return RemoteClassic.ComponentImpl.this.placed().thisPlace();
       }
     }
     
@@ -260,31 +277,19 @@ public abstract class RemoteClassic<Msg> {
     }
   }
   
-  public interface Provides<Msg> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Send<Msg, RemoteAgentRef> send();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Pull<Place> thisPlace();
-    
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public CreateRemoteClassic<Msg, RemoteAgentRef> create();
-  }
-  
-  public interface Component<Msg> extends RemoteClassic.Provides<Msg> {
-  }
-  
   public abstract static class ClassicAgent<Msg> {
     public interface Requires<Msg> {
+    }
+    
+    public interface Component<Msg> extends RemoteClassic.ClassicAgent.Provides<Msg> {
+    }
+    
+    public interface Provides<Msg> {
+      /**
+       * This can be called to access the provided port.
+       * 
+       */
+      public Pull<RemoteAgentRef> ref();
     }
     
     public interface Parts<Msg> {
@@ -328,13 +333,6 @@ public abstract class RemoteClassic<Msg> {
        * It will be initialized after the required ports are initialized and before the provided ports are initialized.
        * 
        */
-      public Forward.Caller.Component<Send<Msg, RemoteAgentRef>> ss();
-      
-      /**
-       * This can be called by the implementation to access the part and its provided ports.
-       * It will be initialized after the required ports are initialized and before the provided ports are initialized.
-       * 
-       */
       public RemoteReceiver.Agent.Component<Msg, DirRef> rr();
     }
     
@@ -354,42 +352,65 @@ public abstract class RemoteClassic<Msg> {
         ((ExecutorServiceWrapper.Executing.ComponentImpl) this.s).start();
         assert this.r != null: "This is a bug.";
         ((DirRefAsyncReceiver.Receiver.ComponentImpl<Msg>) this.r).start();
-        assert this.ss != null: "This is a bug.";
-        ((Forward.Caller.ComponentImpl<Send<Msg, RemoteAgentRef>>) this.ss).start();
         assert this.rr != null: "This is a bug.";
         ((RemoteReceiver.Agent.ComponentImpl<Msg, DirRef>) this.rr).start();
         this.implementation.start();
         this.implementation.started = true;
-        
       }
       
-      protected void initParts() {
+      private void init_arch() {
         assert this.arch == null: "This is a bug.";
         assert this.implem_arch == null: "This is a bug.";
         this.implem_arch = this.implementation.make_arch();
         if (this.implem_arch == null) {
-        	throw new RuntimeException("make_arch() in fr.irit.smac.may.lib.classic.remote.RemoteClassic$ClassicAgent should not return null.");
+        	throw new RuntimeException("make_arch() in fr.irit.smac.may.lib.classic.remote.RemoteClassic$ClassicAgent<Msg> should not return null.");
         }
         this.arch = this.implem_arch._newComponent(new BridgeImpl_arch(), false);
+        
+      }
+      
+      private void init_p() {
         assert this.p == null: "This is a bug.";
         assert this.implementation.use_p != null: "This is a bug.";
         this.p = this.implementation.use_p._newComponent(new BridgeImpl_placed_p(), false);
+        
+      }
+      
+      private void init_f() {
         assert this.f == null: "This is a bug.";
         assert this.implementation.use_f != null: "This is a bug.";
         this.f = this.implementation.use_f._newComponent(new BridgeImpl_fact_f(), false);
+        
+      }
+      
+      private void init_s() {
         assert this.s == null: "This is a bug.";
         assert this.implementation.use_s != null: "This is a bug.";
         this.s = this.implementation.use_s._newComponent(new BridgeImpl_executor_s(), false);
+        
+      }
+      
+      private void init_r() {
         assert this.r == null: "This is a bug.";
         assert this.implementation.use_r != null: "This is a bug.";
         this.r = this.implementation.use_r._newComponent(new BridgeImpl_receive_r(), false);
-        assert this.ss == null: "This is a bug.";
-        assert this.implementation.use_ss != null: "This is a bug.";
-        this.ss = this.implementation.use_ss._newComponent(new BridgeImpl_sender_ss(), false);
+        
+      }
+      
+      private void init_rr() {
         assert this.rr == null: "This is a bug.";
         assert this.implementation.use_rr != null: "This is a bug.";
         this.rr = this.implementation.use_rr._newComponent(new BridgeImpl_remReceive_rr(), false);
         
+      }
+      
+      protected void initParts() {
+        init_arch();
+        init_p();
+        init_f();
+        init_s();
+        init_r();
+        init_rr();
       }
       
       protected void initProvidedPorts() {
@@ -410,11 +431,10 @@ public abstract class RemoteClassic<Msg> {
         	initParts();
         	initProvidedPorts();
         }
-        
       }
       
       public Pull<RemoteAgentRef> ref() {
-        return this.rr.me();
+        return this.rr().me();
       }
       
       private RemoteClassicAgentComponent.Component<Msg, RemoteAgentRef> arch;
@@ -423,27 +443,27 @@ public abstract class RemoteClassic<Msg> {
       
       private final class BridgeImpl_arch implements RemoteClassicAgentComponent.Requires<Msg, RemoteAgentRef> {
         public final Send<Msg, RemoteAgentRef> send() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.ss.forwardedPort();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.implementation.ecosystemComponent.remReceive().send();
         }
         
         public final Pull<RemoteAgentRef> me() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr.me();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr().me();
         }
         
         public final Do stopExec() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.s.stop();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.s().stop();
         }
         
         public final Do stopReceive() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr.disconnect();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr().disconnect();
         }
         
         public final Executor executor() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.s.executor();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.s().executor();
         }
         
         public final CreateRemoteClassic<Msg, RemoteAgentRef> create() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.f.create();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.f().create();
         }
       }
       
@@ -482,7 +502,7 @@ public abstract class RemoteClassic<Msg> {
       
       private final class BridgeImpl_receive_r implements DirRefAsyncReceiver.Receiver.Requires<Msg> {
         public final Push<Msg> put() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.arch.put();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.arch().put();
         }
       }
       
@@ -490,37 +510,17 @@ public abstract class RemoteClassic<Msg> {
         return this.r;
       }
       
-      private Forward.Caller.Component<Send<Msg, RemoteAgentRef>> ss;
-      
-      private final class BridgeImpl_sender_ss implements Forward.Caller.Requires<Send<Msg, RemoteAgentRef>> {
-      }
-      
-      public final Forward.Caller.Component<Send<Msg, RemoteAgentRef>> ss() {
-        return this.ss;
-      }
-      
       private RemoteReceiver.Agent.Component<Msg, DirRef> rr;
       
       private final class BridgeImpl_remReceive_rr implements RemoteReceiver.Agent.Requires<Msg, DirRef> {
         public final Pull<DirRef> localMe() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.r.me();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.r().me();
         }
       }
       
       public final RemoteReceiver.Agent.Component<Msg, DirRef> rr() {
         return this.rr;
       }
-    }
-    
-    public interface Provides<Msg> {
-      /**
-       * This can be called to access the provided port.
-       * 
-       */
-      public Pull<RemoteAgentRef> ref();
-    }
-    
-    public interface Component<Msg> extends RemoteClassic.ClassicAgent.Provides<Msg> {
     }
     
     /**
@@ -533,6 +533,7 @@ public abstract class RemoteClassic<Msg> {
     
     /**
      * Used to check that the component is not started by hand.
+     * 
      */
     private boolean started = false;;
     
@@ -547,7 +548,6 @@ public abstract class RemoteClassic<Msg> {
       if (!this.init || this.started) {
       	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
       }
-      
     }
     
     /**
@@ -560,7 +560,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -573,7 +572,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
       }
       return this.selfComponent.bridge;
-      
     }
     
     /**
@@ -586,7 +584,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
       }
       return this.selfComponent;
-      
     }
     
     /**
@@ -604,8 +601,6 @@ public abstract class RemoteClassic<Msg> {
     
     private DirRefAsyncReceiver.Receiver<Msg> use_r;
     
-    private Forward.Caller<Send<Msg, RemoteAgentRef>> use_ss;
-    
     private RemoteReceiver.Agent<Msg, DirRef> use_rr;
     
     /**
@@ -617,12 +612,11 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("This instance of ClassicAgent has already been used to create a component, use another one.");
       }
       this.init = true;
-      RemoteClassic.ClassicAgent.ComponentImpl<Msg> comp = new RemoteClassic.ClassicAgent.ComponentImpl<Msg>(this, b, true);
+      RemoteClassic.ClassicAgent.ComponentImpl<Msg>  _comp = new RemoteClassic.ClassicAgent.ComponentImpl<Msg>(this, b, true);
       if (start) {
-      	comp.start();
+      	_comp.start();
       }
-      return comp;
-      
+      return _comp;
     }
     
     private RemoteClassic.ComponentImpl<Msg> ecosystemComponent;
@@ -634,7 +628,6 @@ public abstract class RemoteClassic<Msg> {
     protected RemoteClassic.Provides<Msg> eco_provides() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
     
     /**
@@ -644,7 +637,6 @@ public abstract class RemoteClassic<Msg> {
     protected RemoteClassic.Requires<Msg> eco_requires() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent.bridge;
-      
     }
     
     /**
@@ -654,7 +646,6 @@ public abstract class RemoteClassic<Msg> {
     protected RemoteClassic.Parts<Msg> eco_parts() {
       assert this.ecosystemComponent != null: "This is a bug.";
       return this.ecosystemComponent;
-      
     }
   }
   
@@ -668,6 +659,7 @@ public abstract class RemoteClassic<Msg> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -682,7 +674,6 @@ public abstract class RemoteClassic<Msg> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -695,7 +686,6 @@ public abstract class RemoteClassic<Msg> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -715,7 +705,6 @@ public abstract class RemoteClassic<Msg> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -728,15 +717,7 @@ public abstract class RemoteClassic<Msg> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
-  
-  /**
-   * This should be overridden by the implementation to define how to create this sub-component.
-   * This will be called once during the construction of the component to initialize this sub-component.
-   * 
-   */
-  protected abstract Forward<Send<Msg, RemoteAgentRef>> make_sender();
   
   /**
    * This should be overridden by the implementation to define how to create this sub-component.
@@ -782,12 +763,11 @@ public abstract class RemoteClassic<Msg> {
     	throw new RuntimeException("This instance of RemoteClassic has already been used to create a component, use another one.");
     }
     this.init = true;
-    RemoteClassic.ComponentImpl<Msg> comp = new RemoteClassic.ComponentImpl<Msg>(this, b, true);
+    RemoteClassic.ComponentImpl<Msg>  _comp = new RemoteClassic.ComponentImpl<Msg>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**
@@ -820,9 +800,6 @@ public abstract class RemoteClassic<Msg> {
     assert this.selfComponent.implem_receive != null: "This is a bug.";
     assert implem.use_r == null: "This is a bug.";
     implem.use_r = this.selfComponent.implem_receive._createImplementationOfReceiver(name);
-    assert this.selfComponent.implem_sender != null: "This is a bug.";
-    assert implem.use_ss == null: "This is a bug.";
-    implem.use_ss = this.selfComponent.implem_sender._createImplementationOfCaller();
     assert this.selfComponent.implem_remReceive != null: "This is a bug.";
     assert implem.use_rr == null: "This is a bug.";
     implem.use_rr = this.selfComponent.implem_remReceive._createImplementationOfAgent();
@@ -834,8 +811,8 @@ public abstract class RemoteClassic<Msg> {
    * 
    */
   protected RemoteClassic.ClassicAgent.Component<Msg> newClassicAgent(final RemoteClassicBehaviour<Msg, RemoteAgentRef> beh, final String name) {
-    RemoteClassic.ClassicAgent<Msg> implem = _createImplementationOfClassicAgent(beh,name);
-    return implem._newComponent(new RemoteClassic.ClassicAgent.Requires<Msg>() {},true);
+    RemoteClassic.ClassicAgent<Msg> _implem = _createImplementationOfClassicAgent(beh,name);
+    return _implem._newComponent(new RemoteClassic.ClassicAgent.Requires<Msg>() {},true);
   }
   
   /**

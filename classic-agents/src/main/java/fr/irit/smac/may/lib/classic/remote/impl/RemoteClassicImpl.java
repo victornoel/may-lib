@@ -10,8 +10,6 @@ import fr.irit.smac.may.lib.classic.remote.RemoteFactory;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver;
 import fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiverImpl;
 import fr.irit.smac.may.lib.components.interactions.directreferences.DirRef;
-import fr.irit.smac.may.lib.components.meta.Forward;
-import fr.irit.smac.may.lib.components.meta.ForwardImpl;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteAgentRef;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver;
 import fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiverImpl;
@@ -20,7 +18,6 @@ import fr.irit.smac.may.lib.components.remote.place.Placed;
 import fr.irit.smac.may.lib.components.remote.place.PlacedImpl;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper;
 import fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapperImpl;
-import fr.irit.smac.may.lib.interfaces.Send;
 
 public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 
@@ -32,10 +29,10 @@ public class RemoteClassicImpl<Msg> extends RemoteClassic<Msg> {
 		this.port = port;
 	}
 
-	@Override
-	protected Forward<Send<Msg, RemoteAgentRef>> make_sender() {
-		return new ForwardImpl<Send<Msg,RemoteAgentRef>>();
-	}
+//	@Override
+//	protected Forward<Send<Msg, RemoteAgentRef>> make_sender() {
+//		return new ForwardImpl<Send<Msg,RemoteAgentRef>>();
+//	}
 
 	@Override
 	protected DirRefAsyncReceiver<Msg> make_receive() {

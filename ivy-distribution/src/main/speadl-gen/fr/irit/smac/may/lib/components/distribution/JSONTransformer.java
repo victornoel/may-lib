@@ -7,66 +7,7 @@ public abstract class JSONTransformer<T> {
   public interface Requires<T> {
   }
   
-  public interface Parts<T> {
-  }
-  
-  public static class ComponentImpl<T> implements JSONTransformer.Component<T>, JSONTransformer.Parts<T> {
-    private final JSONTransformer.Requires<T> bridge;
-    
-    private final JSONTransformer<T> implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.serializer == null: "This is a bug.";
-      this.serializer = this.implementation.make_serializer();
-      if (this.serializer == null) {
-      	throw new RuntimeException("make_serializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer should not return null.");
-      }
-      assert this.deserializer == null: "This is a bug.";
-      this.deserializer = this.implementation.make_deserializer();
-      if (this.deserializer == null) {
-      	throw new RuntimeException("make_deserializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final JSONTransformer<T> implem, final JSONTransformer.Requires<T> b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private Transform<T, String> serializer;
-    
-    public Transform<T, String> serializer() {
-      return this.serializer;
-    }
-    
-    private Transform<String, T> deserializer;
-    
-    public Transform<String, T> deserializer() {
-      return this.deserializer;
-    }
+  public interface Component<T> extends JSONTransformer.Provides<T> {
   }
   
   public interface Provides<T> {
@@ -83,7 +24,71 @@ public abstract class JSONTransformer<T> {
     public Transform<String, T> deserializer();
   }
   
-  public interface Component<T> extends JSONTransformer.Provides<T> {
+  public interface Parts<T> {
+  }
+  
+  public static class ComponentImpl<T> implements JSONTransformer.Component<T>, JSONTransformer.Parts<T> {
+    private final JSONTransformer.Requires<T> bridge;
+    
+    private final JSONTransformer<T> implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_serializer() {
+      assert this.serializer == null: "This is a bug.";
+      this.serializer = this.implementation.make_serializer();
+      if (this.serializer == null) {
+      	throw new RuntimeException("make_serializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer<T> should not return null.");
+      }
+    }
+    
+    private void init_deserializer() {
+      assert this.deserializer == null: "This is a bug.";
+      this.deserializer = this.implementation.make_deserializer();
+      if (this.deserializer == null) {
+      	throw new RuntimeException("make_deserializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer<T> should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_serializer();
+      init_deserializer();
+    }
+    
+    public ComponentImpl(final JSONTransformer<T> implem, final JSONTransformer.Requires<T> b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private Transform<T, String> serializer;
+    
+    public Transform<T, String> serializer() {
+      return this.serializer;
+    }
+    
+    private Transform<String, T> deserializer;
+    
+    public Transform<String, T> deserializer() {
+      return this.deserializer;
+    }
   }
   
   /**
@@ -96,6 +101,7 @@ public abstract class JSONTransformer<T> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -110,7 +116,6 @@ public abstract class JSONTransformer<T> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -123,7 +128,6 @@ public abstract class JSONTransformer<T> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -150,7 +154,6 @@ public abstract class JSONTransformer<T> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -163,7 +166,6 @@ public abstract class JSONTransformer<T> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -175,12 +177,11 @@ public abstract class JSONTransformer<T> {
     	throw new RuntimeException("This instance of JSONTransformer has already been used to create a component, use another one.");
     }
     this.init = true;
-    JSONTransformer.ComponentImpl<T> comp = new JSONTransformer.ComponentImpl<T>(this, b, true);
+    JSONTransformer.ComponentImpl<T>  _comp = new JSONTransformer.ComponentImpl<T>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
   
   /**

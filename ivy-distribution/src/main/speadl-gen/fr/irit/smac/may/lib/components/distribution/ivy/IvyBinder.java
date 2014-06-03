@@ -26,6 +26,17 @@ public abstract class IvyBinder {
     public Push<List<String>> receive();
   }
   
+  public interface Component extends IvyBinder.Provides {
+  }
+  
+  public interface Provides {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<String> reBindMsg();
+  }
+  
   public interface Parts {
   }
   
@@ -37,20 +48,22 @@ public abstract class IvyBinder {
     public void start() {
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
     protected void initParts() {
       
     }
     
-    protected void initProvidedPorts() {
+    private void init_reBindMsg() {
       assert this.reBindMsg == null: "This is a bug.";
       this.reBindMsg = this.implementation.make_reBindMsg();
       if (this.reBindMsg == null) {
       	throw new RuntimeException("make_reBindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_reBindMsg();
     }
     
     public ComponentImpl(final IvyBinder implem, final IvyBinder.Requires b, final boolean doInits) {
@@ -67,7 +80,6 @@ public abstract class IvyBinder {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Push<String> reBindMsg;
@@ -75,17 +87,6 @@ public abstract class IvyBinder {
     public Push<String> reBindMsg() {
       return this.reBindMsg;
     }
-  }
-  
-  public interface Provides {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<String> reBindMsg();
-  }
-  
-  public interface Component extends IvyBinder.Provides {
   }
   
   /**
@@ -98,6 +99,7 @@ public abstract class IvyBinder {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -112,7 +114,6 @@ public abstract class IvyBinder {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -125,7 +126,6 @@ public abstract class IvyBinder {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -145,7 +145,6 @@ public abstract class IvyBinder {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -158,7 +157,6 @@ public abstract class IvyBinder {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -170,11 +168,10 @@ public abstract class IvyBinder {
     	throw new RuntimeException("This instance of IvyBinder has already been used to create a component, use another one.");
     }
     this.init = true;
-    IvyBinder.ComponentImpl comp = new IvyBinder.ComponentImpl(this, b, true);
+    IvyBinder.ComponentImpl  _comp = new IvyBinder.ComponentImpl(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

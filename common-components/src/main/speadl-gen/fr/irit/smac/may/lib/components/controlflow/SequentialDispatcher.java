@@ -20,6 +20,17 @@ public abstract class SequentialDispatcher<T> {
     public Push<T> handler();
   }
   
+  public interface Component<T> extends SequentialDispatcher.Provides<T> {
+  }
+  
+  public interface Provides<T> {
+    /**
+     * This can be called to access the provided port.
+     * 
+     */
+    public Push<T> dispatch();
+  }
+  
   public interface Parts<T> {
     /**
      * This can be called by the implementation to access the part and its provided ports.
@@ -39,27 +50,33 @@ public abstract class SequentialDispatcher<T> {
       ((Queue.ComponentImpl<T>) this.queue).start();
       this.implementation.start();
       this.implementation.started = true;
-      
     }
     
-    protected void initParts() {
+    private void init_queue() {
       assert this.queue == null: "This is a bug.";
       assert this.implem_queue == null: "This is a bug.";
       this.implem_queue = this.implementation.make_queue();
       if (this.implem_queue == null) {
-      	throw new RuntimeException("make_queue() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher should not return null.");
+      	throw new RuntimeException("make_queue() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher<T> should not return null.");
       }
       this.queue = this.implem_queue._newComponent(new BridgeImpl_queue(), false);
       
     }
     
-    protected void initProvidedPorts() {
+    protected void initParts() {
+      init_queue();
+    }
+    
+    private void init_dispatch() {
       assert this.dispatch == null: "This is a bug.";
       this.dispatch = this.implementation.make_dispatch();
       if (this.dispatch == null) {
-      	throw new RuntimeException("make_dispatch() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher should not return null.");
+      	throw new RuntimeException("make_dispatch() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher<T> should not return null.");
       }
-      
+    }
+    
+    protected void initProvidedPorts() {
+      init_dispatch();
     }
     
     public ComponentImpl(final SequentialDispatcher<T> implem, final SequentialDispatcher.Requires<T> b, final boolean doInits) {
@@ -76,7 +93,6 @@ public abstract class SequentialDispatcher<T> {
       	initParts();
       	initProvidedPorts();
       }
-      
     }
     
     private Push<T> dispatch;
@@ -97,17 +113,6 @@ public abstract class SequentialDispatcher<T> {
     }
   }
   
-  public interface Provides<T> {
-    /**
-     * This can be called to access the provided port.
-     * 
-     */
-    public Push<T> dispatch();
-  }
-  
-  public interface Component<T> extends SequentialDispatcher.Provides<T> {
-  }
-  
   /**
    * Used to check that two components are not created from the same implementation,
    * that the component has been started to call requires(), provides() and parts()
@@ -118,6 +123,7 @@ public abstract class SequentialDispatcher<T> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -132,7 +138,6 @@ public abstract class SequentialDispatcher<T> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -145,7 +150,6 @@ public abstract class SequentialDispatcher<T> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -165,7 +169,6 @@ public abstract class SequentialDispatcher<T> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -178,7 +181,6 @@ public abstract class SequentialDispatcher<T> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -197,11 +199,10 @@ public abstract class SequentialDispatcher<T> {
     	throw new RuntimeException("This instance of SequentialDispatcher has already been used to create a component, use another one.");
     }
     this.init = true;
-    SequentialDispatcher.ComponentImpl<T> comp = new SequentialDispatcher.ComponentImpl<T>(this, b, true);
+    SequentialDispatcher.ComponentImpl<T>  _comp = new SequentialDispatcher.ComponentImpl<T>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }

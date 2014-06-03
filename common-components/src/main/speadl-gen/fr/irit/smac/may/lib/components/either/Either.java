@@ -12,66 +12,7 @@ public abstract class Either<L, R> {
     public Push<fr.irit.smac.may.lib.components.either.datatypes.Either<L, R>> out();
   }
   
-  public interface Parts<L, R> {
-  }
-  
-  public static class ComponentImpl<L, R> implements Either.Component<L, R>, Either.Parts<L, R> {
-    private final Either.Requires<L, R> bridge;
-    
-    private final Either<L, R> implementation;
-    
-    public void start() {
-      this.implementation.start();
-      this.implementation.started = true;
-      
-    }
-    
-    protected void initParts() {
-      
-    }
-    
-    protected void initProvidedPorts() {
-      assert this.left == null: "This is a bug.";
-      this.left = this.implementation.make_left();
-      if (this.left == null) {
-      	throw new RuntimeException("make_left() in fr.irit.smac.may.lib.components.either.Either should not return null.");
-      }
-      assert this.right == null: "This is a bug.";
-      this.right = this.implementation.make_right();
-      if (this.right == null) {
-      	throw new RuntimeException("make_right() in fr.irit.smac.may.lib.components.either.Either should not return null.");
-      }
-      
-    }
-    
-    public ComponentImpl(final Either<L, R> implem, final Either.Requires<L, R> b, final boolean doInits) {
-      this.bridge = b;
-      this.implementation = implem;
-      
-      assert implem.selfComponent == null: "This is a bug.";
-      implem.selfComponent = this;
-      
-      // prevent them to be called twice if we are in
-      // a specialized component: only the last of the
-      // hierarchy will call them after everything is initialised
-      if (doInits) {
-      	initParts();
-      	initProvidedPorts();
-      }
-      
-    }
-    
-    private Push<L> left;
-    
-    public Push<L> left() {
-      return this.left;
-    }
-    
-    private Push<R> right;
-    
-    public Push<R> right() {
-      return this.right;
-    }
+  public interface Component<L, R> extends Either.Provides<L, R> {
   }
   
   public interface Provides<L, R> {
@@ -88,7 +29,71 @@ public abstract class Either<L, R> {
     public Push<R> right();
   }
   
-  public interface Component<L, R> extends Either.Provides<L, R> {
+  public interface Parts<L, R> {
+  }
+  
+  public static class ComponentImpl<L, R> implements Either.Component<L, R>, Either.Parts<L, R> {
+    private final Either.Requires<L, R> bridge;
+    
+    private final Either<L, R> implementation;
+    
+    public void start() {
+      this.implementation.start();
+      this.implementation.started = true;
+    }
+    
+    protected void initParts() {
+      
+    }
+    
+    private void init_left() {
+      assert this.left == null: "This is a bug.";
+      this.left = this.implementation.make_left();
+      if (this.left == null) {
+      	throw new RuntimeException("make_left() in fr.irit.smac.may.lib.components.either.Either<L, R> should not return null.");
+      }
+    }
+    
+    private void init_right() {
+      assert this.right == null: "This is a bug.";
+      this.right = this.implementation.make_right();
+      if (this.right == null) {
+      	throw new RuntimeException("make_right() in fr.irit.smac.may.lib.components.either.Either<L, R> should not return null.");
+      }
+    }
+    
+    protected void initProvidedPorts() {
+      init_left();
+      init_right();
+    }
+    
+    public ComponentImpl(final Either<L, R> implem, final Either.Requires<L, R> b, final boolean doInits) {
+      this.bridge = b;
+      this.implementation = implem;
+      
+      assert implem.selfComponent == null: "This is a bug.";
+      implem.selfComponent = this;
+      
+      // prevent them to be called twice if we are in
+      // a specialized component: only the last of the
+      // hierarchy will call them after everything is initialised
+      if (doInits) {
+      	initParts();
+      	initProvidedPorts();
+      }
+    }
+    
+    private Push<L> left;
+    
+    public Push<L> left() {
+      return this.left;
+    }
+    
+    private Push<R> right;
+    
+    public Push<R> right() {
+      return this.right;
+    }
   }
   
   /**
@@ -101,6 +106,7 @@ public abstract class Either<L, R> {
   
   /**
    * Used to check that the component is not started by hand.
+   * 
    */
   private boolean started = false;;
   
@@ -115,7 +121,6 @@ public abstract class Either<L, R> {
     if (!this.init || this.started) {
     	throw new RuntimeException("start() should not be called by hand: to create a new component, use newComponent().");
     }
-    
   }
   
   /**
@@ -128,7 +133,6 @@ public abstract class Either<L, R> {
     	throw new RuntimeException("provides() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if provides() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -155,7 +159,6 @@ public abstract class Either<L, R> {
     	throw new RuntimeException("requires() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if requires() is needed to initialise the component.");
     }
     return this.selfComponent.bridge;
-    
   }
   
   /**
@@ -168,7 +171,6 @@ public abstract class Either<L, R> {
     	throw new RuntimeException("parts() can't be accessed until a component has been created from this implementation, use start() instead of the constructor if parts() is needed to initialise the component.");
     }
     return this.selfComponent;
-    
   }
   
   /**
@@ -180,11 +182,10 @@ public abstract class Either<L, R> {
     	throw new RuntimeException("This instance of Either has already been used to create a component, use another one.");
     }
     this.init = true;
-    Either.ComponentImpl<L, R> comp = new Either.ComponentImpl<L, R>(this, b, true);
+    Either.ComponentImpl<L, R>  _comp = new Either.ComponentImpl<L, R>(this, b, true);
     if (start) {
-    	comp.start();
+    	_comp.start();
     }
-    return comp;
-    
+    return _comp;
   }
 }
