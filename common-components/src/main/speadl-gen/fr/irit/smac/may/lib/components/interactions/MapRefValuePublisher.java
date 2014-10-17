@@ -131,7 +131,7 @@ public abstract class MapRefValuePublisher<T, K> {
     }
   }
   
-  public abstract static class PublisherPush<T, K> {
+  public static class PublisherPush<T, K> {
     public interface Requires<T, K> {
     }
     
@@ -374,7 +374,7 @@ public abstract class MapRefValuePublisher<T, K> {
     }
   }
   
-  public abstract static class PublisherPull<T, K> {
+  public static class PublisherPull<T, K> {
     public interface Requires<T, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -615,7 +615,7 @@ public abstract class MapRefValuePublisher<T, K> {
     }
   }
   
-  public abstract static class PublisherPushKeyPort<T, K> {
+  public static class PublisherPushKeyPort<T, K> {
     public interface Requires<T, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -867,7 +867,7 @@ public abstract class MapRefValuePublisher<T, K> {
     }
   }
   
-  public abstract static class PublisherPullKeyPort<T, K> {
+  public static class PublisherPullKeyPort<T, K> {
     public interface Requires<T, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -1118,7 +1118,7 @@ public abstract class MapRefValuePublisher<T, K> {
     }
   }
   
-  public abstract static class Observer<T, K> {
+  public static class Observer<T, K> {
     public interface Requires<T, K> {
     }
     
@@ -1407,7 +1407,9 @@ public abstract class MapRefValuePublisher<T, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefValuePublisher.PublisherPush<T, K> make_PublisherPush(final K key);
+  protected MapRefValuePublisher.PublisherPush<T, K> make_PublisherPush(final K key) {
+    return new MapRefValuePublisher.PublisherPush<T, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -1443,7 +1445,9 @@ public abstract class MapRefValuePublisher<T, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefValuePublisher.PublisherPull<T, K> make_PublisherPull(final K key);
+  protected MapRefValuePublisher.PublisherPull<T, K> make_PublisherPull(final K key) {
+    return new MapRefValuePublisher.PublisherPull<T, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -1470,7 +1474,9 @@ public abstract class MapRefValuePublisher<T, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefValuePublisher.PublisherPushKeyPort<T, K> make_PublisherPushKeyPort();
+  protected MapRefValuePublisher.PublisherPushKeyPort<T, K> make_PublisherPushKeyPort() {
+    return new MapRefValuePublisher.PublisherPushKeyPort<T, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -1497,7 +1503,9 @@ public abstract class MapRefValuePublisher<T, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefValuePublisher.PublisherPullKeyPort<T, K> make_PublisherPullKeyPort();
+  protected MapRefValuePublisher.PublisherPullKeyPort<T, K> make_PublisherPullKeyPort() {
+    return new MapRefValuePublisher.PublisherPullKeyPort<T, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -1524,7 +1532,9 @@ public abstract class MapRefValuePublisher<T, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefValuePublisher.Observer<T, K> make_Observer();
+  protected MapRefValuePublisher.Observer<T, K> make_Observer() {
+    return new MapRefValuePublisher.Observer<T, K>();
+  }
   
   /**
    * Do not call, used by generated code.

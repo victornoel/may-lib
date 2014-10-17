@@ -72,7 +72,7 @@ public abstract class CollectionOf<I> {
     }
   }
   
-  public abstract static class Element<I> {
+  public static abstract class Element<I> {
     public interface Requires<I> {
       /**
        * This can be called by the implementation to access this required port.

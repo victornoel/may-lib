@@ -78,7 +78,7 @@ public abstract class ValuePublisher<T, K> {
     }
   }
   
-  public abstract static class PublisherPush<T, K> {
+  public static abstract class PublisherPush<T, K> {
     public interface Requires<T, K> {
     }
     
@@ -299,7 +299,7 @@ public abstract class ValuePublisher<T, K> {
     }
   }
   
-  public abstract static class PublisherPull<T, K> {
+  public static abstract class PublisherPull<T, K> {
     public interface Requires<T, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -497,7 +497,7 @@ public abstract class ValuePublisher<T, K> {
     }
   }
   
-  public abstract static class Observer<T, K> {
+  public static abstract class Observer<T, K> {
     public interface Requires<T, K> {
     }
     

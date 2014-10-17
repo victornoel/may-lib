@@ -98,7 +98,7 @@ public abstract class Scheduler {
     }
   }
   
-  public abstract static class Scheduled {
+  public static abstract class Scheduled {
     public interface Requires {
       /**
        * This can be called by the implementation to access this required port.

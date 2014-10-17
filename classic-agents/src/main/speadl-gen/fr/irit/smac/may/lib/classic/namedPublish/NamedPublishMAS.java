@@ -254,7 +254,7 @@ public abstract class NamedPublishMAS {
     }
   }
   
-  public abstract static class Observed {
+  public static abstract class Observed {
     public interface Requires {
     }
     
@@ -510,7 +510,7 @@ public abstract class NamedPublishMAS {
     }
   }
   
-  public abstract static class Observer {
+  public static abstract class Observer {
     public interface Requires {
     }
     

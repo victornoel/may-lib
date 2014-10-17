@@ -54,7 +54,7 @@ public abstract class Forward<I> {
     }
   }
   
-  public abstract static class Caller<I> {
+  public static abstract class Caller<I> {
     public interface Requires<I> {
     }
     

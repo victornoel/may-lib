@@ -132,7 +132,7 @@ public abstract class DirRefAsyncReceiver<M> {
     }
   }
   
-  public abstract static class Receiver<M> {
+  public static class Receiver<M> {
     public interface Requires<M> {
       /**
        * This can be called by the implementation to access this required port.
@@ -373,7 +373,7 @@ public abstract class DirRefAsyncReceiver<M> {
     }
   }
   
-  public abstract static class Sender<M> {
+  public static class Sender<M> {
     public interface Requires<M> {
     }
     
@@ -662,7 +662,9 @@ public abstract class DirRefAsyncReceiver<M> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract DirRefAsyncReceiver.Receiver<M> make_Receiver(final String name);
+  protected DirRefAsyncReceiver.Receiver<M> make_Receiver(final String name) {
+    return new DirRefAsyncReceiver.Receiver<M>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -689,7 +691,9 @@ public abstract class DirRefAsyncReceiver<M> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract DirRefAsyncReceiver.Sender<M> make_Sender();
+  protected DirRefAsyncReceiver.Sender<M> make_Sender() {
+    return new DirRefAsyncReceiver.Sender<M>();
+  }
   
   /**
    * Do not call, used by generated code.

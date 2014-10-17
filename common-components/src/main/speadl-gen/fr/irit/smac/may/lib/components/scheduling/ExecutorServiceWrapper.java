@@ -92,7 +92,7 @@ public abstract class ExecutorServiceWrapper {
     }
   }
   
-  public abstract static class Executing {
+  public static abstract class Executing {
     public interface Requires {
     }
     

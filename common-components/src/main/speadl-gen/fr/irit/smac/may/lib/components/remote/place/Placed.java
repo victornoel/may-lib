@@ -71,7 +71,7 @@ public abstract class Placed {
     }
   }
   
-  public abstract static class Agent {
+  public static abstract class Agent {
     public interface Requires {
     }
     

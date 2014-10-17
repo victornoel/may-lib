@@ -85,7 +85,7 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
     }
   }
   
-  public abstract static class Agent<Msg, LocalRef> {
+  public static abstract class Agent<Msg, LocalRef> {
     public interface Requires<Msg, LocalRef> {
       /**
        * This can be called by the implementation to access this required port.

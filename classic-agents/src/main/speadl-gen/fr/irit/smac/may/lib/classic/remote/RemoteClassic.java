@@ -277,7 +277,7 @@ public abstract class RemoteClassic<Msg> {
     }
   }
   
-  public abstract static class ClassicAgent<Msg> {
+  public static abstract class ClassicAgent<Msg> {
     public interface Requires<Msg> {
     }
     

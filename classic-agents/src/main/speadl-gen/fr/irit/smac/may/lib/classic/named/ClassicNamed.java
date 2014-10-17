@@ -151,7 +151,7 @@ public abstract class ClassicNamed<Msg> {
     }
   }
   
-  public abstract static class ClassicNamedAgent<Msg> {
+  public static abstract class ClassicNamedAgent<Msg> {
     public interface Requires<Msg> {
     }
     

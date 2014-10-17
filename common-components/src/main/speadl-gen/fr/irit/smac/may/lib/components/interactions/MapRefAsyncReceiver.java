@@ -131,7 +131,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
     }
   }
   
-  public abstract static class Receiver<M, K> {
+  public static class Receiver<M, K> {
     public interface Requires<M, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -372,7 +372,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
     }
   }
   
-  public abstract static class ReceiverKeyPort<M, K> {
+  public static class ReceiverKeyPort<M, K> {
     public interface Requires<M, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -623,7 +623,7 @@ public abstract class MapRefAsyncReceiver<M, K> {
     }
   }
   
-  public abstract static class Sender<M, K> {
+  public static class Sender<M, K> {
     public interface Requires<M, K> {
     }
     
@@ -912,7 +912,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefAsyncReceiver.Receiver<M, K> make_Receiver(final K key);
+  protected MapRefAsyncReceiver.Receiver<M, K> make_Receiver(final K key) {
+    return new MapRefAsyncReceiver.Receiver<M, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -939,7 +941,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefAsyncReceiver.ReceiverKeyPort<M, K> make_ReceiverKeyPort();
+  protected MapRefAsyncReceiver.ReceiverKeyPort<M, K> make_ReceiverKeyPort() {
+    return new MapRefAsyncReceiver.ReceiverKeyPort<M, K>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -966,7 +970,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract MapRefAsyncReceiver.Sender<M, K> make_Sender();
+  protected MapRefAsyncReceiver.Sender<M, K> make_Sender() {
+    return new MapRefAsyncReceiver.Sender<M, K>();
+  }
   
   /**
    * Do not call, used by generated code.

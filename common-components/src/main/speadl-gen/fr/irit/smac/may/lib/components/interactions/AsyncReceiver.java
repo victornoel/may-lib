@@ -248,7 +248,7 @@ public abstract class AsyncReceiver<M, K> {
     }
   }
   
-  public abstract static class Sender<M, K> {
+  public static abstract class Sender<M, K> {
     public interface Requires<M, K> {
     }
     

@@ -72,7 +72,7 @@ public abstract class MapReferences<I, K> {
     }
   }
   
-  public abstract static class Callee<I, K> {
+  public static abstract class Callee<I, K> {
     public interface Requires<I, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -288,7 +288,7 @@ public abstract class MapReferences<I, K> {
     }
   }
   
-  public abstract static class CalleeKeyPort<I, K> {
+  public static abstract class CalleeKeyPort<I, K> {
     public interface Requires<I, K> {
       /**
        * This can be called by the implementation to access this required port.
@@ -510,7 +510,7 @@ public abstract class MapReferences<I, K> {
     }
   }
   
-  public abstract static class Caller<I, K> {
+  public static abstract class Caller<I, K> {
     public interface Requires<I, K> {
     }
     

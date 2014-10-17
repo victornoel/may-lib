@@ -78,7 +78,7 @@ public abstract class Broadcast<M, R> {
     }
   }
   
-  public abstract static class BroadcastTarget<M, R> {
+  public static abstract class BroadcastTarget<M, R> {
     public interface Requires<M, R> {
       /**
        * This can be called by the implementation to access this required port.
@@ -266,7 +266,7 @@ public abstract class Broadcast<M, R> {
     }
   }
   
-  public abstract static class Broadcaster<M, R> {
+  public static abstract class Broadcaster<M, R> {
     public interface Requires<M, R> {
     }
     

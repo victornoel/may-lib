@@ -83,7 +83,7 @@ public abstract class RemoteFactory<Msg, Ref> {
     }
   }
   
-  public abstract static class Agent<Msg, Ref> {
+  public static abstract class Agent<Msg, Ref> {
     public interface Requires<Msg, Ref> {
     }
     

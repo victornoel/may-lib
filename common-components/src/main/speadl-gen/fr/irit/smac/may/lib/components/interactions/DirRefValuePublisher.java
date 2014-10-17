@@ -132,7 +132,7 @@ public abstract class DirRefValuePublisher<T> {
     }
   }
   
-  public abstract static class PublisherPush<T> {
+  public static class PublisherPush<T> {
     public interface Requires<T> {
     }
     
@@ -375,7 +375,7 @@ public abstract class DirRefValuePublisher<T> {
     }
   }
   
-  public abstract static class PublisherPull<T> {
+  public static class PublisherPull<T> {
     public interface Requires<T> {
       /**
        * This can be called by the implementation to access this required port.
@@ -616,7 +616,7 @@ public abstract class DirRefValuePublisher<T> {
     }
   }
   
-  public abstract static class Observer<T> {
+  public static class Observer<T> {
     public interface Requires<T> {
     }
     
@@ -905,7 +905,9 @@ public abstract class DirRefValuePublisher<T> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract DirRefValuePublisher.PublisherPush<T> make_PublisherPush(final String name);
+  protected DirRefValuePublisher.PublisherPush<T> make_PublisherPush(final String name) {
+    return new DirRefValuePublisher.PublisherPush<T>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -941,7 +943,9 @@ public abstract class DirRefValuePublisher<T> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract DirRefValuePublisher.PublisherPull<T> make_PublisherPull(final String name);
+  protected DirRefValuePublisher.PublisherPull<T> make_PublisherPull(final String name) {
+    return new DirRefValuePublisher.PublisherPull<T>();
+  }
   
   /**
    * Do not call, used by generated code.
@@ -968,7 +972,9 @@ public abstract class DirRefValuePublisher<T> {
    * This should be overridden by the implementation to instantiate the implementation of the species.
    * 
    */
-  protected abstract DirRefValuePublisher.Observer<T> make_Observer();
+  protected DirRefValuePublisher.Observer<T> make_Observer() {
+    return new DirRefValuePublisher.Observer<T>();
+  }
   
   /**
    * Do not call, used by generated code.
