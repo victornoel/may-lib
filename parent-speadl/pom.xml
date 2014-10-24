@@ -19,7 +19,7 @@
 
 	<properties>
 		<xtext-version>2.7.2</xtext-version>
-		<may-version>3.4.0</may-version>
+		<may-version>3.4.1-SNAPSHOT</may-version>
 	</properties>
 
 	<build>
