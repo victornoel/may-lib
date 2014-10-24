@@ -10,4 +10,6 @@
 
 	<artifactId>common-interfaces</artifactId>
 	
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Java interfaces generally used in the MAY component library</description>
 </project>

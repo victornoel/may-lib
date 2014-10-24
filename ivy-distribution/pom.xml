@@ -10,6 +10,9 @@
 
 	<artifactId>ivy-distribution</artifactId>
 	
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Collection of component to communicate using Ivy</description>
+	
 	<dependencies>
 		<dependency>
 			<groupId>fr.irit.smac.lib.may</groupId>
@@ -19,7 +22,7 @@
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-mapper-lgpl</artifactId>
-			<version>1.9.11</version>
+			<version>1.9.13</version>
 		</dependency>
 		<dependency>
 			<groupId>fr.dgac.ivy</groupId>
@@ -27,31 +30,9 @@
 			<version>1.2.13</version>
 		</dependency>
 		<dependency>
-			<groupId>org.javatuples</groupId>
-			<artifactId>javatuples</artifactId>
-			<version>1.2</version>
-		</dependency>
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.7</version>
 		</dependency>
 	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.xtext</groupId>
-				<artifactId>xtext-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>

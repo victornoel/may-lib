@@ -10,6 +10,9 @@
 
 	<artifactId>classic-agents</artifactId>
 	
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Examples of MAS infrastructure defined with MAY/SpeADL</description>
+	
 	<dependencies>
 		<dependency>
 			<groupId>fr.irit.smac.lib.may</groupId>
@@ -17,21 +20,4 @@
 			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.xtext</groupId>
-				<artifactId>xtext-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>

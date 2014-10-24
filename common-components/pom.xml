@@ -10,6 +10,9 @@
 
 	<artifactId>common-components</artifactId>
 
+	<name>${project.groupId}:${project.artifactId}</name>
+	<description>Collection of components usable with MAY/SpeADL</description>
+
 	<dependencies>
 		<dependency>
 			<groupId>fr.irit.smac.lib.may</groupId>
@@ -19,24 +22,7 @@
 		<dependency>
 			<groupId>org.functionaljava</groupId>
 			<artifactId>functionaljava</artifactId>
-			<version>3.1</version>
+			<version>4.1</version>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-clean-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.eclipse.xtext</groupId>
-				<artifactId>xtext-maven-plugin</artifactId>
-			</plugin>
-		</plugins>
-	</build>
 </project>
