@@ -15,8 +15,10 @@
 		<module>classic-agents</module>
 		<module>common-interfaces</module>
 		<module>common-components</module>
-		<module>ivy-distribution</module>
 		<module>webservices</module>
+		<!-- For now, do not include this for deployment
+			as it depends on a lib not available on Maven Central -->
+		<!-- module>ivy-distribution</module -->
 	</modules>
 
 	<build>

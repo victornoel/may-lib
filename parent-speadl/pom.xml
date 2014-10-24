@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>fr.irit.smac.lib.may</groupId>
 		<artifactId>parent</artifactId>
-		<version>3.4.0-SNAPSHOT</version>
+		<version>3.4.0</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 
@@ -19,7 +19,7 @@
 
 	<properties>
 		<xtext-version>2.7.2</xtext-version>
-		<may-version>3.4.0-SNAPSHOT</may-version>
+		<may-version>3.4.0</may-version>
 	</properties>
 
 	<build>
