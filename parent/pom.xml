@@ -13,7 +13,7 @@
 
 	<groupId>fr.irit.smac.lib.may</groupId>
 	<artifactId>parent</artifactId>
-	<version>3.4.0</version>
+	<version>3.4.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>${project.groupId}:${project.artifactId}</name>
