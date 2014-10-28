@@ -4,15 +4,15 @@
 	<parent>
 		<artifactId>parent-speadl</artifactId>
 		<groupId>fr.irit.smac.lib.may</groupId>
-		<version>3.4.1-SNAPSHOT</version>
+		<version>3.4.1</version>
 		<relativePath>../parent-speadl/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>ivy-distribution</artifactId>
-	
+
 	<name>${project.groupId}:${project.artifactId}</name>
 	<description>Collection of component to communicate using Ivy</description>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>fr.irit.smac.lib.may</groupId>
@@ -25,7 +25,7 @@
 			<version>1.9.13</version>
 		</dependency>
 		<dependency>
-			<groupId>fr.dgac.ivy</groupId>
+			<groupId>fr.irit.smac.thirdparty.ivy</groupId>
 			<artifactId>ivy-java</artifactId>
 			<version>1.2.13</version>
 		</dependency>
