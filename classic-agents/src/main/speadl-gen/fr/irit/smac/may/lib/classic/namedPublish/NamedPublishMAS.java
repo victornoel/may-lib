@@ -96,7 +96,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_observeds() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.observeds = this.implem_observeds._newComponent(new BridgeImpl_observeds(), false);
-      
     }
     
     private void init_executor() {
@@ -107,7 +106,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.executor = this.implem_executor._newComponent(new BridgeImpl_executor(), false);
-      
     }
     
     private void init_schedule() {
@@ -118,7 +116,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_schedule() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.schedule = this.implem_schedule._newComponent(new BridgeImpl_schedule(), false);
-      
     }
     
     private void init_clock() {
@@ -129,7 +126,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_clock() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.clock = this.implem_clock._newComponent(new BridgeImpl_clock(), false);
-      
     }
     
     private void init_gui() {
@@ -140,7 +136,6 @@ public abstract class NamedPublishMAS {
       	throw new RuntimeException("make_gui() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
       }
       this.gui = this.implem_gui._newComponent(new BridgeImpl_gui(), false);
-      
     }
     
     protected void initParts() {
@@ -151,11 +146,11 @@ public abstract class NamedPublishMAS {
       init_gui();
     }
     
-    private void init_create() {
+    protected void init_create() {
       assert this.create == null: "This is a bug.";
       this.create = this.implementation.make_create();
       if (this.create == null) {
-      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS should not return null.");
+      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS shall not return null.");
       }
     }
     
@@ -213,7 +208,9 @@ public abstract class NamedPublishMAS {
     
     private final class BridgeImpl_schedule implements Scheduler.Requires {
       public final AdvancedExecutor executor() {
-        return NamedPublishMAS.ComponentImpl.this.executor().executor();
+        return NamedPublishMAS.ComponentImpl.this.executor().
+        executor()
+        ;
       }
     }
     
@@ -227,11 +224,15 @@ public abstract class NamedPublishMAS {
     
     private final class BridgeImpl_clock implements Clock.Requires {
       public final Executor sched() {
-        return NamedPublishMAS.ComponentImpl.this.executor().executor();
+        return NamedPublishMAS.ComponentImpl.this.executor().
+        executor()
+        ;
       }
       
       public final Do tick() {
-        return NamedPublishMAS.ComponentImpl.this.schedule().tick();
+        return NamedPublishMAS.ComponentImpl.this.schedule().
+        tick()
+        ;
       }
     }
     
@@ -245,7 +246,9 @@ public abstract class NamedPublishMAS {
     
     private final class BridgeImpl_gui implements SchedulingControllerGUI.Requires {
       public final SchedulingControl control() {
-        return NamedPublishMAS.ComponentImpl.this.clock().control();
+        return NamedPublishMAS.ComponentImpl.this.clock().
+        control()
+        ;
       }
     }
     
@@ -307,7 +310,6 @@ public abstract class NamedPublishMAS {
         assert this.sched == null: "This is a bug.";
         assert this.implementation.use_sched != null: "This is a bug.";
         this.sched = this.implementation.use_sched._newComponent(new BridgeImpl_schedule_sched(), false);
-        
       }
       
       private void init_beh() {
@@ -318,14 +320,12 @@ public abstract class NamedPublishMAS {
         	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS$Observed should not return null.");
         }
         this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
-        
       }
       
       private void init_observed() {
         assert this.observed == null: "This is a bug.";
         assert this.implementation.use_observed != null: "This is a bug.";
         this.observed = this.implementation.use_observed._newComponent(new BridgeImpl_observeds_observed(), false);
-        
       }
       
       protected void initParts() {
@@ -358,7 +358,9 @@ public abstract class NamedPublishMAS {
       
       private final class BridgeImpl_schedule_sched implements Scheduler.Scheduled.Requires {
         public final Do cycle() {
-          return NamedPublishMAS.Observed.ComponentImpl.this.beh().cycle();
+          return NamedPublishMAS.Observed.ComponentImpl.this.beh().
+          cycle()
+          ;
         }
       }
       
@@ -372,7 +374,9 @@ public abstract class NamedPublishMAS {
       
       private final class BridgeImpl_beh implements ObservedBehaviour.Requires {
         public final Push<Integer> changeValue() {
-          return NamedPublishMAS.Observed.ComponentImpl.this.observed().set();
+          return NamedPublishMAS.Observed.ComponentImpl.this.observed().
+          set()
+          ;
         }
       }
       
@@ -563,7 +567,6 @@ public abstract class NamedPublishMAS {
         assert this.sched == null: "This is a bug.";
         assert this.implementation.use_sched != null: "This is a bug.";
         this.sched = this.implementation.use_sched._newComponent(new BridgeImpl_schedule_sched(), false);
-        
       }
       
       private void init_beh() {
@@ -574,14 +577,12 @@ public abstract class NamedPublishMAS {
         	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.namedPublish.NamedPublishMAS$Observer should not return null.");
         }
         this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
-        
       }
       
       private void init_observer() {
         assert this.observer == null: "This is a bug.";
         assert this.implementation.use_observer != null: "This is a bug.";
         this.observer = this.implementation.use_observer._newComponent(new BridgeImpl_observeds_observer(), false);
-        
       }
       
       protected void initParts() {
@@ -614,7 +615,9 @@ public abstract class NamedPublishMAS {
       
       private final class BridgeImpl_schedule_sched implements Scheduler.Scheduled.Requires {
         public final Do cycle() {
-          return NamedPublishMAS.Observer.ComponentImpl.this.beh().cycle();
+          return NamedPublishMAS.Observer.ComponentImpl.this.beh().
+          cycle()
+          ;
         }
       }
       
@@ -628,7 +631,9 @@ public abstract class NamedPublishMAS {
       
       private final class BridgeImpl_beh implements ObserverBehaviour.Requires<String> {
         public final Observe<Integer, String> observe() {
-          return NamedPublishMAS.Observer.ComponentImpl.this.observer().observe();
+          return NamedPublishMAS.Observer.ComponentImpl.this.observer().
+          observe()
+          ;
         }
       }
       

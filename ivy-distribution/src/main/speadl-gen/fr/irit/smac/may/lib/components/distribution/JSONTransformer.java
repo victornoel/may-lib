@@ -41,19 +41,19 @@ public abstract class JSONTransformer<T> {
       
     }
     
-    private void init_serializer() {
+    protected void init_serializer() {
       assert this.serializer == null: "This is a bug.";
       this.serializer = this.implementation.make_serializer();
       if (this.serializer == null) {
-      	throw new RuntimeException("make_serializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer<T> should not return null.");
+      	throw new RuntimeException("make_serializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer<T> shall not return null.");
       }
     }
     
-    private void init_deserializer() {
+    protected void init_deserializer() {
       assert this.deserializer == null: "This is a bug.";
       this.deserializer = this.implementation.make_deserializer();
       if (this.deserializer == null) {
-      	throw new RuntimeException("make_deserializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer<T> should not return null.");
+      	throw new RuntimeException("make_deserializer() in fr.irit.smac.may.lib.components.distribution.JSONTransformer<T> shall not return null.");
       }
     }
     

@@ -78,7 +78,6 @@ public abstract class Classic<Msg> {
       	throw new RuntimeException("make_receive() in fr.irit.smac.may.lib.classic.local.Classic<Msg> should not return null.");
       }
       this.receive = this.implem_receive._newComponent(new BridgeImpl_receive(), false);
-      
     }
     
     private void init_executor() {
@@ -89,7 +88,6 @@ public abstract class Classic<Msg> {
       	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.local.Classic<Msg> should not return null.");
       }
       this.executor = this.implem_executor._newComponent(new BridgeImpl_executor(), false);
-      
     }
     
     protected void initParts() {
@@ -97,16 +95,26 @@ public abstract class Classic<Msg> {
       init_executor();
     }
     
-    private void init_create() {
+    protected void init_send() {
+      // nothing to do here
+    }
+    
+    protected void init_create() {
       assert this.create == null: "This is a bug.";
       this.create = this.implementation.make_create();
       if (this.create == null) {
-      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.local.Classic<Msg> should not return null.");
+      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.local.Classic<Msg> shall not return null.");
       }
     }
     
+    protected void init_stop() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
+      init_send();
       init_create();
+      init_stop();
     }
     
     public ComponentImpl(final Classic<Msg> implem, final Classic.Requires<Msg> b, final boolean doInits) {
@@ -126,7 +134,9 @@ public abstract class Classic<Msg> {
     }
     
     public Send<Msg, DirRef> send() {
-      return this.receive().send();
+      return this.receive().
+      send()
+      ;
     }
     
     private CreateClassic<Msg, DirRef> create;
@@ -136,7 +146,9 @@ public abstract class Classic<Msg> {
     }
     
     public Do stop() {
-      return this.executor().stop();
+      return this.executor().
+      stop()
+      ;
     }
     
     private DirRefAsyncReceiver.Component<Msg> receive;
@@ -233,28 +245,24 @@ public abstract class Classic<Msg> {
         	throw new RuntimeException("make_arch() in fr.irit.smac.may.lib.classic.local.Classic$ClassicAgent<Msg> should not return null.");
         }
         this.arch = this.implem_arch._newComponent(new BridgeImpl_arch(), false);
-        
       }
       
       private void init_s() {
         assert this.s == null: "This is a bug.";
         assert this.implementation.use_s != null: "This is a bug.";
         this.s = this.implementation.use_s._newComponent(new BridgeImpl_executor_s(), false);
-        
       }
       
       private void init_receive() {
         assert this.receive == null: "This is a bug.";
         assert this.implementation.use_receive != null: "This is a bug.";
         this.receive = this.implementation.use_receive._newComponent(new BridgeImpl_receive_receive(), false);
-        
       }
       
       private void init_ss() {
         assert this.ss == null: "This is a bug.";
         assert this.implementation.use_ss != null: "This is a bug.";
         this.ss = this.implementation.use_ss._newComponent(new BridgeImpl_receive_ss(), false);
-        
       }
       
       protected void initParts() {
@@ -264,8 +272,12 @@ public abstract class Classic<Msg> {
         init_ss();
       }
       
+      protected void init_me() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_me();
       }
       
       public ComponentImpl(final Classic.ClassicAgent<Msg> implem, final Classic.ClassicAgent.Requires<Msg> b, final boolean doInits) {
@@ -285,7 +297,9 @@ public abstract class Classic<Msg> {
       }
       
       public Pull<DirRef> me() {
-        return this.receive().me();
+        return this.receive().
+        me()
+        ;
       }
       
       private ClassicAgentComponent.Component<Msg, DirRef> arch;
@@ -294,23 +308,33 @@ public abstract class Classic<Msg> {
       
       private final class BridgeImpl_arch implements ClassicAgentComponent.Requires<Msg, DirRef> {
         public final Send<Msg, DirRef> send() {
-          return Classic.ClassicAgent.ComponentImpl.this.ss().send();
+          return Classic.ClassicAgent.ComponentImpl.this.ss().
+          send()
+          ;
         }
         
         public final Pull<DirRef> me() {
-          return Classic.ClassicAgent.ComponentImpl.this.receive().me();
+          return Classic.ClassicAgent.ComponentImpl.this.receive().
+          me()
+          ;
         }
         
         public final Executor executor() {
-          return Classic.ClassicAgent.ComponentImpl.this.s().executor();
+          return Classic.ClassicAgent.ComponentImpl.this.s().
+          executor()
+          ;
         }
         
         public final Do die() {
-          return Classic.ClassicAgent.ComponentImpl.this.s().stop();
+          return Classic.ClassicAgent.ComponentImpl.this.s().
+          stop()
+          ;
         }
         
         public final CreateClassic<Msg, DirRef> create() {
-          return Classic.ClassicAgent.ComponentImpl.this.implementation.ecosystemComponent.create();
+          return Classic.ClassicAgent.ComponentImpl.this.implementation.ecosystemComponent.
+          create()
+          ;
         }
       }
       
@@ -331,7 +355,9 @@ public abstract class Classic<Msg> {
       
       private final class BridgeImpl_receive_receive implements DirRefAsyncReceiver.Receiver.Requires<Msg> {
         public final Push<Msg> put() {
-          return Classic.ClassicAgent.ComponentImpl.this.arch().put();
+          return Classic.ClassicAgent.ComponentImpl.this.arch().
+          put()
+          ;
         }
       }
       

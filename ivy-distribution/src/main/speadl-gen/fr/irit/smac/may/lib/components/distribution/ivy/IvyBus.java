@@ -61,35 +61,35 @@ public abstract class IvyBus {
       
     }
     
-    private void init_disconnect() {
+    protected void init_disconnect() {
       assert this.disconnect == null: "This is a bug.";
       this.disconnect = this.implementation.make_disconnect();
       if (this.disconnect == null) {
-      	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus should not return null.");
+      	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus shall not return null.");
       }
     }
     
-    private void init_bindMsg() {
+    protected void init_bindMsg() {
       assert this.bindMsg == null: "This is a bug.";
       this.bindMsg = this.implementation.make_bindMsg();
       if (this.bindMsg == null) {
-      	throw new RuntimeException("make_bindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus should not return null.");
+      	throw new RuntimeException("make_bindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus shall not return null.");
       }
     }
     
-    private void init_unBindMsg() {
+    protected void init_unBindMsg() {
       assert this.unBindMsg == null: "This is a bug.";
       this.unBindMsg = this.implementation.make_unBindMsg();
       if (this.unBindMsg == null) {
-      	throw new RuntimeException("make_unBindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus should not return null.");
+      	throw new RuntimeException("make_unBindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus shall not return null.");
       }
     }
     
-    private void init_send() {
+    protected void init_send() {
       assert this.send == null: "This is a bug.";
       this.send = this.implementation.make_send();
       if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus should not return null.");
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBus shall not return null.");
       }
     }
     

@@ -41,11 +41,11 @@ public abstract class ObserverBehaviour<Ref> {
       
     }
     
-    private void init_cycle() {
+    protected void init_cycle() {
       assert this.cycle == null: "This is a bug.";
       this.cycle = this.implementation.make_cycle();
       if (this.cycle == null) {
-      	throw new RuntimeException("make_cycle() in fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour<Ref> should not return null.");
+      	throw new RuntimeException("make_cycle() in fr.irit.smac.may.lib.classic.namedPublish.ObserverBehaviour<Ref> shall not return null.");
       }
     }
     

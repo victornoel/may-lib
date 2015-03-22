@@ -48,11 +48,11 @@ public abstract class Clock {
       
     }
     
-    private void init_control() {
+    protected void init_control() {
       assert this.control == null: "This is a bug.";
       this.control = this.implementation.make_control();
       if (this.control == null) {
-      	throw new RuntimeException("make_control() in fr.irit.smac.may.lib.components.scheduling.Clock should not return null.");
+      	throw new RuntimeException("make_control() in fr.irit.smac.may.lib.components.scheduling.Clock shall not return null.");
       }
     }
     

@@ -38,11 +38,11 @@ public abstract class DirectReferences<I> {
       
     }
     
-    private void init_call() {
+    protected void init_call() {
       assert this.call == null: "This is a bug.";
       this.call = this.implementation.make_call();
       if (this.call == null) {
-      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences<I> should not return null.");
+      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences<I> shall not return null.");
       }
     }
     
@@ -116,19 +116,19 @@ public abstract class DirectReferences<I> {
         
       }
       
-      private void init_me() {
+      protected void init_me() {
         assert this.me == null: "This is a bug.";
         this.me = this.implementation.make_me();
         if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee<I> should not return null.");
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee<I> shall not return null.");
         }
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee<I> should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Callee<I> shall not return null.");
         }
       }
       
@@ -321,11 +321,11 @@ public abstract class DirectReferences<I> {
         
       }
       
-      private void init_call() {
+      protected void init_call() {
         assert this.call == null: "This is a bug.";
         this.call = this.implementation.make_call();
         if (this.call == null) {
-        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Caller<I> should not return null.");
+        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.DirectReferences$Caller<I> shall not return null.");
         }
       }
       

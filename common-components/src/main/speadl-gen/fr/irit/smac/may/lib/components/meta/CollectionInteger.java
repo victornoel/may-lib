@@ -43,19 +43,19 @@ public abstract class CollectionInteger<I> {
       
     }
     
-    private void init_get() {
+    protected void init_get() {
       assert this.get == null: "This is a bug.";
       this.get = this.implementation.make_get();
       if (this.get == null) {
-      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.meta.CollectionInteger<I> should not return null.");
+      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.meta.CollectionInteger<I> shall not return null.");
       }
     }
     
-    private void init_size() {
+    protected void init_size() {
       assert this.size == null: "This is a bug.";
       this.size = this.implementation.make_size();
       if (this.size == null) {
-      	throw new RuntimeException("make_size() in fr.irit.smac.may.lib.components.meta.CollectionInteger<I> should not return null.");
+      	throw new RuntimeException("make_size() in fr.irit.smac.may.lib.components.meta.CollectionInteger<I> shall not return null.");
       }
     }
     
@@ -136,19 +136,19 @@ public abstract class CollectionInteger<I> {
         
       }
       
-      private void init_idx() {
+      protected void init_idx() {
         assert this.idx == null: "This is a bug.";
         this.idx = this.implementation.make_idx();
         if (this.idx == null) {
-        	throw new RuntimeException("make_idx() in fr.irit.smac.may.lib.components.meta.CollectionInteger$Element<I> should not return null.");
+        	throw new RuntimeException("make_idx() in fr.irit.smac.may.lib.components.meta.CollectionInteger$Element<I> shall not return null.");
         }
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.meta.CollectionInteger$Element<I> should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.meta.CollectionInteger$Element<I> shall not return null.");
         }
       }
       

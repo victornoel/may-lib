@@ -63,35 +63,35 @@ public abstract class IvyReceive {
       
     }
     
-    private void init_bindMsg() {
+    protected void init_bindMsg() {
       assert this.bindMsg == null: "This is a bug.";
       this.bindMsg = this.implementation.make_bindMsg();
       if (this.bindMsg == null) {
-      	throw new RuntimeException("make_bindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      	throw new RuntimeException("make_bindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive shall not return null.");
       }
     }
     
-    private void init_connectionStatus() {
+    protected void init_connectionStatus() {
       assert this.connectionStatus == null: "This is a bug.";
       this.connectionStatus = this.implementation.make_connectionStatus();
       if (this.connectionStatus == null) {
-      	throw new RuntimeException("make_connectionStatus() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      	throw new RuntimeException("make_connectionStatus() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive shall not return null.");
       }
     }
     
-    private void init_connect() {
+    protected void init_connect() {
       assert this.connect == null: "This is a bug.";
       this.connect = this.implementation.make_connect();
       if (this.connect == null) {
-      	throw new RuntimeException("make_connect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      	throw new RuntimeException("make_connect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive shall not return null.");
       }
     }
     
-    private void init_disconnect() {
+    protected void init_disconnect() {
       assert this.disconnect == null: "This is a bug.";
       this.disconnect = this.implementation.make_disconnect();
       if (this.disconnect == null) {
-      	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive should not return null.");
+      	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.distribution.ivy.IvyReceive shall not return null.");
       }
     }
     

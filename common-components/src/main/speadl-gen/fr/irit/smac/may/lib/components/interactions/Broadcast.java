@@ -43,11 +43,11 @@ public abstract class Broadcast<M, R> {
       
     }
     
-    private void init_broadcast() {
+    protected void init_broadcast() {
       assert this.broadcast == null: "This is a bug.";
       this.broadcast = this.implementation.make_broadcast();
       if (this.broadcast == null) {
-      	throw new RuntimeException("make_broadcast() in fr.irit.smac.may.lib.components.interactions.Broadcast<M, R> should not return null.");
+      	throw new RuntimeException("make_broadcast() in fr.irit.smac.may.lib.components.interactions.Broadcast<M, R> shall not return null.");
       }
     }
     
@@ -115,11 +115,11 @@ public abstract class Broadcast<M, R> {
         
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.Broadcast$BroadcastTarget<M, R> should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.Broadcast$BroadcastTarget<M, R> shall not return null.");
         }
       }
       
@@ -298,11 +298,11 @@ public abstract class Broadcast<M, R> {
         
       }
       
-      private void init_broadcast() {
+      protected void init_broadcast() {
         assert this.broadcast == null: "This is a bug.";
         this.broadcast = this.implementation.make_broadcast();
         if (this.broadcast == null) {
-        	throw new RuntimeException("make_broadcast() in fr.irit.smac.may.lib.components.interactions.Broadcast$Broadcaster<M, R> should not return null.");
+        	throw new RuntimeException("make_broadcast() in fr.irit.smac.may.lib.components.interactions.Broadcast$Broadcaster<M, R> shall not return null.");
         }
       }
       

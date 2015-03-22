@@ -63,7 +63,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("make_dr() in fr.irit.smac.may.lib.components.interactions.DirRefValuePublisher<T> should not return null.");
       }
       this.dr = this.implem_dr._newComponent(new BridgeImpl_dr(), false);
-      
     }
     
     private void init_vp() {
@@ -74,7 +73,6 @@ public abstract class DirRefValuePublisher<T> {
       	throw new RuntimeException("make_vp() in fr.irit.smac.may.lib.components.interactions.DirRefValuePublisher<T> should not return null.");
       }
       this.vp = this.implem_vp._newComponent(new BridgeImpl_vp(), false);
-      
     }
     
     protected void initParts() {
@@ -82,8 +80,12 @@ public abstract class DirRefValuePublisher<T> {
       init_vp();
     }
     
+    protected void init_observe() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
-      
+      init_observe();
     }
     
     public ComponentImpl(final DirRefValuePublisher<T> implem, final DirRefValuePublisher.Requires<T> b, final boolean doInits) {
@@ -103,7 +105,9 @@ public abstract class DirRefValuePublisher<T> {
     }
     
     public ReliableObserve<T, DirRef> observe() {
-      return this.vp().observe();
+      return this.vp().
+      observe()
+      ;
     }
     
     private DirectReferences.Component<Pull<T>> dr;
@@ -123,7 +127,9 @@ public abstract class DirRefValuePublisher<T> {
     
     private final class BridgeImpl_vp implements ValuePublisher.Requires<T, DirRef> {
       public final Call<Pull<T>, DirRef> call() {
-        return DirRefValuePublisher.ComponentImpl.this.dr().call();
+        return DirRefValuePublisher.ComponentImpl.this.dr().
+        call()
+        ;
       }
     }
     
@@ -193,14 +199,12 @@ public abstract class DirRefValuePublisher<T> {
         assert this.dr == null: "This is a bug.";
         assert this.implementation.use_dr != null: "This is a bug.";
         this.dr = this.implementation.use_dr._newComponent(new BridgeImpl_dr_dr(), false);
-        
       }
       
       private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
@@ -208,8 +212,22 @@ public abstract class DirRefValuePublisher<T> {
         init_vp();
       }
       
+      protected void init_set() {
+        // nothing to do here
+      }
+      
+      protected void init_get() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_set();
+        init_get();
+        init_stop();
       }
       
       public ComponentImpl(final DirRefValuePublisher.PublisherPush<T> implem, final DirRefValuePublisher.PublisherPush.Requires<T> b, final boolean doInits) {
@@ -229,22 +247,30 @@ public abstract class DirRefValuePublisher<T> {
       }
       
       public Push<T> set() {
-        return this.vp().set();
+        return this.vp().
+        set()
+        ;
       }
       
       public Pull<T> get() {
-        return this.vp().get();
+        return this.vp().
+        get()
+        ;
       }
       
       public Do stop() {
-        return this.dr().stop();
+        return this.dr().
+        stop()
+        ;
       }
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
       
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Pull<T>> {
         public final Pull<T> toCall() {
-          return DirRefValuePublisher.PublisherPush.ComponentImpl.this.vp().toCall();
+          return DirRefValuePublisher.PublisherPush.ComponentImpl.this.vp().
+          toCall()
+          ;
         }
       }
       
@@ -435,14 +461,12 @@ public abstract class DirRefValuePublisher<T> {
         assert this.dr == null: "This is a bug.";
         assert this.implementation.use_dr != null: "This is a bug.";
         this.dr = this.implementation.use_dr._newComponent(new BridgeImpl_dr_dr(), false);
-        
       }
       
       private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
@@ -450,8 +474,17 @@ public abstract class DirRefValuePublisher<T> {
         init_vp();
       }
       
+      protected void init_get() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_get();
+        init_stop();
       }
       
       public ComponentImpl(final DirRefValuePublisher.PublisherPull<T> implem, final DirRefValuePublisher.PublisherPull.Requires<T> b, final boolean doInits) {
@@ -471,18 +504,24 @@ public abstract class DirRefValuePublisher<T> {
       }
       
       public Pull<T> get() {
-        return this.vp().get();
+        return this.vp().
+        get()
+        ;
       }
       
       public Do stop() {
-        return this.dr().stop();
+        return this.dr().
+        stop()
+        ;
       }
       
       private DirectReferences.Callee.Component<Pull<T>> dr;
       
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Pull<T>> {
         public final Pull<T> toCall() {
-          return DirRefValuePublisher.PublisherPull.ComponentImpl.this.vp().toCall();
+          return DirRefValuePublisher.PublisherPull.ComponentImpl.this.vp().
+          toCall()
+          ;
         }
       }
       
@@ -494,7 +533,9 @@ public abstract class DirRefValuePublisher<T> {
       
       private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPull.Requires<T, DirRef> {
         public final Pull<T> getValue() {
-          return DirRefValuePublisher.PublisherPull.ComponentImpl.this.bridge.getValue();
+          return DirRefValuePublisher.PublisherPull.ComponentImpl.this.bridge.
+          getValue()
+          ;
         }
       }
       
@@ -656,15 +697,18 @@ public abstract class DirRefValuePublisher<T> {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
         init_vp();
       }
       
+      protected void init_observe() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_observe();
       }
       
       public ComponentImpl(final DirRefValuePublisher.Observer<T> implem, final DirRefValuePublisher.Observer.Requires<T> b, final boolean doInits) {
@@ -684,7 +728,9 @@ public abstract class DirRefValuePublisher<T> {
       }
       
       public ReliableObserve<T, DirRef> observe() {
-        return this.vp().observe();
+        return this.vp().
+        observe()
+        ;
       }
       
       private ValuePublisher.Observer.Component<T, DirRef> vp;

@@ -62,11 +62,11 @@ public abstract class RemoteClassicBehaviour<Msg, Ref> {
       
     }
     
-    private void init_cycle() {
+    protected void init_cycle() {
       assert this.cycle == null: "This is a bug.";
       this.cycle = this.implementation.make_cycle();
       if (this.cycle == null) {
-      	throw new RuntimeException("make_cycle() in fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour<Msg, Ref> should not return null.");
+      	throw new RuntimeException("make_cycle() in fr.irit.smac.may.lib.classic.remote.RemoteClassicBehaviour<Msg, Ref> shall not return null.");
       }
     }
     

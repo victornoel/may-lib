@@ -42,19 +42,19 @@ public abstract class ExecutorServiceWrapper {
       
     }
     
-    private void init_executor() {
+    protected void init_executor() {
       assert this.executor == null: "This is a bug.";
       this.executor = this.implementation.make_executor();
       if (this.executor == null) {
-      	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper should not return null.");
+      	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper shall not return null.");
       }
     }
     
-    private void init_stop() {
+    protected void init_stop() {
       assert this.stop == null: "This is a bug.";
       this.stop = this.implementation.make_stop();
       if (this.stop == null) {
-      	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper should not return null.");
+      	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper shall not return null.");
       }
     }
     
@@ -130,19 +130,19 @@ public abstract class ExecutorServiceWrapper {
         
       }
       
-      private void init_executor() {
+      protected void init_executor() {
         assert this.executor == null: "This is a bug.";
         this.executor = this.implementation.make_executor();
         if (this.executor == null) {
-        	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing should not return null.");
+        	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing shall not return null.");
         }
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.ExecutorServiceWrapper$Executing shall not return null.");
         }
       }
       

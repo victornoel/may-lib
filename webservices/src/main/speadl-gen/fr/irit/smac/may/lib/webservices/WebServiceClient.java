@@ -35,11 +35,11 @@ public abstract class WebServiceClient<I> {
       
     }
     
-    private void init_service() {
+    protected void init_service() {
       assert this.service == null: "This is a bug.";
       this.service = this.implementation.make_service();
       if (this.service == null) {
-      	throw new RuntimeException("make_service() in fr.irit.smac.may.lib.webservices.WebServiceClient<I> should not return null.");
+      	throw new RuntimeException("make_service() in fr.irit.smac.may.lib.webservices.WebServiceClient<I> shall not return null.");
       }
     }
     

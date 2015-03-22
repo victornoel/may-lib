@@ -71,7 +71,6 @@ public abstract class ClassicNamed<Msg> {
       	throw new RuntimeException("make_receive() in fr.irit.smac.may.lib.classic.named.ClassicNamed<Msg> should not return null.");
       }
       this.receive = this.implem_receive._newComponent(new BridgeImpl_receive(), false);
-      
     }
     
     private void init_executor() {
@@ -82,7 +81,6 @@ public abstract class ClassicNamed<Msg> {
       	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.named.ClassicNamed<Msg> should not return null.");
       }
       this.executor = this.implem_executor._newComponent(new BridgeImpl_executor(), false);
-      
     }
     
     protected void initParts() {
@@ -90,15 +88,20 @@ public abstract class ClassicNamed<Msg> {
       init_executor();
     }
     
-    private void init_create() {
+    protected void init_send() {
+      // nothing to do here
+    }
+    
+    protected void init_create() {
       assert this.create == null: "This is a bug.";
       this.create = this.implementation.make_create();
       if (this.create == null) {
-      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.named.ClassicNamed<Msg> should not return null.");
+      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.named.ClassicNamed<Msg> shall not return null.");
       }
     }
     
     protected void initProvidedPorts() {
+      init_send();
       init_create();
     }
     
@@ -119,7 +122,9 @@ public abstract class ClassicNamed<Msg> {
     }
     
     public Send<Msg, String> send() {
-      return this.receive().send();
+      return this.receive().
+      send()
+      ;
     }
     
     private CreateNamed<Msg, String> create;
@@ -217,28 +222,24 @@ public abstract class ClassicNamed<Msg> {
         	throw new RuntimeException("make_arch() in fr.irit.smac.may.lib.classic.named.ClassicNamed$ClassicNamedAgent<Msg> should not return null.");
         }
         this.arch = this.implem_arch._newComponent(new BridgeImpl_arch(), false);
-        
       }
       
       private void init_s() {
         assert this.s == null: "This is a bug.";
         assert this.implementation.use_s != null: "This is a bug.";
         this.s = this.implementation.use_s._newComponent(new BridgeImpl_executor_s(), false);
-        
       }
       
       private void init_receive() {
         assert this.receive == null: "This is a bug.";
         assert this.implementation.use_receive != null: "This is a bug.";
         this.receive = this.implementation.use_receive._newComponent(new BridgeImpl_receive_receive(), false);
-        
       }
       
       private void init_ss() {
         assert this.ss == null: "This is a bug.";
         assert this.implementation.use_ss != null: "This is a bug.";
         this.ss = this.implementation.use_ss._newComponent(new BridgeImpl_receive_ss(), false);
-        
       }
       
       protected void initParts() {
@@ -274,23 +275,33 @@ public abstract class ClassicNamed<Msg> {
       
       private final class BridgeImpl_arch implements ClassicNamedAgentComponent.Requires<Msg, String> {
         public final Send<Msg, String> send() {
-          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.ss().send();
+          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.ss().
+          send()
+          ;
         }
         
         public final Executor executor() {
-          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.s().executor();
+          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.s().
+          executor()
+          ;
         }
         
         public final Do die() {
-          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.s().stop();
+          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.s().
+          stop()
+          ;
         }
         
         public final CreateNamed<Msg, String> create() {
-          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.implementation.ecosystemComponent.create();
+          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.implementation.ecosystemComponent.
+          create()
+          ;
         }
         
         public final Pull<String> me() {
-          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.receive().me();
+          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.receive().
+          me()
+          ;
         }
       }
       
@@ -311,7 +322,9 @@ public abstract class ClassicNamed<Msg> {
       
       private final class BridgeImpl_receive_receive implements MapRefAsyncReceiver.Receiver.Requires<Msg, String> {
         public final Push<Msg> put() {
-          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.arch().put();
+          return ClassicNamed.ClassicNamedAgent.ComponentImpl.this.arch().
+          put()
+          ;
         }
       }
       

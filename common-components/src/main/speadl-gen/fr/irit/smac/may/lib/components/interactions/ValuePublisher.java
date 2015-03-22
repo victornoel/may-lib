@@ -43,11 +43,11 @@ public abstract class ValuePublisher<T, K> {
       
     }
     
-    private void init_observe() {
+    protected void init_observe() {
       assert this.observe == null: "This is a bug.";
       this.observe = this.implementation.make_observe();
       if (this.observe == null) {
-      	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher<T, K> should not return null.");
+      	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher<T, K> shall not return null.");
       }
     }
     
@@ -122,25 +122,30 @@ public abstract class ValuePublisher<T, K> {
         
       }
       
-      private void init_set() {
+      protected void init_set() {
         assert this.set == null: "This is a bug.";
         this.set = this.implementation.make_set();
         if (this.set == null) {
-        	throw new RuntimeException("make_set() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush<T, K> should not return null.");
+        	throw new RuntimeException("make_set() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush<T, K> shall not return null.");
         }
       }
       
-      private void init_get() {
+      protected void init_get() {
         assert this.get == null: "This is a bug.";
         this.get = this.implementation.make_get();
         if (this.get == null) {
-        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush<T, K> should not return null.");
+        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPush<T, K> shall not return null.");
         }
+      }
+      
+      protected void init_toCall() {
+        // nothing to do here
       }
       
       protected void initProvidedPorts() {
         init_set();
         init_get();
+        init_toCall();
       }
       
       public ComponentImpl(final ValuePublisher.PublisherPush<T, K> implem, final ValuePublisher.PublisherPush.Requires<T, K> b, final boolean doInits) {
@@ -172,7 +177,8 @@ public abstract class ValuePublisher<T, K> {
       }
       
       public Pull<T> toCall() {
-        return this.get();
+        return this.get()
+        ;
       }
     }
     
@@ -342,16 +348,21 @@ public abstract class ValuePublisher<T, K> {
         
       }
       
-      private void init_get() {
+      protected void init_get() {
         assert this.get == null: "This is a bug.";
         this.get = this.implementation.make_get();
         if (this.get == null) {
-        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPull<T, K> should not return null.");
+        	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$PublisherPull<T, K> shall not return null.");
         }
+      }
+      
+      protected void init_toCall() {
+        // nothing to do here
       }
       
       protected void initProvidedPorts() {
         init_get();
+        init_toCall();
       }
       
       public ComponentImpl(final ValuePublisher.PublisherPull<T, K> implem, final ValuePublisher.PublisherPull.Requires<T, K> b, final boolean doInits) {
@@ -377,7 +388,8 @@ public abstract class ValuePublisher<T, K> {
       }
       
       public Pull<T> toCall() {
-        return this.get();
+        return this.get()
+        ;
       }
     }
     
@@ -529,11 +541,11 @@ public abstract class ValuePublisher<T, K> {
         
       }
       
-      private void init_observe() {
+      protected void init_observe() {
         assert this.observe == null: "This is a bug.";
         this.observe = this.implementation.make_observe();
         if (this.observe == null) {
-        	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$Observer<T, K> should not return null.");
+        	throw new RuntimeException("make_observe() in fr.irit.smac.may.lib.components.interactions.ValuePublisher$Observer<T, K> shall not return null.");
         }
       }
       

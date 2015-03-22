@@ -37,11 +37,11 @@ public abstract class CollectionOf<I> {
       
     }
     
-    private void init_get() {
+    protected void init_get() {
       assert this.get == null: "This is a bug.";
       this.get = this.implementation.make_get();
       if (this.get == null) {
-      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.meta.CollectionOf<I> should not return null.");
+      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.meta.CollectionOf<I> shall not return null.");
       }
     }
     
@@ -109,11 +109,11 @@ public abstract class CollectionOf<I> {
         
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.meta.CollectionOf$Element<I> should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.meta.CollectionOf$Element<I> shall not return null.");
         }
       }
       

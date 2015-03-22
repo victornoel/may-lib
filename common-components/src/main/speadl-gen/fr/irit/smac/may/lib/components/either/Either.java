@@ -46,19 +46,19 @@ public abstract class Either<L, R> {
       
     }
     
-    private void init_left() {
+    protected void init_left() {
       assert this.left == null: "This is a bug.";
       this.left = this.implementation.make_left();
       if (this.left == null) {
-      	throw new RuntimeException("make_left() in fr.irit.smac.may.lib.components.either.Either<L, R> should not return null.");
+      	throw new RuntimeException("make_left() in fr.irit.smac.may.lib.components.either.Either<L, R> shall not return null.");
       }
     }
     
-    private void init_right() {
+    protected void init_right() {
       assert this.right == null: "This is a bug.";
       this.right = this.implementation.make_right();
       if (this.right == null) {
-      	throw new RuntimeException("make_right() in fr.irit.smac.may.lib.components.either.Either<L, R> should not return null.");
+      	throw new RuntimeException("make_right() in fr.irit.smac.may.lib.components.either.Either<L, R> shall not return null.");
       }
     }
     

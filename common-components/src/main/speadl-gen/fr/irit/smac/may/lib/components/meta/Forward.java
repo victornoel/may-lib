@@ -86,11 +86,11 @@ public abstract class Forward<I> {
         
       }
       
-      private void init_forwardedPort() {
+      protected void init_forwardedPort() {
         assert this.forwardedPort == null: "This is a bug.";
         this.forwardedPort = this.implementation.make_forwardedPort();
         if (this.forwardedPort == null) {
-        	throw new RuntimeException("make_forwardedPort() in fr.irit.smac.may.lib.components.meta.Forward$Caller<I> should not return null.");
+        	throw new RuntimeException("make_forwardedPort() in fr.irit.smac.may.lib.components.meta.Forward$Caller<I> shall not return null.");
         }
       }
       

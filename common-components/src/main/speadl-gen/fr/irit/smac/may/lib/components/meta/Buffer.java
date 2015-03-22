@@ -46,19 +46,19 @@ public abstract class Buffer<I> {
       
     }
     
-    private void init_port() {
+    protected void init_port() {
       assert this.port == null: "This is a bug.";
       this.port = this.implementation.make_port();
       if (this.port == null) {
-      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Buffer<I> should not return null.");
+      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Buffer<I> shall not return null.");
       }
     }
     
-    private void init_release() {
+    protected void init_release() {
       assert this.release == null: "This is a bug.";
       this.release = this.implementation.make_release();
       if (this.release == null) {
-      	throw new RuntimeException("make_release() in fr.irit.smac.may.lib.components.meta.Buffer<I> should not return null.");
+      	throw new RuntimeException("make_release() in fr.irit.smac.may.lib.components.meta.Buffer<I> shall not return null.");
       }
     }
     

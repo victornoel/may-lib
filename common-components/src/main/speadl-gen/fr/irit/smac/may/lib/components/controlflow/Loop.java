@@ -47,11 +47,11 @@ public abstract class Loop {
       
     }
     
-    private void init_stop() {
+    protected void init_stop() {
       assert this.stop == null: "This is a bug.";
       this.stop = this.implementation.make_stop();
       if (this.stop == null) {
-      	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.controlflow.Loop should not return null.");
+      	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.controlflow.Loop shall not return null.");
       }
     }
     

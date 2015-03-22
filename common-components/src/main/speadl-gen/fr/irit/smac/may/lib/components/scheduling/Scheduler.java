@@ -48,19 +48,19 @@ public abstract class Scheduler {
       
     }
     
-    private void init_tick() {
+    protected void init_tick() {
       assert this.tick == null: "This is a bug.";
       this.tick = this.implementation.make_tick();
       if (this.tick == null) {
-      	throw new RuntimeException("make_tick() in fr.irit.smac.may.lib.components.scheduling.Scheduler should not return null.");
+      	throw new RuntimeException("make_tick() in fr.irit.smac.may.lib.components.scheduling.Scheduler shall not return null.");
       }
     }
     
-    private void init_async() {
+    protected void init_async() {
       assert this.async == null: "This is a bug.";
       this.async = this.implementation.make_async();
       if (this.async == null) {
-      	throw new RuntimeException("make_async() in fr.irit.smac.may.lib.components.scheduling.Scheduler should not return null.");
+      	throw new RuntimeException("make_async() in fr.irit.smac.may.lib.components.scheduling.Scheduler shall not return null.");
       }
     }
     
@@ -135,11 +135,11 @@ public abstract class Scheduler {
         
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.Scheduler$Scheduled should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.scheduling.Scheduler$Scheduled shall not return null.");
         }
       }
       

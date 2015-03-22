@@ -48,11 +48,11 @@ public abstract class RemoteFactory<Msg, Ref> {
       
     }
     
-    private void init_factCreate() {
+    protected void init_factCreate() {
       assert this.factCreate == null: "This is a bug.";
       this.factCreate = this.implementation.make_factCreate();
       if (this.factCreate == null) {
-      	throw new RuntimeException("make_factCreate() in fr.irit.smac.may.lib.classic.remote.RemoteFactory<Msg, Ref> should not return null.");
+      	throw new RuntimeException("make_factCreate() in fr.irit.smac.may.lib.classic.remote.RemoteFactory<Msg, Ref> shall not return null.");
       }
     }
     
@@ -115,11 +115,11 @@ public abstract class RemoteFactory<Msg, Ref> {
         
       }
       
-      private void init_create() {
+      protected void init_create() {
         assert this.create == null: "This is a bug.";
         this.create = this.implementation.make_create();
         if (this.create == null) {
-        	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.remote.RemoteFactory$Agent<Msg, Ref> should not return null.");
+        	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.remote.RemoteFactory$Agent<Msg, Ref> shall not return null.");
         }
       }
       

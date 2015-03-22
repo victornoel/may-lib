@@ -110,7 +110,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("make_receive() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.receive = this.implem_receive._newComponent(new BridgeImpl_receive(), false);
-      
     }
     
     private void init_placed() {
@@ -121,7 +120,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("make_placed() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.placed = this.implem_placed._newComponent(new BridgeImpl_placed(), false);
-      
     }
     
     private void init_remReceive() {
@@ -132,7 +130,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("make_remReceive() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.remReceive = this.implem_remReceive._newComponent(new BridgeImpl_remReceive(), false);
-      
     }
     
     private void init_fact() {
@@ -143,7 +140,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("make_fact() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.fact = this.implem_fact._newComponent(new BridgeImpl_fact(), false);
-      
     }
     
     private void init_executor() {
@@ -154,7 +150,6 @@ public abstract class RemoteClassic<Msg> {
       	throw new RuntimeException("make_executor() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
       }
       this.executor = this.implem_executor._newComponent(new BridgeImpl_executor(), false);
-      
     }
     
     protected void initParts() {
@@ -165,15 +160,25 @@ public abstract class RemoteClassic<Msg> {
       init_executor();
     }
     
-    private void init_create() {
+    protected void init_send() {
+      // nothing to do here
+    }
+    
+    protected void init_thisPlace() {
+      // nothing to do here
+    }
+    
+    protected void init_create() {
       assert this.create == null: "This is a bug.";
       this.create = this.implementation.make_create();
       if (this.create == null) {
-      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> should not return null.");
+      	throw new RuntimeException("make_create() in fr.irit.smac.may.lib.classic.remote.RemoteClassic<Msg> shall not return null.");
       }
     }
     
     protected void initProvidedPorts() {
+      init_send();
+      init_thisPlace();
       init_create();
     }
     
@@ -194,11 +199,15 @@ public abstract class RemoteClassic<Msg> {
     }
     
     public Send<Msg, RemoteAgentRef> send() {
-      return this.remReceive().send();
+      return this.remReceive().
+      send()
+      ;
     }
     
     public Pull<Place> thisPlace() {
-      return this.placed().thisPlace();
+      return this.placed().
+      thisPlace()
+      ;
     }
     
     private CreateRemoteClassic<Msg, RemoteAgentRef> create;
@@ -235,11 +244,15 @@ public abstract class RemoteClassic<Msg> {
     
     private final class BridgeImpl_remReceive implements RemoteReceiver.Requires<Msg, DirRef> {
       public final Send<Msg, DirRef> localSend() {
-        return RemoteClassic.ComponentImpl.this.receive().send();
+        return RemoteClassic.ComponentImpl.this.receive().
+        send()
+        ;
       }
       
       public final Pull<Place> myPlace() {
-        return RemoteClassic.ComponentImpl.this.placed().thisPlace();
+        return RemoteClassic.ComponentImpl.this.placed().
+        thisPlace()
+        ;
       }
     }
     
@@ -253,11 +266,14 @@ public abstract class RemoteClassic<Msg> {
     
     private final class BridgeImpl_fact implements RemoteFactory.Requires<Msg, RemoteAgentRef> {
       public final CreateRemoteClassic<Msg, RemoteAgentRef> infraCreate() {
-        return RemoteClassic.ComponentImpl.this.create();
+        return RemoteClassic.ComponentImpl.this.create()
+        ;
       }
       
       public final Pull<Place> thisPlace() {
-        return RemoteClassic.ComponentImpl.this.placed().thisPlace();
+        return RemoteClassic.ComponentImpl.this.placed().
+        thisPlace()
+        ;
       }
     }
     
@@ -366,42 +382,36 @@ public abstract class RemoteClassic<Msg> {
         	throw new RuntimeException("make_arch() in fr.irit.smac.may.lib.classic.remote.RemoteClassic$ClassicAgent<Msg> should not return null.");
         }
         this.arch = this.implem_arch._newComponent(new BridgeImpl_arch(), false);
-        
       }
       
       private void init_p() {
         assert this.p == null: "This is a bug.";
         assert this.implementation.use_p != null: "This is a bug.";
         this.p = this.implementation.use_p._newComponent(new BridgeImpl_placed_p(), false);
-        
       }
       
       private void init_f() {
         assert this.f == null: "This is a bug.";
         assert this.implementation.use_f != null: "This is a bug.";
         this.f = this.implementation.use_f._newComponent(new BridgeImpl_fact_f(), false);
-        
       }
       
       private void init_s() {
         assert this.s == null: "This is a bug.";
         assert this.implementation.use_s != null: "This is a bug.";
         this.s = this.implementation.use_s._newComponent(new BridgeImpl_executor_s(), false);
-        
       }
       
       private void init_r() {
         assert this.r == null: "This is a bug.";
         assert this.implementation.use_r != null: "This is a bug.";
         this.r = this.implementation.use_r._newComponent(new BridgeImpl_receive_r(), false);
-        
       }
       
       private void init_rr() {
         assert this.rr == null: "This is a bug.";
         assert this.implementation.use_rr != null: "This is a bug.";
         this.rr = this.implementation.use_rr._newComponent(new BridgeImpl_remReceive_rr(), false);
-        
       }
       
       protected void initParts() {
@@ -413,8 +423,12 @@ public abstract class RemoteClassic<Msg> {
         init_rr();
       }
       
+      protected void init_ref() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_ref();
       }
       
       public ComponentImpl(final RemoteClassic.ClassicAgent<Msg> implem, final RemoteClassic.ClassicAgent.Requires<Msg> b, final boolean doInits) {
@@ -434,7 +448,9 @@ public abstract class RemoteClassic<Msg> {
       }
       
       public Pull<RemoteAgentRef> ref() {
-        return this.rr().me();
+        return this.rr().
+        me()
+        ;
       }
       
       private RemoteClassicAgentComponent.Component<Msg, RemoteAgentRef> arch;
@@ -443,27 +459,40 @@ public abstract class RemoteClassic<Msg> {
       
       private final class BridgeImpl_arch implements RemoteClassicAgentComponent.Requires<Msg, RemoteAgentRef> {
         public final Send<Msg, RemoteAgentRef> send() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.implementation.ecosystemComponent.remReceive().send();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.implementation.ecosystemComponent.
+          remReceive().
+          send()
+          ;
         }
         
         public final Pull<RemoteAgentRef> me() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr().me();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr().
+          me()
+          ;
         }
         
         public final Do stopExec() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.s().stop();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.s().
+          stop()
+          ;
         }
         
         public final Do stopReceive() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr().disconnect();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.rr().
+          disconnect()
+          ;
         }
         
         public final Executor executor() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.s().executor();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.s().
+          executor()
+          ;
         }
         
         public final CreateRemoteClassic<Msg, RemoteAgentRef> create() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.f().create();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.f().
+          create()
+          ;
         }
       }
       
@@ -502,7 +531,9 @@ public abstract class RemoteClassic<Msg> {
       
       private final class BridgeImpl_receive_r implements DirRefAsyncReceiver.Receiver.Requires<Msg> {
         public final Push<Msg> put() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.arch().put();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.arch().
+          put()
+          ;
         }
       }
       
@@ -514,7 +545,9 @@ public abstract class RemoteClassic<Msg> {
       
       private final class BridgeImpl_remReceive_rr implements RemoteReceiver.Agent.Requires<Msg, DirRef> {
         public final Pull<DirRef> localMe() {
-          return RemoteClassic.ClassicAgent.ComponentImpl.this.r().me();
+          return RemoteClassic.ClassicAgent.ComponentImpl.this.r().
+          me()
+          ;
         }
       }
       

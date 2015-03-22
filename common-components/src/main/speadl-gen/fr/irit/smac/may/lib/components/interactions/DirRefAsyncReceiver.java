@@ -63,7 +63,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("make_dr() in fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver<M> should not return null.");
       }
       this.dr = this.implem_dr._newComponent(new BridgeImpl_dr(), false);
-      
     }
     
     private void init_ar() {
@@ -74,7 +73,6 @@ public abstract class DirRefAsyncReceiver<M> {
       	throw new RuntimeException("make_ar() in fr.irit.smac.may.lib.components.interactions.DirRefAsyncReceiver<M> should not return null.");
       }
       this.ar = this.implem_ar._newComponent(new BridgeImpl_ar(), false);
-      
     }
     
     protected void initParts() {
@@ -82,8 +80,12 @@ public abstract class DirRefAsyncReceiver<M> {
       init_ar();
     }
     
+    protected void init_send() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
-      
+      init_send();
     }
     
     public ComponentImpl(final DirRefAsyncReceiver<M> implem, final DirRefAsyncReceiver.Requires<M> b, final boolean doInits) {
@@ -103,7 +105,9 @@ public abstract class DirRefAsyncReceiver<M> {
     }
     
     public ReliableSend<M, DirRef> send() {
-      return this.ar().send();
+      return this.ar().
+      send()
+      ;
     }
     
     private DirectReferences.Component<Push<M>> dr;
@@ -123,7 +127,9 @@ public abstract class DirRefAsyncReceiver<M> {
     
     private final class BridgeImpl_ar implements AsyncReceiver.Requires<M, DirRef> {
       public final Call<Push<M>, DirRef> call() {
-        return DirRefAsyncReceiver.ComponentImpl.this.dr().call();
+        return DirRefAsyncReceiver.ComponentImpl.this.dr().
+        call()
+        ;
       }
     }
     
@@ -192,14 +198,12 @@ public abstract class DirRefAsyncReceiver<M> {
         assert this.dr == null: "This is a bug.";
         assert this.implementation.use_dr != null: "This is a bug.";
         this.dr = this.implementation.use_dr._newComponent(new BridgeImpl_dr_dr(), false);
-        
       }
       
       private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
-        
       }
       
       protected void initParts() {
@@ -207,8 +211,17 @@ public abstract class DirRefAsyncReceiver<M> {
         init_ar();
       }
       
+      protected void init_me() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_me();
+        init_stop();
       }
       
       public ComponentImpl(final DirRefAsyncReceiver.Receiver<M> implem, final DirRefAsyncReceiver.Receiver.Requires<M> b, final boolean doInits) {
@@ -228,18 +241,24 @@ public abstract class DirRefAsyncReceiver<M> {
       }
       
       public Pull<DirRef> me() {
-        return this.dr().me();
+        return this.dr().
+        me()
+        ;
       }
       
       public Do stop() {
-        return this.dr().stop();
+        return this.dr().
+        stop()
+        ;
       }
       
       private DirectReferences.Callee.Component<Push<M>> dr;
       
       private final class BridgeImpl_dr_dr implements DirectReferences.Callee.Requires<Push<M>> {
         public final Push<M> toCall() {
-          return DirRefAsyncReceiver.Receiver.ComponentImpl.this.ar().toCall();
+          return DirRefAsyncReceiver.Receiver.ComponentImpl.this.ar().
+          toCall()
+          ;
         }
       }
       
@@ -251,7 +270,9 @@ public abstract class DirRefAsyncReceiver<M> {
       
       private final class BridgeImpl_ar_ar implements AsyncReceiver.Receiver.Requires<M, DirRef> {
         public final Push<M> put() {
-          return DirRefAsyncReceiver.Receiver.ComponentImpl.this.bridge.put();
+          return DirRefAsyncReceiver.Receiver.ComponentImpl.this.bridge.
+          put()
+          ;
         }
       }
       
@@ -413,15 +434,18 @@ public abstract class DirRefAsyncReceiver<M> {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
-        
       }
       
       protected void initParts() {
         init_ar();
       }
       
+      protected void init_send() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_send();
       }
       
       public ComponentImpl(final DirRefAsyncReceiver.Sender<M> implem, final DirRefAsyncReceiver.Sender.Requires<M> b, final boolean doInits) {
@@ -441,7 +465,9 @@ public abstract class DirRefAsyncReceiver<M> {
       }
       
       public ReliableSend<M, DirRef> send() {
-        return this.ar().send();
+        return this.ar().
+        send()
+        ;
       }
       
       private AsyncReceiver.Sender.Component<M, DirRef> ar;

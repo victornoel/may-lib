@@ -50,11 +50,11 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
       
     }
     
-    private void init_send() {
+    protected void init_send() {
       assert this.send == null: "This is a bug.";
       this.send = this.implementation.make_send();
       if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver<Msg, LocalRef> should not return null.");
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver<Msg, LocalRef> shall not return null.");
       }
     }
     
@@ -128,19 +128,19 @@ public abstract class RemoteReceiver<Msg, LocalRef> {
         
       }
       
-      private void init_me() {
+      protected void init_me() {
         assert this.me == null: "This is a bug.";
         this.me = this.implementation.make_me();
         if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent<Msg, LocalRef> should not return null.");
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent<Msg, LocalRef> shall not return null.");
         }
       }
       
-      private void init_disconnect() {
+      protected void init_disconnect() {
         assert this.disconnect == null: "This is a bug.";
         this.disconnect = this.implementation.make_disconnect();
         if (this.disconnect == null) {
-        	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent<Msg, LocalRef> should not return null.");
+        	throw new RuntimeException("make_disconnect() in fr.irit.smac.may.lib.components.remote.messaging.receiver.RemoteReceiver$Agent<Msg, LocalRef> shall not return null.");
         }
       }
       

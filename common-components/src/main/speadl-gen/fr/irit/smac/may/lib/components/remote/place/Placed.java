@@ -36,11 +36,11 @@ public abstract class Placed {
       
     }
     
-    private void init_thisPlace() {
+    protected void init_thisPlace() {
       assert this.thisPlace == null: "This is a bug.";
       this.thisPlace = this.implementation.make_thisPlace();
       if (this.thisPlace == null) {
-      	throw new RuntimeException("make_thisPlace() in fr.irit.smac.may.lib.components.remote.place.Placed should not return null.");
+      	throw new RuntimeException("make_thisPlace() in fr.irit.smac.may.lib.components.remote.place.Placed shall not return null.");
       }
     }
     
@@ -103,11 +103,11 @@ public abstract class Placed {
         
       }
       
-      private void init_myPlace() {
+      protected void init_myPlace() {
         assert this.myPlace == null: "This is a bug.";
         this.myPlace = this.implementation.make_myPlace();
         if (this.myPlace == null) {
-        	throw new RuntimeException("make_myPlace() in fr.irit.smac.may.lib.components.remote.place.Placed$Agent should not return null.");
+        	throw new RuntimeException("make_myPlace() in fr.irit.smac.may.lib.components.remote.place.Placed$Agent shall not return null.");
         }
       }
       

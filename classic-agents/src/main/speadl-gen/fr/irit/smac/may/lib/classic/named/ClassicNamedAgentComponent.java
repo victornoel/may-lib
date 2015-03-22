@@ -92,7 +92,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       	throw new RuntimeException("make_dispatcher() in fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent<Msg, Ref> should not return null.");
       }
       this.dispatcher = this.implem_dispatcher._newComponent(new BridgeImpl_dispatcher(), false);
-      
     }
     
     private void init_beh() {
@@ -103,7 +102,6 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.named.ClassicNamedAgentComponent<Msg, Ref> should not return null.");
       }
       this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
-      
     }
     
     protected void initParts() {
@@ -111,8 +109,12 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
       init_beh();
     }
     
+    protected void init_put() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
-      
+      init_put();
     }
     
     public ComponentImpl(final ClassicNamedAgentComponent<Msg, Ref> implem, final ClassicNamedAgentComponent.Requires<Msg, Ref> b, final boolean doInits) {
@@ -132,7 +134,9 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     }
     
     public Push<Msg> put() {
-      return this.dispatcher().dispatch();
+      return this.dispatcher().
+      dispatch()
+      ;
     }
     
     private SequentialDispatcher.Component<Msg> dispatcher;
@@ -141,11 +145,15 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     
     private final class BridgeImpl_dispatcher implements SequentialDispatcher.Requires<Msg> {
       public final Executor executor() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.executor();
+        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.
+        executor()
+        ;
       }
       
       public final Push<Msg> handler() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.beh().cycle();
+        return ClassicNamedAgentComponent.ComponentImpl.this.beh().
+        cycle()
+        ;
       }
     }
     
@@ -159,19 +167,27 @@ public abstract class ClassicNamedAgentComponent<Msg, Ref> {
     
     private final class BridgeImpl_beh implements ClassicNamedBehaviour.Requires<Msg, Ref> {
       public final Send<Msg, Ref> send() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.send();
+        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.
+        send()
+        ;
       }
       
       public final Pull<Ref> me() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.me();
+        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.
+        me()
+        ;
       }
       
       public final Do die() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.die();
+        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.
+        die()
+        ;
       }
       
       public final CreateNamed<Msg, Ref> create() {
-        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.create();
+        return ClassicNamedAgentComponent.ComponentImpl.this.bridge.
+        create()
+        ;
       }
     }
     

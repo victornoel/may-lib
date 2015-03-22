@@ -60,18 +60,17 @@ public abstract class SequentialDispatcher<T> {
       	throw new RuntimeException("make_queue() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher<T> should not return null.");
       }
       this.queue = this.implem_queue._newComponent(new BridgeImpl_queue(), false);
-      
     }
     
     protected void initParts() {
       init_queue();
     }
     
-    private void init_dispatch() {
+    protected void init_dispatch() {
       assert this.dispatch == null: "This is a bug.";
       this.dispatch = this.implementation.make_dispatch();
       if (this.dispatch == null) {
-      	throw new RuntimeException("make_dispatch() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher<T> should not return null.");
+      	throw new RuntimeException("make_dispatch() in fr.irit.smac.may.lib.components.controlflow.SequentialDispatcher<T> shall not return null.");
       }
     }
     

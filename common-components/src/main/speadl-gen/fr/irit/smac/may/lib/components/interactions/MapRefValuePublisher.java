@@ -62,7 +62,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("make_mr() in fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher<T, K> should not return null.");
       }
       this.mr = this.implem_mr._newComponent(new BridgeImpl_mr(), false);
-      
     }
     
     private void init_vp() {
@@ -73,7 +72,6 @@ public abstract class MapRefValuePublisher<T, K> {
       	throw new RuntimeException("make_vp() in fr.irit.smac.may.lib.components.interactions.MapRefValuePublisher<T, K> should not return null.");
       }
       this.vp = this.implem_vp._newComponent(new BridgeImpl_vp(), false);
-      
     }
     
     protected void initParts() {
@@ -81,8 +79,12 @@ public abstract class MapRefValuePublisher<T, K> {
       init_vp();
     }
     
+    protected void init_observe() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
-      
+      init_observe();
     }
     
     public ComponentImpl(final MapRefValuePublisher<T, K> implem, final MapRefValuePublisher.Requires<T, K> b, final boolean doInits) {
@@ -102,7 +104,9 @@ public abstract class MapRefValuePublisher<T, K> {
     }
     
     public ReliableObserve<T, K> observe() {
-      return this.vp().observe();
+      return this.vp().
+      observe()
+      ;
     }
     
     private MapReferences.Component<Pull<T>, K> mr;
@@ -122,7 +126,9 @@ public abstract class MapRefValuePublisher<T, K> {
     
     private final class BridgeImpl_vp implements ValuePublisher.Requires<T, K> {
       public final Call<Pull<T>, K> call() {
-        return MapRefValuePublisher.ComponentImpl.this.mr().call();
+        return MapRefValuePublisher.ComponentImpl.this.mr().
+        call()
+        ;
       }
     }
     
@@ -192,14 +198,12 @@ public abstract class MapRefValuePublisher<T, K> {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
-        
       }
       
       private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
@@ -207,8 +211,22 @@ public abstract class MapRefValuePublisher<T, K> {
         init_vp();
       }
       
+      protected void init_set() {
+        // nothing to do here
+      }
+      
+      protected void init_get() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_set();
+        init_get();
+        init_stop();
       }
       
       public ComponentImpl(final MapRefValuePublisher.PublisherPush<T, K> implem, final MapRefValuePublisher.PublisherPush.Requires<T, K> b, final boolean doInits) {
@@ -228,22 +246,30 @@ public abstract class MapRefValuePublisher<T, K> {
       }
       
       public Push<T> set() {
-        return this.vp().set();
+        return this.vp().
+        set()
+        ;
       }
       
       public Pull<T> get() {
-        return this.vp().get();
+        return this.vp().
+        get()
+        ;
       }
       
       public Do stop() {
-        return this.mr().stop();
+        return this.mr().
+        stop()
+        ;
       }
       
       private MapReferences.Callee.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.Callee.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPush.ComponentImpl.this.vp().toCall();
+          return MapRefValuePublisher.PublisherPush.ComponentImpl.this.vp().
+          toCall()
+          ;
         }
       }
       
@@ -434,14 +460,12 @@ public abstract class MapRefValuePublisher<T, K> {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
-        
       }
       
       private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
@@ -449,8 +473,17 @@ public abstract class MapRefValuePublisher<T, K> {
         init_vp();
       }
       
+      protected void init_get() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_get();
+        init_stop();
       }
       
       public ComponentImpl(final MapRefValuePublisher.PublisherPull<T, K> implem, final MapRefValuePublisher.PublisherPull.Requires<T, K> b, final boolean doInits) {
@@ -470,18 +503,24 @@ public abstract class MapRefValuePublisher<T, K> {
       }
       
       public Pull<T> get() {
-        return this.vp().get();
+        return this.vp().
+        get()
+        ;
       }
       
       public Do stop() {
-        return this.mr().stop();
+        return this.mr().
+        stop()
+        ;
       }
       
       private MapReferences.Callee.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.Callee.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPull.ComponentImpl.this.vp().toCall();
+          return MapRefValuePublisher.PublisherPull.ComponentImpl.this.vp().
+          toCall()
+          ;
         }
       }
       
@@ -493,7 +532,9 @@ public abstract class MapRefValuePublisher<T, K> {
       
       private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPull.Requires<T, K> {
         public final Pull<T> getValue() {
-          return MapRefValuePublisher.PublisherPull.ComponentImpl.this.bridge.getValue();
+          return MapRefValuePublisher.PublisherPull.ComponentImpl.this.bridge.
+          getValue()
+          ;
         }
       }
       
@@ -681,14 +722,12 @@ public abstract class MapRefValuePublisher<T, K> {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
-        
       }
       
       private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
@@ -696,8 +735,22 @@ public abstract class MapRefValuePublisher<T, K> {
         init_vp();
       }
       
+      protected void init_set() {
+        // nothing to do here
+      }
+      
+      protected void init_get() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_set();
+        init_get();
+        init_stop();
       }
       
       public ComponentImpl(final MapRefValuePublisher.PublisherPushKeyPort<T, K> implem, final MapRefValuePublisher.PublisherPushKeyPort.Requires<T, K> b, final boolean doInits) {
@@ -717,26 +770,36 @@ public abstract class MapRefValuePublisher<T, K> {
       }
       
       public Push<T> set() {
-        return this.vp().set();
+        return this.vp().
+        set()
+        ;
       }
       
       public Pull<T> get() {
-        return this.vp().get();
+        return this.vp().
+        get()
+        ;
       }
       
       public Do stop() {
-        return this.mr().stop();
+        return this.mr().
+        stop()
+        ;
       }
       
       private MapReferences.CalleeKeyPort.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.CalleeKeyPort.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl.this.vp().toCall();
+          return MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl.this.vp().
+          toCall()
+          ;
         }
         
         public final Pull<K> key() {
-          return MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl.this.bridge.key();
+          return MapRefValuePublisher.PublisherPushKeyPort.ComponentImpl.this.bridge.
+          key()
+          ;
         }
       }
       
@@ -933,14 +996,12 @@ public abstract class MapRefValuePublisher<T, K> {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
-        
       }
       
       private void init_vp() {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
@@ -948,8 +1009,17 @@ public abstract class MapRefValuePublisher<T, K> {
         init_vp();
       }
       
+      protected void init_get() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_get();
+        init_stop();
       }
       
       public ComponentImpl(final MapRefValuePublisher.PublisherPullKeyPort<T, K> implem, final MapRefValuePublisher.PublisherPullKeyPort.Requires<T, K> b, final boolean doInits) {
@@ -969,22 +1039,30 @@ public abstract class MapRefValuePublisher<T, K> {
       }
       
       public Pull<T> get() {
-        return this.vp().get();
+        return this.vp().
+        get()
+        ;
       }
       
       public Do stop() {
-        return this.mr().stop();
+        return this.mr().
+        stop()
+        ;
       }
       
       private MapReferences.CalleeKeyPort.Component<Pull<T>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.CalleeKeyPort.Requires<Pull<T>, K> {
         public final Pull<T> toCall() {
-          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.vp().toCall();
+          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.vp().
+          toCall()
+          ;
         }
         
         public final Pull<K> key() {
-          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.bridge.key();
+          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.bridge.
+          key()
+          ;
         }
       }
       
@@ -996,7 +1074,9 @@ public abstract class MapRefValuePublisher<T, K> {
       
       private final class BridgeImpl_vp_vp implements ValuePublisher.PublisherPull.Requires<T, K> {
         public final Pull<T> getValue() {
-          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.bridge.getValue();
+          return MapRefValuePublisher.PublisherPullKeyPort.ComponentImpl.this.bridge.
+          getValue()
+          ;
         }
       }
       
@@ -1158,15 +1238,18 @@ public abstract class MapRefValuePublisher<T, K> {
         assert this.vp == null: "This is a bug.";
         assert this.implementation.use_vp != null: "This is a bug.";
         this.vp = this.implementation.use_vp._newComponent(new BridgeImpl_vp_vp(), false);
-        
       }
       
       protected void initParts() {
         init_vp();
       }
       
+      protected void init_observe() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_observe();
       }
       
       public ComponentImpl(final MapRefValuePublisher.Observer<T, K> implem, final MapRefValuePublisher.Observer.Requires<T, K> b, final boolean doInits) {
@@ -1186,7 +1269,9 @@ public abstract class MapRefValuePublisher<T, K> {
       }
       
       public ReliableObserve<T, K> observe() {
-        return this.vp().observe();
+        return this.vp().
+        observe()
+        ;
       }
       
       private ValuePublisher.Observer.Component<T, K> vp;

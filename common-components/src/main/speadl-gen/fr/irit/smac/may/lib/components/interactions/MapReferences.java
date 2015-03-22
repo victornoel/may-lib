@@ -37,11 +37,11 @@ public abstract class MapReferences<I, K> {
       
     }
     
-    private void init_call() {
+    protected void init_call() {
       assert this.call == null: "This is a bug.";
       this.call = this.implementation.make_call();
       if (this.call == null) {
-      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences<I, K> should not return null.");
+      	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences<I, K> shall not return null.");
       }
     }
     
@@ -115,19 +115,19 @@ public abstract class MapReferences<I, K> {
         
       }
       
-      private void init_me() {
+      protected void init_me() {
         assert this.me == null: "This is a bug.";
         this.me = this.implementation.make_me();
         if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee<I, K> should not return null.");
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee<I, K> shall not return null.");
         }
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee<I, K> should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$Callee<I, K> shall not return null.");
         }
       }
       
@@ -337,19 +337,19 @@ public abstract class MapReferences<I, K> {
         
       }
       
-      private void init_me() {
+      protected void init_me() {
         assert this.me == null: "This is a bug.";
         this.me = this.implementation.make_me();
         if (this.me == null) {
-        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort<I, K> should not return null.");
+        	throw new RuntimeException("make_me() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort<I, K> shall not return null.");
         }
       }
       
-      private void init_stop() {
+      protected void init_stop() {
         assert this.stop == null: "This is a bug.";
         this.stop = this.implementation.make_stop();
         if (this.stop == null) {
-        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort<I, K> should not return null.");
+        	throw new RuntimeException("make_stop() in fr.irit.smac.may.lib.components.interactions.MapReferences$CalleeKeyPort<I, K> shall not return null.");
         }
       }
       
@@ -542,11 +542,11 @@ public abstract class MapReferences<I, K> {
         
       }
       
-      private void init_call() {
+      protected void init_call() {
         assert this.call == null: "This is a bug.";
         this.call = this.implementation.make_call();
         if (this.call == null) {
-        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences$Caller<I, K> should not return null.");
+        	throw new RuntimeException("make_call() in fr.irit.smac.may.lib.components.interactions.MapReferences$Caller<I, K> shall not return null.");
         }
       }
       

@@ -33,11 +33,11 @@ public abstract class Void<I> {
       
     }
     
-    private void init_port() {
+    protected void init_port() {
       assert this.port == null: "This is a bug.";
       this.port = this.implementation.make_port();
       if (this.port == null) {
-      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Void<I> should not return null.");
+      	throw new RuntimeException("make_port() in fr.irit.smac.may.lib.components.meta.Void<I> shall not return null.");
       }
     }
     

@@ -72,19 +72,19 @@ public abstract class IvyBroadcaster<T> {
       
     }
     
-    private void init_ivyReceive() {
+    protected void init_ivyReceive() {
       assert this.ivyReceive == null: "This is a bug.";
       this.ivyReceive = this.implementation.make_ivyReceive();
       if (this.ivyReceive == null) {
-      	throw new RuntimeException("make_ivyReceive() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster<T> should not return null.");
+      	throw new RuntimeException("make_ivyReceive() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster<T> shall not return null.");
       }
     }
     
-    private void init_send() {
+    protected void init_send() {
       assert this.send == null: "This is a bug.";
       this.send = this.implementation.make_send();
       if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster<T> should not return null.");
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.distribution.IvyBroadcaster<T> shall not return null.");
       }
     }
     

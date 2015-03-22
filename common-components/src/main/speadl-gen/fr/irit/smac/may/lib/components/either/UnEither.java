@@ -47,11 +47,11 @@ public abstract class UnEither<L, R> {
       
     }
     
-    private void init_in() {
+    protected void init_in() {
       assert this.in == null: "This is a bug.";
       this.in = this.implementation.make_in();
       if (this.in == null) {
-      	throw new RuntimeException("make_in() in fr.irit.smac.may.lib.components.either.UnEither<L, R> should not return null.");
+      	throw new RuntimeException("make_in() in fr.irit.smac.may.lib.components.either.UnEither<L, R> shall not return null.");
       }
     }
     

@@ -62,7 +62,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("make_mr() in fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver<M, K> should not return null.");
       }
       this.mr = this.implem_mr._newComponent(new BridgeImpl_mr(), false);
-      
     }
     
     private void init_ar() {
@@ -73,7 +72,6 @@ public abstract class MapRefAsyncReceiver<M, K> {
       	throw new RuntimeException("make_ar() in fr.irit.smac.may.lib.components.interactions.MapRefAsyncReceiver<M, K> should not return null.");
       }
       this.ar = this.implem_ar._newComponent(new BridgeImpl_ar(), false);
-      
     }
     
     protected void initParts() {
@@ -81,8 +79,12 @@ public abstract class MapRefAsyncReceiver<M, K> {
       init_ar();
     }
     
+    protected void init_send() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
-      
+      init_send();
     }
     
     public ComponentImpl(final MapRefAsyncReceiver<M, K> implem, final MapRefAsyncReceiver.Requires<M, K> b, final boolean doInits) {
@@ -102,7 +104,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
     }
     
     public ReliableSend<M, K> send() {
-      return this.ar().send();
+      return this.ar().
+      send()
+      ;
     }
     
     private MapReferences.Component<Push<M>, K> mr;
@@ -122,7 +126,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
     
     private final class BridgeImpl_ar implements AsyncReceiver.Requires<M, K> {
       public final Call<Push<M>, K> call() {
-        return MapRefAsyncReceiver.ComponentImpl.this.mr().call();
+        return MapRefAsyncReceiver.ComponentImpl.this.mr().
+        call()
+        ;
       }
     }
     
@@ -191,14 +197,12 @@ public abstract class MapRefAsyncReceiver<M, K> {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
-        
       }
       
       private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
-        
       }
       
       protected void initParts() {
@@ -206,8 +210,17 @@ public abstract class MapRefAsyncReceiver<M, K> {
         init_ar();
       }
       
+      protected void init_me() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_me();
+        init_stop();
       }
       
       public ComponentImpl(final MapRefAsyncReceiver.Receiver<M, K> implem, final MapRefAsyncReceiver.Receiver.Requires<M, K> b, final boolean doInits) {
@@ -227,18 +240,24 @@ public abstract class MapRefAsyncReceiver<M, K> {
       }
       
       public Pull<K> me() {
-        return this.mr().me();
+        return this.mr().
+        me()
+        ;
       }
       
       public Do stop() {
-        return this.mr().stop();
+        return this.mr().
+        stop()
+        ;
       }
       
       private MapReferences.Callee.Component<Push<M>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.Callee.Requires<Push<M>, K> {
         public final Push<M> toCall() {
-          return MapRefAsyncReceiver.Receiver.ComponentImpl.this.ar().toCall();
+          return MapRefAsyncReceiver.Receiver.ComponentImpl.this.ar().
+          toCall()
+          ;
         }
       }
       
@@ -250,7 +269,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
       
       private final class BridgeImpl_ar_ar implements AsyncReceiver.Receiver.Requires<M, K> {
         public final Push<M> put() {
-          return MapRefAsyncReceiver.Receiver.ComponentImpl.this.bridge.put();
+          return MapRefAsyncReceiver.Receiver.ComponentImpl.this.bridge.
+          put()
+          ;
         }
       }
       
@@ -438,14 +459,12 @@ public abstract class MapRefAsyncReceiver<M, K> {
         assert this.mr == null: "This is a bug.";
         assert this.implementation.use_mr != null: "This is a bug.";
         this.mr = this.implementation.use_mr._newComponent(new BridgeImpl_mr_mr(), false);
-        
       }
       
       private void init_ar() {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
-        
       }
       
       protected void initParts() {
@@ -453,8 +472,17 @@ public abstract class MapRefAsyncReceiver<M, K> {
         init_ar();
       }
       
+      protected void init_me() {
+        // nothing to do here
+      }
+      
+      protected void init_stop() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_me();
+        init_stop();
       }
       
       public ComponentImpl(final MapRefAsyncReceiver.ReceiverKeyPort<M, K> implem, final MapRefAsyncReceiver.ReceiverKeyPort.Requires<M, K> b, final boolean doInits) {
@@ -474,22 +502,30 @@ public abstract class MapRefAsyncReceiver<M, K> {
       }
       
       public Pull<K> me() {
-        return this.mr().me();
+        return this.mr().
+        me()
+        ;
       }
       
       public Do stop() {
-        return this.mr().stop();
+        return this.mr().
+        stop()
+        ;
       }
       
       private MapReferences.CalleeKeyPort.Component<Push<M>, K> mr;
       
       private final class BridgeImpl_mr_mr implements MapReferences.CalleeKeyPort.Requires<Push<M>, K> {
         public final Pull<K> key() {
-          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.bridge.key();
+          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.bridge.
+          key()
+          ;
         }
         
         public final Push<M> toCall() {
-          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.ar().toCall();
+          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.ar().
+          toCall()
+          ;
         }
       }
       
@@ -501,7 +537,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
       
       private final class BridgeImpl_ar_ar implements AsyncReceiver.Receiver.Requires<M, K> {
         public final Push<M> put() {
-          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.bridge.put();
+          return MapRefAsyncReceiver.ReceiverKeyPort.ComponentImpl.this.bridge.
+          put()
+          ;
         }
       }
       
@@ -663,15 +701,18 @@ public abstract class MapRefAsyncReceiver<M, K> {
         assert this.ar == null: "This is a bug.";
         assert this.implementation.use_ar != null: "This is a bug.";
         this.ar = this.implementation.use_ar._newComponent(new BridgeImpl_ar_ar(), false);
-        
       }
       
       protected void initParts() {
         init_ar();
       }
       
+      protected void init_send() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_send();
       }
       
       public ComponentImpl(final MapRefAsyncReceiver.Sender<M, K> implem, final MapRefAsyncReceiver.Sender.Requires<M, K> b, final boolean doInits) {
@@ -691,7 +732,9 @@ public abstract class MapRefAsyncReceiver<M, K> {
       }
       
       public ReliableSend<M, K> send() {
-        return this.ar().send();
+        return this.ar().
+        send()
+        ;
       }
       
       private AsyncReceiver.Sender.Component<M, K> ar;

@@ -104,7 +104,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       	throw new RuntimeException("make_dispatcher() in fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent<Msg, Ref> should not return null.");
       }
       this.dispatcher = this.implem_dispatcher._newComponent(new BridgeImpl_dispatcher(), false);
-      
     }
     
     private void init_beh() {
@@ -115,7 +114,6 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       	throw new RuntimeException("make_beh() in fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent<Msg, Ref> should not return null.");
       }
       this.beh = this.implem_beh._newComponent(new BridgeImpl_beh(), false);
-      
     }
     
     protected void initParts() {
@@ -123,15 +121,20 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
       init_beh();
     }
     
-    private void init_die() {
+    protected void init_put() {
+      // nothing to do here
+    }
+    
+    protected void init_die() {
       assert this.die == null: "This is a bug.";
       this.die = this.implementation.make_die();
       if (this.die == null) {
-      	throw new RuntimeException("make_die() in fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent<Msg, Ref> should not return null.");
+      	throw new RuntimeException("make_die() in fr.irit.smac.may.lib.classic.remote.RemoteClassicAgentComponent<Msg, Ref> shall not return null.");
       }
     }
     
     protected void initProvidedPorts() {
+      init_put();
       init_die();
     }
     
@@ -152,7 +155,9 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
     }
     
     public Push<Msg> put() {
-      return this.dispatcher().dispatch();
+      return this.dispatcher().
+      dispatch()
+      ;
     }
     
     private Do die;
@@ -167,11 +172,15 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
     
     private final class BridgeImpl_dispatcher implements SequentialDispatcher.Requires<Msg> {
       public final Executor executor() {
-        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.executor();
+        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.
+        executor()
+        ;
       }
       
       public final Push<Msg> handler() {
-        return RemoteClassicAgentComponent.ComponentImpl.this.beh().cycle();
+        return RemoteClassicAgentComponent.ComponentImpl.this.beh().
+        cycle()
+        ;
       }
     }
     
@@ -185,19 +194,26 @@ public abstract class RemoteClassicAgentComponent<Msg, Ref> {
     
     private final class BridgeImpl_beh implements RemoteClassicBehaviour.Requires<Msg, Ref> {
       public final Send<Msg, Ref> send() {
-        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.send();
+        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.
+        send()
+        ;
       }
       
       public final Pull<Ref> me() {
-        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.me();
+        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.
+        me()
+        ;
       }
       
       public final Do die() {
-        return RemoteClassicAgentComponent.ComponentImpl.this.die();
+        return RemoteClassicAgentComponent.ComponentImpl.this.die()
+        ;
       }
       
       public final CreateRemoteClassic<Msg, Ref> create() {
-        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.create();
+        return RemoteClassicAgentComponent.ComponentImpl.this.bridge.
+        create()
+        ;
       }
     }
     

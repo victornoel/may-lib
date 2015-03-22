@@ -42,11 +42,11 @@ public abstract class AsyncReceiver<M, K> {
       
     }
     
-    private void init_send() {
+    protected void init_send() {
       assert this.send == null: "This is a bug.";
       this.send = this.implementation.make_send();
       if (this.send == null) {
-      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver<M, K> should not return null.");
+      	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver<M, K> shall not return null.");
       }
     }
     
@@ -114,8 +114,12 @@ public abstract class AsyncReceiver<M, K> {
         
       }
       
+      protected void init_toCall() {
+        // nothing to do here
+      }
+      
       protected void initProvidedPorts() {
-        
+        init_toCall();
       }
       
       public ComponentImpl(final AsyncReceiver.Receiver<M, K> implem, final AsyncReceiver.Receiver.Requires<M, K> b, final boolean doInits) {
@@ -135,7 +139,9 @@ public abstract class AsyncReceiver<M, K> {
       }
       
       public Push<M> toCall() {
-        return this.bridge.put();
+        return this.bridge.
+        put()
+        ;
       }
     }
     
@@ -280,11 +286,11 @@ public abstract class AsyncReceiver<M, K> {
         
       }
       
-      private void init_send() {
+      protected void init_send() {
         assert this.send == null: "This is a bug.";
         this.send = this.implementation.make_send();
         if (this.send == null) {
-        	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver$Sender<M, K> should not return null.");
+        	throw new RuntimeException("make_send() in fr.irit.smac.may.lib.components.interactions.AsyncReceiver$Sender<M, K> shall not return null.");
         }
       }
       

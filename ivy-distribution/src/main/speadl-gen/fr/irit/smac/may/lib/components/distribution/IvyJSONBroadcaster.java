@@ -93,7 +93,6 @@ public abstract class IvyJSONBroadcaster<T> {
       	throw new RuntimeException("make_ivy() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.ivy = this.implem_ivy._newComponent(new BridgeImpl_ivy(), false);
-      
     }
     
     private void init_json() {
@@ -104,7 +103,6 @@ public abstract class IvyJSONBroadcaster<T> {
       	throw new RuntimeException("make_json() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.json = this.implem_json._newComponent(new BridgeImpl_json(), false);
-      
     }
     
     private void init_binder() {
@@ -115,7 +113,6 @@ public abstract class IvyJSONBroadcaster<T> {
       	throw new RuntimeException("make_binder() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.binder = this.implem_binder._newComponent(new BridgeImpl_binder(), false);
-      
     }
     
     private void init_bc() {
@@ -126,7 +123,6 @@ public abstract class IvyJSONBroadcaster<T> {
       	throw new RuntimeException("make_bc() in fr.irit.smac.may.lib.components.distribution.IvyJSONBroadcaster<T> should not return null.");
       }
       this.bc = this.implem_bc._newComponent(new BridgeImpl_bc(), false);
-      
     }
     
     protected void initParts() {
@@ -136,8 +132,12 @@ public abstract class IvyJSONBroadcaster<T> {
       init_bc();
     }
     
+    protected void init_send() {
+      // nothing to do here
+    }
+    
     protected void initProvidedPorts() {
-      
+      init_send();
     }
     
     public ComponentImpl(final IvyJSONBroadcaster<T> implem, final IvyJSONBroadcaster.Requires<T> b, final boolean doInits) {
@@ -157,7 +157,9 @@ public abstract class IvyJSONBroadcaster<T> {
     }
     
     public Push<T> send() {
-      return this.bc().send();
+      return this.bc().
+      send()
+      ;
     }
     
     private IvyBus.Component ivy;
@@ -166,7 +168,9 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private final class BridgeImpl_ivy implements IvyBus.Requires {
       public final Executor exec() {
-        return IvyJSONBroadcaster.ComponentImpl.this.bridge.exec();
+        return IvyJSONBroadcaster.ComponentImpl.this.bridge.
+        exec()
+        ;
       }
     }
     
@@ -191,15 +195,21 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private final class BridgeImpl_binder implements IvyBinder.Requires {
       public final Bind bindMsg() {
-        return IvyJSONBroadcaster.ComponentImpl.this.ivy().bindMsg();
+        return IvyJSONBroadcaster.ComponentImpl.this.ivy().
+        bindMsg()
+        ;
       }
       
       public final Push<List<String>> receive() {
-        return IvyJSONBroadcaster.ComponentImpl.this.bc().ivyReceive();
+        return IvyJSONBroadcaster.ComponentImpl.this.bc().
+        ivyReceive()
+        ;
       }
       
       public final Push<Integer> unBindMsg() {
-        return IvyJSONBroadcaster.ComponentImpl.this.ivy().unBindMsg();
+        return IvyJSONBroadcaster.ComponentImpl.this.ivy().
+        unBindMsg()
+        ;
       }
     }
     
@@ -213,23 +223,33 @@ public abstract class IvyJSONBroadcaster<T> {
     
     private final class BridgeImpl_bc implements IvyBroadcaster.Requires<T> {
       public final Transform<String, T> deserializer() {
-        return IvyJSONBroadcaster.ComponentImpl.this.json().deserializer();
+        return IvyJSONBroadcaster.ComponentImpl.this.json().
+        deserializer()
+        ;
       }
       
       public final Transform<T, String> serializer() {
-        return IvyJSONBroadcaster.ComponentImpl.this.json().serializer();
+        return IvyJSONBroadcaster.ComponentImpl.this.json().
+        serializer()
+        ;
       }
       
       public final Push<T> handle() {
-        return IvyJSONBroadcaster.ComponentImpl.this.bridge.handle();
+        return IvyJSONBroadcaster.ComponentImpl.this.bridge.
+        handle()
+        ;
       }
       
       public final Push<String> ivyBindMsg() {
-        return IvyJSONBroadcaster.ComponentImpl.this.binder().reBindMsg();
+        return IvyJSONBroadcaster.ComponentImpl.this.binder().
+        reBindMsg()
+        ;
       }
       
       public final Push<String> ivySend() {
-        return IvyJSONBroadcaster.ComponentImpl.this.ivy().send();
+        return IvyJSONBroadcaster.ComponentImpl.this.ivy().
+        send()
+        ;
       }
     }
     

@@ -49,27 +49,27 @@ public abstract class Queue<Truc> {
       
     }
     
-    private void init_put() {
+    protected void init_put() {
       assert this.put == null: "This is a bug.";
       this.put = this.implementation.make_put();
       if (this.put == null) {
-      	throw new RuntimeException("make_put() in fr.irit.smac.may.lib.components.collections.Queue<Truc> should not return null.");
+      	throw new RuntimeException("make_put() in fr.irit.smac.may.lib.components.collections.Queue<Truc> shall not return null.");
       }
     }
     
-    private void init_get() {
+    protected void init_get() {
       assert this.get == null: "This is a bug.";
       this.get = this.implementation.make_get();
       if (this.get == null) {
-      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.collections.Queue<Truc> should not return null.");
+      	throw new RuntimeException("make_get() in fr.irit.smac.may.lib.components.collections.Queue<Truc> shall not return null.");
       }
     }
     
-    private void init_getAll() {
+    protected void init_getAll() {
       assert this.getAll == null: "This is a bug.";
       this.getAll = this.implementation.make_getAll();
       if (this.getAll == null) {
-      	throw new RuntimeException("make_getAll() in fr.irit.smac.may.lib.components.collections.Queue<Truc> should not return null.");
+      	throw new RuntimeException("make_getAll() in fr.irit.smac.may.lib.components.collections.Queue<Truc> shall not return null.");
       }
     }
     

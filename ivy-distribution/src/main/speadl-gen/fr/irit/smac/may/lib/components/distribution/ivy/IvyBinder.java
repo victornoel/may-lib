@@ -54,11 +54,11 @@ public abstract class IvyBinder {
       
     }
     
-    private void init_reBindMsg() {
+    protected void init_reBindMsg() {
       assert this.reBindMsg == null: "This is a bug.";
       this.reBindMsg = this.implementation.make_reBindMsg();
       if (this.reBindMsg == null) {
-      	throw new RuntimeException("make_reBindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder should not return null.");
+      	throw new RuntimeException("make_reBindMsg() in fr.irit.smac.may.lib.components.distribution.ivy.IvyBinder shall not return null.");
       }
     }
     

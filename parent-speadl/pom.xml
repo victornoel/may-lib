@@ -18,8 +18,8 @@
 	<description>Parent pom for the official MAY library that generates code with SpeADL</description>
 
 	<properties>
-		<xtext-version>2.7.2</xtext-version>
-		<may-version>3.4.1</may-version>
+		<xtext-version>2.7.3</xtext-version>
+		<may-version>3.5.0</may-version>
 	</properties>
 
 	<build>
