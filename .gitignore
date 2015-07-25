@@ -1,0 +1,6 @@
+/*/target/
+*._trace
+/*/pom.xml.versionsBackup
+.classpath
+.project
+.settings/
