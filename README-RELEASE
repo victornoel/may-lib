@@ -1,3 +1,7 @@
 Release procedure:
 
-See https://wwwsecu.irit.fr/redmine/projects/may/wiki/MAY_Lib_Release_Process
+To release a new version of the MAY components, follow the instructions in the README of https://github.com/victornoel/smac-poms for a Tycho build.
+
+Important point:
+- follow the maven build type
+- the parent is in the parent folder, not at the root
