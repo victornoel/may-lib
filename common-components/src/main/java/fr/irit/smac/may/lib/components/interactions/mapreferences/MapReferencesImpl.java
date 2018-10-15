@@ -17,8 +17,9 @@ public class MapReferencesImpl<I, K> extends MapReferences<I, K> {
 	protected Call<I, K> make_call() {
 		return new Call<I, K>() {
 			public I call(K ref) throws RefDoesNotExistsException {
-				if (!interfaces.containsKey(ref)) throw new RefDoesNotExistsException();
-				else return interfaces.get(ref).getIf();
+				Agent<I> agent = interfaces.get(ref);
+				if (agent == null) throw new RefDoesNotExistsException();
+				else return agent.getIf();
 			};
 		};
 	}
