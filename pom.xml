@@ -6,7 +6,7 @@
 
 	<groupId>fr.irit.smac.lib.may</groupId>
 	<artifactId>aggregator</artifactId>
-	<version>3.6.0</version>
+	<version>3.6.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<modules>
