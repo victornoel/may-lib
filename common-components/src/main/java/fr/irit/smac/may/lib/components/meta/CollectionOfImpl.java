@@ -32,11 +32,7 @@ public class CollectionOfImpl<I> extends CollectionOf<I> {
 			
 			@Override
 			protected Do make_stop() {
-				return new Do() {
-					public void doIt() {
-						interfaces.remove(this);
-					}
-				};
+				return () -> interfaces.remove(this);
 			}
 		};
 	}
