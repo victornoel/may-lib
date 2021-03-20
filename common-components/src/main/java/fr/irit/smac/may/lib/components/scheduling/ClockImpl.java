@@ -2,7 +2,6 @@ package fr.irit.smac.may.lib.components.scheduling;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import fr.irit.smac.may.lib.components.scheduling.Clock;
 import fr.irit.smac.may.lib.components.scheduling.interfaces.SchedulingControl;
 
 public class ClockImpl extends Clock {

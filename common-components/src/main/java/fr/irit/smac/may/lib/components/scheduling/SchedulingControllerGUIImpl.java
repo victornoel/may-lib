@@ -82,9 +82,9 @@ public class SchedulingControllerGUIImpl extends SchedulingControllerGUI {
 				super(SwingConstants.HORIZONTAL, 1, 3, 1);
 
 				Dictionary<Integer, JLabel> labelTable = new Hashtable<Integer, JLabel>();
-				labelTable.put(new Integer(1), new JLabel("Pause"));
-				labelTable.put(new Integer(2), new JLabel("Slow (" + ms +"msec)"));
-				labelTable.put(new Integer(3), new JLabel("Fast "));
+				labelTable.put(1, new JLabel("Pause"));
+				labelTable.put(2, new JLabel("Slow (" + ms +"msec)"));
+				labelTable.put(3, new JLabel("Fast "));
 
 				setLabelTable(labelTable);
 				setMinorTickSpacing(1);

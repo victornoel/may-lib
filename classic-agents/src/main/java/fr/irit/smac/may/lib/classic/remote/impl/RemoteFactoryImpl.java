@@ -65,6 +65,7 @@ public class RemoteFactoryImpl<Msg, Ref> extends RemoteFactory<Msg, Ref> {
 			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh) {
 				return requires().infraCreate().create(beh);
 			}
+			@SuppressWarnings("unchecked")
 			public Ref create(AbstractRemoteClassicBehaviour<Msg, Ref> beh, Place place) {
 				if (place.equals(RemoteFactoryImpl.this.requires().thisPlace().pull()))
 					return RemoteFactoryImpl.this.requires().infraCreate().create(beh);
