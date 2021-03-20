@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>parent-speadl</artifactId>
 		<groupId>fr.irit.smac.lib.may</groupId>
-		<version>3.6.1</version>
+		<version>3.6.2-SNAPSHOT</version>
 		<relativePath>../parent-speadl/pom.xml</relativePath>
 	</parent>
 
