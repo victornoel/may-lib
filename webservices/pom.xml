@@ -14,7 +14,7 @@
 	<description>Collection of component to communicate using Webservices</description>
 	
 	<properties>
-		<cxf-version>3.0.2</cxf-version>
+		<cxf-version>3.1.16</cxf-version>
 	</properties>
 
 	<dependencies>
